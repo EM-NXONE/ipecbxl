@@ -26,10 +26,10 @@ function Admissions() {
       <section className="py-20 lg:py-32 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Admissions</div>
-          <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
+          <h1 className="font-display md:text-7xl text-cream leading-[1] max-w-4xl text-balance text-5xl">
             Rejoignez la <em className="text-gradient-gold not-italic">prochaine</em> promotion.
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Les inscriptions sont ouvertes pour toutes les années de cursus.
             Notre équipe vous accompagne à chaque étape.
           </p>
