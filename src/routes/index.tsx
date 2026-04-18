@@ -235,9 +235,8 @@ function Home() {
           <h2 className="font-display text-4xl md:text-6xl text-cream leading-tight text-balance">
             Prêt·e à <em className="text-gradient-gold not-italic">commencer</em> ?
           </h2>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Les inscriptions pour la rentrée sont ouvertes. Notre équipe vous accompagne
-            à chaque étape.
+          <p className="mt-6 text-muted-foreground max-w-2xl mx-auto text-base">
+            Les inscriptions sont ouvertes. Notre équipe vous accompagne à chaque étape.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-gold text-ink font-medium shadow-gold hover:opacity-90 transition-opacity">
