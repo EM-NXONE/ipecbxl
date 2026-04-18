@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import logoIpec from "@/assets/logo-ipec.svg";
+import { LogoIpec } from "./LogoIpec";
 
 const links = [
   { to: "/", label: "Accueil" },
@@ -19,7 +19,7 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/40">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <img src={logoIpec} alt="Logo IPEC" className="w-10 h-10 shrink-0" width={40} height={40} />
+          <LogoIpec size={40} className="text-gold shrink-0" />
           <div className="leading-tight">
             <div className="font-display text-xl text-cream tracking-tight">IPEC</div>
             <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES</div>
