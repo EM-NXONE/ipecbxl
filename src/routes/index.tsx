@@ -38,7 +38,7 @@ function Home() {
           </h1>
 
           <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-up">
-            L'<span className="text-cream font-normal">Institut Privé des Études Commerciales</span> forme
+            L'Institut Privé des Études Commerciales forme
             une nouvelle génération de professionnels du business, à Bruxelles,
             capitale politique et économique de l'Europe.
           </p>
