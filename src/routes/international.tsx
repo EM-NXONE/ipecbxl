@@ -43,7 +43,7 @@ function International() {
           <div className="p-10 rounded-sm border border-border/60 bg-card/50">
             <Plane className="text-gold mb-6" size={32} strokeWidth={1.5} />
             <h2 className="font-display text-3xl text-cream mb-4">Demande de visa</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-base">
               Si votre nationalité requiert un visa pour étudier en Belgique, votre
               inscription à l'IPEC est tout à fait possible. Notre équipe vous remet
               les documents nécessaires (attestation d'inscription, pré-inscription,
@@ -53,7 +53,7 @@ function International() {
           <div className="p-10 rounded-sm border border-border/60 bg-card/50">
             <FileCheck className="text-gold mb-6" size={32} strokeWidth={1.5} />
             <h2 className="font-display text-3xl text-cream mb-4">Accompagnement</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed text-base">
               Nous vous guidons à chaque étape : constitution du dossier, traduction
               et légalisation des diplômes, conseils sur le logement à Bruxelles,
               démarches administratives à votre arrivée.
