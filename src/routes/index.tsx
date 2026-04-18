@@ -32,11 +32,6 @@ function Home() {
         </div>
 
         <div className="mx-auto max-w-7xl px-6 lg:px-10 pt-20 pb-32 lg:pt-32 lg:pb-48">
-          <div className="flex items-center gap-2 text-gold mb-8 animate-fade-up">
-            <Sparkles size={16} />
-            <span className="text-xs uppercase tracking-[0.3em]">Promotion 2025 — 2026</span>
-          </div>
-
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-cream leading-[0.95] max-w-5xl text-balance animate-fade-up">
             Apprendre à <em className="text-gradient-gold not-italic">décider</em>,
             au cœur de l'Europe.
