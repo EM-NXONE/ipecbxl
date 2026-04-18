@@ -69,6 +69,19 @@ function Contact() {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-xs uppercase tracking-widest text-gold mb-3">Spécialisation souhaitée</label>
+                  <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-gold focus:outline-none transition-colors">
+                    <option>Management</option>
+                    <option>Marketing</option>
+                    <option>Relations Internationales</option>
+                    <option>Économie & Finance</option>
+                    <option>Je ne sais pas encore</option>
+                  </select>
+                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                    Pour le PAA, ce choix est indicatif et non définitif : la spécialisation se précise progressivement au fil du cursus.
+                  </p>
+                </div>
+                <div>
                   <label className="block text-xs uppercase tracking-widest text-gold mb-3">Message</label>
                   <textarea required rows={6} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-gold focus:outline-none transition-colors resize-none" />
                 </div>
