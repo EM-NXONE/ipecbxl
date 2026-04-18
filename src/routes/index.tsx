@@ -110,9 +110,6 @@ function Home() {
                 Choisissez votre voie, <em className="text-gradient-gold not-italic">à votre rythme</em>.
               </h2>
             </div>
-            <Link to="/programmes" className="text-gold hover:underline inline-flex items-center gap-2 text-sm">
-              Voir tous les programmes <ArrowRight size={16} />
-            </Link>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
