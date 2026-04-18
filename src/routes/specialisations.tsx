@@ -50,12 +50,12 @@ function Specs() {
       <section className="py-20 lg:py-32 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Spécialisations</div>
-          <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
+          <h1 className="font-display md:text-7xl text-cream leading-[1] max-w-4xl text-balance text-5xl">
             Quatre voies pour <em className="text-gradient-gold not-italic">tracer</em> la vôtre.
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Chaque spécialisation s'appuie sur le tronc commun de votre cursus.
-            Vous choisissez quand vous êtes prêt·e — pas quand on vous y oblige.
+            Vous choisissez quand vous êtes prêt·e, pas quand on vous y oblige.
           </p>
         </div>
       </section>
@@ -72,7 +72,7 @@ function Specs() {
                 <h2 className="font-display text-4xl md:text-5xl text-cream mb-4 group-hover:text-gradient-gold transition-colors">
                   {s.t}
                 </h2>
-                <p className="text-muted-foreground leading-relaxed text-lg">{s.desc}</p>
+                <p className="text-muted-foreground leading-relaxed text-base">{s.desc}</p>
               </div>
               <div className="lg:col-span-5 lg:col-start-8">
                 <div className="text-xs uppercase tracking-widest text-gold mb-6">— Compétences clés</div>
