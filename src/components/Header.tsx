@@ -23,7 +23,7 @@ export function Header() {
           </div>
           <div className="leading-tight">
             <div className="font-display text-xl text-cream tracking-tight">IPEC</div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Bruxelles</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES</div>
           </div>
         </Link>
 
