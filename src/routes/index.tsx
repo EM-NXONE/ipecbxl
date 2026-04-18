@@ -107,7 +107,7 @@ function Home() {
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-gold mb-4">— Nos cursus</div>
               <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl text-balance">
-                Deux programmes, une exigence.
+                Choisissez votre voie, <em className="text-gradient-gold not-italic">à votre rythme</em>.
               </h2>
             </div>
             <Link to="/programmes" className="text-gold hover:underline inline-flex items-center gap-2 text-sm">
