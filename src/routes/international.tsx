@@ -28,10 +28,10 @@ function International() {
             <Globe2 size={16} />
             <span className="text-xs uppercase tracking-[0.3em]">International</span>
           </div>
-          <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
+          <h1 className="font-display md:text-7xl text-cream leading-[1] max-w-4xl text-balance text-5xl">
             Étudier à Bruxelles, <em className="text-gradient-gold not-italic">depuis le monde entier</em>.
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             L'IPEC accueille avec joie les étudiants venus de l'étranger.
             Quel que soit votre pays d'origine, votre candidature est la bienvenue.
           </p>
