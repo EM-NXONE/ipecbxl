@@ -123,7 +123,7 @@ function Home() {
                 level: "BAC+1 à BAC+3",
                 duration: "3 années",
                 price: "5 900 €",
-                desc: "Le socle complet pour comprendre l'entreprise et le monde des affaires. Tronc commun généreux, spécialisation progressive.",
+                desc: "Le socle complet pour comprendre l'entreprise et le monde des affaires. Tronc commun et spécialisation progressive.",
                 icon: GraduationCap,
               },
               {
@@ -149,7 +149,7 @@ function Home() {
                   </div>
                   <h3 className="font-display text-2xl text-cream mb-2">{p.title}</h3>
                   <div className="text-sm text-gold mb-6">{p.level} · {p.duration}</div>
-                  <p className="text-muted-foreground leading-relaxed mb-8">{p.desc}</p>
+                  <p className="text-muted-foreground leading-relaxed mb-8 text-base">{p.desc}</p>
                   <div className="flex items-center justify-between pt-6 border-t border-border/40">
                     <div>
                       <div className="text-xs uppercase tracking-widest text-muted-foreground">À partir de</div>
