@@ -51,7 +51,7 @@ function Programmes() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Nos programmes</div>
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
-            Un parcours en <em className="text-gradient-gold not-italic">cinq temps</em>.
+            Du fondamental à <em className="text-gradient-gold not-italic">l'expertise</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Notre cursus se déploie sur cinq années, de l'initiation aux fondamentaux
