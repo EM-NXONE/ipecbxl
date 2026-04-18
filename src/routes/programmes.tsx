@@ -54,7 +54,7 @@ function Programmes() {
             Du fondamental à <em className="text-gradient-gold not-italic">l'expertise</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
-            Notre cursus se déploie sur cinq années, de l'initiation aux fondamentaux
+            Notre cursus complet se déploie sur cinq années, de l'initiation aux fondamentaux
             jusqu'à l'expertise avancée. Choisissez votre voie à votre rythme.
           </p>
         </div>
