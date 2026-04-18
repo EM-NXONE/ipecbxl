@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LogoIpec } from "@/components/LogoIpec";
 
 export function Footer() {
   return (
@@ -6,9 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-sm bg-gradient-gold flex items-center justify-center">
-              <span className="font-display text-ink font-bold text-lg">I</span>
-            </div>
+            <LogoIpec size={40} className="text-gold shrink-0" />
             <div>
               <div className="font-display text-xl text-cream">IPEC</div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
