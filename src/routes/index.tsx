@@ -33,8 +33,7 @@ function Home() {
 
         <div className="mx-auto max-w-7xl px-6 lg:px-10 pt-20 pb-32 lg:pt-32 lg:pb-48">
           <h1 className="font-display md:text-7xl lg:text-8xl text-cream leading-[0.95] max-w-5xl text-balance animate-fade-up text-5xl">
-            Apprendre à <em className="text-gradient-gold not-italic">décider</em>,
-            au cœur de l'Europe.
+            Penser, entreprendre, <em className="text-gradient-gold not-italic">diriger</em>.
           </h1>
 
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed animate-fade-up text-base">
