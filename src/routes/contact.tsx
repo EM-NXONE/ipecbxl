@@ -25,7 +25,7 @@ function Contact() {
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
             Parlons de <em className="text-gradient-gold not-italic">votre projet</em>.
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Notre équipe est à votre écoute pour vous renseigner sur nos programmes,
             constituer votre dossier ou organiser une visite.
           </p>
