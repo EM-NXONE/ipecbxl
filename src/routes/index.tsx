@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       { title: "IPEC Bruxelles — École supérieure de commerce" },
       { name: "description", content: "L'IPEC forme la nouvelle génération de leaders en business, marketing, relations internationales, économie et finance, au cœur de Bruxelles." },
       { property: "og:title", content: "IPEC Bruxelles — Institut Privé des Études Commerciales" },
-      { property: "og:description", content: "Une école nouvelle génération au cœur de Bruxelles. Programmes PAA et PEA, spécialisation tardive, ouverture internationale." },
+      { property: "og:description", content: "Une école nouvelle génération au cœur de Bruxelles. Programmes PAA et PEA, spécialisation progressive, ouverture internationale." },
     ],
   }),
   component: Home,

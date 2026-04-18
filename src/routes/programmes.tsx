@@ -142,7 +142,7 @@ function Programmes() {
           <div>
             <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Notre approche</div>
             <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-              Tronc commun généreux, spécialisation tardive.
+              Tronc commun généreux, spécialisation progressive.
             </h2>
           </div>
           <ul className="space-y-5">
