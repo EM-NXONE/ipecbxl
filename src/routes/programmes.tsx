@@ -53,7 +53,7 @@ function Programmes() {
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
             Un parcours en <em className="text-gradient-gold not-italic">cinq temps</em>.
           </h1>
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-8 max-w-2xl text-base text-muted-foreground leading-relaxed">
             Notre cursus se déploie sur cinq années, de l'initiation aux fondamentaux
             jusqu'à l'expertise avancée. Choisissez votre voie à votre rythme.
           </p>
