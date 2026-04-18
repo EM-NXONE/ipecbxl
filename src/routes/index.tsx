@@ -150,11 +150,7 @@ function Home() {
                   <h3 className="font-display text-2xl text-cream mb-2">{p.title}</h3>
                   <div className="text-sm text-gold mb-6">{p.level} · {p.duration}</div>
                   <p className="text-muted-foreground leading-relaxed mb-8 text-base">{p.desc}</p>
-                  <div className="flex items-center justify-between pt-6 border-t border-border/40">
-                    <div>
-                      <div className="text-xs uppercase tracking-widest text-muted-foreground">À partir de</div>
-                      <div className="font-display text-2xl text-cream">{p.price}<span className="text-sm text-muted-foreground"> / an</span></div>
-                    </div>
+                  <div className="flex items-center justify-end pt-6 border-t border-border/40">
                     <ArrowRight className="text-gold group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
