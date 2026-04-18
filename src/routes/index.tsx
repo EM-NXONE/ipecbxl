@@ -37,7 +37,7 @@ function Home() {
             au cœur de l'Europe.
           </h1>
 
-          <p className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed animate-fade-up">
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed animate-fade-up text-base">
             L'Institut Privé des Études Commerciales forme
             une nouvelle génération de professionnels du business, à Bruxelles,
             capitale politique et économique de l'Europe.
@@ -86,12 +86,12 @@ function Home() {
             </h2>
           </div>
           <div className="lg:col-span-6 lg:col-start-7 space-y-6 text-muted-foreground leading-relaxed">
-            <p className="text-lg">
+            <p className="text-base">
               À l'IPEC, nous croyons qu'un parcours d'études doit garder ses portes ouvertes
               le plus longtemps possible. C'est pourquoi notre tronc commun est généreux :
               vous explorez avant de choisir.
             </p>
-            <p>
+            <p className="text-base">
               La spécialisation se fait <span className="text-cream">le plus tard possible</span>,
               quand vos goûts, vos forces et vos ambitions se sont vraiment révélés. Vous ne
               choisissez pas votre voie à 18 ans : vous la construisez.
