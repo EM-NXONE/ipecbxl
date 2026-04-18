@@ -36,6 +36,12 @@ export const Route = createRootRoute({
       { name: "author", content: "IPEC Bruxelles" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "IPEC — Institut Privé des Études Commerciales · Bruxelles" },
+      { name: "twitter:title", content: "IPEC — Institut Privé des Études Commerciales · Bruxelles" },
+      { property: "og:description", content: "École supérieure de commerce à Bruxelles. Programmes en administration des affaires et exécutif avancé. Management, Marketing, Relations Internationales, Économie & Finance." },
+      { name: "twitter:description", content: "École supérieure de commerce à Bruxelles. Programmes en administration des affaires et exécutif avancé. Management, Marketing, Relations Internationales, Économie & Finance." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e932aee-86c9-4425-a47f-13ef7c0151b8/id-preview-fd44bf7a--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app-1776547649654.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e932aee-86c9-4425-a47f-13ef7c0151b8/id-preview-fd44bf7a--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app-1776547649654.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
