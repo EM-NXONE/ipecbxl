@@ -82,8 +82,8 @@ function Contact() {
                   </p>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-gold mb-3">Message</label>
-                  <textarea required rows={6} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-gold focus:outline-none transition-colors resize-none" />
+                  <label className="block text-xs uppercase tracking-widest text-gold mb-3">Message <span className="text-muted-foreground normal-case tracking-normal">(facultatif)</span></label>
+                  <textarea rows={6} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-gold focus:outline-none transition-colors resize-none" />
                 </div>
                 <button
                   type="submit"
