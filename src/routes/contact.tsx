@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/contact")({
@@ -33,9 +33,9 @@ function Contact() {
       </section>
 
       <section className="py-20 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-16">
+        <div className="mx-auto max-w-3xl px-6 lg:px-10">
           {/* Form */}
-          <div className="lg:col-span-7">
+          <div>
             {sent ? (
               <div className="p-10 rounded-sm border border-gold/40 bg-gold/5 text-center">
                 <div className="font-display text-3xl text-gradient-gold mb-3">Merci !</div>
@@ -93,41 +93,6 @@ function Contact() {
                 </button>
               </form>
             )}
-          </div>
-
-          {/* Info */}
-          <div className="lg:col-span-5 lg:col-start-9 space-y-10">
-            <div>
-              <div className="flex items-center gap-3 text-gold mb-3">
-                <MapPin size={18} />
-                <span className="text-xs uppercase tracking-widest">Adresse</span>
-              </div>
-              <p className="text-cream font-display text-xl">IPEC — Campus de Bruxelles</p>
-              <p className="text-muted-foreground mt-1">Bruxelles, Belgique</p>
-            </div>
-            <div>
-              <div className="flex items-center gap-3 text-gold mb-3">
-                <Mail size={18} />
-                <span className="text-xs uppercase tracking-widest">E-mail</span>
-              </div>
-              <a href="mailto:contact@ipec-bruxelles.be" className="text-cream hover:text-gold font-display text-xl">
-                contact@ipec-bruxelles.be
-              </a>
-            </div>
-            <div>
-              <div className="flex items-center gap-3 text-gold mb-3">
-                <Phone size={18} />
-                <span className="text-xs uppercase tracking-widest">Téléphone</span>
-              </div>
-              <a href="tel:+3220000000" className="text-cream hover:text-gold font-display text-xl">
-                +32 2 000 00 00
-              </a>
-            </div>
-            <div className="pt-8 border-t border-border/40">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                L'équipe des admissions vous répond généralement sous 48h ouvrées.
-              </p>
-            </div>
           </div>
         </div>
       </section>
