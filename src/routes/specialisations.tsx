@@ -72,7 +72,7 @@ function Specs() {
                 <h2 className="font-display text-4xl md:text-5xl text-cream mb-4 group-hover:text-gradient-gold transition-colors">
                   {s.t}
                 </h2>
-                <p className="text-muted-foreground leading-relaxed text-lg">{s.desc}</p>
+                <p className="text-muted-foreground leading-relaxed text-base">{s.desc}</p>
               </div>
               <div className="lg:col-span-5 lg:col-start-8">
                 <div className="text-xs uppercase tracking-widest text-gold mb-6">— Compétences clés</div>
