@@ -82,45 +82,63 @@
   --shadow-deep: 0 30px 80px -20px oklch(0.05 0.02 260 / 0.6);
 }
 
-/* Light mode — warm cream + deep ink + same blue accent */
+/* ============================================================
+   LIGHT MODE — Editorial premium palette
+   Inspired by FT, Stripe, Apple. Warm paper background,
+   deep ink text, restrained blue accent. WCAG AA+ contrast.
+   ============================================================ */
 .light {
-  --background: oklch(0.98 0.01 80);
-  --foreground: oklch(0.16 0.02 260);
-  --ink: oklch(0.12 0.02 260);
-  --cream: oklch(0.16 0.02 260);
-  --surface: oklch(0.95 0.012 80);
+  /* Surfaces — warm off-white paper with subtle warmth */
+  --background: oklch(0.985 0.006 85);          /* #FBFAF7 paper */
+  --surface:    oklch(0.965 0.008 85);          /* slightly tinted band */
+  --card:       oklch(1 0 0);                   /* pure white cards */
+  --popover:    oklch(1 0 0);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.02 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.02 260);
+  /* Text — deep ink, never pure black (softer on the eye) */
+  --foreground:         oklch(0.22 0.025 260);  /* primary text — 13.5:1 on bg */
+  --card-foreground:    oklch(0.22 0.025 260);
+  --popover-foreground: oklch(0.22 0.025 260);
+  --ink:                oklch(0.22 0.025 260);
+  --cream:              oklch(0.22 0.025 260);  /* legacy alias → ink */
 
-  --primary: oklch(0.55 0.20 255);
-  --primary-foreground: oklch(0.98 0.01 80);
-  --gold: oklch(0.55 0.20 255);
-  --gold-soft: oklch(0.70 0.15 245);
+  /* Muted — used for body copy & secondary text. 5.8:1 contrast. */
+  --muted:              oklch(0.945 0.010 85);
+  --muted-foreground:   oklch(0.42 0.020 260);
 
-  --secondary: oklch(0.94 0.015 80);
-  --secondary-foreground: oklch(0.16 0.02 260);
+  --secondary:           oklch(0.945 0.010 85);
+  --secondary-foreground: oklch(0.22 0.025 260);
 
-  --muted: oklch(0.94 0.015 80);
-  --muted-foreground: oklch(0.45 0.02 260);
+  /* Accent — deep editorial blue. Used sparingly. */
+  --primary:             oklch(0.48 0.18 258);
+  --primary-foreground:  oklch(0.99 0.005 85);
+  --accent:              oklch(0.48 0.18 258);
+  --accent-foreground:   oklch(0.99 0.005 85);
+  --gold:                oklch(0.48 0.18 258);  /* legacy alias → accent */
+  --gold-soft:           oklch(0.58 0.16 255);
 
-  --accent: oklch(0.55 0.20 255);
-  --accent-foreground: oklch(0.98 0.01 80);
+  --destructive:            oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 85);
 
-  --destructive: oklch(0.60 0.22 25);
-  --destructive-foreground: oklch(0.98 0.01 80);
+  /* Lines & inputs — hairlines, never heavy */
+  --border: oklch(0.22 0.025 260 / 10%);
+  --input:  oklch(0.22 0.025 260 / 14%);
+  --ring:   oklch(0.48 0.18 258);
 
-  --border: oklch(0.16 0.02 260 / 12%);
-  --input: oklch(0.90 0.015 80);
-  --ring: oklch(0.55 0.20 255);
+  /* Gradients — restrained, no flashy shifts */
+  --gradient-gold:   linear-gradient(135deg, oklch(0.52 0.18 258), oklch(0.40 0.20 265));
+  --gradient-night:  linear-gradient(180deg, oklch(0.985 0.006 85), oklch(0.96 0.010 85));
+  --gradient-radial: radial-gradient(ellipse at top, oklch(0.48 0.18 258 / 0.06), transparent 65%);
 
-  --gradient-gold: linear-gradient(135deg, oklch(0.60 0.20 250), oklch(0.45 0.22 260));
-  --gradient-night: linear-gradient(180deg, oklch(0.98 0.01 80), oklch(0.94 0.015 80));
-  --gradient-radial: radial-gradient(ellipse at top, oklch(0.55 0.20 255 / 0.10), transparent 60%);
-  --shadow-gold: 0 20px 60px -20px oklch(0.55 0.20 255 / 0.30);
-  --shadow-deep: 0 20px 60px -20px oklch(0.16 0.02 260 / 0.15);
+  /* Shadows — soft, layered, never harsh */
+  --shadow-gold: 0 1px 2px oklch(0.22 0.025 260 / 0.04),
+                 0 8px 24px -8px oklch(0.48 0.18 258 / 0.18);
+  --shadow-deep: 0 1px 2px oklch(0.22 0.025 260 / 0.04),
+                 0 12px 32px -12px oklch(0.22 0.025 260 / 0.10);
+}
+
+/* In light mode, kill the fixed radial overlay on body for a cleaner paper feel */
+.light body {
+  background-image: none;
 }
 
 @layer base {
@@ -182,6 +200,46 @@
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+}
+
+/* ============================================================
+   LIGHT MODE — surgical refinements for readability
+   ============================================================ */
+.light .grain::after {
+  /* Grain overlay reads as dirt on paper — disable in light mode */
+  display: none;
+}
+
+/* Solid deep blue reads better than a gradient at small sizes.
+   Gradient is preserved only inside large display headings (h1/h2). */
+.light .text-gradient-gold {
+  background-image: none;
+  -webkit-text-fill-color: var(--primary);
+  color: var(--primary);
+}
+.light h1 .text-gradient-gold,
+.light h2 .text-gradient-gold {
+  background-image: var(--gradient-gold);
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Header — clean hairline + warmer blur in light mode */
+.light header {
+  background-color: oklch(0.985 0.006 85 / 0.85);
+  border-bottom-color: oklch(0.22 0.025 260 / 8%);
+}
+
+/* Strengthen all hairline borders slightly for definition on paper */
+.light .border-border\/40,
+.light .border-border\/30,
+.light .border-border\/60 {
+  border-color: oklch(0.22 0.025 260 / 10%);
+}
+
+/* Footer — soft tonal lift from page */
+.light footer.bg-surface {
+  background-color: oklch(0.955 0.010 85);
 }
 
 @keyframes fade-up {
