@@ -202,6 +202,46 @@
   }
 }
 
+/* ============================================================
+   LIGHT MODE — surgical refinements for readability
+   ============================================================ */
+.light .grain::after {
+  /* Grain overlay reads as dirt on paper — disable in light mode */
+  display: none;
+}
+
+/* Solid deep blue reads better than a gradient at small sizes.
+   Gradient is preserved only inside large display headings (h1/h2). */
+.light .text-gradient-gold {
+  background-image: none;
+  -webkit-text-fill-color: var(--primary);
+  color: var(--primary);
+}
+.light h1 .text-gradient-gold,
+.light h2 .text-gradient-gold {
+  background-image: var(--gradient-gold);
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Header — clean hairline + warmer blur in light mode */
+.light header {
+  background-color: oklch(0.985 0.006 85 / 0.85);
+  border-bottom-color: oklch(0.22 0.025 260 / 8%);
+}
+
+/* Strengthen all hairline borders slightly for definition on paper */
+.light .border-border\/40,
+.light .border-border\/30,
+.light .border-border\/60 {
+  border-color: oklch(0.22 0.025 260 / 10%);
+}
+
+/* Footer — soft tonal lift from page */
+.light footer.bg-surface {
+  background-color: oklch(0.955 0.010 85);
+}
+
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
