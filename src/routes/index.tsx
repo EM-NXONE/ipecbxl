@@ -100,7 +100,7 @@ function Home() {
       </section>
 
       {/* PROGRAMS PREVIEW */}
-      <section className="py-24 lg:py-32 bg-ink/40 border-y border-border/30">
+      <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>

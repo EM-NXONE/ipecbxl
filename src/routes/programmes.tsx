@@ -99,7 +99,7 @@ function Programmes() {
       </section>
 
       {/* PEA */}
-      <section className="py-20 lg:py-32 bg-ink/40 border-y border-border/30">
+      <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid lg:grid-cols-12 gap-10 mb-16">
             <div className="lg:col-span-5">
