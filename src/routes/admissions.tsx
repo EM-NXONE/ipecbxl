@@ -73,7 +73,7 @@ function Admissions() {
       </section>
 
       {/* STEPS */}
-      <section className="py-20 lg:py-32 bg-ink/40 border-y border-border/30">
+      <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-gold mb-4">— Process</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">

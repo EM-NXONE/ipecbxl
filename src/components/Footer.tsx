@@ -3,7 +3,7 @@ import { LogoIpec } from "@/components/LogoIpec";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/40 bg-ink/60 mt-32">
+    <footer className="border-t border-border/40 bg-surface mt-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
