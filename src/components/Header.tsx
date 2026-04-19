@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { LogoIpec } from "./LogoIpec";
+import { useTheme } from "@/hooks/use-theme";
 
 const links = [
   { to: "/", label: "Accueil" },
@@ -14,6 +15,7 @@ const links = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { theme, toggle } = useTheme();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/40">
@@ -39,20 +41,38 @@ export function Header() {
           ))}
         </nav>
 
-        <Link
-          to="/admissions"
-          className="hidden lg:inline-flex items-center px-5 py-2.5 rounded-sm bg-gradient-gold text-ink text-sm font-medium hover:opacity-90 transition-opacity shadow-gold"
-        >
-          S'inscrire
-        </Link>
+        <div className="hidden lg:flex items-center gap-3">
+          <button
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
+            className="p-2 rounded-sm text-muted-foreground hover:text-gold transition-colors"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <Link
+            to="/admissions"
+            className="inline-flex items-center px-5 py-2.5 rounded-sm bg-gradient-gold text-ink text-sm font-medium hover:opacity-90 transition-opacity shadow-gold"
+          >
+            S'inscrire
+          </Link>
+        </div>
 
-        <button
-          className="lg:hidden text-cream"
-          onClick={() => setOpen(!open)}
-          aria-label="Menu"
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="lg:hidden flex items-center gap-2">
+          <button
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
+            className="p-2 text-cream"
+          >
+            {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <button
+            className="text-cream"
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {open && (
