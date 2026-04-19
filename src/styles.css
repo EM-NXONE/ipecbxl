@@ -242,10 +242,11 @@
   background-color: oklch(0.955 0.010 85);
 }
 
-/* Force white text on gradient CTA buttons in light mode */
-.light .cta-primary,
-.light .cta-primary * {
+/* All gradient-gold buttons/CTAs use white text in light mode */
+.light .bg-gradient-gold,
+.light .bg-gradient-gold * {
   color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 @keyframes fade-up {
