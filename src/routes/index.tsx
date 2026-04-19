@@ -231,7 +231,7 @@ function Home() {
             Les inscriptions sont ouvertes. Notre équipe vous accompagne à chaque étape.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-gold text-ink font-medium shadow-gold hover:opacity-90 transition-opacity">
+            <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-gold text-ink light:text-white font-medium shadow-gold hover:opacity-90 transition-opacity">
               Candidater à l'IPEC
             </Link>
             <Link to="/contact" className="px-8 py-4 rounded-sm border border-gold/40 text-cream hover:bg-gold/10 transition-colors">
