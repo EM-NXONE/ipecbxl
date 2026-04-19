@@ -33,7 +33,7 @@ function Home() {
 
         <div className="mx-auto max-w-7xl px-6 lg:px-10 pt-20 pb-32 lg:pt-32 lg:pb-48">
           <h1 className="font-display md:text-7xl lg:text-8xl text-cream leading-[0.95] max-w-5xl text-balance animate-fade-up text-5xl">
-            Penser, <em className="text-gradient-gold not-italic">entreprendre</em>, diriger.
+            Penser, <em className="text-gradient-blue not-italic">entreprendre</em>, diriger.
           </h1>
 
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed animate-fade-up text-base">
@@ -45,14 +45,14 @@ function Home() {
           <div className="mt-12 flex flex-wrap gap-4 animate-fade-up">
             <Link
               to="/programmes"
-              className="group inline-flex items-center gap-2 px-7 py-4 rounded-sm bg-gradient-gold text-ink font-medium shadow-gold hover:opacity-90 transition-opacity"
+              className="group inline-flex items-center gap-2 px-7 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity"
             >
               Découvrir nos programmes
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/admissions"
-              className="inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-gold/40 text-cream hover:bg-gold/10 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors"
             >
               Candidater
             </Link>
@@ -67,7 +67,7 @@ function Home() {
               { v: "∞", l: "perspectives" },
             ].map((s) => (
               <div key={s.l}>
-                <div className="font-display text-4xl md:text-5xl text-gradient-gold">{s.v}</div>
+                <div className="font-display text-4xl md:text-5xl text-gradient-blue">{s.v}</div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2">{s.l}</div>
               </div>
             ))}
@@ -79,9 +79,9 @@ function Home() {
       <section className="py-24 lg:py-40 border-t border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-5">
-            <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Notre vision</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Notre vision</div>
             <h2 className="font-display text-4xl md:text-5xl text-cream leading-tight text-balance">
-              Une école pensée pour <em className="text-gradient-gold not-italic">le monde réel</em>.
+              Une école pensée pour <em className="text-gradient-blue not-italic">le monde réel</em>.
             </h2>
           </div>
           <div className="lg:col-span-6 lg:col-start-7 space-y-6 text-muted-foreground leading-relaxed">
@@ -104,9 +104,9 @@ function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>
-              <div className="text-xs uppercase tracking-[0.3em] text-gold mb-4">— Nos cursus</div>
+              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Nos cursus</div>
               <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl text-balance">
-                Choisissez votre voie, <em className="text-gradient-gold not-italic">à votre rythme</em>.
+                Choisissez votre voie, <em className="text-gradient-blue not-italic">à votre rythme</em>.
               </h2>
             </div>
           </div>
@@ -135,19 +135,19 @@ function Home() {
               <Link
                 key={p.code}
                 to="/programmes"
-                className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-gold/60 hover:bg-card transition-all overflow-hidden"
+                className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden"
               >
-                <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gold/10 blur-3xl group-hover:bg-gold/20 transition-colors" />
+                <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-blue/10 blur-3xl group-hover:bg-blue/20 transition-colors" />
                 <div className="relative">
                   <div className="flex items-center justify-between mb-8">
-                    <div className="font-display text-6xl text-gradient-gold">{p.code}</div>
-                    <p.icon className="text-gold/60" size={32} />
+                    <div className="font-display text-6xl text-gradient-blue">{p.code}</div>
+                    <p.icon className="text-blue/60" size={32} />
                   </div>
                   <h3 className="font-display text-2xl text-cream mb-2">{p.title}</h3>
-                  <div className="text-sm text-gold mb-6">{p.level} · {p.duration}</div>
+                  <div className="text-sm text-blue mb-6">{p.level} · {p.duration}</div>
                   <p className="text-muted-foreground leading-relaxed mb-8 text-base">{p.desc}</p>
                   <div className="flex items-center justify-end pt-6 border-t border-border/40">
-                    <ArrowRight className="text-gold group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="text-blue group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -159,9 +159,9 @@ function Home() {
       {/* SPECIALIZATIONS */}
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-gold mb-4">— Spécialisations</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Spécialisations</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream max-w-3xl mb-16 text-balance">
-            Quatre voies pour <em className="text-gradient-gold not-italic">construire</em> votre carrière.
+            Quatre voies pour <em className="text-gradient-blue not-italic">construire</em> votre carrière.
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
@@ -172,15 +172,15 @@ function Home() {
               { n: "04", t: "Économie & Finance", d: "Maîtriser les équilibres et flux du monde économique." },
             ].map((s) => (
               <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group">
-                <div className="font-display text-sm text-gold mb-12">{s.n}</div>
-                <h3 className="font-display text-2xl text-cream mb-3 group-hover:text-gradient-gold transition-colors">{s.t}</h3>
+                <div className="font-display text-sm text-blue mb-12">{s.n}</div>
+                <h3 className="font-display text-2xl text-cream mb-3 group-hover:text-gradient-blue transition-colors">{s.t}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-12 text-center">
-            <Link to="/specialisations" className="inline-flex items-center gap-2 text-gold hover:underline">
+            <Link to="/specialisations" className="inline-flex items-center gap-2 text-blue hover:underline">
               Explorer les spécialisations <ArrowRight size={16} />
             </Link>
           </div>
@@ -195,7 +195,7 @@ function Home() {
         </div>
         <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-16">
           <div>
-            <div className="flex items-center gap-2 text-gold mb-6">
+            <div className="flex items-center gap-2 text-blue mb-6">
               <Globe2 size={16} />
               <span className="text-xs uppercase tracking-[0.3em]">Bruxelles · Belgique</span>
             </div>
@@ -213,7 +213,7 @@ function Home() {
                 où l'on apprend autant en classe qu'en dehors.
               </p>
             </div>
-            <Link to="/international" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-gold/40 text-cream hover:bg-gold/10 transition-colors">
+            <Link to="/international" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
               Étudiants internationaux
               <ArrowRight size={16} />
             </Link>
@@ -225,16 +225,16 @@ function Home() {
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
           <h2 className="font-display text-4xl md:text-6xl text-cream leading-tight text-balance">
-            Prêt·e à <em className="text-gradient-gold not-italic">commencer</em> ?
+            Prêt·e à <em className="text-gradient-blue not-italic">commencer</em> ?
           </h2>
           <p className="mt-6 text-muted-foreground max-w-2xl mx-auto text-base">
             Les inscriptions sont ouvertes. Notre équipe vous accompagne à chaque étape.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-gold text-ink font-medium shadow-gold hover:opacity-90 transition-opacity">
+            <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
               Candidater à l'IPEC
             </Link>
-            <Link to="/contact" className="px-8 py-4 rounded-sm border border-gold/40 text-cream hover:bg-gold/10 transition-colors">
+            <Link to="/contact" className="px-8 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
               Nous contacter
             </Link>
           </div>

@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
-            <LogoIpec size={40} className="text-gold shrink-0" />
+            <LogoIpec size={40} className="text-blue shrink-0" />
             <div>
               <div className="font-display text-xl text-cream">IPEC</div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -26,10 +26,10 @@ export function Footer() {
             Navigation
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/programmes" className="hover:text-gold">Programmes</Link></li>
-            <li><Link to="/specialisations" className="hover:text-gold">Spécialisations</Link></li>
-            <li><Link to="/admissions" className="hover:text-gold">Admissions</Link></li>
-            <li><Link to="/international" className="hover:text-gold">International</Link></li>
+            <li><Link to="/programmes" className="hover:text-blue">Programmes</Link></li>
+            <li><Link to="/specialisations" className="hover:text-blue">Spécialisations</Link></li>
+            <li><Link to="/admissions" className="hover:text-blue">Admissions</Link></li>
+            <li><Link to="/international" className="hover:text-blue">International</Link></li>
           </ul>
         </div>
 

@@ -49,9 +49,9 @@ function Programmes() {
     <>
       <section className="py-20 lg:py-32 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Nos programmes</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Nos programmes</div>
           <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
-            Du fondamental à <em className="text-gradient-gold not-italic">l'expertise</em>.
+            Du fondamental à <em className="text-gradient-blue not-italic">l'expertise</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Notre cursus complet se déploie sur cinq années, de l'initiation aux fondamentaux
@@ -65,8 +65,8 @@ function Programmes() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid lg:grid-cols-12 gap-10 mb-16">
             <div className="lg:col-span-5">
-              <div className="font-display text-7xl md:text-8xl text-gradient-gold leading-none">PAA</div>
-              <div className="text-sm text-gold mt-2 uppercase tracking-widest">BAC+1 à BAC+3 · 3 ans</div>
+              <div className="font-display text-7xl md:text-8xl text-gradient-blue leading-none">PAA</div>
+              <div className="text-sm text-blue mt-2 uppercase tracking-widest">BAC+1 à BAC+3 · 3 ans</div>
             </div>
             <div className="lg:col-span-6 lg:col-start-7">
               <h2 className="font-display text-3xl md:text-4xl text-cream mb-6">
@@ -80,7 +80,7 @@ function Programmes() {
               </p>
               <div className="inline-flex items-baseline gap-3 px-5 py-3 rounded-sm bg-card border border-border/60">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">Frais de scolarité</span>
-                <span className="font-display text-2xl text-gradient-gold">5 900 €</span>
+                <span className="font-display text-2xl text-gradient-blue">5 900 €</span>
                 <span className="text-xs text-muted-foreground">/ an</span>
               </div>
             </div>
@@ -89,7 +89,7 @@ function Programmes() {
           <div className="grid md:grid-cols-3 gap-px bg-border/40">
             {paaYears.map((y) => (
               <div key={y.code} className="bg-background p-8 hover:bg-card transition-colors">
-                <div className="text-gold text-xs uppercase tracking-widest mb-4">{y.code}</div>
+                <div className="text-blue text-xs uppercase tracking-widest mb-4">{y.code}</div>
                 <h3 className="font-display text-2xl text-cream mb-4">{y.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{y.desc}</p>
               </div>
@@ -103,8 +103,8 @@ function Programmes() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid lg:grid-cols-12 gap-10 mb-16">
             <div className="lg:col-span-5">
-              <div className="font-display text-7xl md:text-8xl text-gradient-gold leading-none">PEA</div>
-              <div className="text-sm text-gold mt-2 uppercase tracking-widest">BAC+4 et BAC+5 · 2 ans</div>
+              <div className="font-display text-7xl md:text-8xl text-gradient-blue leading-none">PEA</div>
+              <div className="text-sm text-blue mt-2 uppercase tracking-widest">BAC+4 et BAC+5 · 2 ans</div>
             </div>
             <div className="lg:col-span-6 lg:col-start-7">
               <h2 className="font-display text-3xl md:text-4xl text-cream mb-6">
@@ -118,7 +118,7 @@ function Programmes() {
               </p>
               <div className="inline-flex items-baseline gap-3 px-5 py-3 rounded-sm bg-card border border-border/60">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">Frais de scolarité</span>
-                <span className="font-display text-2xl text-gradient-gold">6 900 €</span>
+                <span className="font-display text-2xl text-gradient-blue">6 900 €</span>
                 <span className="text-xs text-muted-foreground">/ an</span>
               </div>
             </div>
@@ -127,7 +127,7 @@ function Programmes() {
           <div className="grid md:grid-cols-2 gap-px bg-border/40">
             {peaYears.map((y) => (
               <div key={y.code} className="bg-background p-8 hover:bg-card transition-colors">
-                <div className="text-gold text-xs uppercase tracking-widest mb-4">{y.code}</div>
+                <div className="text-blue text-xs uppercase tracking-widest mb-4">{y.code}</div>
                 <h3 className="font-display text-2xl text-cream mb-4">{y.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{y.desc}</p>
               </div>
@@ -140,7 +140,7 @@ function Programmes() {
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-16">
           <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-gold mb-6">— Notre approche</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Notre approche</div>
             <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
               Tronc commun généreux, spécialisation progressive.
             </h2>
@@ -154,8 +154,8 @@ function Programmes() {
               "Passerelles fluides entre les spécialisations",
             ].map((p) => (
               <li key={p} className="flex items-start gap-4">
-                <div className="mt-1 w-6 h-6 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="text-gold" />
+                <div className="mt-1 w-6 h-6 rounded-full bg-blue/15 flex items-center justify-center flex-shrink-0">
+                  <Check size={14} className="text-blue" />
                 </div>
                 <span className="text-muted-foreground leading-relaxed">{p}</span>
               </li>
@@ -169,7 +169,7 @@ function Programmes() {
           <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
             Construisez votre parcours.
           </h2>
-          <Link to="/admissions" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-gold text-ink font-medium shadow-gold hover:opacity-90 transition-opacity">
+          <Link to="/admissions" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
             Candidater <ArrowRight size={18} />
           </Link>
         </div>
