@@ -242,6 +242,12 @@
   background-color: oklch(0.955 0.010 85);
 }
 
+/* Force white text on gradient CTA buttons in light mode */
+.light .cta-primary,
+.light .cta-primary * {
+  color: #ffffff !important;
+}
+
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
