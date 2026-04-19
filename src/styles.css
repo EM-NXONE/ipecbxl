@@ -34,6 +34,7 @@
   --color-gold-soft: var(--gold-soft);
   --color-ink: var(--ink);
   --color-cream: var(--cream);
+  --color-surface: var(--surface);
   --font-display: 'Fraunces', serif;
   --font-body: 'Inter', sans-serif;
 }
@@ -45,6 +46,7 @@
   --foreground: oklch(0.96 0.015 80);
   --ink: oklch(0.12 0.02 260);
   --cream: oklch(0.96 0.02 80);
+  --surface: oklch(0.12 0.02 260);
 
   --card: oklch(0.20 0.025 260);
   --card-foreground: oklch(0.96 0.015 80);
@@ -86,6 +88,7 @@
   --foreground: oklch(0.16 0.02 260);
   --ink: oklch(0.12 0.02 260);
   --cream: oklch(0.16 0.02 260);
+  --surface: oklch(0.95 0.012 80);
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.16 0.02 260);
