@@ -341,7 +341,7 @@ function International() {
             {[
               { t: "Cœur européen", d: "Siège de la Commission européenne, du Parlement européen, de l'OTAN." },
               { t: "Multilingue", d: "Français, néerlandais, anglais : Bruxelles vit en plusieurs langues au quotidien." },
-              { t: "À taille humaine", d: "Une grande capitale qui se traverse à pied. Étudiants accueillis avec chaleur." },
+              { t: "À taille humaine", d: "Une capitale qui se traverse à pied, où les étudiants font partie intégrante du quotidien et trouvent vite leurs repères." },
             ].map((c) => (
               <div key={c.t} className="bg-background p-10">
                 <Users className="text-blue mb-6" size={28} strokeWidth={1.5} />
