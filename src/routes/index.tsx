@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero-building.jpg";
 import brusselsImg from "@/assets/brussels.jpg";
-import { ArrowRight, Sparkles, GraduationCap, Globe2, Compass } from "lucide-react";
+import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, DoorOpen, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -183,6 +183,60 @@ function Home() {
             <Link to="/specialisations" className="inline-flex items-center gap-2 text-blue hover:underline">
               Explorer les spécialisations <ArrowRight size={16} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* MODALITIES — Inspired by IPHE */}
+      <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Modalités</div>
+          <h2 className="font-display text-4xl md:text-5xl text-cream max-w-3xl mb-16 text-balance">
+            Trois manières de <em className="text-gradient-blue not-italic">nous rejoindre</em>.
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: ClipboardCheck,
+                tag: "Inscriptions ouvertes",
+                title: "Candidater",
+                desc: "Les inscriptions pour la rentrée académique sont ouvertes. Constituez votre dossier en ligne et recevez une réponse sous 7 jours.",
+                cta: "Déposer ma candidature",
+                to: "/admissions" as const,
+              },
+              {
+                icon: CalendarDays,
+                tag: "Rentrée décalée",
+                title: "Rejoindre en cours d'année",
+                desc: "Vous avez manqué la rentrée d'octobre ? Notre rentrée décalée vous permet d'intégrer l'IPEC en cours d'année académique.",
+                cta: "En savoir plus",
+                to: "/admissions" as const,
+              },
+              {
+                icon: DoorOpen,
+                tag: "Portes ouvertes",
+                title: "Visiter le campus",
+                desc: "Découvrez l'IPEC lors de nos journées portes ouvertes, sur place à Bruxelles ou en visioconférence avec notre équipe pédagogique.",
+                cta: "Réserver ma visite",
+                to: "/contact" as const,
+              },
+            ].map((m) => (
+              <Link
+                key={m.title}
+                to={m.to}
+                className="group relative p-8 lg:p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all flex flex-col"
+              >
+                <m.icon className="text-blue mb-8" size={32} strokeWidth={1.5} />
+                <div className="text-xs uppercase tracking-[0.25em] text-blue mb-3">{m.tag}</div>
+                <h3 className="font-display text-2xl text-cream mb-4">{m.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-8 flex-1">{m.desc}</p>
+                <div className="inline-flex items-center gap-2 text-sm text-blue pt-4 border-t border-border/40">
+                  {m.cta}
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
