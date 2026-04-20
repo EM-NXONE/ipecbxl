@@ -62,7 +62,7 @@ function Specs() {
             <div className="bg-background p-8">
               <div className="text-xs uppercase tracking-[0.25em] text-blue mb-4">— Parcours intégral</div>
               <h2 className="font-display text-2xl text-cream mb-3">Choix en PAA3</h2>
-              <p className="text-muted-foreground leading-relaxed text-sm">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 Les étudiant·e·s qui suivent l'intégralité du cursus choisissent leur
                 spécialisation en troisième année du PAA, après avoir exploré l'ensemble
                 des disciplines. Ils la poursuivent ensuite tout au long du PEA.
@@ -71,7 +71,7 @@ function Specs() {
             <div className="bg-background p-8">
               <div className="text-xs uppercase tracking-[0.25em] text-blue mb-4">— Entrée directe en PEA</div>
               <h2 className="font-display text-2xl text-cream mb-3">Choix dès l'admission</h2>
-              <p className="text-muted-foreground leading-relaxed text-sm">
+              <p className="text-muted-foreground leading-relaxed text-base">
                 Les candidat·e·s admis·es directement en PEA déterminent leur spécialisation
                 dès l'entrée dans le programme. Une réorientation en cours d'année peut être
                 envisagée à titre exceptionnel, sur demande motivée et à l'issue d'un entretien
