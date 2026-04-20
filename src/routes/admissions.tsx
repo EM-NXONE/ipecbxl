@@ -76,12 +76,12 @@ function Admissions() {
               {
                 year: "2ᵉ année",
                 title: "Admission Bac+1",
-                desc: "L'intégration en deuxième année est ouverte aux étudiants ayant validé une première année d'études supérieures, soit 60 crédits ECTS reconnus.",
+                desc: "L'intégration en deuxième année est ouverte aux étudiants ayant validé une première année d'études supérieures, soit 60 crédits.",
               },
               {
                 year: "3ᵉ année",
                 title: "Admission Bac+2",
-                desc: "Tout candidat justifiant d'un Bac+2 et de 120 crédits ECTS peut postuler en troisième année. Deux rentrées sont organisées chaque année : septembre et février.",
+                desc: "Tout candidat justifiant d'un Bac+2 et de 120 crédits peut postuler en troisième année.",
               },
             ].map((c) => (
               <div key={c.year} className="p-10 rounded-sm border border-border/60 bg-card/50">
