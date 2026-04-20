@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 
 export const Route = createFileRoute("/specialisations")({
   head: () => ({
