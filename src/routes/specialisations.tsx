@@ -86,7 +86,7 @@ function Specs() {
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 space-y-px bg-border/40">
           {specs.map((s, i) => (
-            <div key={s.n} className="bg-background p-10 lg:p-16 grid lg:grid-cols-12 gap-10 hover:bg-card/50 transition-colors group">
+            <div key={s.n} className="bg-muted p-10 lg:p-16 grid lg:grid-cols-12 gap-10 hover:bg-card/50 transition-colors group">
               <div className="lg:col-span-1">
                 <div className="font-display text-2xl text-blue">{s.n}</div>
               </div>
