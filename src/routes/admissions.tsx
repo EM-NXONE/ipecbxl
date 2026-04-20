@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays } from "lucide-react";
+import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays, GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "Admissions — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 500 €, frais de scolarité PAA 5 900 €/an, PEA 6 900 €/an. Étudiants belges et internationaux." },
+      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité Bachelor 4 900 €/an, Master 5 900 €/an. Étudiants belges et internationaux." },
       { property: "og:title", content: "Admissions — IPEC Bruxelles" },
       { property: "og:description", content: "Candidatez à l'IPEC : process simple, frais transparents, accueil des étudiants internationaux." },
     ],
@@ -17,7 +17,7 @@ const steps = [
   { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez votre dossier en ligne et joignez vos pièces justificatives." },
   { n: "02", icon: Mail, t: "Entretien personnel", d: "Échange avec notre équipe pédagogique pour préciser votre projet." },
   { n: "03", icon: Calendar, t: "Réponse sous 7 jours", d: "Vous recevez la décision d'admission rapidement, par e-mail." },
-  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier (500 €, une seule fois) et du premier acompte." },
+  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier (300 €) et de la première tranche de scolarité." },
 ];
 
 function Admissions() {
@@ -36,10 +36,47 @@ function Admissions() {
         </div>
       </section>
 
-      {/* PRICES */}
+      {/* CONDITIONS D'ADMISSION */}
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Frais de scolarité</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Conditions d'admission</div>
+          <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
+            Une porte d'entrée à <em className="text-gradient-blue not-italic">chaque niveau</em>.
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            {[
+              {
+                year: "1ʳᵉ année",
+                title: "Entrée post-secondaire",
+                desc: "Vous êtes en dernière année de secondaire ou déjà titulaire du CESS (ou équivalent) ? Vous pouvez déposer votre candidature à tout moment de l'année. Votre inscription sera définitivement validée à l'obtention de votre diplôme.",
+              },
+              {
+                year: "2ᵉ année",
+                title: "Admission Bac+1",
+                desc: "L'intégration en deuxième année est ouverte aux étudiants ayant validé une première année d'études supérieures, soit 60 crédits ECTS reconnus.",
+              },
+              {
+                year: "3ᵉ année",
+                title: "Admission Bac+2",
+                desc: "Tout candidat justifiant d'un Bac+2 et de 120 crédits ECTS peut postuler en troisième année. Deux rentrées sont organisées chaque année : septembre et février.",
+              },
+            ].map((c) => (
+              <div key={c.year} className="p-10 rounded-sm border border-border/60 bg-card/50">
+                <GraduationCap className="text-blue mb-6" size={28} strokeWidth={1.5} />
+                <div className="text-xs text-blue uppercase tracking-widest mb-3">{c.year}</div>
+                <h3 className="font-display text-xl text-cream mb-4">{c.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRICES */}
+      <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Frais de scolarité 2025-2026</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
             Une grille claire, sans surprise.
           </h2>
@@ -47,28 +84,46 @@ function Admissions() {
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PAA</div>
-              <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+1 à BAC+3</div>
-              <div className="font-display text-6xl text-cream">5 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
+              <div className="text-sm text-blue uppercase tracking-widest mb-8">Bachelor · BAC+1 à BAC+3</div>
+              <div className="font-display text-6xl text-cream">4 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme en Administration des Affaires</p>
             </div>
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PEA</div>
-              <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+4 et BAC+5</div>
-              <div className="font-display text-6xl text-cream">6 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
+              <div className="text-sm text-blue uppercase tracking-widest mb-8">Master · BAC+4 et BAC+5</div>
+              <div className="font-display text-6xl text-cream">5 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme Exécutif Avancé</p>
             </div>
           </div>
 
-          <div className="p-8 rounded-sm border border-blue/40 bg-blue/5 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="p-8 rounded-sm border border-blue/40 bg-blue/5 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
             <div>
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Frais de dossier</div>
-              <div className="font-display text-3xl text-cream">500 € · une seule fois</div>
+              <div className="font-display text-3xl text-cream">300 €</div>
             </div>
             <p className="text-sm text-muted-foreground max-w-md">
-              Versés une seule fois lors de l'inscription, peu importe l'année du cursus
-              dans laquelle vous entrez à l'IPEC.
+              Réglés au dépôt de la candidature, ils couvrent l'instruction administrative
+              et pédagogique de votre dossier.
             </p>
           </div>
+
+          <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
+            <div className="text-xs uppercase tracking-widest text-blue mb-3">Première tranche à l'inscription</div>
+            <div className="font-display text-3xl text-cream mb-4">3 000 €</div>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+              Cette première tranche couvre l'accès au cursus en ligne dès la
+              confirmation de votre inscription. Pour les candidats devant solliciter
+              un visa d'études afin de rejoindre l'IPEC en présentiel à Bruxelles,
+              ce montant est intégralement déduit des droits de scolarité annuels.
+            </p>
+          </div>
+
+          <p className="mt-10 text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            Les droits de scolarité couvrent l'ensemble des activités pédagogiques de
+            l'année académique : cours, syllabi, séminaires, conférences et visites
+            extérieures auprès des institutions européennes — sans frais supplémentaires
+            en cours d'année.
+          </p>
         </div>
       </section>
 
