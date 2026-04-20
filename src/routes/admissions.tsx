@@ -244,8 +244,23 @@ function Admissions() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   Actuellement, l'Office des étrangers (OE) n'accepte que les attestations
                   de virement irrévocable (AVI) établies par les sociétés{" "}
-                  <span className="text-cream">Studely</span> et{" "}
-                  <span className="text-cream">Ready Study Go International</span>.
+                  <a
+                    href="https://www.studely.com/fr/caution-bancaire-etudiante"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cream underline decoration-blue/50 underline-offset-2 hover:decoration-blue"
+                  >
+                    Studely
+                  </a>{" "}
+                  et{" "}
+                  <a
+                    href="https://www.ready-study-go.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cream underline decoration-blue/50 underline-offset-2 hover:decoration-blue"
+                  >
+                    Ready Study Go International
+                  </a>.
                   L'OE n'est toutefois pas lié contractuellement à ces sociétés et ne peut
                   pas être tenu pour responsable en cas de manquement à leurs obligations
                   vis-à-vis de l'étudiant.
