@@ -57,6 +57,28 @@ function Specs() {
             Chaque spécialisation s'appuie sur le tronc commun de votre cursus.
             Vous choisissez quand vous êtes prêt·e, pas quand on vous y oblige.
           </p>
+
+          <div className="mt-12 grid lg:grid-cols-2 gap-px bg-border/40 max-w-5xl">
+            <div className="bg-background p-8">
+              <div className="text-xs uppercase tracking-[0.25em] text-blue mb-4">— Parcours intégral</div>
+              <h2 className="font-display text-2xl text-cream mb-3">Choix en PAA3</h2>
+              <p className="text-muted-foreground leading-relaxed text-sm">
+                Les étudiant·e·s qui suivent l'intégralité du cursus choisissent leur
+                spécialisation en troisième année du PAA, après avoir exploré l'ensemble
+                des disciplines. Ils la poursuivent ensuite tout au long du PEA.
+              </p>
+            </div>
+            <div className="bg-background p-8">
+              <div className="text-xs uppercase tracking-[0.25em] text-blue mb-4">— Entrée directe en PEA</div>
+              <h2 className="font-display text-2xl text-cream mb-3">Choix dès l'admission</h2>
+              <p className="text-muted-foreground leading-relaxed text-sm">
+                Celles et ceux qui intègrent directement le PEA choisissent leur
+                spécialisation à l'admission. Un changement de voie reste possible en
+                cours d'année, après entretien de motivation et d'ambitions avec notre
+                équipe pédagogique — il n'est ni automatique, ni un droit.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
