@@ -150,7 +150,7 @@ function Admissions() {
       {/* 4. TARIFS & PAIEMENT */}
       <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Frais de scolarité 2025-2026</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Frais de scolarité</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
             Une grille claire, sans surprise.
           </h2>
