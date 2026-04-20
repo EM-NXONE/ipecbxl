@@ -118,6 +118,7 @@ function Home() {
                 title: "Programme en Administration des Affaires",
                 level: "BAC+1 à BAC+3",
                 duration: "3 années",
+                prereq: "Être titulaire du CESS / BAC ou équivalent",
                 desc: "Le socle complet pour comprendre l'entreprise et le monde des affaires. Tronc commun et spécialisation progressive.",
                 icon: GraduationCap,
               },
@@ -126,6 +127,7 @@ function Home() {
                 title: "Programme Exécutif Avancé",
                 level: "BAC+4 à BAC+5",
                 duration: "2 années",
+                prereq: "Être titulaire d'un BAC+3 (180 crédits) ou équivalent",
                 desc: "Approfondissement stratégique pour celles et ceux qui visent les responsabilités de direction et l'expertise de pointe.",
                 icon: Compass,
               },
@@ -143,8 +145,12 @@ function Home() {
                   </div>
                   <h3 className="font-display text-2xl text-cream mb-2">{p.title}</h3>
                   <div className="text-sm text-blue mb-6">{p.level} · {p.duration}</div>
-                  <p className="text-muted-foreground leading-relaxed mb-8 text-base">{p.desc}</p>
-                  <div className="flex items-center justify-end pt-6 border-t border-border/40">
+                  <p className="text-muted-foreground leading-relaxed mb-6 text-base">{p.desc}</p>
+                  <div className="pt-5 border-t border-border/40">
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-blue/70 mb-2">Prérequis</div>
+                    <div className="text-sm text-cream/90">{p.prereq}</div>
+                  </div>
+                  <div className="flex items-center justify-end mt-6">
                     <ArrowRight className="text-blue group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
