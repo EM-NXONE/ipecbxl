@@ -72,10 +72,11 @@ function Specs() {
               <div className="text-xs uppercase tracking-[0.25em] text-blue mb-4">— Entrée directe en PEA</div>
               <h2 className="font-display text-2xl text-cream mb-3">Choix dès l'admission</h2>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Celles et ceux qui intègrent directement le PEA choisissent leur
-                spécialisation à l'admission. Un changement de voie reste possible en
-                cours d'année, après entretien de motivation et d'ambitions avec notre
-                équipe pédagogique — il n'est ni automatique, ni un droit.
+                Les candidat·e·s admis·es directement en PEA déterminent leur spécialisation
+                dès l'entrée dans le programme. Une réorientation en cours d'année peut être
+                envisagée à titre exceptionnel, sur demande motivée et à l'issue d'un entretien
+                avec notre équipe pédagogique évaluant la cohérence du projet académique et
+                professionnel. Elle demeure soumise à l'appréciation de l'institution.
               </p>
             </div>
           </div>
