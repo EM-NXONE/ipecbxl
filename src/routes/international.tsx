@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Plane, FileCheck, Globe2, Users } from "lucide-react";
 import brusselsImg from "@/assets/brussels.jpg";
 
@@ -85,19 +85,7 @@ function International() {
         </div>
       </section>
 
-      <section className="py-20 lg:py-32">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-            Votre dossier, où que vous soyez.
-          </h2>
-          <p className="mt-6 text-muted-foreground max-w-2xl mx-auto">
-            Contactez-nous pour démarrer votre candidature internationale.
-          </p>
-          <Link to="/contact" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
-            Nous contacter
-          </Link>
-        </div>
-      </section>
+      {/* CTA final retiré : le header et le footer assurent déjà l'accès au formulaire de contact. */}
     </>
   );
 }

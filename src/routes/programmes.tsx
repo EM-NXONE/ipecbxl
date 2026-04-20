@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, ArrowRight } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/programmes")({
   head: () => ({
@@ -136,44 +135,7 @@ function Programmes() {
         </div>
       </section>
 
-      {/* Approach */}
-      <section className="py-20 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-16">
-          <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Notre approche</div>
-            <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-              Tronc commun généreux, spécialisation progressive.
-            </h2>
-          </div>
-          <ul className="space-y-5">
-            {[
-              "Vous explorez chaque discipline avant de choisir votre voie",
-              "La spécialisation intervient le plus tard possible dans le cursus",
-              "Promotions à taille humaine, suivi individualisé",
-              "Pédagogie ancrée dans le réel : projets, cas, immersions",
-              "Passerelles fluides entre les spécialisations",
-            ].map((p) => (
-              <li key={p} className="flex items-start gap-4">
-                <div className="mt-1 w-6 h-6 rounded-full bg-blue/15 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="text-blue" />
-                </div>
-                <span className="text-muted-foreground leading-relaxed">{p}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="py-20 border-t border-border/30">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-            Construisez votre parcours.
-          </h2>
-          <Link to="/admissions" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
-            Candidater <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
+      {/* (Section "Notre approche" et CTA final retirés : déjà couverts par la home et la page admissions) */}
     </>
   );
 }
