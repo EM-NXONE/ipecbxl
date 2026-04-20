@@ -114,7 +114,7 @@ function Admissions() {
                   "Diplômes et relevés de notes des trois dernières années",
                   "CV à jour et lettre de motivation",
                   "Photo d'identité récente au format numérique",
-                  "Justificatif de niveau de français (CECRL B2 minimum pour les non-francophones)",
+                  "Justificatif de niveau de français (facultatif)",
                 ].map((item) => (
                   <li key={item} className="flex gap-3">
                     <CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" />
