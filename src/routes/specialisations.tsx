@@ -48,7 +48,7 @@ function Specs() {
   return (
     <>
       {/* HERO */}
-      <section className="pt-10 pb-8 lg:pt-14 lg:pb-10 border-b border-border/30">
+      <section className="py-16 lg:py-24 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Spécialisations</div>
           <h1 className="font-display text-cream leading-[1.05] max-w-4xl text-balance">
@@ -62,7 +62,7 @@ function Specs() {
       </section>
 
       {/* MOMENT DU CHOIX */}
-      <section className="py-8 lg:py-12 border-b border-border/30">
+      <section className="py-14 lg:py-20 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-px bg-border/40 border border-border/40">
             <div className="bg-background p-8 lg:p-10">
@@ -90,7 +90,7 @@ function Specs() {
       </section>
 
       {/* LISTE DES SPÉCIALISATIONS */}
-      <section className="py-8 lg:py-12">
+      <section className="py-14 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="space-y-px bg-border/40 border border-border/40">
             {specs.map((s) => (
