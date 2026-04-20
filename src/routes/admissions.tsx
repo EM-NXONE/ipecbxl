@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, DoorOpen, CalendarDays } from "lucide-react";
+import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/admissions")({
   head: () => ({
@@ -140,20 +140,6 @@ function Admissions() {
                   <div className="text-cream">7 jours après réception du dossier complet</div>
                 </li>
               </ul>
-            </div>
-
-            {/* Portes ouvertes */}
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
-              <DoorOpen className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <h3 className="font-display text-2xl text-cream mb-6">Journées portes ouvertes</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                Découvrez nos locaux au cœur de Bruxelles, échangez avec nos enseignants
-                et étudiants, et assistez à des cours de démonstration. Sessions
-                organisées sur place ou en visioconférence.
-              </p>
-              <Link to="/contact" className="inline-flex items-center gap-2 text-sm text-blue hover:underline">
-                Demander le calendrier des sessions <ArrowRight size={14} />
-              </Link>
             </div>
 
             {/* Paiement */}

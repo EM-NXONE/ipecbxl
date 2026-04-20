@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero-building.jpg";
 import brusselsImg from "@/assets/brussels.jpg";
-import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, DoorOpen, ClipboardCheck } from "lucide-react";
+import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -195,7 +195,7 @@ function Home() {
             Trois manières de <em className="text-gradient-blue not-italic">nous rejoindre</em>.
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
               {
                 icon: ClipboardCheck,
@@ -212,14 +212,6 @@ function Home() {
                 desc: "Vous avez manqué la rentrée d'octobre ? Notre rentrée décalée vous permet d'intégrer l'IPEC en cours d'année académique.",
                 cta: "En savoir plus",
                 to: "/admissions" as const,
-              },
-              {
-                icon: DoorOpen,
-                tag: "Portes ouvertes",
-                title: "Visiter le campus",
-                desc: "Découvrez l'IPEC lors de nos journées portes ouvertes, sur place à Bruxelles ou en visioconférence avec notre équipe pédagogique.",
-                cta: "Réserver ma visite",
-                to: "/contact" as const,
               },
             ].map((m) => (
               <Link
