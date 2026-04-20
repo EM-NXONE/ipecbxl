@@ -5,7 +5,7 @@ export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "Admissions — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité Bachelor 4 900 €/an, Master 5 900 €/an. Étudiants belges et internationaux." },
+      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudiants belges et internationaux." },
       { property: "og:title", content: "Admissions — IPEC Bruxelles" },
       { property: "og:description", content: "Candidatez à l'IPEC : process simple, frais transparents, accueil des étudiants internationaux." },
     ],
