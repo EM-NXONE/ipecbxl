@@ -246,26 +246,7 @@ function Admissions() {
         </div>
       </section>
 
-      {/* 6. CTA */}
-      <section className="py-20 lg:py-32 bg-surface border-t border-border/30">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-            Prêt·e à candidater ?
-          </h2>
-          <p className="mt-6 text-muted-foreground max-w-2xl mx-auto">
-            Contactez-nous pour recevoir votre dossier de candidature ou organiser
-            un entretien.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/contact" className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
-              Demander mon dossier <ArrowRight size={18} />
-            </Link>
-            <Link to="/international" className="inline-flex items-center gap-2 px-8 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
-              Étudiants internationaux
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* CTA final retiré : la page entière EST l'invitation à candidater. */}
     </>
   );
 }

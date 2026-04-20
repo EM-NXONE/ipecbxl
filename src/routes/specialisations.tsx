@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Briefcase, Megaphone, Globe, LineChart, ArrowRight } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 
 export const Route = createFileRoute("/specialisations")({
   head: () => ({
@@ -90,20 +90,7 @@ function Specs() {
         </div>
       </section>
 
-      <section className="py-20 border-t border-border/30">
-        <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <h2 className="font-display text-4xl md:text-5xl text-cream text-balance">
-            Pas encore décidé·e ? <em className="text-gradient-blue not-italic">C'est normal.</em>
-          </h2>
-          <p className="mt-6 text-muted-foreground max-w-2xl mx-auto">
-            À l'IPEC, vous explorez avant de choisir. Notre tronc commun vous permet
-            de découvrir chaque discipline avant de vous engager.
-          </p>
-          <Link to="/programmes" className="mt-10 inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
-            Voir nos programmes <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
+      {/* CTA final retiré : la home et la page programmes assurent déjà le relais. */}
     </>
   );
 }
