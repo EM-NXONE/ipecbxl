@@ -106,7 +106,7 @@ function Home() {
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Nos cursus</div>
               <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl text-balance">
-                Choisissez votre voie, <em className="text-gradient-blue not-italic">à votre rythme</em>.
+                Deux programmes, <em className="text-gradient-blue not-italic">un parcours complet</em>.
               </h2>
             </div>
           </div>
