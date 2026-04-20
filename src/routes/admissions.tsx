@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, CreditCard, Mail, Calendar, ArrowRight } from "lucide-react";
+import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, DoorOpen, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/admissions")({
   head: () => ({
