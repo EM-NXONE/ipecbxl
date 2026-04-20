@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Send } from "lucide-react";
+import { Send, Mail, MapPin, Phone, Clock } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/contact")({
@@ -33,9 +33,55 @@ function Contact() {
       </section>
 
       <section className="py-20 lg:py-32">
-        <div className="mx-auto max-w-3xl px-6 lg:px-10">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-12">
+          {/* Coordonnées */}
+          <aside className="lg:col-span-4 space-y-8">
+            <div>
+              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Nous joindre</div>
+              <h2 className="font-display text-2xl text-cream mb-2">Bureau des admissions</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                L'équipe vous répond du lundi au vendredi.
+              </p>
+            </div>
+
+            <ul className="space-y-6 text-sm">
+              <li className="flex gap-4">
+                <MapPin size={20} className="text-blue shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-1">Adresse</div>
+                  <div className="text-cream leading-relaxed">Bruxelles<br />Belgique</div>
+                </div>
+              </li>
+              <li className="flex gap-4">
+                <Mail size={20} className="text-blue shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-1">E-mail</div>
+                  <a href="mailto:contact@ipec-bruxelles.be" className="text-cream hover:text-blue transition-colors">
+                    contact@ipec-bruxelles.be
+                  </a>
+                </div>
+              </li>
+              <li className="flex gap-4">
+                <Phone size={20} className="text-blue shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-1">Téléphone</div>
+                  <a href="tel:+3220000000" className="text-cream hover:text-blue transition-colors">
+                    +32 2 000 00 00
+                  </a>
+                </div>
+              </li>
+              <li className="flex gap-4">
+                <Clock size={20} className="text-blue shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-1">Horaires</div>
+                  <div className="text-cream leading-relaxed">Lun – Ven · 9h00 – 17h30</div>
+                </div>
+              </li>
+            </ul>
+          </aside>
+
           {/* Form */}
-          <div>
+          <div className="lg:col-span-7 lg:col-start-6">
             {sent ? (
               <div className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center">
                 <div className="font-display text-3xl text-gradient-blue mb-3">Merci !</div>
