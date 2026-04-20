@@ -91,9 +91,9 @@ function Home() {
               vous explorez avant de choisir.
             </p>
             <p className="text-base">
-              La spécialisation se fait <span className="text-cream">le plus tard possible</span>,
-              quand vos goûts, vos forces et vos ambitions se sont vraiment révélés. Vous ne
-              choisissez pas votre voie au hasard : vous la construisez, étape après étape.
+              La spécialisation se fait <span className="text-cream">après avoir exploré</span> l'ensemble
+              des disciplines qui composent le monde de l'entrepreneuriat et du business.
+              Vous ne choisissez pas votre voie au hasard : vous la construisez, étape après étape.
             </p>
           </div>
         </div>
