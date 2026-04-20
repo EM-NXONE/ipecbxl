@@ -131,7 +131,7 @@ function Admissions() {
               <ul className="space-y-5 text-sm">
                 <li>
                   <div className="text-blue uppercase tracking-widest text-xs mb-1">Rentrée principale</div>
-                  <div className="text-cream">Début octobre · candidatures ouvertes dès janvier</div>
+                  <div className="text-cream">Le deuxième lundi du mois de septembre de l'année en cours</div>
                 </li>
                 <li>
                   <div className="text-blue uppercase tracking-widest text-xs mb-1">Rentrée décalée</div>
