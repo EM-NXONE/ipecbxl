@@ -5,7 +5,7 @@ export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "Admissions — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité Bachelor 4 900 €/an, Master 5 900 €/an. Étudiants belges et internationaux." },
+      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudiants belges et internationaux." },
       { property: "og:title", content: "Admissions — IPEC Bruxelles" },
       { property: "og:description", content: "Candidatez à l'IPEC : process simple, frais transparents, accueil des étudiants internationaux." },
     ],
@@ -158,13 +158,13 @@ function Admissions() {
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PAA</div>
-              <div className="text-sm text-blue uppercase tracking-widest mb-8">Bachelor · BAC+1 à BAC+3</div>
+              <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+1 à BAC+3</div>
               <div className="font-display text-6xl text-cream">4 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme en Administration des Affaires</p>
             </div>
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PEA</div>
-              <div className="text-sm text-blue uppercase tracking-widest mb-8">Master · BAC+4 et BAC+5</div>
+              <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+4 et BAC+5</div>
               <div className="font-display text-6xl text-cream">5 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme Exécutif Avancé</p>
             </div>
