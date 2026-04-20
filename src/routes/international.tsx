@@ -94,7 +94,7 @@ function International() {
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             L'IPEC accueille les étudiants venus de l'étranger. Ce guide rassemble
-            les démarches officielles à anticiper pour rejoindre Bruxelles dans
+            les démarches officielles à anticiper pour rejoindre l'IPEC dans
             les meilleures conditions.
           </p>
         </div>
