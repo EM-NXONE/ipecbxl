@@ -238,6 +238,28 @@ function Admissions() {
                 hors UE sont en nombre limité chaque année : nous vous recommandons d'anticiper
                 vos démarches consulaires dès l'admission confirmée.
               </p>
+
+              <div className="rounded-sm border border-blue/30 bg-background/40 p-5 mb-4">
+                <div className="text-xs uppercase tracking-[0.25em] text-blue mb-2">Attestation de virement irrévocable (AVI)</div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  Actuellement, l'Office des étrangers (OE) n'accepte que les attestations
+                  de virement irrévocable (AVI) établies par les sociétés{" "}
+                  <span className="text-cream">Studely</span> et{" "}
+                  <span className="text-cream">Ready Study Go International</span>.
+                  L'OE n'est toutefois pas lié contractuellement à ces sociétés et ne peut
+                  pas être tenu pour responsable en cas de manquement à leurs obligations
+                  vis-à-vis de l'étudiant.
+                </p>
+                <a
+                  href="https://dofi.ibz.be/fr/themes/ressortissants-dun-pays-tiers/etudes/favoris/moyens-de-subsistance-suffisants"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
+                >
+                  Voir la page officielle de l'Office des étrangers <ArrowRight size={14} />
+                </a>
+              </div>
+
               <Link to="/international" className="inline-flex items-center gap-2 text-sm text-blue hover:underline">
                 Page Étudiants internationaux <ArrowRight size={14} />
               </Link>
