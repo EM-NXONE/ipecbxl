@@ -148,7 +148,7 @@ function Home() {
                   <p className="text-muted-foreground leading-relaxed mb-6 text-base">{p.desc}</p>
                   <div className="pt-5 border-t border-border/40">
                     <div className="text-[10px] uppercase tracking-[0.25em] text-blue/70 mb-2">Prérequis</div>
-                    <div className="text-sm text-cream/90">{p.prereq}</div>
+                    <div className="text-cream/90 text-base">{p.prereq}</div>
                   </div>
                   <div className="flex items-center justify-end mt-6">
                     <ArrowRight className="text-blue group-hover:translate-x-1 transition-transform" />
