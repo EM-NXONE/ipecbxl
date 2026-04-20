@@ -93,7 +93,7 @@ function Home() {
             <p className="text-base">
               La spécialisation se fait <span className="text-cream">le plus tard possible</span>,
               quand vos goûts, vos forces et vos ambitions se sont vraiment révélés. Vous ne
-              choisissez pas votre voie à 18 ans : vous la construisez.
+              choisissez pas votre voie au hasard : vous la construisez, étape après étape.
             </p>
           </div>
         </div>
