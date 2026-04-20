@@ -47,7 +47,7 @@ const timeline = [
     n: "03",
     icon: FileCheck,
     t: "Équivalence de diplôme",
-    d: "Pour intégrer une 1ʳᵉ année de cycle, demandez l'équivalence de votre diplôme secondaire auprès du service compétent de la Fédération Wallonie-Bruxelles.",
+    d: "Facultative dans le cas d'un institut privé comme l'IPEC. Pour intégrer une 1ʳᵉ année de cycle dans un établissement public, l'équivalence du diplôme secondaire se demande auprès du service compétent de la Fédération Wallonie-Bruxelles.",
   },
   {
     n: "04",
@@ -290,9 +290,10 @@ function International() {
               <FileCheck className="text-blue mb-6" size={28} strokeWidth={1.5} />
               <h3 className="font-display text-xl text-cream mb-4">Équivalence de diplôme</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                Pour une entrée en 1ʳᵉ année, l'équivalence du diplôme secondaire
-                est demandée auprès du service compétent de la Fédération
-                Wallonie-Bruxelles. Anticipez : la procédure peut durer plusieurs mois.
+                <span className="text-cream">Facultative pour intégrer l'IPEC</span>, qui est
+                un institut privé. Elle reste requise pour une entrée en 1ʳᵉ année dans un
+                établissement public : la demande se fait auprès de la Fédération
+                Wallonie-Bruxelles et peut durer plusieurs mois — anticipez.
               </p>
               <a
                 href="http://www.equivalences.cfwb.be/"
