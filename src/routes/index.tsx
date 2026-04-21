@@ -342,7 +342,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  Le deuxième lundi de <em className="text-gradient-blue not-italic">septembre</em>
+                  <em className="text-gradient-blue not-italic">{formatRentreeDate(septembreRentree)}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   La grande rentrée académique : démarrage du cursus complet,
