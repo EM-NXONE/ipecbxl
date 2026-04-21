@@ -133,7 +133,7 @@ function International() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Cadre réglementaire</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-3xl text-balance">
-            Visa long séjour pour études (visa D).
+            Visa long séjour (visa D).
           </h2>
 
           <div className="grid lg:grid-cols-2 gap-6">
