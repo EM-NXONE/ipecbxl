@@ -157,15 +157,18 @@ function Home() {
                     "Relations Internationales",
                     "Économie & Finance",
                   ].map((label, i) => (
-                    <li
-                      key={label}
-                      className="group flex items-center gap-4 px-4 py-4 rounded-sm border border-border/40 bg-background/40 hover:border-blue/40 hover:bg-background/60 transition-colors"
-                    >
-                      <div className="font-display text-xs tracking-[0.2em] text-blue/60 group-hover:text-blue transition-colors">
-                        0{i + 1}
-                      </div>
-                      <div className="w-px h-6 bg-blue/20" />
-                      <span className="text-cream text-sm sm:text-base leading-tight">{label}</span>
+                    <li key={label}>
+                      <Link
+                        to="/programmes"
+                        hash="quatre-voies"
+                        className="group flex items-center gap-4 px-4 py-4 rounded-sm border border-border/40 bg-background/40 hover:border-blue/40 hover:bg-background/60 transition-colors h-full"
+                      >
+                        <div className="font-display text-xs tracking-[0.2em] text-blue/60 group-hover:text-blue transition-colors">
+                          0{i + 1}
+                        </div>
+                        <div className="w-px h-6 bg-blue/20" />
+                        <span className="text-cream text-sm sm:text-base leading-tight">{label}</span>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -285,12 +288,7 @@ function Home() {
                 skills: ["Macroéconomie", "Finance", "Analyse de données"],
               },
             ].map((s) => (
-              <Link
-                key={s.n}
-                to="/programmes"
-                hash="quatre-voies"
-                className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col cursor-pointer"
-              >
+              <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col">
                 <div className="flex items-center justify-between mb-10">
                   <s.icon className="text-blue" size={26} strokeWidth={1.5} />
                   <span className="font-display text-sm text-blue/70">{s.n}</span>
@@ -305,7 +303,7 @@ function Home() {
                     </li>
                   ))}
                 </ul>
-              </Link>
+              </div>
             ))}
           </div>
 
