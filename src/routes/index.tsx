@@ -175,15 +175,50 @@ function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
             {[
-              { n: "01", t: "Management", d: "Diriger les équipes et les organisations." },
-              { n: "02", t: "Marketing", d: "Comprendre, attirer et fidéliser les marchés." },
-              { n: "03", t: "Relations Internationales", d: "Naviguer la complexité géopolitique et diplomatique." },
-              { n: "04", t: "Économie & Finance", d: "Maîtriser les équilibres et flux du monde économique." },
+              {
+                n: "01",
+                t: "Management",
+                icon: Briefcase,
+                d: "Diriger des équipes, structurer des organisations, conduire le changement avec méthode et vision.",
+                skills: ["Stratégie", "Leadership", "RH"],
+              },
+              {
+                n: "02",
+                t: "Marketing",
+                icon: Megaphone,
+                d: "Comprendre les marchés, construire des marques fortes et créer un lien durable avec les publics.",
+                skills: ["Brand", "Digital", "Études de marché"],
+              },
+              {
+                n: "03",
+                t: "Relations Internationales",
+                icon: Globe,
+                d: "Naviguer la complexité géopolitique, comprendre les institutions et négocier à l'international.",
+                skills: ["Diplomatie", "Géopolitique", "Négociation"],
+              },
+              {
+                n: "04",
+                t: "Économie & Finance",
+                icon: LineChart,
+                d: "Décrypter les flux économiques, gérer le risque et maîtriser la finance d'entreprise et de marché.",
+                skills: ["Macroéconomie", "Finance", "Analyse de données"],
+              },
             ].map((s) => (
-              <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group">
-                <div className="font-display text-sm text-blue mb-12">{s.n}</div>
+              <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col">
+                <div className="flex items-center justify-between mb-10">
+                  <s.icon className="text-blue" size={26} strokeWidth={1.5} />
+                  <span className="font-display text-sm text-blue/70">{s.n}</span>
+                </div>
                 <h3 className="font-display text-2xl text-cream mb-3 group-hover:text-gradient-blue transition-colors">{s.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">{s.d}</p>
+                <ul className="mt-auto pt-5 border-t border-border/40 space-y-2">
+                  {s.skills.map((sk) => (
+                    <li key={sk} className="flex items-center gap-2.5 text-cream/90 text-xs">
+                      <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
+                      <span>{sk}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
