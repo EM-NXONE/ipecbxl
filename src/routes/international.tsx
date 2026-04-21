@@ -305,7 +305,7 @@ function International() {
 
           <div className="p-10 rounded-sm border border-border/60 bg-card/50">
             <FileCheck className="text-blue mb-6" size={28} strokeWidth={1.5} />
-            <h3 className="font-display text-2xl text-cream mb-4">Une démarche indépendante de l'IPEC</h3>
+            
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               <span className="text-cream">L'IPEC étant un établissement d'enseignement privé</span>,
               l'équivalence du diplôme secondaire n'est pas requise pour s'y
