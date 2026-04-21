@@ -116,7 +116,7 @@ function Home() {
               <div className="lg:col-span-5 flex flex-col items-start">
                 <div className="text-xs uppercase tracking-[0.3em] text-blue mb-8">— Notre emblème</div>
 
-                <div className="relative w-full flex items-center justify-center py-8 sm:py-10 lg:py-12 rounded-sm border-border/40 bg-background/30 border-0">
+                <div className="relative w-full flex items-center justify-center rounded-sm border-border/40 bg-background/30 border-0 overflow-hidden aspect-square sm:aspect-auto sm:min-h-[360px] lg:min-h-[400px]">
                   {/* Concentric decorative rings */}
                   <div className="absolute w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-full border border-blue/10 pointer-events-none" />
                   <div className="absolute w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] rounded-full border border-blue/15 pointer-events-none" />
