@@ -172,8 +172,8 @@ function Home() {
 
                 <div className="pt-6 border-t border-border/40">
                   <p className="text-muted-foreground leading-relaxed text-base">
-                    En son cœur, le sigle <span className="text-cream">« IPEC »</span> forme l'axe
-                    central de la rose, l'ancrage immuable d'où s'élancent les quatre vents. Plus
+                    En son cœur, le sigle <span className="text-cream">« IPEC »</span>,
+                    ancrage immuable d'où s'élancent les quatre vents. Plus
                     qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
                     centre de sa propre trajectoire et lui donne les repères pour tracer, avec
                     exigence et liberté, la route de son ambition.
