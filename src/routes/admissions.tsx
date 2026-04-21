@@ -27,6 +27,9 @@ const steps = [
 ];
 
 function Admissions() {
+  const septembreRentree = getNextSeptemberRentree();
+  const fevrierRentree = getNextFebruaryRentree();
+  const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
       {/* HERO */}
