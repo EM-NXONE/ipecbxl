@@ -307,8 +307,8 @@ function International() {
             <FileCheck className="text-blue mb-6" size={28} strokeWidth={1.5} />
             
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
-              En tant qu'<span className="text-cream">établissement d'enseignement supérieur privé</span>,
-              l'IPEC ne soumet pas l'admission à l'obtention préalable d'une
+              <span className="text-cream">Établissement d'enseignement supérieur privé</span>,
+              l'IPEC ne subordonne pas l'admission à l'obtention préalable d'une
               équivalence de diplôme secondaire : cette démarche demeure
               <span className="text-cream"> facultative</span> dans le cadre de
               notre procédure. Elle constitue néanmoins un
