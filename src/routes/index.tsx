@@ -367,9 +367,9 @@ function Home() {
               </div>
             </div>
 
-            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden">
+            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden flex">
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-blue/10 blur-3xl group-hover:bg-blue/20 transition-colors" />
-              <div className="relative">
+              <div className="relative flex flex-col w-full">
                 <div className="flex items-center justify-between mb-8">
                   <CalendarDays className="text-blue" size={28} strokeWidth={1.5} />
                   <span className="font-display text-sm text-blue/70 uppercase tracking-widest">02</span>
@@ -386,7 +386,7 @@ function Home() {
                   en format intensif</span>, sur un rythme condensé et exigeant, pour
                   rattraper le calendrier classique sans perdre une année.
                 </p>
-                <ul className="space-y-2.5 pt-6 border-t border-border/40">
+                <ul className="space-y-2.5 pt-6 border-t border-border/40 mt-auto">
                   {[
                     "Idéale pour une réorientation",
                     "Année validée en format intensif",
