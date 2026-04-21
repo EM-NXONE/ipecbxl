@@ -227,6 +227,40 @@ function Home() {
         </div>
       </section>
 
+      {/* RENTRÉES */}
+      <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées</div>
+          <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl mb-16 text-balance">
+            Deux dates pour <em className="text-gradient-blue not-italic">nous rejoindre</em>.
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
+              <CalendarDays className="text-blue mb-6" size={28} strokeWidth={1.5} />
+              <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
+              <h3 className="font-display text-2xl text-cream leading-snug mb-4">
+                Le deuxième lundi de septembre
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Démarrage du cursus complet pour l'année académique en cours.
+              </p>
+            </div>
+
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
+              <CalendarDays className="text-blue mb-6" size={28} strokeWidth={1.5} />
+              <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
+              <h3 className="font-display text-2xl text-cream leading-snug mb-4">
+                Le premier lundi de février
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Pour intégrer l'IPEC en cours d'année.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
