@@ -119,7 +119,7 @@ function Home() {
             <div className="lg:col-span-9 space-y-6">
               <div className="text-xs uppercase tracking-[0.3em] text-blue">— Notre emblème</div>
               <h3 className="font-display text-3xl md:text-4xl text-cream leading-tight text-balance">
-                Une <em className="text-gradient-blue not-italic">rose des vents</em> pour guider chaque parcours.
+                Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
               </h3>
               <p className="text-muted-foreground leading-relaxed text-base">
                 Notre logo s'inspire de la rose des vents, instrument millénaire des navigateurs
