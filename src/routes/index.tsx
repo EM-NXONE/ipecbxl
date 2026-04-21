@@ -327,7 +327,7 @@ function Home() {
       {/* RENTRÉES — info pratique juste après l'offre académique */}
       <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées · Année {academicYear}</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl mb-16 text-balance">
             Deux dates pour <em className="text-gradient-blue not-italic">nous rejoindre</em>.
           </h2>
