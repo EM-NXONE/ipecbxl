@@ -134,7 +134,7 @@ function Home() {
               {/* CONTENT COLUMN */}
               <div className="lg:col-span-7 space-y-6">
                 <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight text-balance">
-                  Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
+                  Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em>.
                 </h3>
 
                 <p className="text-muted-foreground leading-relaxed text-base">
