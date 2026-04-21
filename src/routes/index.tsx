@@ -137,7 +137,7 @@ function Home() {
                   Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
                 </h3>
 
-                <p className="text-muted-foreground leading-relaxed sm:text-lg text-base">
+                <p className="text-muted-foreground leading-relaxed text-base">
                   Inspiré de la <span className="text-cream">rose des vents</span>, instrument
                   millénaire des navigateurs et symbole universel de guidance, notre emblème
                   incarne la mission de l'IPEC : accompagner chaque étudiant·e dans la construction
