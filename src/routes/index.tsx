@@ -285,7 +285,12 @@ function Home() {
                 skills: ["Macroéconomie", "Finance", "Analyse de données"],
               },
             ].map((s) => (
-              <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col">
+              <Link
+                key={s.n}
+                to="/programmes"
+                hash="quatre-voies"
+                className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col cursor-pointer"
+              >
                 <div className="flex items-center justify-between mb-10">
                   <s.icon className="text-blue" size={26} strokeWidth={1.5} />
                   <span className="font-display text-sm text-blue/70">{s.n}</span>
@@ -300,7 +305,7 @@ function Home() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Link>
             ))}
           </div>
 
