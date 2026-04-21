@@ -333,9 +333,9 @@ function Home() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden">
+            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden flex">
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-blue/10 blur-3xl group-hover:bg-blue/20 transition-colors" />
-              <div className="relative">
+              <div className="relative flex flex-col w-full">
                 <div className="flex items-center justify-between mb-8">
                   <CalendarDays className="text-blue" size={28} strokeWidth={1.5} />
                   <span className="font-display text-sm text-blue/70 uppercase tracking-widest">01</span>
@@ -352,7 +352,7 @@ function Home() {
                   l'équipe pédagogique, leurs futurs camarades et le rythme
                   de travail qui rythmera leur parcours à l'IPEC.
                 </p>
-                <ul className="space-y-2.5 pt-6 border-t border-border/40">
+                <ul className="space-y-2.5 pt-6 border-t border-border/40 mt-auto">
                   {[
                     "Ouverte à toutes les années (PAA1 à PEA2)",
                     "Semaine d'accueil et d'intégration",
