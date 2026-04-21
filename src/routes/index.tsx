@@ -191,43 +191,7 @@ function Home() {
         </div>
       </section>
 
-      {/* (Modalités déplacées vers /admissions pour éviter la redite) */}
-
-      {/* BRUSSELS */}
-      <section className="relative py-24 lg:py-40 overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img src={brusselsImg} alt="Bruxelles la nuit" className="w-full h-full object-cover opacity-25" loading="lazy" width={1600} height={1000} />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-        </div>
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-16">
-          <div>
-            <div className="flex items-center gap-2 text-blue mb-6">
-              <Globe2 size={16} />
-              <span className="text-xs uppercase tracking-[0.3em]">Bruxelles · Belgique</span>
-            </div>
-            <h2 className="font-display text-4xl md:text-5xl text-cream leading-tight mb-8 text-balance">
-              Étudier dans la capitale de l'Europe.
-            </h2>
-            <div className="space-y-5 text-muted-foreground leading-relaxed">
-              <p>
-                Bruxelles est l'une des villes les plus internationales du monde :
-                siège des institutions européennes, carrefour culturel, hub d'affaires,
-                point de rencontre des diplomaties.
-              </p>
-              <p>
-                Étudier ici, c'est se former dans un écosystème vivant, multiculturel,
-                où l'on apprend autant en classe qu'en dehors.
-              </p>
-            </div>
-            <Link to="/international" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
-              Étudiants internationaux
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* RENTRÉES */}
+      {/* RENTRÉES — info pratique juste après l'offre académique */}
       <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées</div>
@@ -257,6 +221,40 @@ function Home() {
                 Pour intégrer l'IPEC en cours d'année.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BRUSSELS — ouverture vers le contexte / international */}
+      <section className="relative py-24 lg:py-40 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <img src={brusselsImg} alt="Bruxelles la nuit" className="w-full h-full object-cover opacity-25" loading="lazy" width={1600} height={1000} />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
+        </div>
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-2 gap-16">
+          <div>
+            <div className="flex items-center gap-2 text-blue mb-6">
+              <Globe2 size={16} />
+              <span className="text-xs uppercase tracking-[0.3em]">Bruxelles · Belgique</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl text-cream leading-tight mb-8 text-balance">
+              Étudier dans la capitale de l'Europe.
+            </h2>
+            <div className="space-y-5 text-muted-foreground leading-relaxed">
+              <p>
+                Bruxelles est l'une des villes les plus internationales du monde :
+                siège des institutions européennes, carrefour culturel, hub d'affaires,
+                point de rencontre des diplomaties.
+              </p>
+              <p>
+                Étudier ici, c'est se former dans un écosystème vivant, multiculturel,
+                où l'on apprend autant en classe qu'en dehors.
+              </p>
+            </div>
+            <Link to="/international" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
+              Étudiants internationaux
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>
