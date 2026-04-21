@@ -135,14 +135,14 @@ function Home() {
               </p>
               <ul className="grid sm:grid-cols-2 gap-3 pt-2">
                 {[
-                  { axis: "Nord", label: "Management" },
-                  { axis: "Est", label: "Marketing" },
-                  { axis: "Sud", label: "Relations Internationales" },
-                  { axis: "Ouest", label: "Économie & Finance" },
-                ].map((b) => (
-                  <li key={b.label} className="flex items-baseline gap-3 px-4 py-3 rounded-sm border border-border/40 bg-background/40">
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-blue/70 w-10 shrink-0">{b.axis}</span>
-                    <span className="text-cream text-sm">{b.label}</span>
+                  "Management",
+                  "Marketing",
+                  "Relations Internationales",
+                  "Économie & Finance",
+                ].map((label) => (
+                  <li key={label} className="flex items-center gap-3 px-4 py-3 rounded-sm border border-border/40 bg-background/40">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue shrink-0" />
+                    <span className="text-cream text-sm">{label}</span>
                   </li>
                 ))}
               </ul>
