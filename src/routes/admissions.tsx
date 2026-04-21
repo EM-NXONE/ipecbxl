@@ -149,6 +149,7 @@ function Admissions() {
               </div>
             </div>
           </div>
+        </div>
       </section>
 
       {/* 4. TARIFS & PAIEMENT */}
