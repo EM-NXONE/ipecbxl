@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero-building.jpg";
 import brusselsImg from "@/assets/brussels.jpg";
 import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
+import { LogoIpec } from "@/components/LogoIpec";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -100,6 +101,57 @@ function Home() {
               les étudiant·e·s qui suivent l'intégralité du cursus, ou dès la <span className="text-cream">première année du PEA</span> pour
               celles et ceux qui y entrent directement.
             </p>
+          </div>
+        </div>
+
+        {/* LOGO — Rose des vents */}
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 mt-24 lg:mt-32">
+          <div className="grid lg:grid-cols-12 gap-12 items-center p-10 lg:p-16 rounded-sm border border-border/60 bg-card/40 relative overflow-hidden">
+            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue/10 blur-3xl pointer-events-none" />
+
+            <div className="lg:col-span-5 flex justify-center lg:justify-start relative">
+              <div className="relative">
+                <div className="absolute inset-0 -m-8 rounded-full bg-gradient-blue opacity-20 blur-3xl" />
+                <LogoIpec size={240} className="text-blue relative" />
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 space-y-6">
+              <div className="text-xs uppercase tracking-[0.3em] text-blue">— Notre emblème</div>
+              <h3 className="font-display text-3xl md:text-4xl text-cream leading-tight text-balance">
+                Une <em className="text-gradient-blue not-italic">rose des vents</em> pour guider chaque parcours.
+              </h3>
+              <p className="text-muted-foreground leading-relaxed text-base">
+                Notre logo s'inspire de la rose des vents, instrument millénaire des navigateurs
+                et symbole universel de <span className="text-cream">guidance, d'orientation et de cap</span>.
+                Il incarne la mission de l'IPEC : accompagner chaque étudiant·e dans la construction
+                d'une trajectoire claire au sein d'un monde économique en mouvement permanent.
+              </p>
+              <p className="text-muted-foreground leading-relaxed text-base">
+                Ses <span className="text-cream">quatre branches cardinales</span> représentent les quatre
+                disciplines fondatrices qui structurent le monde du business et de l'entrepreneuriat
+                contemporain — les quatre points d'appui sur lesquels se construit toute carrière
+                d'envergure :
+              </p>
+              <ul className="grid sm:grid-cols-2 gap-3 pt-2">
+                {[
+                  { axis: "Nord", label: "Management" },
+                  { axis: "Est", label: "Marketing" },
+                  { axis: "Sud", label: "Relations Internationales" },
+                  { axis: "Ouest", label: "Économie & Finance" },
+                ].map((b) => (
+                  <li key={b.label} className="flex items-baseline gap-3 px-4 py-3 rounded-sm border border-border/40 bg-background/40">
+                    <span className="text-[10px] uppercase tracking-[0.25em] text-blue/70 w-10 shrink-0">{b.axis}</span>
+                    <span className="text-cream text-sm">{b.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-muted-foreground leading-relaxed text-base pt-2">
+                Au centre, un <span className="text-cream">« I »</span> stylisé : la signature de
+                l'Institut, le point fixe à partir duquel chaque vent porte ses étudiant·e·s vers
+                leur propre horizon.
+              </p>
+            </div>
           </div>
         </div>
       </section>
