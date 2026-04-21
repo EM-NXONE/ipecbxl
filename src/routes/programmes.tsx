@@ -1,4 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
+
+const specialisations = [
+  { n: "01", t: "Management", icon: Briefcase },
+  { n: "02", t: "Marketing", icon: Megaphone },
+  { n: "03", t: "Relations Internationales", icon: Globe },
+  { n: "04", t: "Économie & Finance", icon: LineChart },
+];
 
 export const Route = createFileRoute("/programmes")({
   head: () => ({
