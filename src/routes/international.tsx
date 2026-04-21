@@ -285,10 +285,6 @@ function International() {
                   <CheckCircle2 size={14} className="text-blue shrink-0 mt-0.5" />
                   <span>Engagement de prise en charge — annexe 32 signée par un garant solvable</span>
                 </li>
-                <li className="flex gap-3">
-                  <CheckCircle2 size={14} className="text-blue shrink-0 mt-0.5" />
-                  <span>Compte bloqué ouvert par un établissement d'enseignement supérieur belge</span>
-                </li>
               </ul>
               <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
                 L'examen relève exclusivement de l'Office des étrangers, qui
