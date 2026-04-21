@@ -95,6 +95,11 @@ function Home() {
               des disciplines qui composent le monde de l'entrepreneuriat et du business.
               Vous ne choisissez pas votre voie au hasard : vous la construisez, étape après étape.
             </p>
+            <p className="text-base">
+              Concrètement, le choix de la spécialisation intervient en <span className="text-cream">3ᵉ année du PAA</span> pour
+              les étudiant·e·s qui suivent l'intégralité du cursus, ou dès la <span className="text-cream">première année du PEA</span> pour
+              celles et ceux qui y entrent directement.
+            </p>
           </div>
         </div>
       </section>
