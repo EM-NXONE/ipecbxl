@@ -287,7 +287,8 @@ function Home() {
             </h2>
             <div className="space-y-5 text-muted-foreground leading-relaxed">
               <p>
-                Bruxelles est l'une des villes les plus internationales du monde :
+                Bruxelles est souvent considérée comme la ville la plus
+                <span className="text-cream"> internationale et cosmopolite d'Europe</span> :
                 siège des institutions européennes, carrefour culturel, hub d'affaires,
                 point de rencontre des diplomaties.
               </p>
