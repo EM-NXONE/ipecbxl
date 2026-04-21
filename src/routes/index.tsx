@@ -252,9 +252,12 @@ function Home() {
                   Le deuxième lundi de <em className="text-gradient-blue not-italic">septembre</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
-                  La grande rentrée académique. Démarrage du cursus complet, semaine
-                  d'intégration, rencontre des promotions et lancement officiel des
-                  enseignements pour l'année.
+                  La grande rentrée académique : démarrage du cursus complet,
+                  semaine d'intégration et lancement officiel des enseignements
+                  pour l'année. C'est le moment où l'ensemble des promotions se
+                  retrouvent sur le campus, où les nouveaux étudiants découvrent
+                  l'équipe pédagogique, leurs futurs camarades et le rythme
+                  de travail qui rythmera leur parcours à l'IPEC.
                 </p>
                 <ul className="space-y-2.5 pt-6 border-t border-border/40">
                   {[
