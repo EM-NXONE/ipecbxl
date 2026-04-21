@@ -238,7 +238,7 @@ function Home() {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
-              Candidater à l'IPEC
+              S'inscrire à l'IPEC
             </Link>
             <Link to="/contact" className="px-8 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
               Nous contacter
