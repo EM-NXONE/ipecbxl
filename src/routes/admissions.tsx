@@ -50,7 +50,7 @@ function Admissions() {
               {
                 year: "1ʳᵉ année",
                 title: "Entrée post-secondaire",
-                desc: "Titulaires du CESS (ou équivalent) ou en dernière année de secondaire : candidatez à tout moment, l'inscription est validée à l'obtention du diplôme.",
+                desc: "Titulaires du CESS (ou équivalent) ou en dernière année de secondaire : candidatez à tout moment, votre inscription sera, dans le second cas, définitivement validée à l'obtention de votre diplôme.",
               },
               {
                 year: "2ᵉ année",
