@@ -1,46 +1,70 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 type Theme = "light" | "dark";
 
 const STORAGE_KEY = "ipec-theme";
 
 /**
- * Read the current theme from the DOM (set early by the no-flash script in __root.tsx).
- * Falls back to "dark" during SSR.
+ * The theme lives in a single source of truth outside React: the `.light` class
+ * on <html>. The no-flash script in __root.tsx sets this class from localStorage
+ * before React hydrates, which prevents the initial flash.
+ *
+ * We use useSyncExternalStore so that:
+ *   1. SSR always returns the same snapshot ("dark") — no hydration mismatch
+ *      warnings (the <html> already has suppressHydrationWarning).
+ *   2. On the client, the snapshot is read directly from the DOM — so React's
+ *      state can never drift from the actual applied class.
+ *   3. Any external mutation of the class (HMR reload, devtools, other tabs via
+ *      storage event) re-renders consumers automatically.
  */
-function readThemeFromDOM(): Theme {
-  if (typeof document === "undefined") return "dark";
+
+function getSnapshot(): Theme {
   return document.documentElement.classList.contains("light") ? "light" : "dark";
 }
 
-export function useTheme() {
-  // Initialize lazily from the DOM so we never override what the no-flash
-  // script already applied. During SSR this returns "dark" (the default).
-  const [theme, setThemeState] = useState<Theme>(readThemeFromDOM);
+function getServerSnapshot(): Theme {
+  return "dark";
+}
 
-  // Re-sync once on mount in case React hydrated with the SSR default ("dark")
-  // but the DOM was already flipped to "light" by the no-flash script.
-  useEffect(() => {
-    const domTheme = readThemeFromDOM();
-    if (domTheme !== theme) setThemeState(domTheme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+function subscribe(onChange: () => void): () => void {
+  // React to writes from other tabs/windows
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY) onChange();
+  };
+  // React to direct DOM mutations (e.g. HMR, devtools, our own setTheme)
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  window.addEventListener("storage", onStorage);
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function applyTheme(next: Theme) {
+  const root = document.documentElement;
+  if (next === "light") root.classList.add("light");
+  else root.classList.remove("light");
+  try {
+    window.localStorage.setItem(STORAGE_KEY, next);
+  } catch {
+    // ignore
+  }
+}
+
+export function useTheme() {
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const setTheme = useCallback((next: Theme) => {
+    applyTheme(next);
   }, []);
 
-  const setTheme = (next: Theme) => {
-    setThemeState(next);
-    if (typeof document !== "undefined") {
-      const root = document.documentElement;
-      if (next === "light") root.classList.add("light");
-      else root.classList.remove("light");
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // ignore
-      }
-    }
-  };
-
-  const toggle = () => setTheme(theme === "dark" ? "light" : "dark");
+  const toggle = useCallback(() => {
+    applyTheme(getSnapshot() === "dark" ? "light" : "dark");
+  }, []);
 
   return { theme, setTheme, toggle };
 }
