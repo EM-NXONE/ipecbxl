@@ -23,6 +23,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const septembreRentree = getNextSeptemberRentree();
+  const fevrierRentree = getNextFebruaryRentree();
+  const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
       {/* HERO */}
