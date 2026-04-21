@@ -7,7 +7,6 @@ import { useTheme } from "@/hooks/use-theme";
 const links = [
   { to: "/", label: "Accueil" },
   { to: "/programmes", label: "Programmes" },
-  { to: "/specialisations", label: "Spécialisations" },
   { to: "/admissions", label: "Admissions" },
   { to: "/international", label: "International" },
   { to: "/contact", label: "Contact" },

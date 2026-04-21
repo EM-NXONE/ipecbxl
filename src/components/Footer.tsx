@@ -27,7 +27,6 @@ export function Footer() {
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/programmes" className="hover:text-blue">Programmes</Link></li>
-            <li><Link to="/specialisations" className="hover:text-blue">Spécialisations</Link></li>
             <li><Link to="/admissions" className="hover:text-blue">Admissions</Link></li>
             <li><Link to="/international" className="hover:text-blue">International</Link></li>
           </ul>
