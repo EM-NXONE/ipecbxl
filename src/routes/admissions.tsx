@@ -37,29 +37,8 @@ function Admissions() {
         </div>
       </section>
 
-      {/* 1. PROCESS — Vue d'ensemble */}
+      {/* 1. CONDITIONS — Suis-je éligible ? */}
       <section className="py-20 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Process</div>
-          <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
-            Quatre étapes pour rejoindre l'IPEC.
-          </h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
-            {steps.map((s) => (
-              <div key={s.n} className="bg-background p-8 hover:bg-card transition-colors">
-                <s.icon className="text-blue mb-6" size={28} strokeWidth={1.5} />
-                <div className="text-xs text-blue uppercase tracking-widest mb-3">Étape {s.n}</div>
-                <h3 className="font-display text-xl text-cream mb-3">{s.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 2. CONDITIONS — Qui peut entrer */}
-      <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Conditions d'admission</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
@@ -89,6 +68,27 @@ function Admissions() {
                 <div className="text-xs text-blue uppercase tracking-widest mb-3">{c.year}</div>
                 <h3 className="font-display text-xl text-cream mb-4">{c.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 2. PROCESS — Comment je candidate ? */}
+      <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Process</div>
+          <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-2xl text-balance">
+            Quatre étapes pour rejoindre l'IPEC.
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
+            {steps.map((s) => (
+              <div key={s.n} className="bg-background p-8 hover:bg-card transition-colors">
+                <s.icon className="text-blue mb-6" size={28} strokeWidth={1.5} />
+                <div className="text-xs text-blue uppercase tracking-widest mb-3">Étape {s.n}</div>
+                <h3 className="font-display text-xl text-cream mb-3">{s.t}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
               </div>
             ))}
           </div>
