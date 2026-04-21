@@ -308,10 +308,12 @@ function International() {
             
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               <span className="text-cream">L'IPEC étant un établissement d'enseignement privé</span>,
-              l'équivalence du diplôme secondaire n'est pas requise pour s'y
-              inscrire. Elle reste obligatoire pour toute inscription en 1ʳᵉ
-              année dans un établissement d'enseignement supérieur reconnu et
-              financé par la Fédération Wallonie-Bruxelles.
+              l'équivalence du diplôme secondaire n'est <span className="text-cream">pas un prérequis</span> pour
+              s'inscrire chez nous : elle demeure <span className="text-cream">facultative</span>.
+              Nous la considérons toutefois comme un <span className="text-cream">atout apprécié</span> dans
+              l'examen du dossier. Elle reste en revanche obligatoire pour toute
+              inscription en 1ʳᵉ année dans un établissement d'enseignement
+              supérieur reconnu et financé par la Fédération Wallonie-Bruxelles.
             </p>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               La procédure relève exclusivement du service des équivalences
