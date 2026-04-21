@@ -307,11 +307,13 @@ function International() {
             <FileCheck className="text-blue mb-6" size={28} strokeWidth={1.5} />
             
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
-              <span className="text-cream">L'IPEC étant un établissement d'enseignement privé</span>,
-              l'équivalence du diplôme secondaire n'est <span className="text-cream">pas un prérequis</span> pour
-              s'inscrire chez nous : elle demeure <span className="text-cream">facultative</span>.
-              Nous la considérons toutefois comme un <span className="text-cream">atout apprécié</span> dans
-              l'examen du dossier.
+              En tant qu'<span className="text-cream">établissement d'enseignement supérieur privé</span>,
+              l'IPEC ne soumet pas l'admission à l'obtention préalable d'une
+              équivalence de diplôme secondaire : cette démarche demeure
+              <span className="text-cream"> facultative</span> dans le cadre de
+              notre procédure. Elle constitue néanmoins un
+              <span className="text-cream"> élément valorisé</span> lors de
+              l'examen du dossier de candidature.
             </p>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-4">
               La procédure relève exclusivement du service des équivalences
