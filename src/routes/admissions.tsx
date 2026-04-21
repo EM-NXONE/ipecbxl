@@ -150,7 +150,7 @@ function Admissions() {
                 <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
                 <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée décalée</div>
                 <h3 className="font-display text-xl text-cream leading-snug">
-                  Le premier lundi de février
+                  {formatRentreeDate(fevrierRentree)}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
                   Pour intégrer l'IPEC en cours d'année.
