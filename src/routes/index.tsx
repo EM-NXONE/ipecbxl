@@ -147,10 +147,10 @@ function Home() {
                 ))}
               </ul>
               <p className="text-muted-foreground leading-relaxed text-base pt-2">
-                Au cœur de la rose, le <span className="text-cream">« I » de l'IPEC</span> —
+                En son cœur, gravé comme une signature, le sigle <span className="text-cream">« IPEC »</span> —
                 <span className="text-cream"> Institut Privé des Études Commerciales</span> —
-                s'érige comme l'axe central, le point d'ancrage immuable d'où s'élancent les
-                quatre vents. Plus qu'un acronyme, une signature : celle d'une école qui place
+                forme l'axe central de la rose, le point d'ancrage immuable d'où s'élancent les
+                quatre vents. Plus qu'un acronyme, une promesse : celle d'une école qui place
                 l'étudiant·e au centre de sa propre trajectoire et lui donne les repères pour
                 tracer, avec exigence et liberté, la route de son ambition.
               </p>
