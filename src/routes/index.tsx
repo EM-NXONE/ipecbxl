@@ -176,7 +176,7 @@ function Home() {
                     ancrage immuable d'où s'élancent les quatre vents. Plus
                     qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
                     centre de sa propre trajectoire et lui donne les repères pour tracer, avec
-                    exigence et liberté, la route de son ambition.
+                    exigence et audace, la route de son ambition.
                   </p>
                 </div>
               </div>
