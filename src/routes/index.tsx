@@ -105,93 +105,87 @@ function Home() {
         </div>
 
         {/* LOGO — Rose des vents */}
-        <div className="mx-auto max-w-6xl px-6 lg:px-10 mt-24 lg:mt-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 mt-24 lg:mt-32">
           <div className="relative rounded-sm border border-border/60 bg-card/40 overflow-hidden">
             {/* Ambient glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue/[0.07] blur-3xl pointer-events-none" />
-            <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-blue/10 blur-3xl pointer-events-none" />
+            <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-blue/10 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-blue/5 blur-3xl pointer-events-none" />
 
-            {/* HERO LOGO SHOWCASE */}
-            <div className="relative px-6 sm:px-10 lg:px-14 pt-12 sm:pt-16 lg:pt-20 pb-10 sm:pb-12 lg:pb-14 flex flex-col items-center text-center border-b border-border/40">
-              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-10 sm:mb-12">
-                — Notre emblème
+            <div className="relative grid lg:grid-cols-12 gap-10 lg:gap-14 p-8 sm:p-10 lg:p-14">
+              {/* LOGO COLUMN */}
+              <div className="lg:col-span-5 flex flex-col items-start">
+                <div className="text-xs uppercase tracking-[0.3em] text-blue mb-8">— Notre emblème</div>
+
+                <div className="relative w-full flex items-center justify-center py-8 sm:py-10 lg:py-12 rounded-sm border border-border/40 bg-background/30">
+                  {/* Concentric decorative rings */}
+                  <div className="absolute w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-full border border-blue/10 pointer-events-none" />
+                  <div className="absolute w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] rounded-full border border-blue/15 pointer-events-none" />
+                  {/* Halo */}
+                  <div className="absolute w-[200px] h-[200px] rounded-full bg-gradient-blue opacity-25 blur-2xl pointer-events-none" />
+                  {/* Logo */}
+                  <LogoIpec
+                    size={220}
+                    className="text-blue relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]"
+                  />
+                </div>
+
+                {/* IPEC signature beneath logo */}
+                <div className="w-full mt-8 pt-8 border-t border-border/40">
+                  <div className="text-xs uppercase tracking-[0.3em] text-blue/70 mb-3">— Au centre</div>
+                  <div className="font-display text-4xl sm:text-5xl text-gradient-blue tracking-wider mb-3">
+                    IPEC
+                  </div>
+                  <div className="text-cream text-sm sm:text-base">
+                    Institut Privé des Études Commerciales
+                  </div>
+                </div>
               </div>
 
-              <div className="relative">
-                {/* Concentric decorative rings */}
-                <div className="absolute inset-0 -m-12 sm:-m-16 lg:-m-20 rounded-full border border-blue/10 pointer-events-none" />
-                <div className="absolute inset-0 -m-6 sm:-m-8 lg:-m-10 rounded-full border border-blue/20 pointer-events-none" />
-                {/* Halo */}
-                <div className="absolute inset-0 -m-10 rounded-full bg-gradient-blue opacity-25 blur-2xl pointer-events-none" />
-                {/* Logo */}
-                <LogoIpec
-                  size={220}
-                  className="text-blue relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[260px] lg:h-[260px]"
-                />
-              </div>
+              {/* CONTENT COLUMN */}
+              <div className="lg:col-span-7 space-y-6">
+                <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight text-balance">
+                  Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
+                </h3>
 
-              <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight text-balance mt-12 sm:mt-14 max-w-2xl">
-                Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
-              </h3>
-
-              <div className="mt-6 h-px w-16 bg-blue/40" />
-
-              <p className="text-muted-foreground leading-relaxed text-base sm:text-lg mt-6 max-w-2xl">
-                Inspiré de la <span className="text-cream">rose des vents</span>, instrument
-                millénaire des navigateurs et symbole universel de guidance, notre emblème incarne
-                la mission de l'IPEC : accompagner chaque étudiant·e dans la construction d'une
-                trajectoire claire au sein d'un monde économique en mouvement permanent.
-              </p>
-            </div>
-
-            {/* FOUR PILLARS */}
-            <div className="relative px-6 sm:px-10 lg:px-14 py-12 sm:py-14 lg:py-16">
-              <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12">
                 <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                  Inspiré de la <span className="text-cream">rose des vents</span>, instrument
+                  millénaire des navigateurs et symbole universel de guidance, notre emblème
+                  incarne la mission de l'IPEC : accompagner chaque étudiant·e dans la construction
+                  d'une trajectoire claire au sein d'un monde économique en mouvement permanent.
+                </p>
+
+                <p className="text-muted-foreground leading-relaxed text-base">
                   Ses <span className="text-cream">quatre branches cardinales</span> représentent
                   les disciplines fondatrices du business et de l'entrepreneuriat contemporain —
-                  les quatre piliers sur lesquels se construit toute carrière d'envergure.
+                  les quatre piliers sur lesquels se construit toute carrière d'envergure :
                 </p>
-              </div>
 
-              <ul className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                {[
-                  "Management",
-                  "Marketing",
-                  "Relations Internationales",
-                  "Économie & Finance",
-                ].map((label, i) => (
-                  <li
-                    key={label}
-                    className="group relative flex flex-col items-center text-center px-4 py-6 sm:py-7 rounded-sm border border-border/40 bg-background/40 hover:border-blue/40 hover:bg-background/60 transition-colors"
-                  >
-                    <div className="font-display text-xs tracking-[0.3em] text-blue/60 group-hover:text-blue transition-colors mb-3">
-                      0{i + 1}
-                    </div>
-                    <div className="w-8 h-px bg-blue/30 mb-3" />
-                    <span className="text-cream text-sm sm:text-base leading-tight">{label}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                <ul className="grid sm:grid-cols-2 gap-3 pt-1">
+                  {[
+                    "Management",
+                    "Marketing",
+                    "Relations Internationales",
+                    "Économie & Finance",
+                  ].map((label, i) => (
+                    <li
+                      key={label}
+                      className="group flex items-center gap-4 px-4 py-4 rounded-sm border border-border/40 bg-background/40 hover:border-blue/40 hover:bg-background/60 transition-colors"
+                    >
+                      <div className="font-display text-xs tracking-[0.2em] text-blue/60 group-hover:text-blue transition-colors">
+                        0{i + 1}
+                      </div>
+                      <div className="w-px h-6 bg-blue/20" />
+                      <span className="text-cream text-sm sm:text-base leading-tight">{label}</span>
+                    </li>
+                  ))}
+                </ul>
 
-            {/* CENTER — IPEC */}
-            <div className="relative px-6 sm:px-10 lg:px-14 py-10 sm:py-12 lg:py-14 border-t border-border/40 bg-background/20">
-              <div className="max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center gap-3 mb-6">
-                  <div className="h-px w-8 bg-blue/40" />
-                  <span className="text-xs uppercase tracking-[0.3em] text-blue">Au centre</span>
-                  <div className="h-px w-8 bg-blue/40" />
-                </div>
-                <div className="font-display text-4xl sm:text-5xl text-gradient-blue mb-6 tracking-wider">
-                  IPEC
-                </div>
-                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
-                  <span className="text-cream">Institut Privé des Études Commerciales</span> —
-                  gravé au cœur de la rose comme une signature, l'axe immuable d'où s'élancent les
-                  quatre vents. Plus qu'un acronyme, une promesse : celle d'une école qui place
-                  l'étudiant·e au centre de sa propre trajectoire et lui donne les repères pour
-                  tracer, avec exigence et liberté, la route de son ambition.
+                <p className="text-muted-foreground leading-relaxed text-base pt-4 border-t border-border/40">
+                  En son cœur, le sigle <span className="text-cream">« IPEC »</span> forme l'axe
+                  central de la rose, l'ancrage immuable d'où s'élancent les quatre vents. Plus
+                  qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
+                  centre de sa propre trajectoire et lui donne les repères pour tracer, avec
+                  exigence et liberté, la route de son ambition.
                 </p>
               </div>
             </div>
