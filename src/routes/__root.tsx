@@ -52,11 +52,17 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
 });
 
+// Inline script that runs BEFORE React hydrates: reads the persisted theme
+// from localStorage and applies the `.light` class to <html> immediately.
+// This prevents the dark→light flash (FOUC) on page load.
+const NO_FLASH_THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('ipec-theme');if(t==='light'){document.documentElement.classList.add('light');}}catch(e){}})();`;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
       </head>
       <body>
         {children}
