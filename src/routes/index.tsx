@@ -106,17 +106,17 @@ function Home() {
 
         {/* LOGO — Rose des vents */}
         <div className="mx-auto max-w-7xl px-6 lg:px-10 mt-24 lg:mt-32">
-          <div className="grid lg:grid-cols-12 gap-12 items-center p-10 lg:p-16 rounded-sm border border-border/60 bg-card/40 relative overflow-hidden">
+          <div className="grid lg:grid-cols-12 gap-10 items-start p-10 lg:p-14 rounded-sm border border-border/60 bg-card/40 relative overflow-hidden">
             <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue/10 blur-3xl pointer-events-none" />
 
-            <div className="lg:col-span-5 flex justify-center lg:justify-start relative">
+            <div className="lg:col-span-3 flex justify-center lg:justify-start relative">
               <div className="relative">
-                <div className="absolute inset-0 -m-8 rounded-full bg-gradient-blue opacity-20 blur-3xl" />
-                <LogoIpec size={240} className="text-blue relative" />
+                <div className="absolute inset-0 -m-6 rounded-full bg-gradient-blue opacity-20 blur-2xl" />
+                <LogoIpec size={140} className="text-blue relative" />
               </div>
             </div>
 
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-9 space-y-6">
               <div className="text-xs uppercase tracking-[0.3em] text-blue">— Notre emblème</div>
               <h3 className="font-display text-3xl md:text-4xl text-cream leading-tight text-balance">
                 Une <em className="text-gradient-blue not-italic">rose des vents</em> pour guider chaque parcours.
