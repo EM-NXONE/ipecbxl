@@ -105,55 +105,95 @@ function Home() {
         </div>
 
         {/* LOGO — Rose des vents */}
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 mt-24 lg:mt-32">
-          <div className="grid lg:grid-cols-12 gap-10 items-start p-10 lg:p-14 rounded-sm border border-border/60 bg-card/40 relative overflow-hidden">
-            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-blue/10 blur-3xl pointer-events-none" />
+        <div className="mx-auto max-w-6xl px-6 lg:px-10 mt-24 lg:mt-32">
+          <div className="relative rounded-sm border border-border/60 bg-card/40 overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue/[0.07] blur-3xl pointer-events-none" />
+            <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-blue/10 blur-3xl pointer-events-none" />
 
-            <div className="lg:col-span-3 flex justify-center lg:justify-start relative">
-              <div className="relative">
-                <div className="absolute inset-0 -m-6 rounded-full bg-gradient-blue opacity-20 blur-2xl" />
-                <LogoIpec size={140} className="text-blue relative" />
+            {/* HERO LOGO SHOWCASE */}
+            <div className="relative px-6 sm:px-10 lg:px-14 pt-12 sm:pt-16 lg:pt-20 pb-10 sm:pb-12 lg:pb-14 flex flex-col items-center text-center border-b border-border/40">
+              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-10 sm:mb-12">
+                — Notre emblème
               </div>
-            </div>
 
-            <div className="lg:col-span-9 space-y-6">
-              <div className="text-xs uppercase tracking-[0.3em] text-blue">— Notre emblème</div>
-              <h3 className="font-display text-3xl md:text-4xl text-cream leading-tight text-balance">
+              <div className="relative">
+                {/* Concentric decorative rings */}
+                <div className="absolute inset-0 -m-12 sm:-m-16 lg:-m-20 rounded-full border border-blue/10 pointer-events-none" />
+                <div className="absolute inset-0 -m-6 sm:-m-8 lg:-m-10 rounded-full border border-blue/20 pointer-events-none" />
+                {/* Halo */}
+                <div className="absolute inset-0 -m-10 rounded-full bg-gradient-blue opacity-25 blur-2xl pointer-events-none" />
+                {/* Logo */}
+                <LogoIpec
+                  size={220}
+                  className="text-blue relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[260px] lg:h-[260px]"
+                />
+              </div>
+
+              <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl text-cream leading-tight text-balance mt-12 sm:mt-14 max-w-2xl">
                 Quatre vents, <em className="text-gradient-blue not-italic">un seul cap</em> : le vôtre.
               </h3>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                Notre logo s'inspire de la rose des vents, instrument millénaire des navigateurs
-                et symbole universel de <span className="text-cream">guidance, d'orientation et de cap</span>.
-                Il incarne la mission de l'IPEC : accompagner chaque étudiant·e dans la construction
-                d'une trajectoire claire au sein d'un monde économique en mouvement permanent.
+
+              <div className="mt-6 h-px w-16 bg-blue/40" />
+
+              <p className="text-muted-foreground leading-relaxed text-base sm:text-lg mt-6 max-w-2xl">
+                Inspiré de la <span className="text-cream">rose des vents</span>, instrument
+                millénaire des navigateurs et symbole universel de guidance, notre emblème incarne
+                la mission de l'IPEC : accompagner chaque étudiant·e dans la construction d'une
+                trajectoire claire au sein d'un monde économique en mouvement permanent.
               </p>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                Ses <span className="text-cream">quatre branches cardinales</span> représentent les quatre
-                disciplines fondatrices qui structurent le monde du business et de l'entrepreneuriat
-                contemporain — les quatre points d'appui sur lesquels se construit toute carrière
-                d'envergure :
-              </p>
-              <ul className="grid sm:grid-cols-2 gap-3 pt-2">
+            </div>
+
+            {/* FOUR PILLARS */}
+            <div className="relative px-6 sm:px-10 lg:px-14 py-12 sm:py-14 lg:py-16">
+              <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12">
+                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                  Ses <span className="text-cream">quatre branches cardinales</span> représentent
+                  les disciplines fondatrices du business et de l'entrepreneuriat contemporain —
+                  les quatre piliers sur lesquels se construit toute carrière d'envergure.
+                </p>
+              </div>
+
+              <ul className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   "Management",
                   "Marketing",
                   "Relations Internationales",
                   "Économie & Finance",
-                ].map((label) => (
-                  <li key={label} className="flex items-center gap-3 px-4 py-3 rounded-sm border border-border/40 bg-background/40">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue shrink-0" />
-                    <span className="text-cream text-sm">{label}</span>
+                ].map((label, i) => (
+                  <li
+                    key={label}
+                    className="group relative flex flex-col items-center text-center px-4 py-6 sm:py-7 rounded-sm border border-border/40 bg-background/40 hover:border-blue/40 hover:bg-background/60 transition-colors"
+                  >
+                    <div className="font-display text-xs tracking-[0.3em] text-blue/60 group-hover:text-blue transition-colors mb-3">
+                      0{i + 1}
+                    </div>
+                    <div className="w-8 h-px bg-blue/30 mb-3" />
+                    <span className="text-cream text-sm sm:text-base leading-tight">{label}</span>
                   </li>
                 ))}
               </ul>
-              <p className="text-muted-foreground leading-relaxed text-base pt-2">
-                En son cœur, gravé comme une signature, le sigle <span className="text-cream">« IPEC »</span> —
-                <span className="text-cream"> Institut Privé des Études Commerciales</span> —
-                forme l'axe central de la rose, le point d'ancrage immuable d'où s'élancent les
-                quatre vents. Plus qu'un acronyme, une promesse : celle d'une école qui place
-                l'étudiant·e au centre de sa propre trajectoire et lui donne les repères pour
-                tracer, avec exigence et liberté, la route de son ambition.
-              </p>
+            </div>
+
+            {/* CENTER — IPEC */}
+            <div className="relative px-6 sm:px-10 lg:px-14 py-10 sm:py-12 lg:py-14 border-t border-border/40 bg-background/20">
+              <div className="max-w-3xl mx-auto text-center">
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="h-px w-8 bg-blue/40" />
+                  <span className="text-xs uppercase tracking-[0.3em] text-blue">Au centre</span>
+                  <div className="h-px w-8 bg-blue/40" />
+                </div>
+                <div className="font-display text-4xl sm:text-5xl text-gradient-blue mb-6 tracking-wider">
+                  IPEC
+                </div>
+                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                  <span className="text-cream">Institut Privé des Études Commerciales</span> —
+                  gravé au cœur de la rose comme une signature, l'axe immuable d'où s'élancent les
+                  quatre vents. Plus qu'un acronyme, une promesse : celle d'une école qui place
+                  l'étudiant·e au centre de sa propre trajectoire et lui donne les repères pour
+                  tracer, avec exigence et liberté, la route de son ambition.
+                </p>
+              </div>
             </div>
           </div>
         </div>
