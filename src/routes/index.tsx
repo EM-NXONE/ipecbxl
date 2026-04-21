@@ -376,7 +376,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  Le premier lundi de <em className="text-gradient-blue not-italic">février</em>
+                  <em className="text-gradient-blue not-italic">{formatRentreeDate(fevrierRentree)}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent
