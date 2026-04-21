@@ -287,14 +287,14 @@ function Home() {
             </h2>
             <div className="space-y-5 text-muted-foreground leading-relaxed">
               <p>
-                Bruxelles est souvent considérée comme la ville la plus
-                <span className="text-cream"> internationale et cosmopolite d'Europe</span> :
-                siège des institutions européennes, carrefour culturel, hub d'affaires,
-                point de rencontre des diplomaties.
+                Bruxelles, souvent considérée comme la
+                <span className="text-cream"> ville la plus internationale et cosmopolite d'Europe</span>.
+                Elle est le siège des institutions européennes, carrefour culturel,
+                hub d'affaires, point de rencontre des diplomaties.
               </p>
               <p>
                 Étudier ici, c'est se former dans un écosystème vivant, multiculturel,
-                où l'on apprend autant en classe qu'en dehors.
+                où l'on apprend autant dans une salle de classe qu'en dehors.
               </p>
             </div>
             <Link to="/international" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
