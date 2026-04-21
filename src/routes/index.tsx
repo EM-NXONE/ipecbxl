@@ -3,6 +3,12 @@ import heroImg from "@/assets/hero-building.jpg";
 import brusselsImg from "@/assets/brussels.jpg";
 import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 import { LogoIpec } from "@/components/LogoIpec";
+import {
+  getNextSeptemberRentree,
+  getNextFebruaryRentree,
+  getUpcomingAcademicYearLabel,
+  formatRentreeDate,
+} from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,6 +23,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const septembreRentree = getNextSeptemberRentree();
+  const fevrierRentree = getNextFebruaryRentree();
+  const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
       {/* HERO */}
@@ -318,7 +327,7 @@ function Home() {
       {/* RENTRÉES — info pratique juste après l'offre académique */}
       <section className="py-24 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Prochaines rentrées · Année {academicYear}</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream max-w-2xl mb-16 text-balance">
             Deux dates pour <em className="text-gradient-blue not-italic">nous rejoindre</em>.
           </h2>
@@ -333,7 +342,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  Le deuxième lundi de <em className="text-gradient-blue not-italic">septembre</em>
+                  <em className="text-gradient-blue not-italic">{formatRentreeDate(septembreRentree)}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   La grande rentrée académique : démarrage du cursus complet,
@@ -367,7 +376,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  Le premier lundi de <em className="text-gradient-blue not-italic">février</em>
+                  <em className="text-gradient-blue not-italic">{formatRentreeDate(fevrierRentree)}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent

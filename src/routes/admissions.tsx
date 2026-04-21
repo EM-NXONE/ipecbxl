@@ -1,5 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays, GraduationCap } from "lucide-react";
+import {
+  getNextSeptemberRentree,
+  getNextFebruaryRentree,
+  getUpcomingAcademicYearLabel,
+  formatRentreeDate,
+} from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/admissions")({
   head: () => ({
@@ -21,6 +27,9 @@ const steps = [
 ];
 
 function Admissions() {
+  const septembreRentree = getNextSeptemberRentree();
+  const fevrierRentree = getNextFebruaryRentree();
+  const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
       {/* HERO */}
@@ -128,12 +137,12 @@ function Admissions() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
               <div className="p-8 rounded-sm border border-border/60 bg-card/50">
                 <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
-                <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée principale</div>
+                <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée principale · {academicYear}</div>
                 <h3 className="font-display text-xl text-cream leading-snug">
-                  Le deuxième lundi de septembre
+                  {formatRentreeDate(septembreRentree)}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-                  Démarrage du cursus complet pour l'année académique en cours.
+                  Démarrage du cursus complet pour l'année académique {academicYear}.
                 </p>
               </div>
 
@@ -141,7 +150,7 @@ function Admissions() {
                 <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
                 <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée décalée</div>
                 <h3 className="font-display text-xl text-cream leading-snug">
-                  Le premier lundi de février
+                  {formatRentreeDate(fevrierRentree)}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
                   Pour intégrer l'IPEC en cours d'année.
