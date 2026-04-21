@@ -137,10 +137,6 @@ function Admissions() {
                   <div className="text-blue uppercase tracking-widest text-xs mb-1">Rentrée décalée</div>
                   <div className="text-cream">Le premier lundi du mois de février · pour intégrer l'IPEC en cours d'année</div>
                 </li>
-                <li>
-                  <div className="text-blue uppercase tracking-widest text-xs mb-1">Délai de réponse</div>
-                  <div className="text-cream">7 jours après réception du dossier complet</div>
-                </li>
               </ul>
             </div>
           </div>
