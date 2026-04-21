@@ -152,6 +152,7 @@ function Admissions() {
         </div>
       </section>
 
+
       {/* 4. TARIFS & PAIEMENT */}
       <section className="py-20 lg:py-32 bg-surface border-y border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
