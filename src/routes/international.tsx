@@ -300,7 +300,7 @@ function International() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Équivalence de diplôme</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-3xl text-balance">
-            Une procédure distincte de l'admission à l'IPEC.
+            Une démarche <em className="text-gradient-blue not-italic">facultative</em>, mais valorisée.
           </h2>
 
           <div className="p-10 rounded-sm border border-border/60 bg-card/50">
