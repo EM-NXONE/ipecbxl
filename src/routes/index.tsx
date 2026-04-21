@@ -184,7 +184,7 @@ function Home() {
           </div>
 
           <div className="mt-12 text-center">
-            <Link to="/specialisations" className="inline-flex items-center gap-2 text-blue hover:underline">
+            <Link to="/programmes" className="inline-flex items-center gap-2 text-blue hover:underline">
               Explorer les spécialisations <ArrowRight size={16} />
             </Link>
           </div>
