@@ -285,13 +285,16 @@ function Home() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent
                   rejoindre l'IPEC en cours d'année académique : réorientation,
-                  retour d'expatriation ou démarrage différé.
+                  retour d'expatriation ou démarrage différé. C'est aussi
+                  l'opportunité de <span className="text-cream">valider une année complète
+                  en format intensif</span>, sur un rythme condensé et exigeant, pour
+                  rattraper le calendrier classique sans perdre une année.
                 </p>
                 <ul className="space-y-2.5 pt-6 border-t border-border/40">
                   {[
                     "Idéale pour une réorientation",
+                    "Année validée en format intensif",
                     "Accompagnement personnalisé à l'arrivée",
-                    "Rattrapage encadré du premier semestre",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-3 text-cream/90 text-sm">
                       <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
