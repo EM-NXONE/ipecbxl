@@ -107,11 +107,10 @@ function Contact() {
                   <input required type="email" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme d'intérêt</label>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme</label>
                   <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
                     <option>PAA — Administration des Affaires</option>
                     <option>PEA — Programme Exécutif Avancé</option>
-                    <option>Je ne sais pas encore</option>
                   </select>
                 </div>
                 <div>
