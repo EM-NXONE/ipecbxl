@@ -147,9 +147,12 @@ function Home() {
                 ))}
               </ul>
               <p className="text-muted-foreground leading-relaxed text-base pt-2">
-                Au centre, un <span className="text-cream">« I »</span> stylisé : la signature de
-                l'Institut, le point fixe à partir duquel chaque vent porte ses étudiant·e·s vers
-                leur propre horizon.
+                Au cœur de la rose, le <span className="text-cream">« I » de l'IPEC</span> —
+                <span className="text-cream"> Institut Privé des Études Commerciales</span> —
+                s'érige comme l'axe central, le point d'ancrage immuable d'où s'élancent les
+                quatre vents. Plus qu'un acronyme, une signature : celle d'une école qui place
+                l'étudiant·e au centre de sa propre trajectoire et lui donne les repères pour
+                tracer, avec exigence et liberté, la route de son ambition.
               </p>
             </div>
           </div>
