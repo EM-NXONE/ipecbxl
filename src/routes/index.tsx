@@ -172,7 +172,7 @@ function Home() {
 
                 <div className="pt-6 border-t border-border/40">
                   <p className="text-muted-foreground leading-relaxed text-base">
-                    En son cœur, le sigle <span className="text-gradient-blue font-semibold">« IPEC »</span>,
+                    En son cœur, le sigle de l'institut,
                     ancrage immuable d'où s'élancent les quatre vents. Plus
                     qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
                     centre de sa propre trajectoire et lui donne les repères pour tracer, avec
