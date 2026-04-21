@@ -59,7 +59,7 @@ const NO_FLASH_THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('ipec-
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
