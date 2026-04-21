@@ -129,16 +129,6 @@ function Home() {
                   />
                 </div>
 
-                {/* IPEC signature beneath logo */}
-                <div className="w-full mt-8 pt-8 border-t border-border/40">
-                  <div className="text-xs uppercase tracking-[0.3em] text-blue/70 mb-3">— Au centre</div>
-                  <div className="font-display text-4xl sm:text-5xl text-gradient-blue tracking-wider mb-3">
-                    IPEC
-                  </div>
-                  <div className="text-cream text-sm sm:text-base">
-                    Institut Privé des Études Commerciales
-                  </div>
-                </div>
               </div>
 
               {/* CONTENT COLUMN */}
