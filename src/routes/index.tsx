@@ -3,6 +3,12 @@ import heroImg from "@/assets/hero-building.jpg";
 import brusselsImg from "@/assets/brussels.jpg";
 import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 import { LogoIpec } from "@/components/LogoIpec";
+import {
+  getNextSeptemberRentree,
+  getNextFebruaryRentree,
+  getUpcomingAcademicYearLabel,
+  formatRentreeDate,
+} from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/")({
   head: () => ({
