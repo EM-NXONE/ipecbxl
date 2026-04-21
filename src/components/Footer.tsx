@@ -38,7 +38,7 @@ export function Footer() {
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Bruxelles, Belgique</li>
-            <li>contact@ipec-bruxelles.be</li>
+            <li>contact@ipec.school</li>
             <li>+32 2 000 00 00</li>
           </ul>
         </div>

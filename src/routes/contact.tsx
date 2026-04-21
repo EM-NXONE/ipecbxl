@@ -56,8 +56,8 @@ function Contact() {
                 <Mail size={20} className="text-blue shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs uppercase tracking-widest text-blue mb-1">E-mail</div>
-                  <a href="mailto:contact@ipec-bruxelles.be" className="text-cream hover:text-blue transition-colors">
-                    contact@ipec-bruxelles.be
+                  <a href="mailto:contact@ipec.school" className="text-cream hover:text-blue transition-colors">
+                    contact@ipec.school
                   </a>
                 </div>
               </li>
