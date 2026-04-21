@@ -129,16 +129,6 @@ function Home() {
                   />
                 </div>
 
-                {/* IPEC signature beneath logo */}
-                <div className="w-full mt-8 pt-8 border-t border-border/40">
-                  <div className="text-xs uppercase tracking-[0.3em] text-blue/70 mb-3">— Au centre</div>
-                  <div className="font-display text-4xl sm:text-5xl text-gradient-blue tracking-wider mb-3">
-                    IPEC
-                  </div>
-                  <div className="text-cream text-sm sm:text-base">
-                    Institut Privé des Études Commerciales
-                  </div>
-                </div>
               </div>
 
               {/* CONTENT COLUMN */}
@@ -180,13 +170,23 @@ function Home() {
                   ))}
                 </ul>
 
-                <p className="text-muted-foreground leading-relaxed text-base pt-4 border-t border-border/40">
-                  En son cœur, le sigle <span className="text-cream">« IPEC »</span> forme l'axe
-                  central de la rose, l'ancrage immuable d'où s'élancent les quatre vents. Plus
-                  qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
-                  centre de sa propre trajectoire et lui donne les repères pour tracer, avec
-                  exigence et liberté, la route de son ambition.
-                </p>
+                {/* IPEC signature */}
+                <div className="pt-6 border-t border-border/40">
+                  <div className="text-xs uppercase tracking-[0.3em] text-blue/70 mb-3">— Au centre</div>
+                  <div className="font-display text-4xl sm:text-5xl text-gradient-blue tracking-wider mb-3">
+                    IPEC
+                  </div>
+                  <div className="text-cream text-sm sm:text-base mb-5">
+                    Institut Privé des Études Commerciales
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed text-base">
+                    En son cœur, le sigle <span className="text-cream">« IPEC »</span> forme l'axe
+                    central de la rose, l'ancrage immuable d'où s'élancent les quatre vents. Plus
+                    qu'un acronyme, une promesse : celle d'une école qui place l'étudiant·e au
+                    centre de sa propre trajectoire et lui donne les repères pour tracer, avec
+                    exigence et liberté, la route de son ambition.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
