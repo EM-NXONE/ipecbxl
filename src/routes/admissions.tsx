@@ -103,7 +103,7 @@ function Admissions() {
             Pièces à fournir et calendrier.
           </h2>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
             {/* Pièces à fournir */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <FileText className="text-blue mb-6" size={28} strokeWidth={1.5} />
@@ -124,20 +124,29 @@ function Admissions() {
               </ul>
             </div>
 
-            {/* Calendrier */}
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
-              <CalendarDays className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <h3 className="font-display text-2xl text-cream mb-6">Calendrier académique</h3>
-              <ul className="space-y-5 text-sm">
-                <li>
-                  <div className="text-blue uppercase tracking-widest text-xs mb-1">Rentrée principale</div>
-                  <div className="text-cream">Le deuxième lundi du mois de septembre de l'année en cours</div>
-                </li>
-                <li>
-                  <div className="text-blue uppercase tracking-widest text-xs mb-1">Rentrée décalée</div>
-                  <div className="text-cream">Le premier lundi du mois de février · pour intégrer l'IPEC en cours d'année</div>
-                </li>
-              </ul>
+            {/* Calendrier — empilé verticalement à droite */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+              <div className="p-8 rounded-sm border border-border/60 bg-card/50">
+                <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
+                <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée principale</div>
+                <h3 className="font-display text-xl text-cream leading-snug">
+                  Le deuxième lundi de septembre
+                </h3>
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                  Démarrage du cursus complet pour l'année académique en cours.
+                </p>
+              </div>
+
+              <div className="p-8 rounded-sm border border-border/60 bg-card/50">
+                <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
+                <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée décalée</div>
+                <h3 className="font-display text-xl text-cream leading-snug">
+                  Le premier lundi de février
+                </h3>
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                  Pour intégrer l'IPEC en cours d'année.
+                </p>
+              </div>
             </div>
           </div>
         </div>
