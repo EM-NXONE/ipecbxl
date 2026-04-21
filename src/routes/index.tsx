@@ -287,8 +287,8 @@ function Home() {
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent
-                  rejoindre l'IPEC en cours d'année académique : réorientation,
-                  retour d'expatriation ou démarrage différé. C'est aussi
+                  rejoindre l'IPEC en cours d'année académique : réorientation
+                  ou démarrage différé. C'est aussi
                   l'opportunité de <span className="text-cream">valider une année complète
                   en format intensif</span>, sur un rythme condensé et exigeant, pour
                   rattraper le calendrier classique sans perdre une année.
