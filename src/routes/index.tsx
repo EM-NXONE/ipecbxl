@@ -54,7 +54,7 @@ function Home() {
               to="/admissions"
               className="inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors"
             >
-              S'inscrire
+              S'inscrire à l'IPEC
             </Link>
           </div>
 
