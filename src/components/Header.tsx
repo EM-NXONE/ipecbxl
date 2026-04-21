@@ -87,6 +87,13 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
+            <Link
+              to="/admissions"
+              onClick={() => setOpen(false)}
+              className="mt-4 inline-flex items-center justify-center px-5 py-3 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 transition-opacity shadow-blue"
+            >
+              Rejoindre l'IPEC
+            </Link>
           </nav>
         </div>
       )}
