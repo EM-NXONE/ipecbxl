@@ -1,4 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
+
+const specialisations = [
+  { n: "01", t: "Management", icon: Briefcase },
+  { n: "02", t: "Marketing", icon: Megaphone },
+  { n: "03", t: "Relations Internationales", icon: Globe },
+  { n: "04", t: "Économie & Finance", icon: LineChart },
+];
 
 export const Route = createFileRoute("/programmes")({
   head: () => ({
@@ -135,7 +143,50 @@ function Programmes() {
         </div>
       </section>
 
-      {/* (Section "Notre approche" et CTA final retirés : déjà couverts par la home et la page admissions) */}
+      {/* SPÉCIALISATIONS */}
+      <section className="py-20 lg:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="grid lg:grid-cols-12 gap-10 mb-16">
+            <div className="lg:col-span-5">
+              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Spécialisations</div>
+              <h2 className="font-display text-4xl md:text-5xl text-cream leading-[1.05] text-balance">
+                Quatre voies pour <em className="text-gradient-blue not-italic">tracer</em> la vôtre.
+              </h2>
+            </div>
+            <div className="lg:col-span-6 lg:col-start-7">
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                Le choix de la spécialisation s'effectue en PAA3 pour les étudiant·e·s
+                du parcours intégral, ou dès l'admission pour celles et ceux qui rejoignent
+                directement le PEA.
+              </p>
+              <Link
+                to="/specialisations"
+                className="inline-flex items-center gap-2 text-blue hover:text-cream transition-colors text-sm uppercase tracking-widest"
+              >
+                Découvrir les spécialisations →
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
+            {specialisations.map((s) => (
+              <Link
+                key={s.n}
+                to="/specialisations"
+                className="bg-background p-8 hover:bg-card transition-colors group"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <s.icon className="text-blue" size={28} strokeWidth={1.5} />
+                  <div className="font-display text-3xl text-gradient-blue">{s.n}</div>
+                </div>
+                <h3 className="font-display text-xl text-cream group-hover:text-gradient-blue transition-colors">
+                  {s.t}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
