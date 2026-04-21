@@ -205,26 +205,66 @@ function Home() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
-              <CalendarDays className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
-              <h3 className="font-display text-2xl text-cream leading-snug mb-4">
-                Le deuxième lundi de septembre
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Démarrage du cursus complet pour l'année académique en cours.
-              </p>
+            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-blue/10 blur-3xl group-hover:bg-blue/20 transition-colors" />
+              <div className="relative">
+                <div className="flex items-center justify-between mb-8">
+                  <CalendarDays className="text-blue" size={28} strokeWidth={1.5} />
+                  <span className="font-display text-sm text-blue/70 uppercase tracking-widest">01</span>
+                </div>
+                <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
+                <h3 className="font-display text-3xl text-cream leading-snug mb-5">
+                  Le deuxième lundi de <em className="text-gradient-blue not-italic">septembre</em>
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+                  La grande rentrée académique. Démarrage du cursus complet, semaine
+                  d'intégration, rencontre des promotions et lancement officiel des
+                  enseignements pour l'année.
+                </p>
+                <ul className="space-y-2.5 pt-6 border-t border-border/40">
+                  {[
+                    "Ouverte à toutes les années (PAA1 à PEA2)",
+                    "Semaine d'accueil et d'intégration",
+                    "Calendrier académique complet",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-cream/90 text-sm">
+                      <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
-              <CalendarDays className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
-              <h3 className="font-display text-2xl text-cream leading-snug mb-4">
-                Le premier lundi de février
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Pour intégrer l'IPEC en cours d'année.
-              </p>
+            <div className="group relative p-10 rounded-sm border border-border/60 bg-card/50 hover:border-blue/60 hover:bg-card transition-all overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-blue/10 blur-3xl group-hover:bg-blue/20 transition-colors" />
+              <div className="relative">
+                <div className="flex items-center justify-between mb-8">
+                  <CalendarDays className="text-blue" size={28} strokeWidth={1.5} />
+                  <span className="font-display text-sm text-blue/70 uppercase tracking-widest">02</span>
+                </div>
+                <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
+                <h3 className="font-display text-3xl text-cream leading-snug mb-5">
+                  Le premier lundi de <em className="text-gradient-blue not-italic">février</em>
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+                  Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent
+                  rejoindre l'IPEC en cours d'année académique : réorientation,
+                  retour d'expatriation ou démarrage différé.
+                </p>
+                <ul className="space-y-2.5 pt-6 border-t border-border/40">
+                  {[
+                    "Idéale pour une réorientation",
+                    "Accompagnement personnalisé à l'arrivée",
+                    "Rattrapage encadré du premier semestre",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-cream/90 text-sm">
+                      <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
