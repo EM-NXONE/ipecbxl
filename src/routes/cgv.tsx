@@ -105,10 +105,8 @@ function CGV() {
                 Les frais de dossier ne sont en aucun cas remboursables.
               </li>
               <li>
-                L'IPEC fait partie d'un groupe d'établissements scolaires. Une admission à un
-                établissement <strong className="text-cream">ne vaut pas</strong> pour les autres
-                établissements du groupe (par exemple, une admission à l'établissement de Bruxelles
-                ne vaut pas pour une admission à l'établissement de Sfax).
+                Formation et diplôme <strong className="text-cream">non reconnus</strong> par la
+                Communauté française de Belgique (article 14/4, §2, du décret du 7 novembre 2013).
               </li>
               <li>
                 Formation et diplôme <strong className="text-cream">non reconnus</strong> par la
