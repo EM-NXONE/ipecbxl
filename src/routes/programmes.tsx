@@ -284,21 +284,32 @@ function Programmes() {
             {specs.map((s) => (
               <div
                 key={s.n}
-                className="bg-background p-10 hover:bg-card transition-colors"
+                className="bg-background p-10 hover:bg-card transition-colors flex flex-col"
               >
                 <div className="flex items-center justify-between mb-6">
                   <s.icon className="text-blue" size={28} strokeWidth={1.5} />
                   <div className="font-display text-3xl text-gradient-blue">{s.n}</div>
                 </div>
                 <h3 className="font-display text-2xl text-cream mb-4">{s.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-8">{s.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6 italic">{s.desc}</p>
+                <p className="text-sm text-cream/85 leading-relaxed mb-8">{s.long}</p>
 
                 <div className="text-xs uppercase tracking-widest text-blue mb-4">— Compétences clés</div>
-                <ul className="space-y-2.5">
+                <ul className="space-y-2.5 mb-8">
                   {s.skills.map((sk) => (
-                    <li key={sk} className="flex items-center gap-3 text-cream">
-                      <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
-                      <span className="font-body text-sm">{sk}</span>
+                    <li key={sk} className="flex items-start gap-3 text-cream">
+                      <div className="w-1 h-1 rounded-full bg-blue shrink-0 mt-2" />
+                      <span className="font-body text-sm leading-relaxed">{sk}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-xs uppercase tracking-widest text-blue mb-4 mt-auto">— Débouchés professionnels</div>
+                <ul className="space-y-2.5">
+                  {s.careers.map((c) => (
+                    <li key={c} className="flex items-start gap-3 text-cream">
+                      <div className="w-2 h-px bg-blue shrink-0 mt-2.5" />
+                      <span className="font-body text-sm leading-relaxed">{c}</span>
                     </li>
                   ))}
                 </ul>
