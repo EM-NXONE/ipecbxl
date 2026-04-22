@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgrammesRouteImport } from './routes/programmes'
 import { Route as InternationalRouteImport } from './routes/international'
+import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const ProgrammesRoute = ProgrammesRouteImport.update({
 const InternationalRoute = InternationalRouteImport.update({
   id: '/international',
   path: '/international',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscriptionRoute = InscriptionRouteImport.update({
+  id: '/inscription',
+  path: '/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admissions': typeof AdmissionsRoute
   '/contact': typeof ContactRoute
+  '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/programmes': typeof ProgrammesRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admissions': typeof AdmissionsRoute
   '/contact': typeof ContactRoute
+  '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/programmes': typeof ProgrammesRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admissions': typeof AdmissionsRoute
   '/contact': typeof ContactRoute
+  '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/programmes': typeof ProgrammesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admissions' | '/contact' | '/international' | '/programmes'
+  fullPaths:
+    | '/'
+    | '/admissions'
+    | '/contact'
+    | '/inscription'
+    | '/international'
+    | '/programmes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admissions' | '/contact' | '/international' | '/programmes'
+  to:
+    | '/'
+    | '/admissions'
+    | '/contact'
+    | '/inscription'
+    | '/international'
+    | '/programmes'
   id:
     | '__root__'
     | '/'
     | '/admissions'
     | '/contact'
+    | '/inscription'
     | '/international'
     | '/programmes'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdmissionsRoute: typeof AdmissionsRoute
   ContactRoute: typeof ContactRoute
+  InscriptionRoute: typeof InscriptionRoute
   InternationalRoute: typeof InternationalRoute
   ProgrammesRoute: typeof ProgrammesRoute
 }
@@ -99,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/international'
       fullPath: '/international'
       preLoaderRoute: typeof InternationalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscription': {
+      id: '/inscription'
+      path: '/inscription'
+      fullPath: '/inscription'
+      preLoaderRoute: typeof InscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdmissionsRoute: AdmissionsRoute,
   ContactRoute: ContactRoute,
+  InscriptionRoute: InscriptionRoute,
   InternationalRoute: InternationalRoute,
   ProgrammesRoute: ProgrammesRoute,
 }

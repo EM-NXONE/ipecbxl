@@ -49,7 +49,7 @@ export function Header() {
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <Link
-            to="/admissions"
+            to="/inscription"
             className="inline-flex items-center px-5 py-2.5 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 transition-opacity shadow-blue"
           >
             S'inscrire
@@ -88,11 +88,11 @@ export function Header() {
               </Link>
             ))}
             <Link
-              to="/admissions"
+              to="/inscription"
               onClick={() => setOpen(false)}
               className="mt-4 inline-flex items-center justify-center px-5 py-3 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 transition-opacity shadow-blue"
             >
-              Rejoindre l'IPEC
+              S'inscrire
             </Link>
           </nav>
         </div>

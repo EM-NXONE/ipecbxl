@@ -1,0 +1,203 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Send, FileText, Mail, CheckCircle2, ArrowRight } from "lucide-react";
+import { useState } from "react";
+
+export const Route = createFileRoute("/inscription")({
+  head: () => ({
+    meta: [
+      { title: "Inscription — Candidater à l'IPEC Bruxelles" },
+      { name: "description", content: "Déposez votre dossier de candidature à l'IPEC. Formulaire d'inscription en ligne pour le PAA et le PEA." },
+      { property: "og:title", content: "Inscription — IPEC Bruxelles" },
+      { property: "og:description", content: "Formulaire d'inscription en ligne. Notre équipe vous répond sous 7 jours." },
+    ],
+  }),
+  component: Inscription,
+});
+
+function Inscription() {
+  const [sent, setSent] = useState(false);
+
+  return (
+    <>
+      {/* HERO */}
+      <section className="py-20 lg:py-32 border-b border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Inscription</div>
+          <h1 className="font-display text-5xl md:text-7xl text-cream leading-[1] max-w-4xl text-balance">
+            Déposez votre <em className="text-gradient-blue not-italic">candidature</em>.
+          </h1>
+          <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
+            Remplissez le formulaire ci-dessous pour engager votre dossier d'admission.
+            Notre équipe revient vers vous sous 7 jours pour la suite de la procédure.
+          </p>
+        </div>
+      </section>
+
+      {/* FORM */}
+      <section className="py-20 lg:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 grid lg:grid-cols-12 gap-12">
+          {/* Aside : rappel du process */}
+          <aside className="lg:col-span-4 space-y-8">
+            <div>
+              <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Étapes</div>
+              <h2 className="font-display text-2xl text-cream mb-2">Comment ça se passe ?</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Une procédure simple, en quatre temps.
+              </p>
+            </div>
+
+            <ol className="space-y-6 text-sm">
+              {[
+                { n: "01", t: "Formulaire", d: "Vous renseignez vos coordonnées et le programme visé." },
+                { n: "02", t: "Pièces justificatives", d: "Nous vous indiquons par e-mail les documents à transmettre." },
+                { n: "03", t: "Entretien", d: "Échange avec l'équipe pédagogique pour préciser votre projet." },
+                { n: "04", t: "Décision", d: "Réponse d'admission sous 7 jours et confirmation d'inscription." },
+              ].map((s) => (
+                <li key={s.n} className="flex gap-4">
+                  <div className="text-blue font-display text-lg shrink-0 w-8">{s.n}</div>
+                  <div>
+                    <div className="text-cream mb-1">{s.t}</div>
+                    <div className="text-muted-foreground leading-relaxed">{s.d}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
+              <FileText className="text-blue mb-3" size={22} strokeWidth={1.5} />
+              <div className="text-xs uppercase tracking-widest text-blue mb-2">Conditions & tarifs</div>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                Retrouvez l'ensemble des modalités d'admission, pièces à fournir et frais de scolarité.
+              </p>
+              <Link to="/admissions" className="inline-flex items-center gap-2 text-sm text-blue hover:underline">
+                Voir la page Admissions <ArrowRight size={14} />
+              </Link>
+            </div>
+          </aside>
+
+          {/* Form */}
+          <div className="lg:col-span-7 lg:col-start-6">
+            {sent ? (
+              <div className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center">
+                <CheckCircle2 className="text-blue mx-auto mb-4" size={40} strokeWidth={1.5} />
+                <div className="font-display text-3xl text-gradient-blue mb-3">Candidature reçue</div>
+                <p className="text-muted-foreground leading-relaxed">
+                  Merci ! Votre dossier d'inscription a bien été enregistré.
+                  Nous vous répondons par e-mail sous 7 jours.
+                </p>
+              </div>
+            ) : (
+              <form
+                className="space-y-6"
+                onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+              >
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
+                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nom</label>
+                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">E-mail</label>
+                    <input required type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Téléphone</label>
+                    <input type="tel" maxLength={30} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Pays de résidence</label>
+                  <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme</label>
+                    <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                      <option>PAA — Administration des Affaires</option>
+                      <option>PEA — Programme Exécutif Avancé</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Année visée</label>
+                    <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                      <option>1ʳᵉ année</option>
+                      <option>2ᵉ année (Bac+1)</option>
+                      <option>3ᵉ année (Bac+2)</option>
+                      <option>4ᵉ année — PEA1 (Bac+3)</option>
+                      <option>5ᵉ année — PEA2 (Bac+4)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Spécialisation souhaitée</label>
+                  <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                    <option>Management</option>
+                    <option>Marketing</option>
+                    <option>Relations Internationales</option>
+                    <option>Économie & Finance</option>
+                    <option>Je ne sais pas encore</option>
+                  </select>
+                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                    Pour le PAA, ce choix est indicatif et non définitif : la spécialisation se précise progressivement au fil du cursus.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Rentrée envisagée</label>
+                  <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                    <option>Rentrée principale — septembre</option>
+                    <option>Rentrée décalée — février</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">
+                    Message <span className="text-muted-foreground normal-case tracking-normal">(facultatif)</span>
+                  </label>
+                  <textarea
+                    rows={5}
+                    maxLength={1500}
+                    placeholder="Parcours, motivations, projet professionnel…"
+                    className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none"
+                  />
+                </div>
+
+                <div className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <input required id="rgpd" type="checkbox" className="mt-1 accent-blue" />
+                  <label htmlFor="rgpd" className="leading-relaxed">
+                    J'accepte que les informations saisies soient utilisées dans le cadre de ma candidature à l'IPEC.
+                  </label>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity"
+                  >
+                    Envoyer ma candidature <Send size={16} />
+                  </button>
+                  <Link
+                    to="/contact"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-blue transition-colors"
+                  >
+                    <Mail size={14} /> Une question avant de candidater ?
+                  </Link>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
