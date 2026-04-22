@@ -47,7 +47,7 @@ function CGV() {
               <li>PEA — Programme Exécutif Avancé : 5 900 € / an</li>
             </ul>
             <p className="mt-3">
-              Une première tranche de <strong className="text-cream">3 000 €</strong> est due à la
+              Une première tranche de 3 000 € est due à la
               confirmation d'inscription. Pour les candidats sollicitant un visa d'études, ce montant
               est intégralement déduit des droits de scolarité annuels.
             </p>
