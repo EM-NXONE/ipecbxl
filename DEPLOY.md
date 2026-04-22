@@ -139,14 +139,19 @@ public_html/
 2. Naviguez dans `public_html/` côté serveur.
 3. **Avant le premier déploiement**, sauvegardez le contenu existant
    (clic droit → télécharger).
-4. Uploadez tout le contenu du dossier de build (`dist/` ou `.output/public/`)
-   dans `public_html/`.
-5. Uploadez en plus :
+4. Uploadez **tout le contenu du dossier `dist/client/`** (et pas le dossier
+   lui-même) dans `public_html/`. Vous devez voir apparaître `index.html`,
+   `assets/`, `admissions/`, `contact/`, `mailer.php`, `PHPMailer/`, etc.
+   directement à la racine de `public_html/`.
+5. Uploadez **en plus** le `.htaccess` (le build ne le copie pas
+   automatiquement à la racine de `dist/client/`) :
    - `public/.htaccess` → `public_html/.htaccess`
-   - `public/mailer.php` → `public_html/mailer.php`
-   - `public/PHPMailer/` → `public_html/PHPMailer/`
 6. Vérifiez que `.ipec-mailer.env` existe bien **un niveau au-dessus** de
    `public_html/` (cf. configuration SMTP).
+
+> 💡 **Astuce FileZilla** : ouvrez `dist/client/` côté gauche, ouvrez
+> `public_html/` côté droit, sélectionnez tout (Ctrl+A) à gauche et glissez
+> à droite. C'est le moyen le plus sûr d'uploader le bon contenu.
 
 ---
 
