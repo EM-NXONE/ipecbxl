@@ -1,0 +1,61 @@
+# =====================================================================
+# IPEC — Configuration Apache pour n0c
+# =====================================================================
+# Ce fichier est lu automatiquement par Apache/n0c quand il est placé
+# dans public_html/.
+#
+# Il fait deux choses essentielles :
+#   1. SPA fallback : redirige les URLs inconnues vers index.html
+#      (sinon /contact, /inscription, etc. donnent une 404 au refresh)
+#   2. Cache navigateur agressif sur les assets versionnés (JS/CSS/images)
+# =====================================================================
+
+# ---------- 1) SPA fallback ----------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Si la requête correspond à un fichier réel (CSS, JS, image, mailer.php, etc.)
+    # → servir le fichier directement.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Sinon → renvoyer index.html (le routeur React prend le relais).
+    RewriteRule . /index.html [L]
+</IfModule>
+
+# ---------- 2) Cache navigateur ----------
+# Les fichiers JS/CSS générés par Vite ont un hash dans leur nom
+# (ex: index.a1b2c3.js) → on peut les cacher 1 an sans risque.
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # HTML : pas de cache (pour récupérer la dernière version après un déploiement)
+    ExpiresByType text/html "access plus 0 seconds"
+
+    # Assets versionnés : cache long
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+</IfModule>
+
+# ---------- 3) Compression Gzip ----------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/json
+</IfModule>
+
+# ---------- 4) Sécurité ----------
+# Empêche l'accès direct au fichier .env si quelqu'un le mettait par erreur
+# dans public_html (il devrait être un niveau au-dessus, mais ceinture+bretelles).
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Désactive le listage de répertoires
+Options -Indexes
