@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Send, Mail, MapPin, Phone, Clock } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Send, Mail, MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/contact")({
@@ -92,43 +92,36 @@ function Contact() {
                 className="space-y-6"
                 onSubmit={(e) => { e.preventDefault(); setSent(true); }}
               >
+                <div className="p-5 rounded-sm border border-blue/30 bg-blue/5">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Vous souhaitez déposer un dossier de candidature ?{" "}
+                    <Link to="/inscription" className="inline-flex items-center gap-1 text-blue hover:underline">
+                      Accéder au formulaire d'inscription <ArrowRight size={14} />
+                    </Link>
+                  </p>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
-                    <input required type="text" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nom</label>
-                    <input required type="text" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">E-mail</label>
-                  <input required type="email" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  <input required type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme</label>
-                  <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>PAA — Administration des Affaires</option>
-                    <option>PEA — Programme Exécutif Avancé</option>
-                  </select>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Sujet</label>
+                  <input required type="text" maxLength={150} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Spécialisation souhaitée</label>
-                  <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>Management</option>
-                    <option>Marketing</option>
-                    <option>Relations Internationales</option>
-                    <option>Économie & Finance</option>
-                    <option>Je ne sais pas encore</option>
-                  </select>
-                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                    Pour le PAA, ce choix est indicatif et non définitif : la spécialisation se précise progressivement au fil du cursus.
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Message <span className="text-muted-foreground normal-case tracking-normal">(facultatif)</span></label>
-                  <textarea rows={6} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none" />
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Message</label>
+                  <textarea required rows={6} maxLength={2000} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none" />
                 </div>
                 <button
                   type="submit"
