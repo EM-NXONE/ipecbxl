@@ -359,7 +359,7 @@ function Inscription() {
                 </div>
 
                 {errorMsg && (
-                  <div className="p-4 rounded-sm border border-red-500/40 bg-red-500/10 text-sm text-red-200">
+                  <div className="p-4 rounded-sm border border-destructive/40 bg-destructive/10 text-sm text-destructive-foreground">
                     {errorMsg}
                   </div>
                 )}
