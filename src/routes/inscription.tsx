@@ -43,6 +43,7 @@ function Inscription() {
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
   const septembreRentree = formatRentreeDate(getNextSeptemberRentree());
   const fevrierRentree = formatRentreeDate(getNextFebruaryRentree());
+  const academicYearLabel = getUpcomingAcademicYearLabel();
 
   const handleProgrammeChange = (value: Programme) => {
     setProgramme(value);
