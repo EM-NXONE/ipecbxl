@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "Admissions — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 300 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudiants belges et internationaux." },
+      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 400 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudiants belges et internationaux." },
       { property: "og:title", content: "Admissions — IPEC Bruxelles" },
       { property: "og:description", content: "Candidatez à l'IPEC : process simple, frais transparents, accueil des étudiants internationaux." },
     ],
@@ -23,7 +23,7 @@ const steps = [
   { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez votre dossier en ligne et joignez vos pièces justificatives." },
   { n: "02", icon: Mail, t: "Entretien personnel", d: "Échange avec notre équipe pédagogique pour préciser votre projet." },
   { n: "03", icon: Calendar, t: "Réponse sous 7 jours", d: "Vous recevez la décision d'admission rapidement, par e-mail." },
-  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier (300 €) et de la première tranche de scolarité." },
+  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier (400 €) et de la première tranche de scolarité." },
 ];
 
 function Admissions() {
@@ -188,7 +188,7 @@ function Admissions() {
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Frais de dossier</div>
-              <div className="font-display text-3xl text-cream mb-3">300 €</div>
+              <div className="font-display text-3xl text-cream mb-3">400 €</div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Réglés au dépôt de la candidature, ils couvrent l'instruction administrative
                 et pédagogique de votre dossier.
