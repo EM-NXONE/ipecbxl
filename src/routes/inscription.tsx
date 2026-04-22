@@ -173,7 +173,13 @@ function Inscription() {
           {/* Form */}
           <div className="lg:col-span-7 lg:col-start-6">
             {sent ? (
-              <div className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center">
+              <div
+                ref={confirmationRef}
+                tabIndex={-1}
+                role="status"
+                aria-live="polite"
+                className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center scroll-mt-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/60"
+              >
                 <CheckCircle2 className="text-blue mx-auto mb-4" size={40} strokeWidth={1.5} />
                 <div className="font-display text-3xl text-gradient-blue mb-3">Candidature reçue</div>
                 <p className="text-muted-foreground leading-relaxed">
