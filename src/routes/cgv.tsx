@@ -69,17 +69,23 @@ function CGV() {
                 l'institut pour les étudiants internationaux soumis à une procédure de visa
               </li>
             </ul>
-            <p className="mt-4">
-              L'octroi d'un plan de paiement échelonné relève de la seule appréciation
-              discrétionnaire du service administratif de l'IPEC. Toute demande est
-              examinée au cas par cas et peut être acceptée, refusée ou révoquée sans
-              que l'IPEC soit tenue de motiver sa décision. Aucune demande ne confère
-              de droit acquis et aucun recours, amiable ou contentieux, ne peut être
-              fondé sur un éventuel refus. Lorsqu'il est accordé, l'aménagement doit
-              faire l'objet d'un accord écrit préalable à la rentrée académique ; tout
-              défaut ou retard de paiement à l'une des échéances convenues entraîne de
-              plein droit la déchéance du terme et l'exigibilité immédiate du solde.
-            </p>
+            <div className="mt-6 p-5 rounded-sm border border-blue/30 bg-blue/5">
+              <div className="text-xs uppercase tracking-[0.25em] text-blue mb-3">Plan de paiement échelonné</div>
+              <p className="text-cream leading-relaxed mb-3">
+                L'octroi d'un plan de paiement échelonné relève de la seule appréciation
+                discrétionnaire du service administratif de l'IPEC. Toute demande est
+                examinée au cas par cas et peut être acceptée, refusée ou révoquée sans
+                que l'IPEC soit tenue de motiver sa décision.
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                Aucune demande ne confère de droit acquis et aucun recours, amiable ou
+                contentieux, ne peut être fondé sur un éventuel refus. Lorsqu'il est
+                accordé, l'aménagement doit faire l'objet d'un accord écrit préalable à
+                la rentrée académique ; tout défaut ou retard de paiement à l'une des
+                échéances convenues entraîne de plein droit la déchéance du terme et
+                l'exigibilité immédiate du solde.
+              </p>
+            </div>
             <p className="mt-4">
               Moyens de paiement acceptés : virement SEPA, Bancontact, carte de crédit
               et espèces (dans les limites prévues par la législation belge en vigueur).
