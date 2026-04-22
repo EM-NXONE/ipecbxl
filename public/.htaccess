@@ -10,18 +10,25 @@
 #   2. Cache navigateur agressif sur les assets versionnés (JS/CSS/images)
 # =====================================================================
 
-# ---------- 1) SPA fallback ----------
+# ---------- 1) Routing : prerender + SPA fallback ----------
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Si la requête correspond à un fichier réel (CSS, JS, image, mailer.php, etc.)
-    # → servir le fichier directement.
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # 1a) Si la requête correspond à un fichier réel (CSS, JS, image,
+    #     mailer.php, etc.) → servir le fichier directement.
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # Sinon → renvoyer index.html (le routeur React prend le relais).
+    # 1b) Si la requête correspond à un dossier qui contient un index.html
+    #     pré-rendu (ex: /contact → public_html/contact/index.html),
+    #     servir CE fichier (et pas le index.html racine).
+    #     → indispensable pour que le SEO du prerender fonctionne.
+    RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/index.html -f
+    RewriteRule ^(.*)$ /$1/index.html [L]
+
+    # 1c) Sinon (route inconnue, ex: /une-page-qui-nexiste-pas) →
+    #     renvoyer le index.html racine, le routeur React affichera la 404.
     RewriteRule . /index.html [L]
 </IfModule>
 
