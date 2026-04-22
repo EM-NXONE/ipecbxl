@@ -290,13 +290,7 @@ function Inscription() {
                     <Link to="/cgv" className="text-blue hover:underline">
                       conditions particulières d'admission
                     </Link>{" "}
-                    de l'IPEC, notamment concernant la non-reconnaissance du diplôme par la
-                    Communauté française de Belgique, le caractère non remboursable des frais de
-                    dossier (300 €), le versement d'une première tranche de 3 000 € rendant
-                    l'inscription définitive, ainsi que les modalités spécifiques applicables aux
-                    candidats hors Union européenne (visa étudiant, suivi en visioconférence,
-                    bascule automatique vers le programme online en cas de refus de visa).
-                    Cette acceptation vaut signature.
+                    de l'IPEC. Cette acceptation vaut signature.
                   </label>
                 </div>
 
