@@ -254,7 +254,7 @@ function Admissions() {
                   <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Virement SEPA</span></li>
                   <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Bancontact</span></li>
                   <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Carte de crédit</span></li>
-                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Espèces<span className="opacity-60"> (dans les limites légales)</span></span></li>
+                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Espèces<span className="opacity-60"> (Limites légales)</span></span></li>
                 </ul>
               </div>
             </div>
