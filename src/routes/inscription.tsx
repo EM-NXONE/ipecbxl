@@ -5,6 +5,7 @@ import {
   formatRentreeDate,
   getNextSeptemberRentree,
   getNextFebruaryRentree,
+  getUpcomingAcademicYearLabel,
 } from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/inscription")({
