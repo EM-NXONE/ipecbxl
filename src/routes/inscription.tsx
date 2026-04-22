@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Send, FileText, Mail, CheckCircle2, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   formatRentreeDate,
   getNextSeptemberRentree,
@@ -40,6 +40,14 @@ function Inscription() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
+  const confirmationRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (sent && confirmationRef.current) {
+      confirmationRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      confirmationRef.current.focus();
+    }
+  }, [sent]);
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
@@ -165,7 +173,13 @@ function Inscription() {
           {/* Form */}
           <div className="lg:col-span-7 lg:col-start-6">
             {sent ? (
-              <div className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center">
+              <div
+                ref={confirmationRef}
+                tabIndex={-1}
+                role="status"
+                aria-live="polite"
+                className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center scroll-mt-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/60"
+              >
                 <CheckCircle2 className="text-blue mx-auto mb-4" size={40} strokeWidth={1.5} />
                 <div className="font-display text-3xl text-gradient-blue mb-3">Candidature reçue</div>
                 <p className="text-muted-foreground leading-relaxed">
