@@ -52,43 +52,78 @@ npm install
 
 ---
 
-## 3️⃣ Builder la version statique
+## 3️⃣ Builder la version statique (mode prerender)
 
+⚠️ **TRÈS IMPORTANT** : utilisez la variable d'environnement `STATIC_BUILD=1`,
+sinon le build produit du code serveur pour Cloudflare et **pas de fichiers
+HTML** (vous obtiendriez `dist/client/` + `dist/server/` sans aucun `.html`).
+
+**Sur macOS / Linux :**
 ```bash
-npm run build
+STATIC_BUILD=1 npm run build
 ```
 
-Cette commande génère le site optimisé. Selon la version du projet, le
-résultat est dans **`dist/`** ou **`.output/public/`** — vérifiez les deux
-dossiers à la racine.
+**Sur Windows (PowerShell) :**
+```powershell
+$env:STATIC_BUILD=1; npm run build
+```
 
-> ⚠️ **Note technique** : votre projet utilise TanStack Start (mode SSR).
-> Pour un déploiement statique sur n0c (Apache/PHP, sans Node.js),
-> l'`index.html` généré sera servi pour toutes les routes grâce au
-> `.htaccess` — le routeur React prend ensuite le relais côté navigateur.
-> C'est ce qu'on appelle le mode **SPA fallback**.
+**Sur Windows (cmd.exe) :**
+```cmd
+set STATIC_BUILD=1 && npm run build
+```
+
+Cette commande :
+1. Compile le site React.
+2. Lance un serveur temporaire en local.
+3. Visite chaque route (`/`, `/contact`, `/programmes`, etc.) et **sauvegarde
+   le HTML rendu** dans `dist/client/`.
+4. Vous obtenez `dist/client/index.html` + un `dist/client/<route>/index.html`
+   par page → SEO complet, chaque page indexable indépendamment.
+
+À la fin, vous devez voir un message `[prerender] Prerendered 12 pages:` listant
+toutes vos routes. Si vous voyez `Prerendered 0 pages` → le `STATIC_BUILD=1`
+n'a pas été pris en compte, recommencez.
 
 ---
 
 ## 4️⃣ Préparer les fichiers à uploader
 
-Vous devez uploader dans le `public_html/` de n0c :
+Après le build, **tout est dans `dist/client/`**. C'est ce dossier (et son
+contenu) qu'il faut uploader dans `public_html/` de n0c.
+
+Structure attendue après upload :
 
 ```
 public_html/
-├── index.html              ← depuis le build (dist/ ou .output/public/)
-├── assets/                 ← depuis le build (JS, CSS générés)
-├── favicon.ico             ← idem
-├── robots.txt              ← idem
-├── .htaccess               ← depuis le repo : public/.htaccess
+├── index.html              ← page d'accueil pré-rendue
+├── assets/                 ← JS, CSS, fonts (générés par Vite, hashés)
 │
-├── mailer.php              ← depuis le repo : public/mailer.php
-└── PHPMailer/              ← depuis le repo : public/PHPMailer/
+├── admissions/index.html   ← une page HTML par route
+├── cgu/index.html
+├── cgv/index.html
+├── confidentialite/index.html
+├── contact/index.html
+├── cookies/index.html
+├── inscription/index.html
+├── international/index.html
+├── mentions-legales/index.html
+├── programmes/index.html
+│
+├── .htaccess               ← À AJOUTER MANUELLEMENT depuis public/.htaccess
+│                              (le build ne le copie pas automatiquement)
+│
+├── mailer.php              ← déjà copié par le build (depuis public/)
+└── PHPMailer/              ← déjà copié par le build (depuis public/)
     └── src/
         ├── Exception.php
         ├── PHPMailer.php
         └── SMTP.php
 ```
+
+> 💡 Le dossier `dist/server/` produit par le build **ne sert à rien sur n0c**.
+> Vous pouvez l'ignorer complètement, c'est juste un sous-produit technique
+> du prerender.
 
 **Et HORS de `public_html/`** (un niveau au-dessus, ex: `/home/VOTRE_USER/`) :
 
@@ -104,14 +139,19 @@ public_html/
 2. Naviguez dans `public_html/` côté serveur.
 3. **Avant le premier déploiement**, sauvegardez le contenu existant
    (clic droit → télécharger).
-4. Uploadez tout le contenu du dossier de build (`dist/` ou `.output/public/`)
-   dans `public_html/`.
-5. Uploadez en plus :
+4. Uploadez **tout le contenu du dossier `dist/client/`** (et pas le dossier
+   lui-même) dans `public_html/`. Vous devez voir apparaître `index.html`,
+   `assets/`, `admissions/`, `contact/`, `mailer.php`, `PHPMailer/`, etc.
+   directement à la racine de `public_html/`.
+5. Uploadez **en plus** le `.htaccess` (le build ne le copie pas
+   automatiquement à la racine de `dist/client/`) :
    - `public/.htaccess` → `public_html/.htaccess`
-   - `public/mailer.php` → `public_html/mailer.php`
-   - `public/PHPMailer/` → `public_html/PHPMailer/`
 6. Vérifiez que `.ipec-mailer.env` existe bien **un niveau au-dessus** de
    `public_html/` (cf. configuration SMTP).
+
+> 💡 **Astuce FileZilla** : ouvrez `dist/client/` côté gauche, ouvrez
+> `public_html/` côté droit, sélectionnez tout (Ctrl+A) à gauche et glissez
+> à droite. C'est le moyen le plus sûr d'uploader le bon contenu.
 
 ---
 
@@ -179,10 +219,14 @@ Une fois en ligne, testez :
 Quand vous modifiez le site (dans Lovable ou en local) :
 
 1. `git pull` (si vous avez modifié dans Lovable, pour récupérer les changements)
-2. `npm run build`
-3. Re-uploader le contenu du dossier de build dans `public_html/`
-   (en remplaçant les anciens fichiers — `.htaccess`, `mailer.php` et
-   `PHPMailer/` ne changent pas, vous pouvez les laisser tels quels).
+2. `STATIC_BUILD=1 npm run build` ⚠️ **toujours avec `STATIC_BUILD=1`**
+3. Re-uploader le contenu de `dist/client/` dans `public_html/` (en remplaçant
+   les anciens fichiers). `.htaccess` ne change pas, vous pouvez le laisser.
+
+> ⚠️ Si vous **ajoutez une nouvelle route** dans `src/routes/` (ex:
+> `src/routes/blog.tsx`), pensez à l'ajouter aussi dans la liste
+> `PRERENDER_ROUTES` du fichier `vite.config.ts`. Sinon elle ne sera pas
+> pré-rendue en HTML statique.
 
 ---
 
@@ -190,6 +234,8 @@ Quand vous modifiez le site (dans Lovable ou en local) :
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
+| `Prerendered 0 pages` au build | `STATIC_BUILD=1` non pris en compte | Sous Windows, utilisez la syntaxe PowerShell ou cmd indiquée à l'étape 3️⃣ |
+| Pas de fichiers `.html` générés | Build lancé sans `STATIC_BUILD=1` | Relancer avec `STATIC_BUILD=1 npm run build` |
 | Page blanche | Fichiers JS/CSS pas uploadés | Vérifier que `assets/` est bien présent |
 | 404 au refresh d'une sous-page | `.htaccess` absent ou ignoré | Vérifier qu'il est bien à la racine de `public_html/` et que mod_rewrite est activé chez n0c |
 | Formulaire renvoie "Origin not allowed" | Le domaine appelant n'est pas dans la whitelist du PHP | Ajouter votre domaine dans `$allowedOrigins` de `mailer.php` |
