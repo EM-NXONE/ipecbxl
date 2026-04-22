@@ -134,14 +134,14 @@ function Home() {
 
                 <div className="relative w-full flex items-center justify-center rounded-sm border-border/40 bg-background/30 border-0 overflow-hidden aspect-square sm:aspect-auto sm:min-h-[360px] lg:min-h-[400px]">
                   {/* Concentric decorative rings */}
-                  <div className="absolute w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-full border border-blue/10 pointer-events-none" />
-                  <div className="absolute w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] rounded-full border border-blue/15 pointer-events-none" />
+                  <div className="absolute w-[210px] h-[210px] sm:w-[320px] sm:h-[320px] rounded-full border border-blue/10 pointer-events-none" />
+                  <div className="absolute w-[165px] h-[165px] sm:w-[260px] sm:h-[260px] rounded-full border border-blue/15 pointer-events-none" />
                   {/* Halo */}
-                  <div className="absolute w-[200px] h-[200px] rounded-full bg-gradient-blue opacity-25 blur-2xl pointer-events-none" />
+                  <div className="absolute w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] rounded-full bg-gradient-blue opacity-25 blur-2xl pointer-events-none" />
                   {/* Logo */}
                   <LogoIpec
                     size={220}
-                    className="text-blue relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]"
+                    className="text-blue relative w-[135px] h-[135px] sm:w-[220px] sm:h-[220px] lg:w-[240px] lg:h-[240px]"
                   />
                 </div>
 
