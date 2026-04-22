@@ -20,6 +20,7 @@ import { Route as CgvRouteImport } from './routes/cgv'
 import { Route as CguRouteImport } from './routes/cgu'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiInscriptionRouteImport } from './routes/api/inscription'
 
 const ProgrammesRoute = ProgrammesRouteImport.update({
   id: '/programmes',
@@ -76,6 +77,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInscriptionRoute = ApiInscriptionRouteImport.update({
+  id: '/api/inscription',
+  path: '/api/inscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/api/inscription': typeof ApiInscriptionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/api/inscription': typeof ApiInscriptionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/api/inscription': typeof ApiInscriptionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/api/inscription'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/api/inscription'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/api/inscription'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   InternationalRoute: typeof InternationalRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   ProgrammesRoute: typeof ProgrammesRoute
+  ApiInscriptionRoute: typeof ApiInscriptionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/inscription': {
+      id: '/api/inscription'
+      path: '/api/inscription'
+      fullPath: '/api/inscription'
+      preLoaderRoute: typeof ApiInscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   InternationalRoute: InternationalRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   ProgrammesRoute: ProgrammesRoute,
+  ApiInscriptionRoute: ApiInscriptionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -36,6 +36,8 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
 
 function Inscription() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
 
@@ -48,6 +50,52 @@ function Inscription() {
   const handleProgrammeChange = (value: Programme) => {
     setProgramme(value);
     setAnnee(yearsByProgramme[value][0].value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitting) return;
+    setErrorMsg(null);
+    setSubmitting(true);
+
+    const fd = new FormData(e.currentTarget);
+    const annee = String(fd.get("annee") ?? "");
+    const anneeLabel = years.find((y) => y.value === annee)?.label ?? annee;
+
+    const payload = {
+      civilite: String(fd.get("civilite") ?? ""),
+      prenom: String(fd.get("prenom") ?? ""),
+      nom: String(fd.get("nom") ?? ""),
+      dateNaissance: String(fd.get("dateNaissance") ?? ""),
+      nationalite: String(fd.get("nationalite") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      telephone: String(fd.get("telephone") ?? ""),
+      adresse: String(fd.get("adresse") ?? ""),
+      paysResidence: String(fd.get("paysResidence") ?? ""),
+      programme: String(fd.get("programme") ?? ""),
+      annee: anneeLabel,
+      specialisation: String(fd.get("specialisation") ?? ""),
+      rentree: String(fd.get("rentree") ?? ""),
+      message: String(fd.get("message") ?? ""),
+    };
+
+    try {
+      const res = await fetch("/api/inscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErrorMsg(data?.error ?? "Une erreur est survenue. Réessayez.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setErrorMsg("Impossible d'envoyer la candidature. Vérifiez votre connexion.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -122,10 +170,7 @@ function Inscription() {
                 </p>
               </div>
             ) : (
-              <form
-                className="space-y-6"
-                onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Votre dossier</div>
                   <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
@@ -159,11 +204,11 @@ function Inscription() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
-                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="prenom" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nom</label>
-                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="nom" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                 </div>
 
@@ -173,6 +218,7 @@ function Inscription() {
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Date de naissance</label>
                     <input
                       required
+                      name="dateNaissance"
                       type="date"
                       max={new Date().toISOString().split("T")[0]}
                       className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
@@ -180,7 +226,7 @@ function Inscription() {
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nationalité</label>
-                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="nationalite" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                 </div>
 
@@ -188,11 +234,11 @@ function Inscription() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">E-mail</label>
-                    <input required type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="email" type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Téléphone</label>
-                    <input type="tel" maxLength={30} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input name="telephone" type="tel" maxLength={30} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                 </div>
 
@@ -201,6 +247,7 @@ function Inscription() {
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Adresse</label>
                   <textarea
                     required
+                    name="adresse"
                     rows={2}
                     maxLength={250}
                     placeholder="Rue, numéro, code postal, ville"
@@ -210,7 +257,7 @@ function Inscription() {
 
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Pays de résidence</label>
-                  <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  <input required name="paysResidence" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
 
 
@@ -219,6 +266,7 @@ function Inscription() {
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme</label>
                     <select
                       required
+                      name="programme"
                       value={programme}
                       onChange={(e) => handleProgrammeChange(e.target.value as Programme)}
                       className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
@@ -231,6 +279,7 @@ function Inscription() {
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Année visée</label>
                     <select
                       required
+                      name="annee"
                       value={annee}
                       onChange={(e) => setAnnee(e.target.value)}
                       className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
@@ -246,6 +295,7 @@ function Inscription() {
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Spécialisation souhaitée</label>
                   <select
                     required
+                    name="specialisation"
                     defaultValue=""
                     className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
                   >
@@ -271,7 +321,7 @@ function Inscription() {
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">
                     Rentrée envisagée — Année {academicYearLabel}
                   </label>
-                  <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                  <select required name="rentree" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
                     <option>Rentrée principale — {septembreRentree}</option>
                     <option>Rentrée décalée — {fevrierRentree}</option>
                   </select>
@@ -282,6 +332,7 @@ function Inscription() {
                     Message <span className="text-muted-foreground normal-case tracking-normal">(facultatif)</span>
                   </label>
                   <textarea
+                    name="message"
                     rows={5}
                     maxLength={1500}
                     placeholder="Parcours, motivations, projet professionnel…"
@@ -307,12 +358,19 @@ function Inscription() {
                   </label>
                 </div>
 
+                {errorMsg && (
+                  <div className="p-4 rounded-sm border border-destructive/40 bg-destructive/10 text-sm text-destructive-foreground">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity"
+                    disabled={submitting}
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Envoyer ma candidature <Send size={16} />
+                    {submitting ? "Envoi en cours…" : "Envoyer ma candidature"} <Send size={16} />
                   </button>
                   <Link
                     to="/contact"
