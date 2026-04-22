@@ -280,11 +280,11 @@ function Programmes() {
             Quatre voies pour <em className="text-gradient-blue not-italic">tracer</em> la vôtre.
           </h2>
 
-          <div className="grid md:grid-cols-2 md:[grid-template-rows:repeat(7,auto)] gap-px bg-border/40">
+          <div className="grid md:grid-cols-2 md:[grid-auto-rows:auto] md:[grid-template-rows:repeat(6,auto)] gap-px bg-border/40">
             {specs.map((s) => (
               <div
                 key={s.n}
-                className="bg-background p-10 hover:bg-card transition-colors grid grid-rows-[auto_auto_auto_auto_auto_auto_auto] gap-y-0 md:[grid-row:span_7] md:[grid-template-rows:subgrid]"
+                className="bg-background p-10 hover:bg-card transition-colors flex flex-col md:grid md:[grid-row:span_6] md:[grid-template-rows:subgrid] md:gap-y-0"
               >
                 <div className="flex items-center justify-between mb-6">
                   <s.icon className="text-blue" size={28} strokeWidth={1.5} />
@@ -294,7 +294,7 @@ function Programmes() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6 italic">{s.desc}</p>
                 <p className="text-sm text-cream/85 leading-relaxed mb-8">{s.long}</p>
 
-                <div>
+                <div className="mb-8">
                   <div className="text-xs uppercase tracking-widest text-blue mb-4">— Compétences clés</div>
                   <ul className="space-y-2.5">
                     {s.skills.map((sk) => (
@@ -305,8 +305,6 @@ function Programmes() {
                     ))}
                   </ul>
                 </div>
-
-                <div className="mt-8" />
 
                 <div>
                   <div className="text-xs uppercase tracking-widest text-blue mb-4">— Débouchés professionnels</div>
