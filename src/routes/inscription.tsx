@@ -131,6 +131,49 @@ function Inscription() {
                   </p>
                 </div>
 
+                {/* Récapitulatif des frais */}
+                <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Receipt className="text-blue shrink-0" size={20} strokeWidth={1.5} />
+                    <div className="text-xs uppercase tracking-widest text-blue">
+                      Récapitulatif des frais — {programme}
+                    </div>
+                  </div>
+
+                  <dl className="space-y-3 text-sm">
+                    <div className="flex items-baseline justify-between gap-4 pb-3 border-b border-border/40">
+                      <dt className="text-muted-foreground">
+                        Frais de dossier
+                        <span className="block text-xs opacity-70">Unique, non remboursable</span>
+                      </dt>
+                      <dd className="text-cream font-display text-lg shrink-0">{formatEUR(APPLICATION_FEE)}</dd>
+                    </div>
+
+                    <div className="flex items-baseline justify-between gap-4 pb-3 border-b border-border/40">
+                      <dt className="text-muted-foreground">
+                        Frais de scolarité
+                        <span className="block text-xs opacity-70">{programme} — par année académique</span>
+                      </dt>
+                      <dd className="text-cream font-display text-lg shrink-0">{formatEUR(TUITION_BY_PROGRAMME[programme])}</dd>
+                    </div>
+
+                    <div className="flex items-baseline justify-between gap-4 pt-1">
+                      <dt className="text-cream uppercase tracking-widest text-xs">
+                        Total estimé — 1ʳᵉ année
+                      </dt>
+                      <dd className="text-gradient-blue font-display text-2xl shrink-0">
+                        {formatEUR(APPLICATION_FEE + TUITION_BY_PROGRAMME[programme])}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+                    Une première tranche de {formatEUR(3000)} valide définitivement l'inscription.
+                    Les modalités de paiement (annuel, semestriel ou mensualisé) sont détaillées dans les{" "}
+                    <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
+                  </p>
+                </div>
+
                 {/* Identité */}
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Civilité</label>
