@@ -115,6 +115,14 @@ function Inscription() {
                 className="space-y-6"
                 onSubmit={(e) => { e.preventDefault(); setSent(true); }}
               >
+                <div>
+                  <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Votre dossier</div>
+                  <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Tous les champs marqués sont obligatoires.
+                  </p>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
