@@ -40,6 +40,8 @@ function Inscription() {
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
+  const septembreRentree = formatRentreeDate(getNextSeptemberRentree());
+  const fevrierRentree = formatRentreeDate(getNextFebruaryRentree());
 
   const handleProgrammeChange = (value: Programme) => {
     setProgramme(value);
