@@ -266,7 +266,10 @@ function Inscription() {
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Rentrée envisagée</label>
+                  <label className="flex items-center justify-between gap-3 text-xs uppercase tracking-widest text-blue mb-3">
+                    <span>Rentrée envisagée</span>
+                    <span className="text-muted-foreground tracking-[0.2em]">Année {academicYearLabel}</span>
+                  </label>
                   <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
                     <option>Rentrée principale — {septembreRentree}</option>
                     <option>Rentrée décalée — {fevrierRentree}</option>
