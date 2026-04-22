@@ -5,11 +5,18 @@ import { useEffect, useRef, useState } from "react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — IPEC Bruxelles" },
-      { name: "description", content: "Contactez l'IPEC à Bruxelles : informations, dossier de candidature, visites du campus." },
+      { title: "Contact — IPEC Bruxelles · Institut privé en Belgique" },
+      { name: "description", content: "Contactez l'IPEC, école supérieure de commerce privée à Bruxelles : informations, dossier de candidature, visites du campus en Belgique." },
+      { name: "keywords", content: "contact IPEC, école privée Bruxelles contact, institut privé Belgique adresse, visite campus Bruxelles" },
       { property: "og:title", content: "Contact — IPEC Bruxelles" },
-      { property: "og:description", content: "Une question, un projet ? Notre équipe vous répond." },
+      { property: "og:description", content: "Une question, un projet ? L'équipe de l'institut privé IPEC à Bruxelles vous répond." },
+      { property: "og:url", content: "https://ipec.school/contact" },
+      { property: "og:image", content: "https://ipec.school/apple-touch-icon.png" },
+      { name: "twitter:title", content: "Contact — IPEC Bruxelles" },
+      { name: "twitter:description", content: "Contactez l'IPEC, institut privé en Belgique." },
+      { name: "twitter:image", content: "https://ipec.school/apple-touch-icon.png" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/contact" }],
   }),
   component: Contact,
 });

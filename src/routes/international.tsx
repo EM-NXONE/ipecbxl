@@ -18,12 +18,18 @@ import brusselsImg from "@/assets/brussels.jpg";
 export const Route = createFileRoute("/international")({
   head: () => ({
     meta: [
-      { title: "Étudiants internationaux — IPEC Bruxelles" },
-      { name: "description", content: "Informations destinées aux candidats résidant hors Union européenne : documents délivrés par l'IPEC et références officielles pour le visa long séjour." },
-      { property: "og:title", content: "Étudiants internationaux — IPEC Bruxelles" },
-      { property: "og:description", content: "Informations à destination des candidats hors UE : périmètre de l'IPEC et renvois aux autorités compétentes." },
+      { title: "Étudiants internationaux — Étudier en Belgique · IPEC Bruxelles" },
+      { name: "description", content: "Étudier en Belgique dans un institut privé à Bruxelles : informations pour les candidats hors UE, documents délivrés par l'IPEC et références officielles pour le visa long séjour." },
+      { name: "keywords", content: "étudier en Belgique, étudiants internationaux Bruxelles, visa étudiant Belgique, école privée internationale Bruxelles, université privée Belgique étrangers, IPEC international" },
+      { property: "og:title", content: "Étudier en Belgique — IPEC Bruxelles · Étudiants internationaux" },
+      { property: "og:description", content: "Tout pour candidater depuis l'étranger à un institut privé en Belgique : documents IPEC, démarches officielles." },
+      { property: "og:url", content: "https://ipec.school/international" },
       { property: "og:image", content: brusselsImg },
+      { name: "twitter:title", content: "Étudier en Belgique — IPEC Bruxelles" },
+      { name: "twitter:description", content: "Candidater depuis l'étranger à un institut privé en Belgique." },
+      { name: "twitter:image", content: brusselsImg },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/international" }],
   }),
   component: International,
 });

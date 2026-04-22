@@ -4,10 +4,13 @@ export const Route = createFileRoute("/cgv")({
   head: () => ({
     meta: [
       { title: "Conditions générales de vente — IPEC Bruxelles" },
-      { name: "description", content: "Conditions générales de vente applicables aux frais de scolarité de l'IPEC." },
+      { name: "description", content: "Conditions générales de vente applicables aux frais de scolarité de l'IPEC, institut privé en Belgique." },
+      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "CGV — IPEC Bruxelles" },
       { property: "og:description", content: "Modalités contractuelles applicables aux inscriptions et frais de scolarité." },
+      { property: "og:url", content: "https://ipec.school/cgv" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/cgv" }],
   }),
   component: CGV,
 });

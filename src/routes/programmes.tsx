@@ -4,11 +4,18 @@ import { Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 export const Route = createFileRoute("/programmes")({
   head: () => ({
     meta: [
-      { title: "Programmes & spécialisations — IPEC Bruxelles" },
-      { name: "description", content: "PAA (BAC+1 à BAC+3), PEA (BAC+4 et BAC+5) et quatre spécialisations : Management, Marketing, Relations Internationales, Économie & Finance." },
-      { property: "og:title", content: "Programmes & spécialisations — IPEC Bruxelles" },
-      { property: "og:description", content: "Cinq années pour construire votre carrière, quatre voies pour tracer la vôtre." },
+      { title: "Programmes BAC+3 & BAC+5 — Institut privé Belgique · IPEC Bruxelles" },
+      { name: "description", content: "Programmes universitaires privés en Belgique : PAA (BAC+1 à BAC+3) et PEA (BAC+4, BAC+5). Quatre spécialisations — Management, Marketing, Relations Internationales, Économie & Finance — dans une école supérieure de commerce à Bruxelles." },
+      { name: "keywords", content: "programmes BAC+3 Belgique, BAC+5 Belgique, master Bruxelles, bachelor Belgique, école de commerce privée, université privée Belgique, management Bruxelles, marketing Belgique, relations internationales Bruxelles, finance Belgique, IPEC programmes" },
+      { property: "og:title", content: "Programmes BAC+3 & BAC+5 — IPEC Bruxelles · Institut privé Belgique" },
+      { property: "og:description", content: "Cinq années pour construire votre carrière, quatre spécialisations pour tracer votre voie. Université privée à Bruxelles." },
+      { property: "og:url", content: "https://ipec.school/programmes" },
+      { property: "og:image", content: "https://ipec.school/apple-touch-icon.png" },
+      { name: "twitter:title", content: "Programmes — IPEC Bruxelles" },
+      { name: "twitter:description", content: "PAA, PEA et 4 spécialisations dans un institut privé en Belgique." },
+      { name: "twitter:image", content: "https://ipec.school/apple-touch-icon.png" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/programmes" }],
   }),
   component: Programmes,
 });

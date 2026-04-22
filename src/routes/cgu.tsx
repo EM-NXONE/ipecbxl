@@ -4,10 +4,13 @@ export const Route = createFileRoute("/cgu")({
   head: () => ({
     meta: [
       { title: "Conditions générales d'utilisation — IPEC Bruxelles" },
-      { name: "description", content: "Conditions générales d'utilisation du site IPEC." },
+      { name: "description", content: "Conditions générales d'utilisation du site de l'IPEC, institut privé en Belgique." },
+      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "CGU — IPEC Bruxelles" },
       { property: "og:description", content: "Règles d'utilisation du site et des services en ligne de l'IPEC." },
+      { property: "og:url", content: "https://ipec.school/cgu" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/cgu" }],
   }),
   component: CGU,
 });

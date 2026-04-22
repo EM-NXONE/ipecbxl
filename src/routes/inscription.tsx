@@ -11,11 +11,18 @@ import {
 export const Route = createFileRoute("/inscription")({
   head: () => ({
     meta: [
-      { title: "Inscription — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Déposez votre dossier de candidature à l'IPEC. Formulaire d'inscription en ligne pour le PAA et le PEA." },
-      { property: "og:title", content: "Inscription — IPEC Bruxelles" },
-      { property: "og:description", content: "Formulaire d'inscription en ligne. Notre équipe vous répond sous 7 jours." },
+      { title: "Inscription en ligne — Institut privé Belgique · IPEC Bruxelles" },
+      { name: "description", content: "Déposez votre dossier d'inscription à l'IPEC, université privée en Belgique. Formulaire en ligne pour les programmes PAA et PEA. Réponse sous 7 jours." },
+      { name: "keywords", content: "inscription école Belgique, formulaire inscription Bruxelles, candidater institut privé Belgique, inscription université privée, IPEC inscription, étudier à Bruxelles" },
+      { property: "og:title", content: "Inscription — IPEC Bruxelles · Institut privé en Belgique" },
+      { property: "og:description", content: "Formulaire d'inscription en ligne pour intégrer une école supérieure privée à Bruxelles. Réponse sous 7 jours." },
+      { property: "og:url", content: "https://ipec.school/inscription" },
+      { property: "og:image", content: "https://ipec.school/apple-touch-icon.png" },
+      { name: "twitter:title", content: "Inscription — IPEC Bruxelles" },
+      { name: "twitter:description", content: "Candidater en ligne à l'IPEC, institut privé en Belgique." },
+      { name: "twitter:image", content: "https://ipec.school/apple-touch-icon.png" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/inscription" }],
   }),
   component: Inscription,
 });
