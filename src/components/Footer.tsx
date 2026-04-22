@@ -4,7 +4,7 @@ import { LogoIpec } from "@/components/LogoIpec";
 export function Footer() {
   return (
     <footer className="border-t border-border/40 bg-surface mt-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-5">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-4">
             <LogoIpec size={40} className="text-blue shrink-0" />
@@ -30,19 +30,6 @@ export function Footer() {
             <li><Link to="/admissions" className="hover:text-blue">Admissions</Link></li>
             <li><Link to="/international" className="hover:text-blue">International</Link></li>
             <li><Link to="/inscription" className="hover:text-blue">Inscription</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-cream text-sm uppercase tracking-widest mb-4 font-body font-medium">
-            Légal
-          </h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/mentions-legales" className="hover:text-blue">Mentions légales</Link></li>
-            <li><Link to="/cgu" className="hover:text-blue">CGU</Link></li>
-            <li><Link to="/cgv" className="hover:text-blue">CGV</Link></li>
-            <li><Link to="/confidentialite" className="hover:text-blue">Confidentialité</Link></li>
-            <li><Link to="/cookies" className="hover:text-blue">Cookies</Link></li>
           </ul>
         </div>
 
