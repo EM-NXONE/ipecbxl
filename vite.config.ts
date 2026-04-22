@@ -6,8 +6,19 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-// Liste de toutes les routes statiques à prérendre en HTML.
-// Ajoutez ici toute nouvelle route créée dans src/routes/.
+// =====================================================================
+// Build statique pour n0c (hébergement Apache/PHP, sans Node.js).
+// =====================================================================
+// Quand STATIC_BUILD=1, on désactive le preset Cloudflare et on active
+// le prerendering : chaque route listée ci-dessous est rendue en HTML
+// au build → n0c sert ces .html directement.
+//
+// Build local pour n0c :   STATIC_BUILD=1 npm run build
+// Build standard Lovable : npm run build
+// =====================================================================
+
+const IS_STATIC_BUILD = process.env.STATIC_BUILD === "1";
+
 const PRERENDER_ROUTES = [
   "/",
   "/admissions",
@@ -22,15 +33,23 @@ const PRERENDER_ROUTES = [
   "/programmes",
 ];
 
-export default defineConfig({
-  tanstackStart: {
-    // Génère un .html pré-rendu pour chaque route → déployable sur n'importe
-    // quel hébergeur statique (n0c, Apache, Nginx) sans Node.js côté serveur.
-    prerender: {
-      enabled: true,
-      crawlLinks: true,
-      retryCount: 2,
-    },
-    pages: PRERENDER_ROUTES.map((path) => ({ path, prerender: { enabled: true } })),
-  },
-});
+export default defineConfig(
+  IS_STATIC_BUILD
+    ? {
+        // Désactive Cloudflare → preset node-server par défaut → produit
+        // dist/server/server.js que le prerender sait charger.
+        cloudflare: false,
+        tanstackStart: {
+          prerender: {
+            enabled: true,
+            crawlLinks: true,
+            retryCount: 2,
+          },
+          pages: PRERENDER_ROUTES.map((path) => ({
+            path,
+            prerender: { enabled: true },
+          })),
+        },
+      }
+    : {},
+);
