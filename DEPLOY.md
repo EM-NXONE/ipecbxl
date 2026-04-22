@@ -229,8 +229,8 @@ Quand vous modifiez le site (dans Lovable ou en local) :
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| `Prerendered 0 pages` au build | `STATIC_BUILD=1` non pris en compte | Sous Windows, utilisez la syntaxe PowerShell ou cmd indiquée à l'étape 3️⃣ |
-| Pas de fichiers `.html` générés | Build lancé sans `STATIC_BUILD=1` | Relancer avec `STATIC_BUILD=1 npm run build` |
+| `Prerendered 0 pages` ou pas de `.html` au build | Vous avez lancé `npm run build` au lieu de `npm run build:static` | Utiliser **systématiquement** `npm run build:static` |
+| Pas de fichiers `.html` générés | Idem | Idem — `npm run build:static` |
 | Page blanche | Fichiers JS/CSS pas uploadés | Vérifier que `assets/` est bien présent |
 | 404 au refresh d'une sous-page | `.htaccess` absent ou ignoré | Vérifier qu'il est bien à la racine de `public_html/` et que mod_rewrite est activé chez n0c |
 | Formulaire renvoie "Origin not allowed" | Le domaine appelant n'est pas dans la whitelist du PHP | Ajouter votre domaine dans `$allowedOrigins` de `mailer.php` |
