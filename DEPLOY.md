@@ -54,24 +54,19 @@ npm install
 
 ## 3️⃣ Builder la version statique (mode prerender)
 
-⚠️ **TRÈS IMPORTANT** : utilisez la variable d'environnement `STATIC_BUILD=1`,
-sinon le build produit du code serveur pour Cloudflare et **pas de fichiers
-HTML** (vous obtiendriez `dist/client/` + `dist/server/` sans aucun `.html`).
+Une commande, **identique sur Windows / macOS / Linux** :
 
-**Sur macOS / Linux :**
 ```bash
-STATIC_BUILD=1 npm run build
+npm run build:static
 ```
 
-**Sur Windows (PowerShell) :**
-```powershell
-$env:STATIC_BUILD=1; npm run build
-```
+> 💡 Sous le capot, ce script utilise `cross-env STATIC_BUILD=1 vite build`,
+> ce qui garantit que la variable d'environnement est bien transmise au
+> process Node, peu importe le shell (cmd, PowerShell, bash, zsh).
 
-**Sur Windows (cmd.exe) :**
-```cmd
-set STATIC_BUILD=1 && npm run build
-```
+⚠️ **N'utilisez PAS `npm run build` tout court** : sans `STATIC_BUILD=1`,
+le build produit du code serveur pour Cloudflare et **aucun fichier HTML**
+(vous obtiendriez `dist/client/` + `dist/server/` sans `.html` à la racine).
 
 Cette commande :
 1. Compile le site React.
@@ -81,9 +76,9 @@ Cette commande :
 4. Vous obtenez `dist/client/index.html` + un `dist/client/<route>/index.html`
    par page → SEO complet, chaque page indexable indépendamment.
 
-À la fin, vous devez voir un message `[prerender] Prerendered 12 pages:` listant
-toutes vos routes. Si vous voyez `Prerendered 0 pages` → le `STATIC_BUILD=1`
-n'a pas été pris en compte, recommencez.
+À la fin, vous devez voir un message `[prerender] Prerendered 11 pages:` listant
+toutes vos routes. Si vous voyez `Prerendered 0 pages` ou aucun `.html`, vérifiez
+que vous avez bien lancé `npm run build:static` (et non `npm run build`).
 
 ---
 
@@ -219,7 +214,7 @@ Une fois en ligne, testez :
 Quand vous modifiez le site (dans Lovable ou en local) :
 
 1. `git pull` (si vous avez modifié dans Lovable, pour récupérer les changements)
-2. `STATIC_BUILD=1 npm run build` ⚠️ **toujours avec `STATIC_BUILD=1`**
+2. `npm run build:static` ⚠️ **toujours `build:static`, pas `build`**
 3. Re-uploader le contenu de `dist/client/` dans `public_html/` (en remplaçant
    les anciens fichiers). `.htaccess` ne change pas, vous pouvez le laisser.
 
@@ -234,8 +229,8 @@ Quand vous modifiez le site (dans Lovable ou en local) :
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
-| `Prerendered 0 pages` au build | `STATIC_BUILD=1` non pris en compte | Sous Windows, utilisez la syntaxe PowerShell ou cmd indiquée à l'étape 3️⃣ |
-| Pas de fichiers `.html` générés | Build lancé sans `STATIC_BUILD=1` | Relancer avec `STATIC_BUILD=1 npm run build` |
+| `Prerendered 0 pages` ou pas de `.html` au build | Vous avez lancé `npm run build` au lieu de `npm run build:static` | Utiliser **systématiquement** `npm run build:static` |
+| Pas de fichiers `.html` générés | Idem | Idem — `npm run build:static` |
 | Page blanche | Fichiers JS/CSS pas uploadés | Vérifier que `assets/` est bien présent |
 | 404 au refresh d'une sous-page | `.htaccess` absent ou ignoré | Vérifier qu'il est bien à la racine de `public_html/` et que mod_rewrite est activé chez n0c |
 | Formulaire renvoie "Origin not allowed" | Le domaine appelant n'est pas dans la whitelist du PHP | Ajouter votre domaine dans `$allowedOrigins` de `mailer.php` |
