@@ -52,6 +52,8 @@ function Inscription() {
     setAnnee(yearsByProgramme[value][0].value);
   };
 
+  const MAILER_URL = "https://ipec.school/inscription-mailer.php";
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
@@ -77,10 +79,11 @@ function Inscription() {
       specialisation: String(fd.get("specialisation") ?? ""),
       rentree: String(fd.get("rentree") ?? ""),
       message: String(fd.get("message") ?? ""),
+      website: String(fd.get("website") ?? ""), // honeypot anti-bot
     };
 
     try {
-      const res = await fetch("/api/inscription", {
+      const res = await fetch(MAILER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -171,6 +174,16 @@ function Inscription() {
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Honeypot anti-bot — caché aux humains, rempli par les bots */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                />
+
                 <div>
                   <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Votre dossier</div>
                   <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
