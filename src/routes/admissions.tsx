@@ -234,7 +234,7 @@ function Admissions() {
                 <div className="font-display text-xl text-cream mb-2">1 900 € (PAA) · 2 900 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Étudiants en présentiel : avant le début effectif des cours.
-                  Étudiants internationaux : à l'arrivée à l'institut, après obtention du visa.
+                  Étudiants internationaux : à l'arrivée à l'institut.
                 </p>
               </div>
             </div>
