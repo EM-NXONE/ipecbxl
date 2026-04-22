@@ -265,7 +265,7 @@ function Programmes() {
                 dès l'entrée dans le programme. Une réorientation en cours d'année peut être
                 envisagée à titre exceptionnel, sur demande motivée et à l'issue d'un entretien
                 avec notre équipe pédagogique évaluant la cohérence du projet académique et
-                professionnel. Elle demeure soumise à l'appréciation de l'institution.
+                professionnel. Elle demeure soumise à l'appréciation de l'institut.
               </p>
             </div>
           </div>
