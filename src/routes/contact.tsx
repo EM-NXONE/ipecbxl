@@ -181,7 +181,7 @@ function Contact() {
                 {errorMsg && (
                   <div
                     role="alert"
-                    className="p-4 rounded-sm border border-red-500/40 bg-red-500/5 text-sm text-red-300"
+                    className="p-4 rounded-sm border border-destructive/40 bg-destructive/5 text-sm text-destructive"
                   >
                     {errorMsg}
                   </div>
