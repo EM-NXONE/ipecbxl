@@ -40,6 +40,14 @@ function Inscription() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
+  const confirmationRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (sent && confirmationRef.current) {
+      confirmationRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      confirmationRef.current.focus();
+    }
+  }, [sent]);
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
