@@ -266,8 +266,8 @@ function Inscription() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Rentrée envisagée</label>
                   <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>Rentrée principale — septembre</option>
-                    <option>Rentrée décalée — février</option>
+                    <option>Rentrée principale — {septembreRentree}</option>
+                    <option>Rentrée décalée — {fevrierRentree}</option>
                   </select>
                 </div>
 
