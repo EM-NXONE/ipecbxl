@@ -91,7 +91,80 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">8. Droit applicable</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">8. Conditions particulières d'admission</h2>
+            <p className="mb-4">
+              Le candidat-étudiant à l'IPEC reconnaît avoir été informé des conditions particulières
+              suivantes, qui font partie intégrante de son engagement contractuel au moment de
+              l'inscription :
+            </p>
+            <ol className="space-y-4 list-decimal list-outside ml-5">
+              <li>
+                Dès réception du dossier complet et du paiement des frais de dossier
+                (<strong className="text-cream">300 €</strong> pour l'année académique en cours),
+                l'IPEC délivre une attestation de préadmission dans un délai raisonnable.
+                Les frais de dossier ne sont en aucun cas remboursables.
+              </li>
+              <li>
+                L'IPEC fait partie d'un groupe d'établissements scolaires. Une admission à un
+                établissement <strong className="text-cream">ne vaut pas</strong> pour les autres
+                établissements du groupe (par exemple, une admission à l'établissement de Bruxelles
+                ne vaut pas pour une admission à l'établissement de Sfax).
+              </li>
+              <li>
+                Formation et diplôme <strong className="text-cream">non reconnus</strong> par la
+                Communauté française de Belgique (article 14/4, §2, du décret du 7 novembre 2013).
+              </li>
+              <li>
+                L'IPEC ne se porte en aucun cas garant des étudiants. L'IPEC ne propose aucun stage
+                ou logement en Belgique. Ces dimensions sont entièrement à la charge du candidat,
+                qui est tenu de faire les démarches nécessaires.
+              </li>
+              <li>
+                En cas de préadmission, celle-ci ne devient définitive qu'à partir de la réception
+                du paiement d'une première tranche des frais de scolarité d'un montant minimum de
+                <strong className="text-cream"> 3 000 €</strong>, qui doit être versé sur le compte
+                de l'IPEC (<span className="text-cream">BE96 3631 5715 5905</span>).
+              </li>
+              <li>
+                Les étudiants établis dans un État ne faisant pas partie de l'Union européenne ne
+                recevront les documents nécessaires à leur demande de visa étudiant qu'une fois le
+                paiement de cette première tranche de 3 000 € réceptionné par l'IPEC. Ces mêmes
+                étudiants seront tenus de suivre leur formation en visioconférence (online) durant
+                toute la procédure d'obtention d'un visa en Belgique, jusqu'à l'obtention effective
+                dudit visa.
+              </li>
+              <li>
+                En cas de refus de visa étudiant par les autorités belges, les étudiants visés au
+                point précédent seront libres d'exercer toute voie de recours disponible, à leur
+                propre discrétion. Le cas échéant, si la date de rentrée académique est échue, les
+                étudiants obtiendront une dérogation leur permettant de participer à la prochaine
+                rentrée décalée.
+              </li>
+              <li>
+                Dans le cas où ces étudiants ne souhaitent pas introduire de recours contre une
+                décision de refus de visa étudiant, ou dans le cas où le recours introduit n'a pas
+                abouti sur une décision d'obtention de visa, leur inscription au programme en
+                présentiel sera <strong className="text-cream">automatiquement remplacée</strong>
+                {" "}par une inscription au programme online correspondant. La première tranche des
+                droits d'inscription versée sera de plein droit utilisée pour le paiement des
+                droits d'inscription audit programme online.
+              </li>
+              <li>
+                Le candidat reconnaît avoir été informé que le paiement des droits d'inscription
+                visés ci-dessus entraîne donc une <strong className="text-cream">inscription
+                définitive</strong> à l'IPEC. Seules les modalités de suivi du programme (en
+                présentiel à Bruxelles ou online) seront déterminées en fonction de l'obtention
+                d'un visa étudiant.
+              </li>
+            </ol>
+            <p className="mt-6 p-4 rounded-sm border border-blue/30 bg-blue/5 text-cream">
+              L'acceptation de ces conditions particulières est requise lors de la soumission du
+              formulaire d'inscription en ligne et vaut signature du candidat.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl text-cream mb-4">9. Droit applicable</h2>
             <p>
               Les présentes CGV sont régies par le droit belge. Tout litige sera porté devant les
               tribunaux compétents de Bruxelles.
