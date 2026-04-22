@@ -195,12 +195,12 @@ function Admissions() {
               </p>
             </div>
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
-              <div className="text-xs uppercase tracking-widest text-blue mb-2">Première tranche à l'inscription</div>
-              <div className="font-display text-3xl text-cream mb-3">3 000 €</div>
+              <div className="text-xs uppercase tracking-widest text-blue mb-2">Règlement de la scolarité</div>
+              <div className="font-display text-3xl text-cream mb-3">50 % + 50 %</div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Cette première tranche couvre l'accès au cursus en ligne dès la confirmation
-                de votre inscription. Pour les candidats devant solliciter un visa d'études,
-                ce montant est intégralement déduit des droits de scolarité annuels.
+                Une première tranche de 50 % à la confirmation d'inscription, une seconde
+                tranche de 50 % avant le début effectif des cours. Un plan de paiement
+                échelonné peut être convenu avec le service administratif.
               </p>
             </div>
           </div>

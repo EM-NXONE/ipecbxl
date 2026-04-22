@@ -47,9 +47,10 @@ function CGV() {
               <li>PEA — Programme Exécutif Avancé : 5 900 € / an</li>
             </ul>
             <p className="mt-3">
-              Une première tranche de 3 000 € est due à la
-              confirmation d'inscription. Pour les candidats sollicitant un visa d'études, ce montant
-              est intégralement déduit des droits de scolarité annuels.
+              Une première tranche égale à 50 % des droits de scolarité est due à la
+              confirmation d'inscription ; le solde (50 %) est exigible avant le début
+              effectif des cours. Pour les candidats sollicitant un visa d'études, ces
+              montants sont intégralement déduits des droits de scolarité annuels.
             </p>
           </section>
 
@@ -125,13 +126,13 @@ function CGV() {
               </li>
               <li>
                 En cas de préadmission, celle-ci ne devient définitive qu'à partir de la réception
-                du paiement d'une première tranche des frais de scolarité d'un montant minimum de
-                3 000 €, qui doit être versé sur le compte de l'IPEC.
+                du paiement de la première tranche des frais de scolarité (50 % des droits
+                annuels), qui doit être versée sur le compte de l'IPEC.
               </li>
               <li>
                 Les étudiants établis dans un État ne faisant pas partie de l'Union européenne ne
                 recevront les documents nécessaires à leur demande de visa étudiant qu'une fois le
-                paiement de cette première tranche de 3 000 € réceptionné par l'IPEC. Ces mêmes
+                paiement de cette première tranche réceptionné par l'IPEC. Ces mêmes
                 étudiants seront tenus de suivre leur formation en visioconférence (online) durant
                 toute la procédure d'obtention d'un visa en Belgique, jusqu'à l'obtention effective
                 dudit visa.
