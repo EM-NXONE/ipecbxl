@@ -28,6 +28,14 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
   ],
 };
 
+const APPLICATION_FEE = 300;
+const TUITION_BY_PROGRAMME: Record<Programme, number> = {
+  PAA: 4900,
+  PEA: 5900,
+};
+const formatEUR = (n: number) =>
+  new Intl.NumberFormat("fr-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+
 function Inscription() {
   const [sent, setSent] = useState(false);
   const [programme, setProgramme] = useState<Programme>("PAA");
