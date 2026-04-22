@@ -26,25 +26,52 @@ function NotFoundComponent() {
   );
 }
 
+const ORG_JSONLD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollegeOrUniversity",
+  "name": "IPEC — Institut Privé des Études Commerciales",
+  "alternateName": ["IPEC Bruxelles", "Institut Privé des Études Commerciales"],
+  "url": "https://ipec.school",
+  "logo": "https://ipec.school/android-chrome-512x512.png",
+  "image": "https://ipec.school/apple-touch-icon.png",
+  "description": "École supérieure de commerce privée à Bruxelles, Belgique. Programmes en management, marketing, relations internationales, économie et finance.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bruxelles",
+    "addressCountry": "BE"
+  },
+  "email": "contact@ipec.school",
+  "areaServed": "BE",
+  "sameAs": []
+});
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "IPEC — Institut Privé des Études Commerciales · Bruxelles" },
-      { name: "description", content: "École supérieure de commerce à Bruxelles. Programmes en administration des affaires et exécutif avancé. Management, Marketing, Relations Internationales, Économie & Finance." },
       { name: "author", content: "IPEC Bruxelles" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+      { name: "theme-color", content: "#0a1628" },
+      { name: "format-detection", content: "telephone=no" },
+      { name: "geo.region", content: "BE-BRU" },
+      { name: "geo.placename", content: "Bruxelles" },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "IPEC Bruxelles" },
+      { property: "og:locale", content: "fr_BE" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "IPEC — Institut Privé des Études Commerciales · Bruxelles" },
-      { name: "twitter:title", content: "IPEC — Institut Privé des Études Commerciales · Bruxelles" },
-      { property: "og:description", content: "École supérieure de commerce à Bruxelles. Programmes en administration des affaires et exécutif avancé. Management, Marketing, Relations Internationales, Économie & Finance." },
-      { name: "twitter:description", content: "École supérieure de commerce à Bruxelles. Programmes en administration des affaires et exécutif avancé. Management, Marketing, Relations Internationales, Économie & Finance." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e932aee-86c9-4425-a47f-13ef7c0151b8/id-preview-fd44bf7a--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app-1776547649654.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0e932aee-86c9-4425-a47f-13ef7c0151b8/id-preview-fd44bf7a--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app-1776547649654.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
+    ],
+    scripts: [
+      { type: "application/ld+json", children: ORG_JSONLD },
     ],
   }),
   shellComponent: RootShell,
