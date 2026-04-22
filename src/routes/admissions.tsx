@@ -236,9 +236,9 @@ function Admissions() {
               <div>
                 <div className="text-xs uppercase tracking-widest text-blue mb-3">Plan de paiement</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Un échéancier sur mesure peut être établi en concertation avec le service
-                  administratif, selon votre situation. Contactez-nous pour en convenir avant
-                  la confirmation d'inscription.
+                  L'octroi d'un échéancier relève de la seule appréciation du service
+                  administratif de l'IPEC, sans obligation de motivation. Toute demande
+                  est examinée au cas par cas et n'ouvre aucun droit acquis ni recours.
                 </p>
               </div>
               <div>
