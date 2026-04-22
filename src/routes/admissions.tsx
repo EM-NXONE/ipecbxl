@@ -196,11 +196,11 @@ function Admissions() {
             </div>
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Règlement de la scolarité</div>
-              <div className="font-display text-3xl text-cream mb-3">50 % + 50 %</div>
+              <div className="font-display text-3xl text-cream mb-3">3 000 € + solde</div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Une première tranche de 50 % à la confirmation d'inscription, une seconde
-                tranche de 50 % avant le début effectif des cours. Un plan de paiement
-                échelonné peut être convenu avec le service administratif.
+                Première tranche de 3 000 € à la confirmation d'inscription, puis solde
+                (1 900 € en PAA, 2 900 € en PEA). Un plan de paiement échelonné peut être
+                convenu avec le service administratif.
               </p>
             </div>
           </div>
@@ -210,21 +210,21 @@ function Admissions() {
             <CreditCard className="text-blue mb-6" size={28} strokeWidth={1.5} />
             <h3 className="font-display text-2xl text-cream mb-3">Modalités de paiement</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-              Les frais de scolarité sont réglés en deux tranches égales. Un échéancier
+              Les frais de scolarité sont réglés en deux tranches. Un échéancier
               personnalisé peut être convenu, sur demande, avec le service administratif.
             </p>
 
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">1ʳᵉ tranche</div>
-                <div className="font-display text-xl text-cream mb-2">50 % à l'inscription</div>
+                <div className="font-display text-xl text-cream mb-2">3 000 € à l'inscription</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Versée à la confirmation d'inscription, elle valide définitivement votre place.
                 </p>
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
-                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche</div>
-                <div className="font-display text-xl text-cream mb-2">50 % — solde</div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche — solde</div>
+                <div className="font-display text-xl text-cream mb-2">1 900 € (PAA) · 2 900 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Étudiants en présentiel : avant le début effectif des cours.
                   Étudiants internationaux : à l'arrivée à l'institut, après obtention du visa.
