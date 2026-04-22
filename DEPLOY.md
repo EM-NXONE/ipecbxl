@@ -214,7 +214,7 @@ Une fois en ligne, testez :
 Quand vous modifiez le site (dans Lovable ou en local) :
 
 1. `git pull` (si vous avez modifié dans Lovable, pour récupérer les changements)
-2. `STATIC_BUILD=1 npm run build` ⚠️ **toujours avec `STATIC_BUILD=1`**
+2. `npm run build:static` ⚠️ **toujours `build:static`, pas `build`**
 3. Re-uploader le contenu de `dist/client/` dans `public_html/` (en remplaçant
    les anciens fichiers). `.htaccess` ne change pas, vous pouvez le laisser.
 
