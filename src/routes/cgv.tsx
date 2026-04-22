@@ -43,8 +43,8 @@ function CGV() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">3. Frais de scolarité</h2>
             <ul className="space-y-2 list-disc list-inside">
-              <li>PAA — Administration des Affaires : <strong className="text-cream">4 900 € / an</strong></li>
-              <li>PEA — Programme Exécutif Avancé : <strong className="text-cream">5 900 € / an</strong></li>
+              <li>PAA — Administration des Affaires : 4 900 € / an</li>
+              <li>PEA — Programme Exécutif Avancé : 5 900 € / an</li>
             </ul>
             <p className="mt-3">
               Une première tranche de <strong className="text-cream">3 000 €</strong> est due à la
