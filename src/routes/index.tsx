@@ -13,11 +13,18 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "IPEC Bruxelles — École supérieure de commerce" },
-      { name: "description", content: "L'IPEC forme la nouvelle génération de leaders en business, marketing, relations internationales, économie et finance, au cœur de Bruxelles." },
-      { property: "og:title", content: "IPEC Bruxelles — Institut Privé des Études Commerciales" },
-      { property: "og:description", content: "Une école nouvelle génération au cœur de Bruxelles. Programmes PAA et PEA, spécialisation progressive, ouverture internationale." },
+      { title: "IPEC Bruxelles — Institut privé Belgique · École supérieure de commerce" },
+      { name: "description", content: "IPEC, institut privé en Belgique à Bruxelles : école supérieure de commerce privée. Programmes BAC+1 à BAC+5 en management, marketing, relations internationales, économie & finance. Université privée à dimension internationale." },
+      { name: "keywords", content: "institut privé Belgique, université privée Belgique, école de commerce Bruxelles, école privée Bruxelles, école supérieure Belgique, business school Belgique, IPEC, étudier à Bruxelles, BAC+3 Belgique, BAC+5 Belgique, management Bruxelles, marketing Belgique" },
+      { property: "og:title", content: "IPEC — Institut privé en Belgique · École de commerce à Bruxelles" },
+      { property: "og:description", content: "Institut privé belge au cœur de Bruxelles. Programmes PAA et PEA en management, marketing, relations internationales, économie & finance. Spécialisation progressive et ouverture internationale." },
+      { property: "og:url", content: "https://ipec.school/" },
+      { property: "og:image", content: "https://ipec.school/apple-touch-icon.png" },
+      { name: "twitter:title", content: "IPEC — Institut privé en Belgique · Bruxelles" },
+      { name: "twitter:description", content: "École supérieure de commerce privée à Bruxelles. Programmes BAC+1 à BAC+5 en business, marketing, relations internationales, finance." },
+      { name: "twitter:image", content: "https://ipec.school/apple-touch-icon.png" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/" }],
   }),
   component: Home,
 });

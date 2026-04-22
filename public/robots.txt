@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /mailer.php
+Disallow: /PHPMailer/
+
+Sitemap: https://ipec.school/sitemap.xml

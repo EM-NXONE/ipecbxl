@@ -4,10 +4,13 @@ export const Route = createFileRoute("/confidentialite")({
   head: () => ({
     meta: [
       { title: "Politique de confidentialité — IPEC Bruxelles" },
-      { name: "description", content: "Politique de protection des données personnelles de l'IPEC, conforme au RGPD." },
+      { name: "description", content: "Politique de protection des données personnelles de l'IPEC, conforme au RGPD. Institut privé en Belgique." },
+      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Confidentialité — IPEC Bruxelles" },
       { property: "og:description", content: "Comment l'IPEC collecte, utilise et protège vos données personnelles." },
+      { property: "og:url", content: "https://ipec.school/confidentialite" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/confidentialite" }],
   }),
   component: Confidentialite,
 });

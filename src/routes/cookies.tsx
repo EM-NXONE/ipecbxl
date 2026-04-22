@@ -4,10 +4,13 @@ export const Route = createFileRoute("/cookies")({
   head: () => ({
     meta: [
       { title: "Politique cookies — IPEC Bruxelles" },
-      { name: "description", content: "Gestion des cookies sur le site de l'IPEC." },
+      { name: "description", content: "Gestion des cookies sur le site de l'IPEC, institut privé en Belgique." },
+      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Cookies — IPEC Bruxelles" },
       { property: "og:description", content: "Comment l'IPEC utilise les cookies sur son site internet." },
+      { property: "og:url", content: "https://ipec.school/cookies" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/cookies" }],
   }),
   component: Cookies,
 });

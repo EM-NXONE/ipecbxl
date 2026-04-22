@@ -10,11 +10,18 @@ import {
 export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
-      { title: "Admissions — Candidater à l'IPEC Bruxelles" },
-      { name: "description", content: "Inscriptions ouvertes pour la rentrée. Frais de dossier 400 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudiants belges et internationaux." },
-      { property: "og:title", content: "Admissions — IPEC Bruxelles" },
-      { property: "og:description", content: "Candidatez à l'IPEC : process simple, frais transparents, accueil des étudiants internationaux." },
+      { title: "Admissions — Candidater à un institut privé en Belgique · IPEC Bruxelles" },
+      { name: "description", content: "Admissions ouvertes à l'IPEC, institut privé en Belgique. Frais de dossier 400 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudier à Bruxelles : candidatures belges et internationales." },
+      { name: "keywords", content: "admissions Belgique, candidature école privée Bruxelles, inscription université privée Belgique, frais scolarité Bruxelles, étudier en Belgique, admission BAC+3 Bruxelles, IPEC admissions" },
+      { property: "og:title", content: "Admissions IPEC — Institut privé Belgique · Bruxelles" },
+      { property: "og:description", content: "Process simple, frais transparents, accueil des étudiants belges et internationaux dans une école supérieure privée à Bruxelles." },
+      { property: "og:url", content: "https://ipec.school/admissions" },
+      { property: "og:image", content: "https://ipec.school/apple-touch-icon.png" },
+      { name: "twitter:title", content: "Admissions — IPEC Bruxelles" },
+      { name: "twitter:description", content: "Candidater à un institut privé en Belgique : process clair, frais transparents." },
+      { name: "twitter:image", content: "https://ipec.school/apple-touch-icon.png" },
     ],
+    links: [{ rel: "canonical", href: "https://ipec.school/admissions" }],
   }),
   component: Admissions,
 });
