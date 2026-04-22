@@ -183,8 +183,9 @@ function Inscription() {
 
                   <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
                     Le solde est dû avant le début des cours pour les étudiants en présentiel,
-                    ou à l'arrivée à l'institut pour les étudiants internationaux. Plan de
-                    paiement personnalisé possible avec le service administratif. Détails dans les{" "}
+                    ou à l'arrivée à l'institut pour les étudiants internationaux. Tout plan
+                    de paiement relève de la seule appréciation du service administratif,
+                    sans obligation de motivation. Détails dans les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
                   </p>
                 </div>

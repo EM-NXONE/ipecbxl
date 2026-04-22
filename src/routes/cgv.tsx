@@ -70,9 +70,15 @@ function CGV() {
               </li>
             </ul>
             <p className="mt-4">
-              Un plan de paiement échelonné peut être établi, sur demande motivée, en
-              concertation avec le service administratif de l'IPEC. Cet aménagement doit
-              faire l'objet d'un accord écrit préalable à la rentrée académique.
+              L'octroi d'un plan de paiement échelonné relève de la seule appréciation
+              discrétionnaire du service administratif de l'IPEC. Toute demande est
+              examinée au cas par cas et peut être acceptée, refusée ou révoquée sans
+              que l'IPEC soit tenue de motiver sa décision. Aucune demande ne confère
+              de droit acquis et aucun recours, amiable ou contentieux, ne peut être
+              fondé sur un éventuel refus. Lorsqu'il est accordé, l'aménagement doit
+              faire l'objet d'un accord écrit préalable à la rentrée académique ; tout
+              défaut ou retard de paiement à l'une des échéances convenues entraîne de
+              plein droit la déchéance du terme et l'exigibilité immédiate du solde.
             </p>
             <p className="mt-4">
               Moyens de paiement acceptés : virement SEPA, Bancontact, carte de crédit
