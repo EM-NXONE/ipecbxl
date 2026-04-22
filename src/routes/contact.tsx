@@ -14,8 +14,48 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
+const MAILER_URL = "https://ipec.school/mailer.php";
+
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitting) return;
+    setErrorMsg(null);
+    setSubmitting(true);
+
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      type: "contact",
+      prenom: String(fd.get("prenom") ?? ""),
+      nom: String(fd.get("nom") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      sujet: String(fd.get("sujet") ?? ""),
+      message: String(fd.get("message") ?? ""),
+      website: String(fd.get("website") ?? ""), // honeypot
+    };
+
+    try {
+      const res = await fetch(MAILER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErrorMsg(data?.error ?? "Une erreur est survenue. Réessayez.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setErrorMsg("Impossible d'envoyer le message. Vérifiez votre connexion.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -88,10 +128,7 @@ function Contact() {
                 <p className="text-muted-foreground">Votre message a bien été envoyé. Nous vous répondons sous 48h.</p>
               </div>
             ) : (
-              <form
-                className="space-y-6"
-                onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit} noValidate>
                 <div className="p-5 rounded-sm border border-blue/30 bg-blue/5">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Vous souhaitez déposer un dossier de candidature ?{" "}
@@ -101,33 +138,63 @@ function Contact() {
                   </p>
                 </div>
 
+                {/* Honeypot anti-bot — caché aux humains */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    width: 1,
+                    height: 1,
+                    opacity: 0,
+                    pointerEvents: "none",
+                  }}
+                />
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
-                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="prenom" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nom</label>
-                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                    <input required name="nom" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">E-mail</label>
-                  <input required type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  <input required name="email" type="email" maxLength={255} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Sujet</label>
-                  <input required type="text" maxLength={150} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  <input required name="sujet" type="text" maxLength={150} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Message</label>
-                  <textarea required rows={6} maxLength={2000} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none" />
+                  <textarea required name="message" rows={6} maxLength={2000} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none" />
                 </div>
+
+                {errorMsg && (
+                  <div
+                    role="alert"
+                    className="p-4 rounded-sm border border-destructive/40 bg-destructive/5 text-sm text-destructive"
+                  >
+                    {errorMsg}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity"
+                  disabled={submitting}
+                  aria-busy={submitting}
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Envoyer le message <Send size={16} />
+                  {submitting ? "Envoi en cours…" : "Envoyer le message"}
+                  {!submitting && <Send size={16} />}
                 </button>
               </form>
             )}

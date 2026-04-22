@@ -52,7 +52,7 @@ function Inscription() {
     setAnnee(yearsByProgramme[value][0].value);
   };
 
-  const MAILER_URL = "https://ipec.school/inscription-mailer.php";
+  const MAILER_URL = "https://ipec.school/mailer.php";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,6 +65,7 @@ function Inscription() {
     const anneeLabel = years.find((y) => y.value === annee)?.label ?? annee;
 
     const payload = {
+      type: "inscription",
       civilite: String(fd.get("civilite") ?? ""),
       prenom: String(fd.get("prenom") ?? ""),
       nom: String(fd.get("nom") ?? ""),
