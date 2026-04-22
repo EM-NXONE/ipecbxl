@@ -123,6 +123,28 @@ function Inscription() {
                   </p>
                 </div>
 
+                {/* Identité */}
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Civilité</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {["Mr", "Mme", "Mlle", "Mx — non binaire"].map((opt) => (
+                      <label
+                        key={opt}
+                        className="flex items-center gap-2 px-4 py-3 rounded-sm border border-border/60 bg-card cursor-pointer hover:border-blue transition-colors text-sm text-cream has-[:checked]:border-blue has-[:checked]:bg-blue/10"
+                      >
+                        <input
+                          type="radio"
+                          name="civilite"
+                          value={opt}
+                          required
+                          className="accent-blue shrink-0"
+                        />
+                        <span>{opt}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Prénom</label>
@@ -134,6 +156,24 @@ function Inscription() {
                   </div>
                 </div>
 
+                {/* État civil */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Date de naissance</label>
+                    <input
+                      required
+                      type="date"
+                      max={new Date().toISOString().split("T")[0]}
+                      className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Nationalité</label>
+                    <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                </div>
+
+                {/* Contact */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">E-mail</label>
@@ -145,10 +185,23 @@ function Inscription() {
                   </div>
                 </div>
 
+                {/* Adresse */}
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Adresse</label>
+                  <textarea
+                    required
+                    rows={2}
+                    maxLength={250}
+                    placeholder="Rue, numéro, code postal, ville"
+                    className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Pays de résidence</label>
                   <input required type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
                 </div>
+
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
