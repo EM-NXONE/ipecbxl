@@ -3,23 +3,31 @@
  * IPEC — Relais SMTP pour le formulaire d'inscription
  * À déposer sur l'hébergement n0c (ex: public_html/inscription-mailer.php)
  *
- * Configuration : remplacez SHARED_SECRET ci-dessous par une longue chaîne aléatoire
- * (40+ caractères). La même valeur doit être configurée côté Lovable comme secret
- * INSCRIPTION_MAILER_TOKEN.
+ * Ce script est appelé DIRECTEMENT par le formulaire du site (sans intermédiaire),
+ * afin que la production ne dépende d'aucun service tiers.
+ *
+ * Sécurité :
+ *   - CORS strict (liste blanche d'origines autorisées)
+ *   - Honeypot anti-bot (champ "website" qui doit rester vide)
+ *   - Rate-limit par IP (max RATE_LIMIT_MAX envois / RATE_LIMIT_WINDOW secondes)
+ *   - Nettoyage des en-têtes (anti-injection)
  */
 
 // ============================================================
-// CONFIGURATION — À MODIFIER
+// CONFIGURATION
 // ============================================================
-const SHARED_SECRET = 'REMPLACEZ_PAR_UNE_CHAINE_ALEATOIRE_LONGUE_DE_40_PLUS_CARACTERES';
 const FROM_EMAIL    = 'process@ipec.school';
 const FROM_NAME     = 'IPEC — Inscriptions';
 const TO_EMAIL      = 'admission@ipec.school';
+
+// Rate-limit : 5 envois max par IP toutes les 10 minutes
+const RATE_LIMIT_MAX    = 5;
+const RATE_LIMIT_WINDOW = 600; // secondes
 // ============================================================
 
 header('Content-Type: application/json; charset=utf-8');
 
-// CORS — autorise uniquement le domaine du site Lovable
+// CORS — autorise uniquement les domaines du site
 $allowedOrigins = [
     'https://ipecbxl.lovable.app',
     'https://www.ipec.school',
@@ -29,7 +37,7 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowedOrigins, true)) {
     header("Access-Control-Allow-Origin: $origin");
     header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, X-Auth-Token');
+    header('Access-Control-Allow-Headers: Content-Type');
     header('Vary: Origin');
 }
 
@@ -44,11 +52,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Authentification par token partagé
-$token = $_SERVER['HTTP_X_AUTH_TOKEN'] ?? '';
-if (!hash_equals(SHARED_SECRET, $token)) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
+// Vérifie que l'origine est dans la liste blanche (sinon refus)
+if (!in_array($origin, $allowedOrigins, true)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Origin not allowed']);
+    exit;
+}
+
+// ----- Rate-limit par IP (fichier dans sys_get_temp_dir) -----
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$rateFile = sys_get_temp_dir() . '/ipec_inscr_' . md5($ip) . '.json';
+$now = time();
+$timestamps = [];
+if (is_file($rateFile)) {
+    $raw = @file_get_contents($rateFile);
+    $decoded = json_decode($raw ?: '[]', true);
+    if (is_array($decoded)) {
+        $timestamps = array_filter(
+            $decoded,
+            fn($t) => is_int($t) && ($now - $t) < RATE_LIMIT_WINDOW
+        );
+    }
+}
+if (count($timestamps) >= RATE_LIMIT_MAX) {
+    http_response_code(429);
+    echo json_encode(['error' => 'Trop de tentatives. Réessayez plus tard.']);
     exit;
 }
 
@@ -61,10 +89,17 @@ if (!is_array($data)) {
     exit;
 }
 
+// Honeypot anti-bot : le champ "website" doit rester vide
+if (!empty($data['website'])) {
+    // On répond OK pour ne pas alerter le bot, mais on n'envoie rien
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 // Helpers de nettoyage
 function clean(string $v, int $max = 250): string {
     $v = trim($v);
-    $v = str_replace(["\r", "\n", "\0"], ' ', $v); // anti-injection d'en-têtes
+    $v = str_replace(["\r", "\n", "\0"], ' ', $v);
     return mb_substr($v, 0, $max);
 }
 function cleanMultiline(string $v, int $max = 2000): string {
@@ -135,7 +170,6 @@ $bodyHtml = <<<HTML
 HTML;
 
 // En-têtes — encodage MIME et Reply-To sur l'adresse du candidat
-$boundary = '=_' . bin2hex(random_bytes(12));
 $encodedFromName = '=?UTF-8?B?' . base64_encode(FROM_NAME) . '?=';
 $encodedSubject  = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
@@ -146,8 +180,6 @@ $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 $headers .= "Content-Transfer-Encoding: 8bit\r\n";
 $headers .= "X-Mailer: IPEC-Inscription/1.0\r\n";
 
-// Envoi via le MTA local (sendmail) — n0c gère l'authentification automatiquement
-// pour les expéditeurs internes au compte d'hébergement.
 $envelopeSender = '-f' . FROM_EMAIL;
 $ok = mail(TO_EMAIL, $encodedSubject, $bodyHtml, $headers, $envelopeSender);
 
@@ -156,5 +188,9 @@ if (!$ok) {
     echo json_encode(['error' => "Échec de l'envoi"]);
     exit;
 }
+
+// Enregistre l'envoi pour le rate-limit (uniquement en cas de succès)
+$timestamps[] = $now;
+@file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
 echo json_encode(['ok' => true]);
