@@ -224,9 +224,10 @@ function Admissions() {
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche</div>
-                <div className="font-display text-xl text-cream mb-2">50 % avant la rentrée</div>
+                <div className="font-display text-xl text-cream mb-2">50 % — solde</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Réglée avant le début effectif des cours de l'année académique.
+                  Étudiants en présentiel : avant le début effectif des cours.
+                  Étudiants internationaux : à l'arrivée à l'institut, après obtention du visa.
                 </p>
               </div>
             </div>

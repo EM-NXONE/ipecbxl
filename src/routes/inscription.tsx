@@ -168,9 +168,10 @@ function Inscription() {
                   </dl>
 
                   <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    Règlement en deux tranches égales : 50 % à l'inscription, 50 % avant le
-                    début des cours. Un plan de paiement personnalisé peut être convenu avec
-                    le service administratif. Détails dans les{" "}
+                    Règlement en deux tranches égales : 50 % à l'inscription, solde de 50 %
+                    avant le début des cours (étudiants en présentiel) ou à l'arrivée à
+                    l'institut (étudiants internationaux). Plan de paiement personnalisé
+                    possible avec le service administratif. Détails dans les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
                   </p>
                 </div>

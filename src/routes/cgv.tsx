@@ -48,9 +48,11 @@ function CGV() {
             </ul>
             <p className="mt-3">
               Une première tranche égale à 50 % des droits de scolarité est due à la
-              confirmation d'inscription ; le solde (50 %) est exigible avant le début
-              effectif des cours. Pour les candidats sollicitant un visa d'études, ces
-              montants sont intégralement déduits des droits de scolarité annuels.
+              confirmation d'inscription. Le solde (50 %) est exigible avant le début
+              effectif des cours pour les étudiants en présentiel ; pour les étudiants
+              internationaux soumis à une procédure de visa, ce solde est dû à l'arrivée
+              à l'institut. Les sommes versées sont intégralement déduites des droits de
+              scolarité annuels.
             </p>
           </section>
 
@@ -61,7 +63,11 @@ function CGV() {
             </p>
             <ul className="space-y-2 list-disc list-inside">
               <li>1ʳᵉ tranche (50 %) à la confirmation d'inscription</li>
-              <li>2ᵉ tranche (50 %) avant le début effectif des cours</li>
+              <li>
+                2ᵉ tranche (50 %) — solde : avant le début effectif des cours pour les
+                étudiants en présentiel ; à l'arrivée à l'institut pour les étudiants
+                internationaux soumis à une procédure de visa
+              </li>
             </ul>
             <p className="mt-4">
               Un plan de paiement échelonné peut être établi, sur demande motivée, en
