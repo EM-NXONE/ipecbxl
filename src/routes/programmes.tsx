@@ -284,7 +284,7 @@ function Programmes() {
             {specs.map((s) => (
               <div
                 key={s.n}
-                className="bg-background p-10 hover:bg-card transition-colors flex flex-col"
+                className="bg-background p-10 hover:bg-card transition-colors grid grid-rows-[auto_auto_auto_auto_auto_auto_auto] content-start"
               >
                 <div className="flex items-center justify-between mb-6">
                   <s.icon className="text-blue" size={28} strokeWidth={1.5} />
@@ -304,7 +304,7 @@ function Programmes() {
                   ))}
                 </ul>
 
-                <div className="text-xs uppercase tracking-widest text-blue mb-4 mt-auto">— Débouchés professionnels</div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-4">— Débouchés professionnels</div>
                 <ul className="space-y-2.5">
                   {s.careers.map((c) => (
                     <li key={c} className="flex items-start gap-3 text-cream">
