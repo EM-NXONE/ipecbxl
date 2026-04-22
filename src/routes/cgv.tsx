@@ -100,12 +100,12 @@ function CGV() {
             <ol className="space-y-4 list-decimal list-outside ml-5">
               <li>
                 Dès réception du dossier complet et du paiement des frais de dossier
-                (<strong className="text-cream">300 €</strong> pour l'année académique en cours),
+                (300 € pour l'année académique en cours),
                 l'IPEC délivre une attestation de préadmission dans un délai raisonnable.
                 Les frais de dossier ne sont en aucun cas remboursables.
               </li>
               <li>
-                Formation et diplôme <strong className="text-cream">non reconnus</strong> par la
+                Formation et diplôme non reconnus par la
                 Communauté française de Belgique (article 14/4, §2, du décret du 7 novembre 2013).
               </li>
               <li>
@@ -137,17 +137,15 @@ function CGV() {
                 Dans le cas où ces étudiants ne souhaitent pas introduire de recours contre une
                 décision de refus de visa étudiant, ou dans le cas où le recours introduit n'a pas
                 abouti sur une décision d'obtention de visa, leur inscription au programme en
-                présentiel sera <strong className="text-cream">automatiquement remplacée</strong>
-                {" "}par une inscription au programme online correspondant. La première tranche des
-                droits d'inscription versée sera de plein droit utilisée pour le paiement des
-                droits d'inscription audit programme online.
+                présentiel sera automatiquement remplacée par une inscription au programme online
+                correspondant. La première tranche des droits d'inscription versée sera de plein
+                droit utilisée pour le paiement des droits d'inscription audit programme online.
               </li>
               <li>
                 Le candidat reconnaît avoir été informé que le paiement des droits d'inscription
-                visés ci-dessus entraîne donc une <strong className="text-cream">inscription
-                définitive</strong> à l'IPEC. Seules les modalités de suivi du programme (en
-                présentiel à Bruxelles ou online) seront déterminées en fonction de l'obtention
-                d'un visa étudiant.
+                visés ci-dessus entraîne donc une inscription définitive à l'IPEC. Seules les
+                modalités de suivi du programme (en présentiel à Bruxelles ou online) seront
+                déterminées en fonction de l'obtention d'un visa étudiant.
               </li>
             </ol>
             <p className="mt-6 p-4 rounded-sm border border-blue/30 bg-blue/5 text-cream">
