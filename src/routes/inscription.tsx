@@ -14,8 +14,32 @@ export const Route = createFileRoute("/inscription")({
   component: Inscription,
 });
 
+type Programme = "PAA" | "PEA";
+
+const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = {
+  PAA: [
+    { value: "1", label: "1ʳᵉ année" },
+    { value: "2", label: "2ᵉ année (Bac+1)" },
+    { value: "3", label: "3ᵉ année (Bac+2)" },
+  ],
+  PEA: [
+    { value: "4", label: "1ʳᵉ année — PEA1 (Bac+3)" },
+    { value: "5", label: "2ᵉ année — PEA2 (Bac+4)" },
+  ],
+};
+
 function Inscription() {
   const [sent, setSent] = useState(false);
+  const [programme, setProgramme] = useState<Programme>("PAA");
+  const [annee, setAnnee] = useState<string>("1");
+
+  const years = yearsByProgramme[programme];
+  const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
+
+  const handleProgrammeChange = (value: Programme) => {
+    setProgramme(value);
+    setAnnee(yearsByProgramme[value][0].value);
+  };
 
   return (
     <>
@@ -121,35 +145,54 @@ function Inscription() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Programme</label>
-                    <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                      <option>PAA — Administration des Affaires</option>
-                      <option>PEA — Programme Exécutif Avancé</option>
+                    <select
+                      required
+                      value={programme}
+                      onChange={(e) => handleProgrammeChange(e.target.value as Programme)}
+                      className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
+                    >
+                      <option value="PAA">PAA — Administration des Affaires</option>
+                      <option value="PEA">PEA — Programme Exécutif Avancé</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-widest text-blue mb-3">Année visée</label>
-                    <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                      <option>1ʳᵉ année</option>
-                      <option>2ᵉ année (Bac+1)</option>
-                      <option>3ᵉ année (Bac+2)</option>
-                      <option>4ᵉ année — PEA1 (Bac+3)</option>
-                      <option>5ᵉ année — PEA2 (Bac+4)</option>
+                    <select
+                      required
+                      value={annee}
+                      onChange={(e) => setAnnee(e.target.value)}
+                      className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
+                    >
+                      {years.map((y) => (
+                        <option key={y.value} value={y.value}>{y.label}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Spécialisation souhaitée</label>
-                  <select className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
+                  <select
+                    required
+                    defaultValue=""
+                    className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
+                  >
+                    <option value="" disabled>Sélectionnez une spécialisation</option>
                     <option>Management</option>
                     <option>Marketing</option>
                     <option>Relations Internationales</option>
                     <option>Économie & Finance</option>
-                    <option>Je ne sais pas encore</option>
+                    {allowUndecided && <option>Je ne sais pas encore</option>}
                   </select>
-                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-                    Pour le PAA, ce choix est indicatif et non définitif : la spécialisation se précise progressivement au fil du cursus.
-                  </p>
+                  {allowUndecided ? (
+                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                      En 1ʳᵉ et 2ᵉ année du PAA, ce choix reste indicatif : la spécialisation se précise progressivement au fil du cursus.
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                      À ce niveau d'études, la spécialisation doit être définitivement choisie au moment de l'inscription.
+                    </p>
+                  )}
                 </div>
 
                 <div>
