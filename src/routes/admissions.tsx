@@ -61,7 +61,7 @@ function Admissions() {
             Une porte d'entrée à <em className="text-gradient-blue not-italic">chaque niveau</em>.
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
               {
                 year: "1ʳᵉ année",
