@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Send, FileText, Mail, CheckCircle2, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import {
+  formatRentreeDate,
+  getNextSeptemberRentree,
+  getNextFebruaryRentree,
+} from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/inscription")({
   head: () => ({
@@ -35,6 +40,8 @@ function Inscription() {
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
+  const septembreRentree = formatRentreeDate(getNextSeptemberRentree());
+  const fevrierRentree = formatRentreeDate(getNextFebruaryRentree());
 
   const handleProgrammeChange = (value: Programme) => {
     setProgramme(value);
@@ -259,8 +266,8 @@ function Inscription() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Rentrée envisagée</label>
                   <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>Rentrée principale — septembre</option>
-                    <option>Rentrée décalée — février</option>
+                    <option>Rentrée principale — {septembreRentree}</option>
+                    <option>Rentrée décalée — {fevrierRentree}</option>
                   </select>
                 </div>
 
