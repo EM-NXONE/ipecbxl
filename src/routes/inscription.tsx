@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Send, FileText, Mail, CheckCircle2, ArrowRight, Receipt } from "lucide-react";
+import { Send, FileText, Mail, CheckCircle2, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/inscription")({
@@ -27,15 +27,6 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
     { value: "5", label: "2ᵉ année — PEA2 (Bac+4)" },
   ],
 };
-
-const APPLICATION_FEE = 400;
-const FIRST_INSTALLMENT = 3000;
-const TUITION_BY_PROGRAMME: Record<Programme, number> = {
-  PAA: 4900,
-  PEA: 5900,
-};
-const formatEUR = (n: number) =>
-  new Intl.NumberFormat("fr-BE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
 
 function Inscription() {
   const [sent, setSent] = useState(false);
@@ -129,64 +120,6 @@ function Inscription() {
                   <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Tous les champs marqués sont obligatoires.
-                  </p>
-                </div>
-
-                {/* Récapitulatif des frais */}
-                <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Receipt className="text-blue shrink-0" size={20} strokeWidth={1.5} />
-                    <div className="text-xs uppercase tracking-widest text-blue">
-                      Récapitulatif des frais — {programme}
-                    </div>
-                  </div>
-
-                  <dl className="space-y-3 text-sm">
-                    <div className="flex items-baseline justify-between gap-4 pb-3 border-b border-border/40">
-                      <dt className="text-muted-foreground">
-                        Frais de dossier
-                        <span className="block text-xs opacity-70">Unique, non remboursable</span>
-                      </dt>
-                      <dd className="text-cream font-display text-lg shrink-0">{formatEUR(APPLICATION_FEE)}</dd>
-                    </div>
-
-                    <div className="flex items-baseline justify-between gap-4 pb-3 border-b border-border/40">
-                      <dt className="text-muted-foreground">
-                        Frais de scolarité
-                        <span className="block text-xs opacity-70">{programme} — par année académique</span>
-                      </dt>
-                      <dd className="text-cream font-display text-lg shrink-0">{formatEUR(TUITION_BY_PROGRAMME[programme])}</dd>
-                    </div>
-
-                    <div className="flex items-baseline justify-between gap-4 pt-1">
-                      <dt className="text-cream uppercase tracking-widest text-xs">
-                        Total estimé — 1ʳᵉ année
-                      </dt>
-                      <dd className="text-gradient-blue font-display text-2xl shrink-0">
-                        {formatEUR(APPLICATION_FEE + TUITION_BY_PROGRAMME[programme])}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <div className="mt-5 pt-5 border-t border-border/40 grid sm:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <div className="text-xs uppercase tracking-widest text-blue mb-1">1ʳᵉ tranche — à l'inscription</div>
-                      <div className="text-cream font-display text-lg">{formatEUR(FIRST_INSTALLMENT)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs uppercase tracking-widest text-blue mb-1">2ᵉ tranche — solde</div>
-                      <div className="text-cream font-display text-lg">
-                        {formatEUR(TUITION_BY_PROGRAMME[programme] - FIRST_INSTALLMENT)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    Le solde est dû avant le début des cours pour les étudiants en présentiel,
-                    ou à l'arrivée à l'institut pour les étudiants internationaux. Tout plan
-                    de paiement relève de la seule appréciation du service administratif,
-                    sans obligation de motivation. Détails dans les{" "}
-                    <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
                   </p>
                 </div>
 
