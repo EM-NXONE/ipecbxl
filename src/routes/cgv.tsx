@@ -67,7 +67,7 @@ function CGV() {
             <h2 className="font-display text-2xl text-cream mb-4">5. Rétractation</h2>
             <p>
               Conformément au Code de droit économique belge, l'étudiant dispose d'un délai de
-              <strong className="text-cream"> 14 jours</strong> à compter de la confirmation de son
+              14 jours à compter de la confirmation de son
               inscription pour exercer son droit de rétractation, sauf renoncement exprès dans le
               cas où la formation a déjà débuté à sa demande.
             </p>
