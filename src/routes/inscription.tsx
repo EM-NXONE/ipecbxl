@@ -79,18 +79,20 @@ function Inscription() {
               </p>
             </div>
 
-            <ol className="space-y-6 text-sm">
+            <ol className="relative space-y-4 text-sm before:content-[''] before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-blue/60 before:via-blue/30 before:to-transparent">
               {[
                 { n: "01", t: "Formulaire", d: "Vous renseignez vos coordonnées et le programme visé." },
                 { n: "02", t: "Pièces justificatives", d: "Nous vous indiquons par e-mail les documents à transmettre." },
                 { n: "03", t: "Entretien", d: "Échange avec l'équipe pédagogique pour préciser votre projet." },
                 { n: "04", t: "Décision", d: "Réponse d'admission sous 7 jours et confirmation d'inscription." },
               ].map((s) => (
-                <li key={s.n} className="flex gap-4">
-                  <div className="text-blue font-display text-lg shrink-0 w-8">{s.n}</div>
-                  <div>
-                    <div className="text-cream mb-1">{s.t}</div>
-                    <div className="text-muted-foreground leading-relaxed">{s.d}</div>
+                <li key={s.n} className="relative flex gap-4 items-start">
+                  <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border border-blue/50 bg-card text-blue font-display text-xs shrink-0 shadow-blue">
+                    {s.n}
+                  </div>
+                  <div className="flex-1 pt-1 pb-4 border-b border-border/30 last:border-b-0">
+                    <div className="text-cream mb-1 font-medium">{s.t}</div>
+                    <div className="text-muted-foreground leading-relaxed text-xs">{s.d}</div>
                   </div>
                 </li>
               ))}
