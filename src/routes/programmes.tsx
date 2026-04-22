@@ -35,7 +35,7 @@ const peaYears = [
   {
     code: "PEA1",
     title: "Première année exécutive",
-    desc: "Expertise avancée dans la spécialisation choisie. Études de cas, immersion en entreprise, séminaires internationaux.",
+    desc: "Expertise avancée dans la spécialisation choisie. Études de cas, immersion en entreprise, séminaires.",
   },
   {
     code: "PEA2",
