@@ -28,7 +28,7 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
   ],
 };
 
-const APPLICATION_FEE = 300;
+const APPLICATION_FEE = 400;
 const TUITION_BY_PROGRAMME: Record<Programme, number> = {
   PAA: 4900,
   PEA: 5900,
