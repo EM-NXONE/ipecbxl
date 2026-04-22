@@ -55,12 +55,22 @@ function CGV() {
 
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">4. Modalités de paiement</h2>
+            <p className="mb-3">
+              Les droits de scolarité sont réglés en deux tranches égales :
+            </p>
             <ul className="space-y-2 list-disc list-inside">
-              <li>Paiement annuel intégral à l'inscription (escompte de 3 %)</li>
-              <li>Paiement en deux fois : 50 % en septembre, 50 % en février</li>
-              <li>Mensualisation sur 10 mensualités, sans frais</li>
-              <li>Moyens acceptés : virement SEPA, carte de crédit, Bancontact</li>
+              <li>1ʳᵉ tranche (50 %) à la confirmation d'inscription</li>
+              <li>2ᵉ tranche (50 %) avant le début effectif des cours</li>
             </ul>
+            <p className="mt-4">
+              Un plan de paiement échelonné peut être établi, sur demande motivée, en
+              concertation avec le service administratif de l'IPEC. Cet aménagement doit
+              faire l'objet d'un accord écrit préalable à la rentrée académique.
+            </p>
+            <p className="mt-4">
+              Moyens de paiement acceptés : virement SEPA, Bancontact, carte de crédit
+              et espèces (dans les limites prévues par la législation belge en vigueur).
+            </p>
           </section>
 
           <section>

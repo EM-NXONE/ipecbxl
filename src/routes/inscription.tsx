@@ -168,8 +168,9 @@ function Inscription() {
                   </dl>
 
                   <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    Une première tranche de {formatEUR(3000)} valide définitivement l'inscription.
-                    Les modalités de paiement (annuel, semestriel ou mensualisé) sont détaillées dans les{" "}
+                    Règlement en deux tranches égales : 50 % à l'inscription, 50 % avant le
+                    début des cours. Un plan de paiement personnalisé peut être convenu avec
+                    le service administratif. Détails dans les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
                   </p>
                 </div>
