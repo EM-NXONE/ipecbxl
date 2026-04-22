@@ -168,11 +168,23 @@ function Inscription() {
                     </div>
                   </dl>
 
+                  <div className="mt-5 pt-5 border-t border-border/40 grid sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <div className="text-xs uppercase tracking-widest text-blue mb-1">1ʳᵉ tranche — à l'inscription</div>
+                      <div className="text-cream font-display text-lg">{formatEUR(FIRST_INSTALLMENT)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs uppercase tracking-widest text-blue mb-1">2ᵉ tranche — solde</div>
+                      <div className="text-cream font-display text-lg">
+                        {formatEUR(TUITION_BY_PROGRAMME[programme] - FIRST_INSTALLMENT)}
+                      </div>
+                    </div>
+                  </div>
+
                   <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    Règlement en deux tranches égales : 50 % à l'inscription, solde de 50 %
-                    avant le début des cours (étudiants en présentiel) ou à l'arrivée à
-                    l'institut (étudiants internationaux). Plan de paiement personnalisé
-                    possible avec le service administratif. Détails dans les{" "}
+                    Le solde est dû avant le début des cours pour les étudiants en présentiel,
+                    ou à l'arrivée à l'institut pour les étudiants internationaux. Plan de
+                    paiement personnalisé possible avec le service administratif. Détails dans les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">CGV</Link>.
                   </p>
                 </div>
