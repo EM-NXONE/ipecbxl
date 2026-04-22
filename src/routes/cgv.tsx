@@ -47,26 +47,26 @@ function CGV() {
               <li>PEA — Programme Exécutif Avancé : 5 900 € / an</li>
             </ul>
             <p className="mt-3">
-              Une première tranche égale à 50 % des droits de scolarité est due à la
-              confirmation d'inscription. Le solde (50 %) est exigible avant le début
-              effectif des cours pour les étudiants en présentiel ; pour les étudiants
-              internationaux soumis à une procédure de visa, ce solde est dû à l'arrivée
-              à l'institut. Les sommes versées sont intégralement déduites des droits de
-              scolarité annuels.
+              Une première tranche de 3 000 € est due à la confirmation d'inscription.
+              Le solde — soit 1 900 € en PAA et 2 900 € en PEA — est exigible avant le
+              début effectif des cours pour les étudiants en présentiel ; pour les
+              étudiants internationaux soumis à une procédure de visa, ce solde est dû
+              à l'arrivée à l'institut. Les sommes versées sont intégralement déduites
+              des droits de scolarité annuels.
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">4. Modalités de paiement</h2>
             <p className="mb-3">
-              Les droits de scolarité sont réglés en deux tranches égales :
+              Les droits de scolarité sont réglés en deux tranches :
             </p>
             <ul className="space-y-2 list-disc list-inside">
-              <li>1ʳᵉ tranche (50 %) à la confirmation d'inscription</li>
+              <li>1ʳᵉ tranche de 3 000 € à la confirmation d'inscription</li>
               <li>
-                2ᵉ tranche (50 %) — solde : avant le début effectif des cours pour les
-                étudiants en présentiel ; à l'arrivée à l'institut pour les étudiants
-                internationaux soumis à une procédure de visa
+                2ᵉ tranche — solde (1 900 € en PAA, 2 900 € en PEA) : avant le début
+                effectif des cours pour les étudiants en présentiel ; à l'arrivée à
+                l'institut pour les étudiants internationaux soumis à une procédure de visa
               </li>
             </ul>
             <p className="mt-4">

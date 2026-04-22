@@ -210,21 +210,21 @@ function Admissions() {
             <CreditCard className="text-blue mb-6" size={28} strokeWidth={1.5} />
             <h3 className="font-display text-2xl text-cream mb-3">Modalités de paiement</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-              Les frais de scolarité sont réglés en deux tranches égales. Un échéancier
+              Les frais de scolarité sont réglés en deux tranches. Un échéancier
               personnalisé peut être convenu, sur demande, avec le service administratif.
             </p>
 
             <div className="grid md:grid-cols-2 gap-4 mb-8">
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">1ʳᵉ tranche</div>
-                <div className="font-display text-xl text-cream mb-2">50 % à l'inscription</div>
+                <div className="font-display text-xl text-cream mb-2">3 000 € à l'inscription</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Versée à la confirmation d'inscription, elle valide définitivement votre place.
                 </p>
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
-                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche</div>
-                <div className="font-display text-xl text-cream mb-2">50 % — solde</div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche — solde</div>
+                <div className="font-display text-xl text-cream mb-2">1 900 € (PAA) · 2 900 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Étudiants en présentiel : avant le début effectif des cours.
                   Étudiants internationaux : à l'arrivée à l'institut, après obtention du visa.
