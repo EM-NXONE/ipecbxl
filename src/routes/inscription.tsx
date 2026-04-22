@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Send, FileText, Mail, CheckCircle2, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import {
+  formatRentreeDate,
+  getNextSeptemberRentree,
+  getNextFebruaryRentree,
+} from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/inscription")({
   head: () => ({
