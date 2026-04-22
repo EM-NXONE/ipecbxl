@@ -89,23 +89,41 @@ n'a pas été pris en compte, recommencez.
 
 ## 4️⃣ Préparer les fichiers à uploader
 
-Vous devez uploader dans le `public_html/` de n0c :
+Après le build, **tout est dans `dist/client/`**. C'est ce dossier (et son
+contenu) qu'il faut uploader dans `public_html/` de n0c.
+
+Structure attendue après upload :
 
 ```
 public_html/
-├── index.html              ← depuis le build (dist/ ou .output/public/)
-├── assets/                 ← depuis le build (JS, CSS générés)
-├── favicon.ico             ← idem
-├── robots.txt              ← idem
-├── .htaccess               ← depuis le repo : public/.htaccess
+├── index.html              ← page d'accueil pré-rendue
+├── assets/                 ← JS, CSS, fonts (générés par Vite, hashés)
 │
-├── mailer.php              ← depuis le repo : public/mailer.php
-└── PHPMailer/              ← depuis le repo : public/PHPMailer/
+├── admissions/index.html   ← une page HTML par route
+├── cgu/index.html
+├── cgv/index.html
+├── confidentialite/index.html
+├── contact/index.html
+├── cookies/index.html
+├── inscription/index.html
+├── international/index.html
+├── mentions-legales/index.html
+├── programmes/index.html
+│
+├── .htaccess               ← À AJOUTER MANUELLEMENT depuis public/.htaccess
+│                              (le build ne le copie pas automatiquement)
+│
+├── mailer.php              ← déjà copié par le build (depuis public/)
+└── PHPMailer/              ← déjà copié par le build (depuis public/)
     └── src/
         ├── Exception.php
         ├── PHPMailer.php
         └── SMTP.php
 ```
+
+> 💡 Le dossier `dist/server/` produit par le build **ne sert à rien sur n0c**.
+> Vous pouvez l'ignorer complètement, c'est juste un sous-produit technique
+> du prerender.
 
 **Et HORS de `public_html/`** (un niveau au-dessus, ex: `/home/VOTRE_USER/`) :
 
