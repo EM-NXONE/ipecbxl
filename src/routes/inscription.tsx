@@ -13,7 +13,7 @@ export const Route = createFileRoute("/inscription")({
     meta: [
       { title: "Inscription en ligne — Institut privé Belgique · IPEC Bruxelles" },
       { name: "description", content: "Déposez votre dossier d'inscription à l'IPEC, université privée en Belgique. Formulaire en ligne pour les programmes PAA et PEA. Réponse sous 7 jours." },
-      { name: "keywords", content: "inscription école Belgique, formulaire inscription Bruxelles, candidater institut privé Belgique, inscription université privée, IPEC inscription, étudier à Bruxelles" },
+      { name: "keywords", content: "inscription école Bruxelles, inscription école Belgique, formulaire inscription Bruxelles, formulaire inscription Belgique, candidater institut privé Bruxelles, candidater institut privé Belgique, inscription université privée Bruxelles, inscription université privée Belgique, école de commerce Bruxelles inscription, IPEC inscription, étudier à Bruxelles, étudier en Belgique" },
       { property: "og:title", content: "Inscription — IPEC Bruxelles · Institut privé en Belgique" },
       { property: "og:description", content: "Formulaire d'inscription en ligne pour intégrer une école supérieure privée à Bruxelles. Réponse sous 7 jours." },
       { property: "og:url", content: "https://ipec.school/inscription" },

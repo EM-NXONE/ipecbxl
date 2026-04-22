@@ -7,7 +7,7 @@ export const Route = createFileRoute("/contact")({
     meta: [
       { title: "Contact — IPEC Bruxelles · Institut privé en Belgique" },
       { name: "description", content: "Contactez l'IPEC, école supérieure de commerce privée à Bruxelles : informations, dossier de candidature, visites du campus en Belgique." },
-      { name: "keywords", content: "contact IPEC, école privée Bruxelles contact, institut privé Belgique adresse, visite campus Bruxelles" },
+      { name: "keywords", content: "contact IPEC, contact école privée Bruxelles, contact école privée Belgique, institut privé Bruxelles adresse, institut privé Belgique adresse, université privée Bruxelles contact, visite campus Bruxelles, école de commerce Bruxelles contact" },
       { property: "og:title", content: "Contact — IPEC Bruxelles" },
       { property: "og:description", content: "Une question, un projet ? L'équipe de l'institut privé IPEC à Bruxelles vous répond." },
       { property: "og:url", content: "https://ipec.school/contact" },

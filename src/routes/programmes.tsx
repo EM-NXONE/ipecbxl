@@ -6,7 +6,7 @@ export const Route = createFileRoute("/programmes")({
     meta: [
       { title: "Programmes BAC+3 & BAC+5 — Institut privé Belgique · IPEC Bruxelles" },
       { name: "description", content: "Programmes universitaires privés en Belgique : PAA (BAC+1 à BAC+3) et PEA (BAC+4, BAC+5). Quatre spécialisations — Management, Marketing, Relations Internationales, Économie & Finance — dans une école supérieure de commerce à Bruxelles." },
-      { name: "keywords", content: "programmes BAC+3 Belgique, BAC+5 Belgique, master Bruxelles, bachelor Belgique, école de commerce privée, université privée Belgique, management Bruxelles, marketing Belgique, relations internationales Bruxelles, finance Belgique, IPEC programmes" },
+      { name: "keywords", content: "programmes BAC+3 Bruxelles, programmes BAC+3 Belgique, BAC+5 Bruxelles, BAC+5 Belgique, master Bruxelles, master Belgique, bachelor Bruxelles, bachelor Belgique, école de commerce privée Bruxelles, école de commerce privée Belgique, université privée Bruxelles, université privée Belgique, institut privé Bruxelles, institut privé Belgique, management Bruxelles, marketing Bruxelles, relations internationales Bruxelles, finance Bruxelles, IPEC programmes" },
       { property: "og:title", content: "Programmes BAC+3 & BAC+5 — IPEC Bruxelles · Institut privé Belgique" },
       { property: "og:description", content: "Cinq années pour construire votre carrière, quatre spécialisations pour tracer votre voie. Université privée à Bruxelles." },
       { property: "og:url", content: "https://ipec.school/programmes" },
