@@ -219,10 +219,14 @@ Une fois en ligne, testez :
 Quand vous modifiez le site (dans Lovable ou en local) :
 
 1. `git pull` (si vous avez modifié dans Lovable, pour récupérer les changements)
-2. `npm run build`
-3. Re-uploader le contenu du dossier de build dans `public_html/`
-   (en remplaçant les anciens fichiers — `.htaccess`, `mailer.php` et
-   `PHPMailer/` ne changent pas, vous pouvez les laisser tels quels).
+2. `STATIC_BUILD=1 npm run build` ⚠️ **toujours avec `STATIC_BUILD=1`**
+3. Re-uploader le contenu de `dist/client/` dans `public_html/` (en remplaçant
+   les anciens fichiers). `.htaccess` ne change pas, vous pouvez le laisser.
+
+> ⚠️ Si vous **ajoutez une nouvelle route** dans `src/routes/` (ex:
+> `src/routes/blog.tsx`), pensez à l'ajouter aussi dans la liste
+> `PRERENDER_ROUTES` du fichier `vite.config.ts`. Sinon elle ne sera pas
+> pré-rendue en HTML statique.
 
 ---
 
@@ -230,6 +234,8 @@ Quand vous modifiez le site (dans Lovable ou en local) :
 
 | Symptôme | Cause probable | Solution |
 |---|---|---|
+| `Prerendered 0 pages` au build | `STATIC_BUILD=1` non pris en compte | Sous Windows, utilisez la syntaxe PowerShell ou cmd indiquée à l'étape 3️⃣ |
+| Pas de fichiers `.html` générés | Build lancé sans `STATIC_BUILD=1` | Relancer avec `STATIC_BUILD=1 npm run build` |
 | Page blanche | Fichiers JS/CSS pas uploadés | Vérifier que `assets/` est bien présent |
 | 404 au refresh d'une sous-page | `.htaccess` absent ou ignoré | Vérifier qu'il est bien à la racine de `public_html/` et que mod_rewrite est activé chez n0c |
 | Formulaire renvoie "Origin not allowed" | Le domaine appelant n'est pas dans la whitelist du PHP | Ajouter votre domaine dans `$allowedOrigins` de `mailer.php` |
