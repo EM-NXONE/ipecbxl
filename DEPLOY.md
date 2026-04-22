@@ -54,24 +54,19 @@ npm install
 
 ## 3️⃣ Builder la version statique (mode prerender)
 
-⚠️ **TRÈS IMPORTANT** : utilisez la variable d'environnement `STATIC_BUILD=1`,
-sinon le build produit du code serveur pour Cloudflare et **pas de fichiers
-HTML** (vous obtiendriez `dist/client/` + `dist/server/` sans aucun `.html`).
+Une commande, **identique sur Windows / macOS / Linux** :
 
-**Sur macOS / Linux :**
 ```bash
-STATIC_BUILD=1 npm run build
+npm run build:static
 ```
 
-**Sur Windows (PowerShell) :**
-```powershell
-$env:STATIC_BUILD=1; npm run build
-```
+> 💡 Sous le capot, ce script utilise `cross-env STATIC_BUILD=1 vite build`,
+> ce qui garantit que la variable d'environnement est bien transmise au
+> process Node, peu importe le shell (cmd, PowerShell, bash, zsh).
 
-**Sur Windows (cmd.exe) :**
-```cmd
-set STATIC_BUILD=1 && npm run build
-```
+⚠️ **N'utilisez PAS `npm run build` tout court** : sans `STATIC_BUILD=1`,
+le build produit du code serveur pour Cloudflare et **aucun fichier HTML**
+(vous obtiendriez `dist/client/` + `dist/server/` sans `.html` à la racine).
 
 Cette commande :
 1. Compile le site React.
@@ -81,9 +76,9 @@ Cette commande :
 4. Vous obtenez `dist/client/index.html` + un `dist/client/<route>/index.html`
    par page → SEO complet, chaque page indexable indépendamment.
 
-À la fin, vous devez voir un message `[prerender] Prerendered 12 pages:` listant
-toutes vos routes. Si vous voyez `Prerendered 0 pages` → le `STATIC_BUILD=1`
-n'a pas été pris en compte, recommencez.
+À la fin, vous devez voir un message `[prerender] Prerendered 11 pages:` listant
+toutes vos routes. Si vous voyez `Prerendered 0 pages` ou aucun `.html`, vérifiez
+que vous avez bien lancé `npm run build:static` (et non `npm run build`).
 
 ---
 
