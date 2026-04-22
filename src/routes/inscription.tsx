@@ -52,6 +52,8 @@ function Inscription() {
     setAnnee(yearsByProgramme[value][0].value);
   };
 
+  const MAILER_URL = "https://ipec.school/inscription-mailer.php";
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
@@ -77,10 +79,11 @@ function Inscription() {
       specialisation: String(fd.get("specialisation") ?? ""),
       rentree: String(fd.get("rentree") ?? ""),
       message: String(fd.get("message") ?? ""),
+      website: String(fd.get("website") ?? ""), // honeypot anti-bot
     };
 
     try {
-      const res = await fetch("/api/inscription", {
+      const res = await fetch(MAILER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
