@@ -109,10 +109,6 @@ function CGV() {
                 Communauté française de Belgique (article 14/4, §2, du décret du 7 novembre 2013).
               </li>
               <li>
-                Formation et diplôme <strong className="text-cream">non reconnus</strong> par la
-                Communauté française de Belgique (article 14/4, §2, du décret du 7 novembre 2013).
-              </li>
-              <li>
                 L'IPEC ne se porte en aucun cas garant des étudiants. L'IPEC ne propose aucun stage
                 ou logement en Belgique. Ces dimensions sont entièrement à la charge du candidat,
                 qui est tenu de faire les démarches nécessaires.
