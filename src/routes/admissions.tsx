@@ -61,7 +61,7 @@ function Admissions() {
             Une porte d'entrée à <em className="text-gradient-blue not-italic">chaque niveau</em>.
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 year: "1ʳᵉ année",
@@ -77,6 +77,11 @@ function Admissions() {
                 year: "3ᵉ année",
                 title: "Admission Bac+2",
                 desc: "Tout candidat justifiant d'un Bac+2 et de 120 crédits peut postuler en troisième année.",
+              },
+              {
+                year: "4ᵉ et 5ᵉ année",
+                title: "Admission directe en PEA",
+                desc: "Les titulaires d'un Bac+3 (180 crédits) peuvent intégrer la première année du PEA ; ceux justifiant d'un Bac+4 (240 crédits) accèdent à la deuxième année. La spécialisation est choisie dès l'admission.",
               },
             ].map((c) => (
               <div key={c.year} className="p-10 rounded-sm border border-border/60 bg-card/50">
