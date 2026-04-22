@@ -196,11 +196,11 @@ function Admissions() {
             </div>
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Règlement de la scolarité</div>
-              <div className="font-display text-3xl text-cream mb-3">50 % + 50 %</div>
+              <div className="font-display text-3xl text-cream mb-3">3 000 € + solde</div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Une première tranche de 50 % à la confirmation d'inscription, une seconde
-                tranche de 50 % avant le début effectif des cours. Un plan de paiement
-                échelonné peut être convenu avec le service administratif.
+                Première tranche de 3 000 € à la confirmation d'inscription, puis solde
+                (1 900 € en PAA, 2 900 € en PEA). Un plan de paiement échelonné peut être
+                convenu avec le service administratif.
               </p>
             </div>
           </div>
