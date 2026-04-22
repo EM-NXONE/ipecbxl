@@ -15,19 +15,30 @@
     RewriteEngine On
     RewriteBase /
 
-    # 1a) Si la requête correspond à un fichier réel (CSS, JS, image,
+    # 1a) Forcer HTTPS (redirection 301)
+    #     Si la requête arrive en HTTP → on redirige vers HTTPS.
+    #     n0c expose la variable HTTPS=on quand le SSL est actif.
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 1b) Forcer le domaine canonique : www.ipec.school → ipec.school
+    #     (évite que Google indexe deux versions du site).
+    RewriteCond %{HTTP_HOST} ^www\.ipec\.school$ [NC]
+    RewriteRule ^ https://ipec.school%{REQUEST_URI} [L,R=301]
+
+    # 1c) Si la requête correspond à un fichier réel (CSS, JS, image,
     #     mailer.php, etc.) → servir le fichier directement.
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # 1b) Si la requête correspond à un dossier qui contient un index.html
+    # 1d) Si la requête correspond à un dossier qui contient un index.html
     #     pré-rendu (ex: /contact → public_html/contact/index.html),
     #     servir CE fichier (et pas le index.html racine).
     #     → indispensable pour que le SEO du prerender fonctionne.
     RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/index.html -f
     RewriteRule ^(.*)$ /$1/index.html [L]
 
-    # 1c) Sinon (route inconnue, ex: /une-page-qui-nexiste-pas) →
+    # 1e) Sinon (route inconnue, ex: /une-page-qui-nexiste-pas) →
     #     renvoyer le index.html racine, le routeur React affichera la 404.
     RewriteRule . /index.html [L]
 </IfModule>
