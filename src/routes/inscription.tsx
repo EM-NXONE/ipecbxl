@@ -283,6 +283,23 @@ function Inscription() {
                   </label>
                 </div>
 
+                <div className="flex items-start gap-3 text-sm text-muted-foreground p-4 rounded-sm border border-blue/30 bg-blue/5">
+                  <input required id="conditions" type="checkbox" className="mt-1 accent-blue" />
+                  <label htmlFor="conditions" className="leading-relaxed">
+                    Je reconnais avoir pris connaissance et accepte sans réserve les{" "}
+                    <Link to="/cgv" className="text-blue hover:underline">
+                      conditions particulières d'admission
+                    </Link>{" "}
+                    de l'IPEC, notamment concernant la non-reconnaissance du diplôme par la
+                    Communauté française de Belgique, le caractère non remboursable des frais de
+                    dossier (300 €), le versement d'une première tranche de 3 000 € rendant
+                    l'inscription définitive, ainsi que les modalités spécifiques applicables aux
+                    candidats hors Union européenne (visa étudiant, suivi en visioconférence,
+                    bascule automatique vers le programme online en cas de refus de visa).
+                    Cette acceptation vaut signature.
+                  </label>
+                </div>
+
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <button
                     type="submit"
