@@ -104,7 +104,7 @@ const specs = [
     icon: Globe,
     desc: "Naviguer la complexité géopolitique, comprendre les institutions, négocier à l'international.",
     long:
-      "Au cœur de Bruxelles, capitale européenne, la spécialisation Relations Internationales forme des profils capables d'analyser les dynamiques géopolitiques, d'évoluer dans les institutions internationales et de conduire des négociations interculturelles. Elle s'appuie sur la proximité unique de l'IPEC avec les institutions de l'Union européenne et les organisations internationales.",
+      "Au cœur de Bruxelles, capitale européenne, la spécialisation Relations Internationales forme des profils capables d'analyser les dynamiques géopolitiques, d'évoluer dans des environnements multiculturels et de conduire des négociations interculturelles. Elle conjugue analyse stratégique, droit et économie internationale pour préparer aux carrières tournées vers l'international.",
     skills: [
       "Diplomatie économique et lobbying institutionnel",
       "Géopolitique et analyse des risques pays",
