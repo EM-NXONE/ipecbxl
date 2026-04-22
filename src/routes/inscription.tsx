@@ -36,6 +36,8 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
 
 function Inscription() {
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
 
@@ -48,6 +50,52 @@ function Inscription() {
   const handleProgrammeChange = (value: Programme) => {
     setProgramme(value);
     setAnnee(yearsByProgramme[value][0].value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitting) return;
+    setErrorMsg(null);
+    setSubmitting(true);
+
+    const fd = new FormData(e.currentTarget);
+    const annee = String(fd.get("annee") ?? "");
+    const anneeLabel = years.find((y) => y.value === annee)?.label ?? annee;
+
+    const payload = {
+      civilite: String(fd.get("civilite") ?? ""),
+      prenom: String(fd.get("prenom") ?? ""),
+      nom: String(fd.get("nom") ?? ""),
+      dateNaissance: String(fd.get("dateNaissance") ?? ""),
+      nationalite: String(fd.get("nationalite") ?? ""),
+      email: String(fd.get("email") ?? ""),
+      telephone: String(fd.get("telephone") ?? ""),
+      adresse: String(fd.get("adresse") ?? ""),
+      paysResidence: String(fd.get("paysResidence") ?? ""),
+      programme: String(fd.get("programme") ?? ""),
+      annee: anneeLabel,
+      specialisation: String(fd.get("specialisation") ?? ""),
+      rentree: String(fd.get("rentree") ?? ""),
+      message: String(fd.get("message") ?? ""),
+    };
+
+    try {
+      const res = await fetch("/api/inscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErrorMsg(data?.error ?? "Une erreur est survenue. Réessayez.");
+        return;
+      }
+      setSent(true);
+    } catch {
+      setErrorMsg("Impossible d'envoyer la candidature. Vérifiez votre connexion.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
