@@ -174,6 +174,16 @@ function Inscription() {
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Honeypot anti-bot — caché aux humains, rempli par les bots */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                />
+
                 <div>
                   <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Votre dossier</div>
                   <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
