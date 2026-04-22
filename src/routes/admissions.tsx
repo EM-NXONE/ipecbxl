@@ -195,12 +195,12 @@ function Admissions() {
               </p>
             </div>
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
-              <div className="text-xs uppercase tracking-widest text-blue mb-2">Première tranche à l'inscription</div>
-              <div className="font-display text-3xl text-cream mb-3">3 000 €</div>
+              <div className="text-xs uppercase tracking-widest text-blue mb-2">Règlement de la scolarité</div>
+              <div className="font-display text-3xl text-cream mb-3">50 % + 50 %</div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Cette première tranche couvre l'accès au cursus en ligne dès la confirmation
-                de votre inscription. Pour les candidats devant solliciter un visa d'études,
-                ce montant est intégralement déduit des droits de scolarité annuels.
+                Une première tranche de 50 % à la confirmation d'inscription, une seconde
+                tranche de 50 % avant le début effectif des cours. Un plan de paiement
+                échelonné peut être convenu avec le service administratif.
               </p>
             </div>
           </div>
@@ -208,25 +208,48 @@ function Admissions() {
           {/* Modalités de paiement */}
           <div className="p-10 rounded-sm border border-border/60 bg-card/50">
             <CreditCard className="text-blue mb-6" size={28} strokeWidth={1.5} />
-            <h3 className="font-display text-2xl text-cream mb-6">Modalités de paiement</h3>
-            <ul className="grid md:grid-cols-2 gap-3 text-sm text-muted-foreground">
-              <li className="flex gap-3">
-                <CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" />
-                <span>Paiement annuel intégral à l'inscription (escompte de 3%)</span>
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" />
-                <span>Paiement en deux fois : 50% en septembre, 50% en février</span>
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" />
-                <span>Paiement mensualisé sur 10 mensualités (sans frais)</span>
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" />
-                <span>Virement SEPA, carte de crédit, Bancontact</span>
-              </li>
-            </ul>
+            <h3 className="font-display text-2xl text-cream mb-3">Modalités de paiement</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+              Les frais de scolarité sont réglés en deux tranches égales. Un échéancier
+              personnalisé peut être convenu, sur demande, avec le service administratif.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
+              <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">1ʳᵉ tranche</div>
+                <div className="font-display text-xl text-cream mb-2">50 % à l'inscription</div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Versée à la confirmation d'inscription, elle valide définitivement votre place.
+                </p>
+              </div>
+              <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche</div>
+                <div className="font-display text-xl text-cream mb-2">50 % avant la rentrée</div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Réglée avant le début effectif des cours de l'année académique.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-3">Plan de paiement</div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Un échéancier sur mesure peut être établi en concertation avec le service
+                  administratif, selon votre situation. Contactez-nous pour en convenir avant
+                  la confirmation d'inscription.
+                </p>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-3">Moyens acceptés</div>
+                <ul className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Virement SEPA</span></li>
+                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Bancontact</span></li>
+                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Carte de crédit</span></li>
+                  <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Espèces<span className="opacity-60"> (dans les limites légales)</span></span></li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           <p className="mt-10 text-sm text-muted-foreground leading-relaxed max-w-3xl">
