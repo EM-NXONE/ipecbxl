@@ -61,7 +61,7 @@ function Home() {
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              to="/admissions"
+              to="/inscription"
               className="inline-flex items-center gap-2 px-7 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors"
             >
               S'inscrire à l'IPEC
@@ -451,7 +451,7 @@ function Home() {
             Les inscriptions sont ouvertes. Notre équipe vous accompagne à chaque étape.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/admissions" className="px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
+            <Link to="/inscription" className="px-8 py-4 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity">
               S'inscrire à l'IPEC
             </Link>
             <Link to="/contact" className="px-8 py-4 rounded-sm border border-blue/40 text-cream hover:bg-blue/10 transition-colors">
