@@ -117,7 +117,7 @@ function CGV() {
                 En cas de préadmission, celle-ci ne devient définitive qu'à partir de la réception
                 du paiement d'une première tranche des frais de scolarité d'un montant minimum de
                 <strong className="text-cream"> 3 000 €</strong>, qui doit être versé sur le compte
-                de l'IPEC (<span className="text-cream">BE96 3631 5715 5905</span>).
+                de l'IPEC.
               </li>
               <li>
                 Les étudiants établis dans un État ne faisant pas partie de l'Union européenne ne
