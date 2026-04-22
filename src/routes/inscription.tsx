@@ -269,7 +269,7 @@ function Inscription() {
 
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">
-                    Rentrée envisagée — <span className="text-muted-foreground">Année {academicYearLabel}</span>
+                    Rentrée envisagée — Année {academicYearLabel}
                   </label>
                   <select required className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
                     <option>Rentrée principale — {septembreRentree}</option>
