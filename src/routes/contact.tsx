@@ -20,6 +20,14 @@ function Contact() {
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const confirmationRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (sent && confirmationRef.current) {
+      confirmationRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      confirmationRef.current.focus();
+    }
+  }, [sent]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
