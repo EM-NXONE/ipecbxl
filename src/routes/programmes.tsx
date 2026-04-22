@@ -280,11 +280,11 @@ function Programmes() {
             Quatre voies pour <em className="text-gradient-blue not-italic">tracer</em> la vôtre.
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-px bg-border/40">
+          <div className="grid md:grid-cols-2 md:[grid-template-rows:repeat(7,auto)] gap-px bg-border/40">
             {specs.map((s) => (
               <div
                 key={s.n}
-                className="bg-background p-10 hover:bg-card transition-colors grid grid-rows-[auto_auto_auto_auto_auto_auto_auto] content-start"
+                className="bg-background p-10 hover:bg-card transition-colors grid grid-rows-[auto_auto_auto_auto_auto_auto_auto] gap-y-0 md:[grid-row:span_7] md:[grid-template-rows:subgrid]"
               >
                 <div className="flex items-center justify-between mb-6">
                   <s.icon className="text-blue" size={28} strokeWidth={1.5} />
@@ -294,25 +294,31 @@ function Programmes() {
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6 italic">{s.desc}</p>
                 <p className="text-sm text-cream/85 leading-relaxed mb-8">{s.long}</p>
 
-                <div className="text-xs uppercase tracking-widest text-blue mb-4">— Compétences clés</div>
-                <ul className="space-y-2.5 mb-8">
-                  {s.skills.map((sk) => (
-                    <li key={sk} className="flex items-start gap-3 text-cream">
-                      <div className="w-1 h-1 rounded-full bg-blue shrink-0 mt-2" />
-                      <span className="font-body text-sm leading-relaxed">{sk}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-4">— Compétences clés</div>
+                  <ul className="space-y-2.5">
+                    {s.skills.map((sk) => (
+                      <li key={sk} className="flex items-start gap-3 text-cream">
+                        <div className="w-1 h-1 rounded-full bg-blue shrink-0 mt-2" />
+                        <span className="font-body text-sm leading-relaxed">{sk}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                <div className="text-xs uppercase tracking-widest text-blue mb-4">— Débouchés professionnels</div>
-                <ul className="space-y-2.5">
-                  {s.careers.map((c) => (
-                    <li key={c} className="flex items-start gap-3 text-cream">
-                      <div className="w-2 h-px bg-blue shrink-0 mt-2.5" />
-                      <span className="font-body text-sm leading-relaxed">{c}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-8" />
+
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-blue mb-4">— Débouchés professionnels</div>
+                  <ul className="space-y-2.5">
+                    {s.careers.map((c) => (
+                      <li key={c} className="flex items-start gap-3 text-cream">
+                        <div className="w-2 h-px bg-blue shrink-0 mt-2.5" />
+                        <span className="font-body text-sm leading-relaxed">{c}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
