@@ -52,21 +52,38 @@ npm install
 
 ---
 
-## 3️⃣ Builder la version statique
+## 3️⃣ Builder la version statique (mode prerender)
 
+⚠️ **TRÈS IMPORTANT** : utilisez la variable d'environnement `STATIC_BUILD=1`,
+sinon le build produit du code serveur pour Cloudflare et **pas de fichiers
+HTML** (vous obtiendriez `dist/client/` + `dist/server/` sans aucun `.html`).
+
+**Sur macOS / Linux :**
 ```bash
-npm run build
+STATIC_BUILD=1 npm run build
 ```
 
-Cette commande génère le site optimisé. Selon la version du projet, le
-résultat est dans **`dist/`** ou **`.output/public/`** — vérifiez les deux
-dossiers à la racine.
+**Sur Windows (PowerShell) :**
+```powershell
+$env:STATIC_BUILD=1; npm run build
+```
 
-> ⚠️ **Note technique** : votre projet utilise TanStack Start (mode SSR).
-> Pour un déploiement statique sur n0c (Apache/PHP, sans Node.js),
-> l'`index.html` généré sera servi pour toutes les routes grâce au
-> `.htaccess` — le routeur React prend ensuite le relais côté navigateur.
-> C'est ce qu'on appelle le mode **SPA fallback**.
+**Sur Windows (cmd.exe) :**
+```cmd
+set STATIC_BUILD=1 && npm run build
+```
+
+Cette commande :
+1. Compile le site React.
+2. Lance un serveur temporaire en local.
+3. Visite chaque route (`/`, `/contact`, `/programmes`, etc.) et **sauvegarde
+   le HTML rendu** dans `dist/client/`.
+4. Vous obtenez `dist/client/index.html` + un `dist/client/<route>/index.html`
+   par page → SEO complet, chaque page indexable indépendamment.
+
+À la fin, vous devez voir un message `[prerender] Prerendered 12 pages:` listant
+toutes vos routes. Si vous voyez `Prerendered 0 pages` → le `STATIC_BUILD=1`
+n'a pas été pris en compte, recommencez.
 
 ---
 
