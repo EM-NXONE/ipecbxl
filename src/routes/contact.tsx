@@ -21,13 +21,18 @@ function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const confirmationRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (sent && confirmationRef.current) {
       confirmationRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       confirmationRef.current.focus();
+      const timer = setTimeout(() => {
+        navigate({ to: "/" });
+      }, 4000);
+      return () => clearTimeout(timer);
     }
-  }, [sent]);
+  }, [sent, navigate]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
