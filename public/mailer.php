@@ -619,6 +619,11 @@ try {
         $mail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
     }
 
+    // PDF de candidature en pièce jointe (preuve signée)
+    if ($pdfAttachment !== '' && $pdfFilename !== '') {
+        $mail->addStringAttachment($pdfAttachment, $pdfFilename, 'base64', 'application/pdf');
+    }
+
     $mail->send();
 } catch (\Throwable $e) {
     http_response_code(502);
