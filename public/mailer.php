@@ -274,6 +274,10 @@ HTML;
 // Définition de la sous-classe au niveau global (PAS dans un eval — souvent bloqué chez les hébergeurs).
 // On la déclare via require conditionnel : la classe est chargée seulement si FPDF l'est aussi.
 if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) {
+    // Force FPDF à chercher ses polices dans FPDF/font/ (slash final OBLIGATOIRE)
+    if (!defined('FPDF_FONTPATH')) {
+        define('FPDF_FONTPATH', __DIR__ . '/FPDF/font/');
+    }
     require_once __DIR__ . '/FPDF/fpdf.php';
     class IpecCandidaturePdf extends FPDF {
         public function Footer() {
@@ -307,11 +311,16 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetCreator('ipec.school');
     $pdf->AddPage();
 
-    // En-tête : logo + titre
+    // En-tête : logo + titre — Image() peut planter sur certains PNG (palette / alpha
+     // / profondeur de bits incompatibles avec FPDF). On l'isole pour ne jamais bloquer
+     // la génération entière du PDF à cause du logo.
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
-        // Logo carré 18×18 mm pour préserver les proportions
-        $pdf->Image($logoPath, 20, 15, 18, 18);
+        try {
+            $pdf->Image($logoPath, 20, 15, 18, 18);
+        } catch (\Throwable $logoErr) {
+            error_log('[mailer.php] Logo PDF ignoré : ' . $logoErr->getMessage());
+        }
     }
     $pdf->SetXY(44, 18);
     $pdf->SetFont('Helvetica', 'B', 16);
@@ -529,6 +538,7 @@ HTML;
     // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
     $pdfAttachment = '';
     $pdfFilename   = '';
+    $pdfError      = null;
     try {
         $pdfAttachment = buildCandidaturePdf([
             'civilite'       => $civilite,
@@ -550,9 +560,12 @@ HTML;
         if ($pdfAttachment !== '') {
             $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
             $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+        } else {
+            $pdfError = 'buildCandidaturePdf a renvoyé une chaîne vide (FPDF non chargé ?)';
         }
     } catch (\Throwable $pdfErr) {
-        error_log('[mailer.php] Échec génération PDF : ' . $pdfErr->getMessage());
+        $pdfError = $pdfErr->getMessage() . ' @ ' . $pdfErr->getFile() . ':' . $pdfErr->getLine();
+        error_log('[mailer.php] Échec génération PDF : ' . $pdfError);
         $pdfAttachment = '';
         $pdfFilename   = '';
     }
@@ -687,7 +700,19 @@ try {
 $timestamps[] = $now;
 @file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
-echo json_encode(['ok' => true]);
+$response = ['ok' => true];
+if ($DEBUG) {
+    $response['debug'] = [
+        'pdf_attached'   => $pdfAttachment !== '',
+        'pdf_size_bytes' => strlen($pdfAttachment),
+        'pdf_filename'   => $pdfFilename,
+        'pdf_error'      => $pdfError ?? null,
+        'fpdf_loaded'    => class_exists('FPDF'),
+        'iconv_loaded'   => function_exists('iconv'),
+        'logo_exists'    => is_file(__DIR__ . '/ipec-logo-email.png'),
+    ];
+}
+echo json_encode($response);
 
 /* =========================================================================
  * INSTALLATION SUR n0c
