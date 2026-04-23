@@ -127,7 +127,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">7. Retard de paiement</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">8. Retard de paiement</h2>
             <p>
               Tout retard de paiement peut entraîner la suspension de l'accès aux activités
               pédagogiques jusqu'à régularisation, sans préjudice de poursuites éventuelles.
