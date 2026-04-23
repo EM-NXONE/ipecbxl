@@ -201,7 +201,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">9. Droit applicable</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">10. Droit applicable</h2>
             <p>
               Les présentes CGV sont régies par le droit belge. Tout litige sera porté devant les
               tribunaux compétents de Bruxelles.
