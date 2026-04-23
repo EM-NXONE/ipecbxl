@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/mentions-legales")({
   head: () => ({
     meta: [
-      { title: "Mentions légales — IPEC Bruxelles · Institut privé Belgique" },
+      { title: "IPEC | Mentions légales" },
       { name: "description", content: "Mentions légales de l'Institut Privé des Études Commerciales (IPEC), école supérieure privée à Bruxelles, Belgique." },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Mentions légales — IPEC Bruxelles" },
