@@ -270,6 +270,134 @@ function emailMessageBlock(string $messageHtml): string {
 HTML;
 }
 
+/**
+ * E-mail HTML envoyé AU CANDIDAT (accusé de réception + procédure à suivre).
+ * Expédié depuis admission@ipec.school après chaque candidature reçue.
+ */
+function buildCandidateConfirmationHtml(array $f): string {
+    $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+    $prenom    = $h($f['prenom']);
+    $programme = $h($f['programme']);
+    $annee     = $h($f['annee']);
+    $specialisation = $h($f['specialisation']);
+    $rentree   = $h($f['rentree']);
+
+    $programmeBanner = <<<HTML
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAF0FF;border-radius:6px;margin-bottom:8px;">
+  <tr>
+    <td style="padding:14px 18px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Votre candidature</div>
+      <div style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:500;letter-spacing:-0.01em;">
+        {$programme} <span style="color:#5B6478;font-weight:400;">— {$annee}</span>
+      </div>
+      <div style="font-size:13px;color:#374151;margin-top:4px;">
+        Spécialisation : <strong>{$specialisation}</strong> · Rentrée : <strong>{$rentree}</strong>
+      </div>
+    </td>
+  </tr>
+</table>
+HTML;
+
+    $intro = <<<HTML
+<p style="margin:0 0 16px 0;">
+  Bonjour {$prenom},
+</p>
+<p style="margin:0 0 16px 0;">
+  L'<strong>Institut Privé des Études Commerciales</strong> (IPEC) vous remercie pour
+  l'intérêt que vous portez à nos programmes. Votre candidature a bien été enregistrée :
+  vous trouverez ci-dessous la procédure à suivre pour finaliser votre dossier.
+</p>
+HTML;
+
+    $step1 = emailSectionTitle('1. Préparez votre dossier')
+        . <<<HTML
+<p style="margin:0 0 12px 0;">
+  En réponse à cet e-mail, faites-nous parvenir votre dossier de candidature complet.
+  Veuillez y inclure les documents suivants :
+</p>
+<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
+  <li style="margin-bottom:6px;">un curriculum vitae à jour ;</li>
+  <li style="margin-bottom:6px;">une lettre de motivation exposant votre projet d'études ;</li>
+  <li style="margin-bottom:6px;">une copie de votre carte d'identité ou de votre passeport ;</li>
+  <li style="margin-bottom:6px;">les diplômes et relevés de notes relatifs à vos études antérieures ;</li>
+  <li style="margin-bottom:6px;">le cas échéant, les justificatifs des stages ou expériences professionnelles ;</li>
+  <li style="margin-bottom:6px;">la preuve de paiement des frais de dossier (400 €).</li>
+</ul>
+<p style="margin:0 0 16px 0;color:#5B6478;font-size:13px;">
+  Pour un traitement optimal, merci de n'inclure que les documents demandés.
+</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 8px 0;">
+  <tr>
+    <td style="background:#2C5DDB;border-radius:6px;">
+      <a href="mailto:admission@ipec.school?subject=Dossier%20de%20candidature%20-%20{$prenom}"
+         style="display:inline-block;padding:11px 22px;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;letter-spacing:0.02em;">
+        Envoyer mon dossier de candidature
+      </a>
+    </td>
+  </tr>
+</table>
+HTML;
+
+    $step2 = emailSectionTitle('2. Réglez les frais de dossier')
+        . <<<HTML
+<p style="margin:0 0 12px 0;">
+  Acquittez-vous des frais de dossier d'un montant de <strong>400 €</strong>
+  (non remboursables). Leur versement vous donne droit à l'examen de votre
+  candidature par la commission pédagogique et, le cas échéant, à un certificat
+  de préadmission.
+</p>
+<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Par virement bancaire :</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F9FC;border-radius:6px;margin:0 0 12px 0;">
+  <tr><td style="padding:14px 18px;font-size:14px;line-height:1.7;color:#1F2937;">
+    <strong>Bénéficiaire :</strong> IPEC Bruxelles<br>
+    <strong>IBAN :</strong> à demander à <a href="mailto:admission@ipec.school" style="color:#2C5DDB;text-decoration:none;">admission@ipec.school</a><br>
+    <strong>Montant :</strong> 400 €<br>
+    <strong>Communication :</strong> {$h($f['nom'])} — {$prenom} — {$programme} — {$specialisation}
+  </td></tr>
+</table>
+<p style="margin:0 0 16px 0;">
+  Dès réception de votre paiement et de votre dossier complet, votre candidature
+  sera examinée par la commission pédagogique de l'IPEC. La décision vous sera
+  communiquée par e-mail.
+</p>
+HTML;
+
+    $infos = emailSectionTitle('Informations générales')
+        . <<<HTML
+<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Dates de rentrée :</p>
+<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
+  <li style="margin-bottom:6px;">Rentrée académique : <strong>début octobre</strong></li>
+  <li style="margin-bottom:6px;">Rentrée décalée : <strong>début février</strong></li>
+</ul>
+<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Frais de scolarité annuels :</p>
+<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
+  <li style="margin-bottom:6px;">Programme <strong>PAA</strong> (BAC+1 à BAC+3) — <strong>4 900 €/an</strong></li>
+  <li style="margin-bottom:6px;">Programme <strong>PEA</strong> (BAC+4 et BAC+5) — <strong>5 900 €/an</strong></li>
+</ul>
+<p style="margin:0 0 16px 0;color:#5B6478;font-size:13px;">
+  Le règlement peut être effectué en deux tranches, selon un échéancier convenu
+  avec l'administration.
+</p>
+<p style="margin:0 0 16px 0;">
+  Notre équipe reste à votre disposition pour toute information,
+  du lundi au vendredi de 9 h 00 à 12 h 30 et de 13 h 30 à 17 h 00.
+</p>
+<p style="margin:24px 0 4px 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:17px;color:#0F1525;">
+  Nous espérons vous compter parmi nos étudiants très bientôt.
+</p>
+<p style="margin:0;color:#5B6478;font-size:13px;">
+  — Le service des admissions de l'IPEC Bruxelles
+</p>
+HTML;
+
+    $inner = $programmeBanner . $intro . $step1 . $step2 . $infos;
+
+    // On réutilise la coquille existante (header + footer + logo) mais en remplaçant
+    // l'eyebrow "Notification interne" par quelque chose de candidat-friendly.
+    $shell = emailShell('Votre candidature', "Votre demande d'admission à l'IPEC", $inner);
+    return str_replace('Notification interne', 'Accusé de réception', $shell);
+}
+
 // ----- Génération du PDF de candidature (preuve signée) -----
 // Définition de la sous-classe au niveau global (PAS dans un eval — souvent bloqué chez les hébergeurs).
 // On la déclare via require conditionnel : la classe est chargée seulement si FPDF l'est aussi.
@@ -700,16 +828,90 @@ try {
 $timestamps[] = $now;
 @file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
+// ============================================================
+// 2e e-mail : ACCUSÉ DE RÉCEPTION envoyé AU CANDIDAT
+// (uniquement pour les candidatures, pas pour le formulaire de contact)
+// Expéditeur : admission@ipec.school — Reply-To : admission@ipec.school
+// Non-bloquant : si l'envoi échoue, l'API renvoie quand même ok=true
+// (l'admission a déjà été notifiée), mais on log l'erreur en debug.
+// ============================================================
+$candidateMailError = null;
+if ($type === 'inscription') {
+    try {
+        $candidateHtml = buildCandidateConfirmationHtml([
+            'prenom'         => $prenom,
+            'nom'            => $nom,
+            'programme'      => $programme,
+            'annee'          => $annee,
+            'specialisation' => $specialisation,
+            'rentree'        => $rentree,
+        ]);
+
+        $candidateText = "Bonjour $prenom,\n\n"
+            . "L'IPEC vous remercie pour votre candidature au programme $programme — $annee "
+            . "(spécialisation : $specialisation, rentrée : $rentree).\n\n"
+            . "Pour finaliser votre dossier :\n"
+            . "1. En réponse à cet e-mail, transmettez votre CV, lettre de motivation, "
+            . "copie de pièce d'identité, diplômes et relevés de notes, justificatifs "
+            . "de stages éventuels, et la preuve de paiement des frais de dossier (400 €).\n"
+            . "2. Réglez les frais de dossier de 400 € (non remboursables) par virement "
+            . "à l'IPEC Bruxelles. Demandez-nous l'IBAN à admission@ipec.school. "
+            . "Communication : $nom — $prenom — $programme — $specialisation.\n\n"
+            . "Dès réception du dossier complet et du paiement, votre candidature sera "
+            . "examinée par la commission pédagogique. La décision vous sera communiquée par e-mail.\n\n"
+            . "— Le service des admissions de l'IPEC Bruxelles\n"
+            . "admission@ipec.school\n";
+
+        // Nouveau PHPMailer dédié au candidat — on N'envoie PAS le PDF de candidature.
+        $candidateMail = new PHPMailer\PHPMailer\PHPMailer(true);
+        $candidateMail->isSMTP();
+        $candidateMail->Host       = $smtpHost;
+        $candidateMail->SMTPAuth   = true;
+        $candidateMail->Username   = $smtpUser;
+        $candidateMail->Password   = $smtpPass;
+        $candidateMail->SMTPSecure = $smtpSecure === 'tls'
+            ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
+            : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $candidateMail->Port       = $smtpPort;
+        $candidateMail->CharSet    = 'UTF-8';
+        $candidateMail->Encoding   = 'base64';
+
+        // From = admission@ipec.school (mailbox dédiée, expéditeur "humain"
+        // côté candidat). Reply-To pareil pour que la réponse atterrisse au
+        // bon endroit (le candidat va répondre avec ses pièces jointes).
+        $candidateMail->setFrom('admission@ipec.school', 'IPEC — Service des admissions');
+        $candidateMail->addAddress($email, "$prenom $nom");
+        $candidateMail->addReplyTo('admission@ipec.school', 'IPEC — Service des admissions');
+
+        $candidateMail->isHTML(true);
+        $candidateMail->Subject = "Votre demande d'admission à l'IPEC — procédure à suivre";
+        $candidateMail->Body    = $candidateHtml;
+        $candidateMail->AltBody = $candidateText;
+
+        // Logo embarqué (CID identique au mail interne)
+        if (is_file($logoPath)) {
+            $candidateMail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+        }
+
+        $candidateMail->send();
+    } catch (\Throwable $e) {
+        // On NE bloque PAS la réponse : l'admission a été notifiée, c'est ce qui compte.
+        $candidateMailError = isset($candidateMail) ? ($candidateMail->ErrorInfo ?: $e->getMessage()) : $e->getMessage();
+        error_log('[mailer.php] Échec envoi accusé candidat : ' . $candidateMailError);
+    }
+}
+
 $response = ['ok' => true];
 if ($DEBUG) {
     $response['debug'] = [
-        'pdf_attached'   => $pdfAttachment !== '',
-        'pdf_size_bytes' => strlen($pdfAttachment),
-        'pdf_filename'   => $pdfFilename,
-        'pdf_error'      => $pdfError ?? null,
-        'fpdf_loaded'    => class_exists('FPDF'),
-        'iconv_loaded'   => function_exists('iconv'),
-        'logo_exists'    => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'pdf_attached'         => $pdfAttachment !== '',
+        'pdf_size_bytes'       => strlen($pdfAttachment),
+        'pdf_filename'         => $pdfFilename,
+        'pdf_error'            => $pdfError ?? null,
+        'fpdf_loaded'          => class_exists('FPDF'),
+        'iconv_loaded'         => function_exists('iconv'),
+        'logo_exists'          => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'candidate_mail_error' => $candidateMailError ?? null,
     ];
 }
 echo json_encode($response);
