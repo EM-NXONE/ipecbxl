@@ -180,11 +180,10 @@ function CGV() {
               </li>
             </ol>
             <p className="mt-6 p-4 rounded-sm border border-blue/30 bg-blue/5 text-cream">
-              L'acceptation de ces conditions particulières est requise lors de la soumission du
-              formulaire d'inscription en ligne. Cette validation électronique constitue une
-              signature électronique au sens du Règlement eIDAS (UE) n° 910/2014 et engage
-              le candidat au même titre qu'une signature manuscrite. L'horodatage et l'adresse
-              IP de la soumission sont conservés à des fins probatoires.
+              La validation du formulaire d'inscription en ligne vaut acceptation des présentes
+              conditions et tient lieu de signature, au sens du Règlement eIDAS
+              (UE) n° 910/2014. Pour la bonne tenue du dossier, l'IPEC conserve simplement
+              la date, l'heure et l'adresse IP de la soumission.
             </p>
           </section>
 
