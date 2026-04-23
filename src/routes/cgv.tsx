@@ -118,7 +118,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">6. Désistement et remboursement</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">7. Désistement et remboursement</h2>
             <p>
               En cas de désistement après la rentrée académique, les sommes versées au titre de la
               scolarité ne sont pas remboursables, sauf cas de force majeure dûment justifié.
