@@ -399,11 +399,11 @@ function Inscription() {
                 <div className="flex items-start gap-3 text-sm text-muted-foreground p-4 rounded-sm border border-blue/30 bg-blue/5">
                   <input required id="conditions" type="checkbox" className="mt-1 accent-blue" />
                   <label htmlFor="conditions" className="leading-relaxed">
-                    Je reconnais avoir pris connaissance et accepte sans réserve les{" "}
+                    J'ai lu et j'accepte les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">
                       conditions particulières d'admission
                     </Link>{" "}
-                    de l'IPEC. Cette acceptation vaut signature.
+                    de l'IPEC.
                   </label>
                 </div>
 
