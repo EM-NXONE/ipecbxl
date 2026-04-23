@@ -274,6 +274,10 @@ HTML;
 // Définition de la sous-classe au niveau global (PAS dans un eval — souvent bloqué chez les hébergeurs).
 // On la déclare via require conditionnel : la classe est chargée seulement si FPDF l'est aussi.
 if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) {
+    // Force FPDF à chercher ses polices dans FPDF/font/ (slash final OBLIGATOIRE)
+    if (!defined('FPDF_FONTPATH')) {
+        define('FPDF_FONTPATH', __DIR__ . '/FPDF/font/');
+    }
     require_once __DIR__ . '/FPDF/fpdf.php';
     class IpecCandidaturePdf extends FPDF {
         public function Footer() {
