@@ -883,6 +883,13 @@ if ($type === 'inscription') {
         $candidateHtml = buildCandidateConfirmationHtml([
             'prenom'         => $prenom,
             'nom'            => $nom,
+            'civilite'       => $civilite,
+            'date_naissance' => $dateNaissance,
+            'nationalite'    => $nationalite,
+            'email'          => $email,
+            'telephone'      => $telephone,
+            'adresse'        => $adresse,
+            'pays_residence' => $paysResidence,
             'programme'      => $programme,
             'annee'          => $annee,
             'specialisation' => $specialisation,
