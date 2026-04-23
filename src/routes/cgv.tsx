@@ -96,12 +96,14 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">5. Rétractation</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">5. Signature électronique</h2>
             <p>
-              Conformément au Code de droit économique belge, l'étudiant dispose d'un délai de
-              14 jours à compter de la confirmation de son
-              inscription pour exercer son droit de rétractation, sauf renoncement exprès dans le
-              cas où la formation a déjà débuté à sa demande.
+              L'acceptation des présentes conditions, formalisée par la validation électronique
+              du formulaire de candidature, constitue une signature électronique et produit les
+              mêmes effets juridiques qu'une signature manuscrite, conformément au Règlement
+              eIDAS (UE) n° 910/2014. À des fins probatoires, l'IPEC conserve l'horodatage
+              de la validation ainsi que l'adresse IP de connexion du candidat au moment de
+              la soumission du formulaire.
             </p>
           </section>
 
