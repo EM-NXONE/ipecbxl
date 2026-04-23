@@ -161,16 +161,16 @@ function cleanMultiline(string $v, int $max = 2000): string {
     $v = trim($v);
     $v = str_replace(["\r\n", "\r"], "\n", $v);
     return mb_substr($v, 0, $max);
+}
 
 /**
  * Formate une date au format jj/mm/aaaa.
  * Accepte les formats ISO (aaaa-mm-jj), aaaa/mm/jj, jj-mm-aaaa, jj/mm/aaaa, etc.
- * Renvoie la chaîne d'origine si le parsing échoue (jamais vide si entrée vide → '').
+ * Renvoie la chaîne d'origine si le parsing échoue, et '' si l'entrée est vide.
  */
 function formatDateFr(string $value): string {
     $value = trim($value);
     if ($value === '') return '';
-    // Tentatives de formats explicites
     $formats = ['Y-m-d', 'Y/m/d', 'd/m/Y', 'd-m-Y', 'd.m.Y', 'Y-m-d\TH:i:s', 'Y-m-d H:i:s'];
     foreach ($formats as $fmt) {
         $dt = DateTimeImmutable::createFromFormat($fmt, $value);
@@ -178,7 +178,6 @@ function formatDateFr(string $value): string {
             return $dt->format('d/m/Y');
         }
     }
-    // Fallback : parsing libre
     try {
         $dt = new DateTimeImmutable($value);
         return $dt->format('d/m/Y');
@@ -187,7 +186,7 @@ function formatDateFr(string $value): string {
     }
 }
 
-
+$h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 // ----- Helpers de rendu HTML (email-safe, table-based, inline styles) -----
 function emailShell(string $eyebrow, string $title, string $innerHtml): string {
     return <<<HTML
