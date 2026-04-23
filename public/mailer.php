@@ -1185,7 +1185,38 @@ if ($type === 'inscription') {
             $candidateMail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
         }
 
+        // PJ #1 : récapitulatif de candidature (le même PDF que celui envoyé
+        // au service admission) — le candidat doit y vérifier ses informations.
+        if ($pdfAttachment !== '' && $pdfFilename !== '') {
+            $candidateMail->addStringAttachment($pdfAttachment, $pdfFilename, 'base64', 'application/pdf');
+        }
+
+        // PJ #2 : facture des frais de dossier (400 €).
+        $factureError = null;
+        try {
+            [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
+                'civilite'      => $civilite,
+                'prenom'        => $prenom,
+                'nom'           => $nom,
+                'adresse'       => $adresse,
+                'paysResidence' => $paysResidence,
+                'email'         => $email,
+                'programme'     => $programme,
+                'annee'         => $annee,
+                'rentree'       => $rentree,
+            ]);
+            if ($facturePdf !== '' && $factureFilename !== '') {
+                $candidateMail->addStringAttachment($facturePdf, $factureFilename, 'base64', 'application/pdf');
+            } else {
+                $factureError = 'buildFacturePdf a renvoyé un résultat vide';
+            }
+        } catch (\Throwable $factErr) {
+            $factureError = $factErr->getMessage() . ' @ ' . $factErr->getFile() . ':' . $factErr->getLine();
+            error_log('[mailer.php] Échec génération facture PDF : ' . $factureError);
+        }
+
         $candidateMail->send();
+
 
         // Archivage IMAP : copie dans le dossier "Sent" de admission@
         [$candidateImapArchived, $candidateImapError] = archiveToImapSent(
