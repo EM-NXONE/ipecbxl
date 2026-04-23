@@ -930,6 +930,12 @@ if ($type === 'inscription') {
     $imapSentBox   = $env['ADMISSION_IMAP_SENT_FOLDER'] ?? 'Sent';
 
     try {
+        // On fixe le Message-ID nous-mêmes pour pouvoir l'injecter dans le
+        // mailto: du bouton CTA → ainsi le clic sur "Soumettez votre dossier
+        // complet" est traité par le client mail comme une RÉPONSE au
+        // message courant (et non comme un nouvel e-mail détaché du fil).
+        $candidateMessageId = sprintf('<%s@ipec.school>', bin2hex(random_bytes(16)));
+
         $candidateHtml = buildCandidateConfirmationHtml([
             'prenom'         => $prenom,
             'nom'            => $nom,
@@ -944,7 +950,7 @@ if ($type === 'inscription') {
             'annee'          => $annee,
             'specialisation' => $specialisation,
             'rentree'        => $rentree,
-        ]);
+        ], $candidateMessageId);
 
         $candidateText = "Bonjour $prenom,\n\n"
             . "L'IPEC vous remercie pour votre candidature au programme $programme — $annee "
