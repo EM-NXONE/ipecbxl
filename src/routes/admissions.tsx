@@ -213,22 +213,13 @@ function Admissions() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="mb-6">
             <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Frais de dossier</div>
               <div className="font-display text-3xl text-cream mb-3">400 €</div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
                 Réglés au dépôt de la candidature, ils couvrent l'instruction administrative
                 et pédagogique de votre dossier.
-              </p>
-            </div>
-            <div className="p-8 rounded-sm border border-blue/40 bg-blue/5">
-              <div className="text-xs uppercase tracking-widest text-blue mb-2">Règlement de la scolarité</div>
-              <div className="font-display text-3xl text-cream mb-3">3 000 € + solde</div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Première tranche de 3 000 € à la confirmation d'inscription, puis solde
-                (1 900 € en PAA, 2 900 € en PEA). Un plan de paiement échelonné peut être
-                convenu avec le service administratif.
               </p>
             </div>
           </div>
