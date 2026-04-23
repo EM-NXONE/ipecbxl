@@ -432,7 +432,7 @@ function Home() {
               <p>
                 Bruxelles est souvent décrite comme la
                 <span className="text-cream"> ville la plus internationale et cosmopolite d'Europe</span>.
-                Capitale politique de l'Union, siège de ses grandes institutions,
+                Capitale politique de l'Union européenne, siège de ses grandes institutions,
                 elle est aussi un carrefour culturel, un hub d'affaires et un
                 point de rencontre des diplomaties du monde entier.
               </p>
