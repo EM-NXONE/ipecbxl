@@ -181,9 +181,9 @@ function CGV() {
             </ol>
             <p className="mt-6 p-4 rounded-sm border border-blue/30 bg-blue/5 text-cream">
               La validation du formulaire d'inscription en ligne vaut acceptation des présentes
-              conditions et tient lieu de signature, au sens du Règlement eIDAS
-              (UE) n° 910/2014. Pour la bonne tenue du dossier, l'IPEC conserve simplement
-              la date, l'heure et l'adresse IP de la soumission.
+              conditions et constitue une signature électronique au sens du Règlement eIDAS.
+              L'IPEC conserve la date, l'heure et l'adresse IP de la soumission, conformément
+              à sa politique de confidentialité.
             </p>
           </section>
 
