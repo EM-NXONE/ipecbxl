@@ -700,7 +700,19 @@ try {
 $timestamps[] = $now;
 @file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
-echo json_encode(['ok' => true]);
+$response = ['ok' => true];
+if ($DEBUG) {
+    $response['debug'] = [
+        'pdf_attached'   => $pdfAttachment !== '',
+        'pdf_size_bytes' => strlen($pdfAttachment),
+        'pdf_filename'   => $pdfFilename,
+        'pdf_error'      => $pdfError ?? null,
+        'fpdf_loaded'    => class_exists('FPDF'),
+        'iconv_loaded'   => function_exists('iconv'),
+        'logo_exists'    => is_file(__DIR__ . '/ipec-logo-email.png'),
+    ];
+}
+echo json_encode($response);
 
 /* =========================================================================
  * INSTALLATION SUR n0c
