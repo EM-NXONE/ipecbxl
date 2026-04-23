@@ -123,7 +123,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">9. Conditions particulières d'admission</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">8. Conditions particulières d'admission</h2>
             <p className="mb-4">
               Le candidat-étudiant à l'IPEC reconnaît avoir été informé des conditions particulières
               suivantes, qui font partie intégrante de son engagement contractuel au moment de
