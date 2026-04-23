@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/cookies")({
   head: () => ({
     meta: [
-      { title: "Politique cookies — IPEC Bruxelles" },
+      { title: "IPEC | Cookies" },
       { name: "description", content: "Gestion des cookies sur le site de l'IPEC, institut privé en Belgique." },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Cookies — IPEC Bruxelles" },
