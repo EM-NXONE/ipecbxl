@@ -331,17 +331,66 @@ function renderEmailTemplate(string $templatePath, array $vars): string {
  * les données du candidat. La mention de spécialisation n'apparaît que si
  * un choix réel a été fait (différent de "Je ne sais pas encore").
  */
-function buildCandidateConfirmationHtml(array $f): string {
+function buildCandidateConfirmationHtml(array $f, string $messageId = ''): string {
     // Données brutes (le moteur de template échappe lui-même)
     $specialisationRaw = trim((string)($f['specialisation'] ?? ''));
     $specLower = mb_strtolower($specialisationRaw, 'UTF-8');
     $hasSpec = $specialisationRaw !== ''
         && strpos($specLower, 'je ne sais pas') === false;
 
+    // ----- Adaptation à la civilité -----
+    // Mr → masculin, Mme/Mlle → féminin, Mx (non binaire) → inclusif (·e)
+    $civiliteRaw = trim((string)($f['civilite'] ?? ''));
+    $civLower    = mb_strtolower($civiliteRaw, 'UTF-8');
+    if ($civLower === 'mr' || $civLower === 'm.' || $civLower === 'm') {
+        $genre = 'm';
+    } elseif (str_starts_with($civLower, 'mme') || str_starts_with($civLower, 'mlle')) {
+        $genre = 'f';
+    } else {
+        // Mx — non binaire, ou tout autre cas → inclusif
+        $genre = 'x';
+    }
+
+    switch ($genre) {
+        case 'm':
+            $salutation = 'Cher';
+            $titre      = 'M.';
+            $ne         = 'né';
+            $invite     = 'invité';
+            break;
+        case 'f':
+            $salutation = 'Chère';
+            $titre      = 'Mme';
+            $ne         = 'née';
+            $invite     = 'invitée';
+            break;
+        default:
+            $salutation = 'Cher·e';
+            $titre      = 'Mx';
+            $ne         = 'né·e';
+            $invite     = 'invité·e';
+    }
+
+    // ----- Lien CTA : réponse directe au mail courant -----
+    // Les clients mail (Gmail, Outlook, Apple Mail, Thunderbird) reconnaissent
+    // les paramètres In-Reply-To / References dans un mailto: et rattachent
+    // alors le nouveau message au fil de discussion existant.
+    $subject = 'Re: Votre demande d\'admission à l\'IPEC — procédure à suivre';
+    $mailtoParams = ['subject=' . rawurlencode($subject)];
+    if ($messageId !== '') {
+        $mailtoParams[] = 'In-Reply-To=' . rawurlencode($messageId);
+        $mailtoParams[] = 'References=' . rawurlencode($messageId);
+    }
+    $ctaHref = 'mailto:admission@ipec.school?' . implode('&', $mailtoParams);
+
     $vars = [
         'prenom'              => (string)($f['prenom'] ?? ''),
         'nom'                 => (string)($f['nom'] ?? ''),
-        'civilite'            => (string)($f['civilite'] ?? ''),
+        'civilite'            => $civiliteRaw,
+        'titre'               => $titre,
+        'salutation'          => $salutation,
+        'ne'                  => $ne,
+        'invite'              => $invite,
         'date_naissance'      => (string)($f['date_naissance'] ?? ''),
         'nationalite'         => (string)($f['nationalite'] ?? ''),
         'email'               => (string)($f['email'] ?? ''),
@@ -353,6 +402,7 @@ function buildCandidateConfirmationHtml(array $f): string {
         'annee'               => (string)($f['annee'] ?? ''),
         'specialisation'      => $hasSpec ? $specialisationRaw : '',
         'has_specialisation'  => $hasSpec ? '1' : '',
+        'cta_href'            => $ctaHref,
     ];
 
     $templatePath = __DIR__ . '/templates/admission_candidat.html';
@@ -880,6 +930,12 @@ if ($type === 'inscription') {
     $imapSentBox   = $env['ADMISSION_IMAP_SENT_FOLDER'] ?? 'Sent';
 
     try {
+        // On fixe le Message-ID nous-mêmes pour pouvoir l'injecter dans le
+        // mailto: du bouton CTA → ainsi le clic sur "Soumettez votre dossier
+        // complet" est traité par le client mail comme une RÉPONSE au
+        // message courant (et non comme un nouvel e-mail détaché du fil).
+        $candidateMessageId = sprintf('<%s@ipec.school>', bin2hex(random_bytes(16)));
+
         $candidateHtml = buildCandidateConfirmationHtml([
             'prenom'         => $prenom,
             'nom'            => $nom,
@@ -894,7 +950,7 @@ if ($type === 'inscription') {
             'annee'          => $annee,
             'specialisation' => $specialisation,
             'rentree'        => $rentree,
-        ]);
+        ], $candidateMessageId);
 
         $candidateText = "Bonjour $prenom,\n\n"
             . "L'IPEC vous remercie pour votre candidature au programme $programme — $annee "
@@ -924,6 +980,9 @@ if ($type === 'inscription') {
         $candidateMail->Port       = $smtpPort;
         $candidateMail->CharSet    = 'UTF-8';
         $candidateMail->Encoding   = 'base64';
+        // Message-ID figé : doit être strictement identique à celui injecté
+        // dans le mailto: du CTA pour que la réponse s'attache au fil.
+        $candidateMail->MessageID  = $candidateMessageId;
 
         // From = même adresse que l'auth SMTP (pas d'usurpation, SPF/DKIM OK)
         $candidateMail->setFrom($admissionUser, 'IPEC — Service des admissions');

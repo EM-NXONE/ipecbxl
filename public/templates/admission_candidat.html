@@ -37,17 +37,23 @@
 
 <p style="margin: 10px 0; margin-top: 10px;">&nbsp;</p>
 
-<p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px"><b>Bonjour {{prenom}} {{nom}},</b></span></p>
+<p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px"><b>{{salutation}} {{titre}} {{nom}},</b></span></p>
 
 <p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px">Nous vous remercions de l'intérêt que vous portez à l'IPEC et avons bien reçu votre demande d'admission soumise via le formulaire dédié sur <a href="https://www.ipec.school" style="color:#2371cd;text-decoration:none;"><b>www.ipec.school</b></a>.</span></p>
 
-<p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px">Chaque candidature fait l'objet d'une étude attentive. Avant d'engager l'analyse complète de votre dossier, nous vous invitons à vérifier l'exactitude des informations que vous nous avez transmises&nbsp;:</span></p>
+<p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px">Chaque candidature fait l'objet d'une étude attentive. Avant d'engager l'analyse complète de votre dossier, nous vous {{invite}} à vérifier l'exactitude des informations que vous nous avez transmises&nbsp;:</span></p>
 
-<ul style="margin: 10px 0 10px 18px;padding:0;">
-  <li style="margin-bottom:6px;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px"><b>Identité&nbsp;:</b> {{civilite}} {{prenom}} {{nom}}, né·e le {{date_naissance}}, de nationalité {{nationalite}}.</span></li>
-  <li style="margin-bottom:6px;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px"><b>Coordonnées&nbsp;:</b> {{email}} — {{telephone}} — résidant à {{adresse}}, {{pays_residence}}.</span></li>
-  <li style="margin-bottom:6px;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px"><b>Projet académique&nbsp;:</b> intégrer l'IPEC à la <b>{{rentree}}</b> dans le programme <b>{{programme}}</b> en <b>{{annee}}</b>{{#has_specialisation}}, spécialisation <b>{{specialisation}}</b>{{/has_specialisation}}.</span></li>
-</ul>
+<!-- Carton bleu : récap des informations à vérifier -->
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin:14px 0;">
+  <tr>
+    <td style="background:#eaf2fc;border-left:4px solid #2371cd;border-radius:6px;padding:18px 20px;font-family:Arial,Helvetica,sans-serif;color:#2c3e50;">
+      <p style="margin:0 0 10px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#2371cd;font-weight:bold;">Informations à vérifier</p>
+      <p style="margin:0 0 8px 0;font-size:14px;line-height:22px;color:#2c3e50;"><b style="color:#2371cd;">Identité&nbsp;:</b> {{titre}} {{prenom}} {{nom}}, {{ne}} le {{date_naissance}}, de nationalité {{nationalite}}.</p>
+      <p style="margin:0 0 8px 0;font-size:14px;line-height:22px;color:#2c3e50;"><b style="color:#2371cd;">Coordonnées&nbsp;:</b> {{email}} — {{telephone}} — résidant à {{adresse}}, {{pays_residence}}.</p>
+      <p style="margin:0;font-size:14px;line-height:22px;color:#2c3e50;"><b style="color:#2371cd;">Projet académique&nbsp;:</b> intégrer l'IPEC à la <b>{{rentree}}</b> dans le programme <b>{{programme}}</b> en <b>{{annee}}</b>{{#has_specialisation}}, spécialisation <b>{{specialisation}}</b>{{/has_specialisation}}.</p>
+    </td>
+  </tr>
+</table>
 
 <p style="margin: 10px 0;"><span style="color:#787878;font-family:Arial;font-size:14px;line-height:22px">Si l'ensemble de ces éléments est exact, vous pouvez dès à présent engager la suite de la procédure décrite ci-dessous. Dans le cas contraire, merci de <b>nous contacter sans délai</b> afin que nous puissions procéder aux corrections nécessaires.</span></p>
 
@@ -87,7 +93,7 @@
 </div></td></tr>
 
 <!-- CTA -->
-<tr><td align="center" vertical-align="middle" style="background:transparent;font-size:0px;padding:10px 25px;word-break:break-word;"><table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;"><tbody><tr><td align="center" bgcolor="#2371cd" role="presentation" style="border:none;border-radius:5px;cursor:auto;mso-padding-alt:10px 25px;background:#2371cd;" valign="middle"><a href="mailto:admission@ipec.school" style="display:inline-block;background:#2371cd;color:#ffffff;font-family:Verdana, Helvetica, Arial, sans-serif;font-size:14px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:5px;">Répondre à cet e-mail</a></td></tr></tbody></table></td></tr>
+<tr><td align="center" vertical-align="middle" style="background:transparent;font-size:0px;padding:10px 25px;word-break:break-word;"><table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;"><tbody><tr><td align="center" bgcolor="#2371cd" role="presentation" style="border:none;border-radius:5px;cursor:auto;mso-padding-alt:12px 28px;background:#2371cd;" valign="middle"><a href="{{cta_href}}" style="display:inline-block;background:#2371cd;color:#ffffff;font-family:Verdana, Helvetica, Arial, sans-serif;font-size:14px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:12px 28px;mso-padding-alt:0px;border-radius:5px;">Soumettez votre dossier complet</a></td></tr></tbody></table></td></tr>
 
 <tr><td align="center" style="background:transparent;font-size:0px;padding:10px 25px;padding-top:15px;word-break:break-word;"><div style="font-family:Verdana, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:center;color:#000000;"><p style="text-align:center;margin:10px 0;"><span style="color:#787878;font-family:Arial;font-size:13px;line-height:20px;"><i>Notre équipe reste à votre disposition pour toute information, du lundi au vendredi de 9 h 00 à 12 h 30 et de 13 h 30 à 17 h 00.</i></span></p></div></td></tr>
 
