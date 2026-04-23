@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — IPEC Bruxelles · Institut privé en Belgique" },
+      { title: "IPEC | Contact" },
       { name: "description", content: "Contactez l'IPEC, école supérieure de commerce privée à Bruxelles : informations, dossier de candidature, visites du campus en Belgique." },
       { name: "keywords", content: "contact IPEC, contact école privée Bruxelles, contact école privée Belgique, institut privé Bruxelles adresse, institut privé Belgique adresse, université privée Bruxelles contact, visite campus Bruxelles, école de commerce Bruxelles contact" },
       { property: "og:title", content: "Contact — IPEC Bruxelles" },
