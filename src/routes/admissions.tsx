@@ -219,8 +219,7 @@ function Admissions() {
               <div className="font-display text-3xl text-cream mb-3">400 € <span className="text-base text-muted-foreground font-sans">· paiement unique</span></div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
                 Réglés une seule fois au dépôt de la candidature, ils couvrent l'instruction
-                administrative et pédagogique de votre dossier et ne sont pas reconduits les
-                années suivantes.
+                administrative et pédagogique de votre dossier.
               </p>
             </div>
           </div>
