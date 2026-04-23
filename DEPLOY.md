@@ -109,11 +109,15 @@ public_html/
 │                              (le build ne le copie pas automatiquement)
 │
 ├── mailer.php              ← déjà copié par le build (depuis public/)
-└── PHPMailer/              ← déjà copié par le build (depuis public/)
-    └── src/
-        ├── Exception.php
-        ├── PHPMailer.php
-        └── SMTP.php
+├── ipec-logo-email.png     ← logo embarqué dans les e-mails et le PDF
+├── PHPMailer/              ← déjà copié par le build (envoi SMTP)
+│   └── src/
+│       ├── Exception.php
+│       ├── PHPMailer.php
+│       └── SMTP.php
+└── FPDF/                   ← déjà copié par le build (génère le PDF de candidature)
+    ├── fpdf.php
+    └── font/               ← polices intégrées (helvetica, times, courier…)
 ```
 
 > 💡 Le dossier `dist/server/` produit par le build **ne sert à rien sur n0c**.
