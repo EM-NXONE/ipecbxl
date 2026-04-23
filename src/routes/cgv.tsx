@@ -147,8 +147,7 @@ function CGV() {
               </li>
               <li>
                 En cas de préadmission, celle-ci ne devient définitive qu'à partir de la réception
-                du paiement de la première tranche des frais de scolarité (50 % des droits
-                annuels), qui doit être versée sur le compte de l'IPEC.
+                du paiement de la première tranche des frais de scolarité (3 000€), qui doit être versée sur le compte de l'IPEC.
               </li>
               <li>
                 Les étudiants établis dans un État ne faisant pas partie de l'Union européenne ne
