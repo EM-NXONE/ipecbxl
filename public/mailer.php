@@ -904,13 +904,14 @@ if ($type === 'inscription') {
 $response = ['ok' => true];
 if ($DEBUG) {
     $response['debug'] = [
-        'pdf_attached'   => $pdfAttachment !== '',
-        'pdf_size_bytes' => strlen($pdfAttachment),
-        'pdf_filename'   => $pdfFilename,
-        'pdf_error'      => $pdfError ?? null,
-        'fpdf_loaded'    => class_exists('FPDF'),
-        'iconv_loaded'   => function_exists('iconv'),
-        'logo_exists'    => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'pdf_attached'         => $pdfAttachment !== '',
+        'pdf_size_bytes'       => strlen($pdfAttachment),
+        'pdf_filename'         => $pdfFilename,
+        'pdf_error'            => $pdfError ?? null,
+        'fpdf_loaded'          => class_exists('FPDF'),
+        'iconv_loaded'         => function_exists('iconv'),
+        'logo_exists'          => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'candidate_mail_error' => $candidateMailError ?? null,
     ];
 }
 echo json_encode($response);
