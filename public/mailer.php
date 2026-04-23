@@ -247,12 +247,25 @@ HTML;
 }
 
 // ----- Génération du PDF de candidature (preuve signée) -----
+// Définition de la sous-classe au niveau global (PAS dans un eval — souvent bloqué chez les hébergeurs).
+// On la déclare via require conditionnel : la classe est chargée seulement si FPDF l'est aussi.
+if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) {
+    require_once __DIR__ . '/FPDF/fpdf.php';
+    class IpecCandidaturePdf extends FPDF {
+        public function Footer() {
+            $this->SetY(-18);
+            $this->SetFont('Helvetica', 'I', 8);
+            $this->SetTextColor(124, 138, 168);
+            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, 'C');
+            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, 'C');
+        }
+    }
+}
+
 function buildCandidaturePdf(array $f): string {
-    $fpdfPath = __DIR__ . '/FPDF/fpdf.php';
-    if (!is_file($fpdfPath)) {
+    if (!class_exists('IpecCandidaturePdf')) {
         return '';
     }
-    require_once $fpdfPath;
 
     // Conversion UTF-8 → CP1252 (Windows-1252) qui supporte le tiret cadratin —,
     // les guillemets typographiques, etc. — contrairement à ISO-8859-1 strict.
@@ -261,21 +274,6 @@ function buildCandidaturePdf(array $f): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
         return $out !== false ? $out : $s;
     };
-
-    // Sous-classe avec footer automatique sur chaque page
-    if (!class_exists('IpecCandidaturePdf')) {
-        eval('
-            class IpecCandidaturePdf extends FPDF {
-                public function Footer() {
-                    $this->SetY(-18);
-                    $this->SetFont("Helvetica", "I", 8);
-                    $this->SetTextColor(124, 138, 168);
-                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, "C");
-                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, "C");
-                }
-            }
-        ');
-    }
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->SetMargins(20, 20, 20);
