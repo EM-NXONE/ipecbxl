@@ -141,6 +141,100 @@ function cleanMultiline(string $v, int $max = 2000): string {
 
 $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 
+// ----- Helpers de rendu HTML (email-safe, table-based, inline styles) -----
+function emailShell(string $eyebrow, string $title, string $innerHtml): string {
+    return <<<HTML
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{$title}</title>
+</head>
+<body style="margin:0;padding:0;background:#0F1525;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;font-size:1px;line-height:1px;overflow:hidden;">{$title} — IPEC Bruxelles</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0F1525;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+          <tr>
+            <td style="padding:0 0 20px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:600;color:#FFFFFF;letter-spacing:-0.01em;">
+                    IPEC <span style="color:#9FB4E6;font-weight:400;">Bruxelles</span>
+                  </td>
+                  <td align="right" style="font-size:11px;color:#9FB4E6;letter-spacing:0.18em;text-transform:uppercase;">
+                    Notification interne
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td style="background:#2C5DDB;height:4px;line-height:4px;font-size:0;">&nbsp;</td></tr>
+              </table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:36px 40px 8px 40px;">
+                    <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:10px;">
+                      — {$eyebrow}
+                    </div>
+                    <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:500;color:#111827;letter-spacing:-0.01em;">
+                      {$title}
+                    </h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 40px 36px 40px;font-size:14px;line-height:1.6;color:#111827;">
+                    {$innerHtml}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 8px 0 8px;text-align:center;font-size:11px;color:#7C8AA8;line-height:1.6;">
+              IPEC — Institut privé, Bruxelles · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
+              E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+HTML;
+}
+
+function emailRow(string $label, string $valueHtml): string {
+    return <<<HTML
+<tr>
+  <td style="padding:10px 0;border-bottom:1px solid #EEF0F4;vertical-align:top;width:38%;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#5B6478;font-weight:600;">{$label}</td>
+  <td style="padding:10px 0;border-bottom:1px solid #EEF0F4;vertical-align:top;font-size:14px;color:#111827;line-height:1.55;">{$valueHtml}</td>
+</tr>
+HTML;
+}
+
+function emailSectionTitle(string $title): string {
+    return <<<HTML
+<div style="margin:24px 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:600;color:#111827;border-left:3px solid #2C5DDB;padding-left:10px;">
+  {$title}
+</div>
+HTML;
+}
+
+function emailMessageBlock(string $messageHtml): string {
+    return <<<HTML
+<div style="margin-top:6px;background:#F7F9FC;border-left:3px solid #2C5DDB;padding:16px 18px;font-size:14px;line-height:1.65;color:#1F2937;border-radius:0 4px 4px 0;">
+  {$messageHtml}
+</div>
+HTML;
+}
+
 // ----- Construction du message selon le type -----
 if ($type === 'inscription') {
     $civilite       = clean($data['civilite']       ?? '', 30);
@@ -168,38 +262,50 @@ if ($type === 'inscription') {
     $replyToEmail = $email;
     $replyToName  = "$prenom $nom";
 
-    $adresseHtml = nl2br(htmlspecialchars($adresse, ENT_QUOTES, 'UTF-8'));
+    $adresseHtml = $adresse !== '' ? nl2br($h($adresse)) : '<span style="color:#9CA3AF;">—</span>';
     $messageHtml = $message !== ''
-        ? nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'))
-        : '<em>Aucun message</em>';
+        ? nl2br($h($message))
+        : '<em style="color:#9CA3AF;">Aucun message accompagnant la candidature.</em>';
 
-    $bodyHtml = <<<HTML
-<!doctype html>
-<html lang="fr"><body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
-  <h2 style="color:#0a4a8a;">Nouvelle candidature IPEC</h2>
-  <p><strong>Programme :</strong> {$h($programme)} — {$h($annee)}<br>
-     <strong>Spécialisation :</strong> {$h($specialisation)}<br>
-     <strong>Rentrée :</strong> {$h($rentree)}</p>
-  <hr>
-  <h3>Identité</h3>
-  <p><strong>Civilité :</strong> {$h($civilite)}<br>
-     <strong>Nom :</strong> {$h($prenom)} {$h($nom)}<br>
-     <strong>Date de naissance :</strong> {$h($dateNaissance)}<br>
-     <strong>Nationalité :</strong> {$h($nationalite)}</p>
-  <h3>Contact</h3>
-  <p><strong>E-mail :</strong> <a href="mailto:{$h($email)}">{$h($email)}</a><br>
-     <strong>Téléphone :</strong> {$h($telephone)}<br>
-     <strong>Pays de résidence :</strong> {$h($paysResidence)}<br>
-     <strong>Adresse :</strong><br>{$adresseHtml}</p>
-  <h3>Message</h3>
-  <p>{$messageHtml}</p>
-  <hr>
-  <p style="color:#888;font-size:12px;">
-    Pour répondre au candidat, utilisez la fonction « Répondre » de votre messagerie —
-    le champ Reply-To est configuré sur son adresse.
-  </p>
-</body></html>
+    $programmeBanner = <<<HTML
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAF0FF;border-radius:6px;margin-bottom:8px;">
+  <tr>
+    <td style="padding:14px 18px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Programme demandé</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:600;">
+        {$h($programme)} <span style="color:#5B6478;font-weight:400;">— {$h($annee)}</span>
+      </div>
+      <div style="font-size:13px;color:#374151;margin-top:4px;">
+        Spécialisation : <strong>{$h($specialisation)}</strong> · Rentrée : <strong>{$h($rentree)}</strong>
+      </div>
+    </td>
+  </tr>
+</table>
 HTML;
+
+    $identite = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'
+        . emailRow('Civilité',          $h($civilite) ?: '—')
+        . emailRow('Nom complet',       '<strong>' . $h($prenom) . ' ' . $h($nom) . '</strong>')
+        . emailRow('Date de naissance', $h($dateNaissance) ?: '—')
+        . emailRow('Nationalité',       $h($nationalite) ?: '—')
+        . '</table>';
+
+    $contact = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'
+        . emailRow('E-mail',     '<a href="mailto:' . $h($email) . '" style="color:#2C5DDB;text-decoration:none;font-weight:600;">' . $h($email) . '</a>')
+        . emailRow('Téléphone',  $telephone !== '' ? '<a href="tel:' . $h($telephone) . '" style="color:#111827;text-decoration:none;">' . $h($telephone) . '</a>' : '—')
+        . emailRow('Pays',       $h($paysResidence) ?: '—')
+        . emailRow('Adresse',    $adresseHtml)
+        . '</table>';
+
+    $inner = $programmeBanner
+        . emailSectionTitle('Identité')
+        . $identite
+        . emailSectionTitle('Contact')
+        . $contact
+        . emailSectionTitle('Message du candidat')
+        . emailMessageBlock($messageHtml);
+
+    $bodyHtml = emailShell('Nouvelle candidature', "$prenom $nom — $programme", $inner);
 
     $bodyText = "Nouvelle candidature IPEC\n"
         . "Programme : $programme — $annee\n"
@@ -235,26 +341,31 @@ HTML;
     $replyToEmail = $email;
     $replyToName  = "$prenom $nom";
 
-    $messageHtml = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
+    $messageHtml = nl2br($h($message));
 
-    $bodyHtml = <<<HTML
-<!doctype html>
-<html lang="fr"><body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
-  <h2 style="color:#0a4a8a;">Nouveau message — Formulaire de contact</h2>
-  <p><strong>Sujet :</strong> {$h($sujet)}</p>
-  <hr>
-  <h3>Expéditeur</h3>
-  <p><strong>Nom :</strong> {$h($prenom)} {$h($nom)}<br>
-     <strong>E-mail :</strong> <a href="mailto:{$h($email)}">{$h($email)}</a></p>
-  <h3>Message</h3>
-  <p>{$messageHtml}</p>
-  <hr>
-  <p style="color:#888;font-size:12px;">
-    Pour répondre, utilisez la fonction « Répondre » de votre messagerie —
-    le champ Reply-To est configuré sur l'adresse de l'expéditeur.
-  </p>
-</body></html>
+    $sujetBanner = <<<HTML
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAF0FF;border-radius:6px;margin-bottom:8px;">
+  <tr>
+    <td style="padding:14px 18px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Sujet</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:600;">{$h($sujet)}</div>
+    </td>
+  </tr>
+</table>
 HTML;
+
+    $expediteur = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'
+        . emailRow('Nom',    '<strong>' . $h($prenom) . ' ' . $h($nom) . '</strong>')
+        . emailRow('E-mail', '<a href="mailto:' . $h($email) . '" style="color:#2C5DDB;text-decoration:none;font-weight:600;">' . $h($email) . '</a>')
+        . '</table>';
+
+    $inner = $sujetBanner
+        . emailSectionTitle('Expéditeur')
+        . $expediteur
+        . emailSectionTitle('Message')
+        . emailMessageBlock($messageHtml);
+
+    $bodyHtml = emailShell('Formulaire de contact', $sujet, $inner);
 
     $bodyText = "Nouveau message — Formulaire de contact IPEC\n\n"
         . "Sujet : $sujet\n\n"
