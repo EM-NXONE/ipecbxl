@@ -449,6 +449,12 @@ try {
     $mail->Body    = $bodyHtml;
     $mail->AltBody = $bodyText;
 
+    // Logo IPEC embarqué (CID) — référencé dans le HTML par cid:ipec-logo
+    $logoPath = __DIR__ . '/ipec-logo-email.png';
+    if (is_file($logoPath)) {
+        $mail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+    }
+
     $mail->send();
 } catch (\Throwable $e) {
     http_response_code(502);
