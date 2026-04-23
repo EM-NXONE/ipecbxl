@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/cgv")({
   head: () => ({
     meta: [
-      { title: "Conditions générales de vente — IPEC Bruxelles" },
+      { title: "IPEC | CGV" },
       { name: "description", content: "Conditions générales de vente applicables aux frais de scolarité de l'IPEC, institut privé en Belgique." },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "CGV — IPEC Bruxelles" },
