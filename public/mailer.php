@@ -963,14 +963,17 @@ if ($type === 'inscription') {
 $response = ['ok' => true];
 if ($DEBUG) {
     $response['debug'] = [
-        'pdf_attached'         => $pdfAttachment !== '',
-        'pdf_size_bytes'       => strlen($pdfAttachment),
-        'pdf_filename'         => $pdfFilename,
-        'pdf_error'            => $pdfError ?? null,
-        'fpdf_loaded'          => class_exists('FPDF'),
-        'iconv_loaded'         => function_exists('iconv'),
-        'logo_exists'          => is_file(__DIR__ . '/ipec-logo-email.png'),
-        'candidate_mail_error' => $candidateMailError ?? null,
+        'pdf_attached'             => $pdfAttachment !== '',
+        'pdf_size_bytes'           => strlen($pdfAttachment),
+        'pdf_filename'             => $pdfFilename,
+        'pdf_error'                => $pdfError ?? null,
+        'fpdf_loaded'              => class_exists('FPDF'),
+        'iconv_loaded'             => function_exists('iconv'),
+        'logo_exists'              => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'candidate_mail_error'     => $candidateMailError ?? null,
+        'candidate_imap_archived'  => $candidateImapArchived ?? false,
+        'candidate_imap_error'     => $candidateImapError ?? null,
+        'imap_extension_loaded'    => function_exists('imap_open'),
     ];
 }
 echo json_encode($response);
@@ -992,10 +995,26 @@ echo json_encode($response);
  *      SMTP_SECURE=ssl
  *      SMTP_USER=process@ipec.school
  *      SMTP_PASS=...
+ *
+ *      # Compte admission@ — utilisé pour l'accusé de réception envoyé
+ *      # au candidat (vraie auth, pas d'usurpation) et pour archiver
+ *      # une copie dans le dossier "Sent" visible dans Roundcube.
+ *      ADMISSION_SMTP_USER=admission@ipec.school
+ *      ADMISSION_SMTP_PASS=...
+ *      ADMISSION_IMAP_HOST=mail.ipec.school     # défaut : SMTP_HOST
+ *      ADMISSION_IMAP_PORT=993                  # défaut : 993
+ *      ADMISSION_IMAP_SENT_FOLDER=Sent          # défaut : Sent
+ *
  *      → chmod 600 .ipec-mailer.env
  *
  * 3) Si l'ancien fichier inscription-mailer.php existe encore sur n0c,
  *    SUPPRIMEZ-LE (il a été remplacé par mailer.php).
  *
  * 4) Vérifier les DNS sur ipec.school : SPF, DKIM, DMARC
+ *
+ * 5) Vérifier que l'extension PHP `imap` est activée (php.ini → extension=imap)
+ *    pour que les accusés candidats apparaissent dans Roundcube → dossier Sent.
+ *    Sans elle, le mail part quand même mais n'est pas archivé.
+ *    Pour diagnostiquer : appeler ?debug=1 et lire `imap_extension_loaded`
+ *    et `candidate_imap_error` dans la réponse JSON.
  * ========================================================================= */
