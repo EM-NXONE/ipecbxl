@@ -30,7 +30,7 @@ const steps = [
   { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez votre dossier en ligne et joignez vos pièces justificatives." },
   { n: "02", icon: Mail, t: "Entretien personnel", d: "Échange avec notre équipe pédagogique pour préciser votre projet." },
   { n: "03", icon: Calendar, t: "Réponse sous 7 jours", d: "Vous recevez la décision d'admission rapidement, par e-mail." },
-  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier (400 €) et de la première tranche de scolarité." },
+  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier et de la première tranche de scolarité." },
 ];
 
 function Admissions() {
