@@ -43,6 +43,12 @@ function Confidentialite() {
               <li>Coordonnées : adresse postale, e-mail, téléphone, pays de résidence</li>
               <li>Données académiques : programme, année et spécialisation visés</li>
               <li>Tout contenu librement transmis dans le champ « Message »</li>
+              <li>
+                Données techniques liées à la signature électronique du formulaire de
+                candidature : horodatage de la soumission et adresse IP de connexion,
+                conservés à des fins probatoires conformément au Règlement eIDAS
+                (UE) n° 910/2014
+              </li>
             </ul>
           </section>
 
