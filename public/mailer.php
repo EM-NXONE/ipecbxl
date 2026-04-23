@@ -664,26 +664,28 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
     $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('admission@ipec.school · ipec.school'), 0, 2);
+    $pdf->Cell(0, 5, $tr('admission@ipec.school     ipec.school'), 0, 2);
 
-    $pdf->SetY(40);
+    // Bloc identification facture (à droite)
+    $pdf->SetXY(130, 18);
+    $pdf->SetFont('Helvetica', 'B', 11);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(60, 6, $tr('FACTURE'), 0, 2, 'R');
+    $pdf->SetX(130);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(60, 5, $tr('N° ' . $numFacture), 0, 2, 'R');
+    $pdf->SetX(130);
+    $pdf->Cell(60, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
+
+    $pdf->SetY(42);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 40, 190, 40);
-
-    // Titre
-    $pdf->Ln(6);
-    $pdf->SetFont('Helvetica', 'B', 18);
-    $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 9, $tr('Facture — Frais de dossier'), 0, 1);
-
-    $pdf->SetFont('Helvetica', '', 10);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('N° ' . $numFacture . '  ·  Émise le ' . $dateStr), 0, 1);
-    $pdf->Ln(6);
+    $pdf->Line(20, 42, 190, 42);
 
     // Bloc "Facturé à"
-    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->Ln(8);
+    $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 6, $tr('FACTURÉ À'), 0, 1);
     $pdf->SetFont('Helvetica', '', 10);
@@ -698,21 +700,28 @@ function buildFacturePdf(array $f): array {
     if (!empty($f['email'])) {
         $pdf->Cell(0, 5, $tr((string)$f['email']), 0, 1);
     }
-    $pdf->Ln(6);
+    $pdf->Ln(8);
 
     // Tableau facture
-    $pdf->SetFillColor(234, 240, 255);
-    $pdf->SetTextColor(44, 93, 219);
+    $pdf->SetFillColor(44, 93, 219);
+    $pdf->SetTextColor(255, 255, 255);
     $pdf->SetFont('Helvetica', 'B', 9);
-    $pdf->Cell(120, 8, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
-    $pdf->Cell(25, 8, $tr('QTÉ'), 0, 0, 'C', true);
-    $pdf->Cell(25, 8, $tr('MONTANT'), 0, 1, 'R', true);
+    $pdf->Cell(120, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
+    $pdf->Cell(25, 9, $tr('QUANTITÉ'), 0, 0, 'C', true);
+    $pdf->Cell(25, 9, $tr('MONTANT'), 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $programme = trim(($f['programme'] ?? '') . ' — ' . ($f['annee'] ?? ''), ' —');
+    $programmeLabel = trim((string)($f['programme'] ?? ''));
+    $anneeLabel     = trim((string)($f['annee'] ?? ''));
+    $programme = $programmeLabel;
+    if ($programmeLabel !== '' && $anneeLabel !== '') {
+        $programme = $programmeLabel . ', ' . $anneeLabel;
+    } elseif ($anneeLabel !== '') {
+        $programme = $anneeLabel;
+    }
     $descriptionLines = [
-        $tr('Frais de dossier — Candidature IPEC'),
+        $tr('Frais de dossier de candidature IPEC'),
     ];
     if ($programme !== '') {
         $descriptionLines[] = $tr('Programme : ' . $programme);
@@ -722,8 +731,11 @@ function buildFacturePdf(array $f): array {
     }
     $descriptionLines[] = $tr('Paiement unique, non remboursable (CGV art. 2).');
 
+    $pdf->Ln(2);
     $startY = $pdf->GetY();
-    $pdf->MultiCell(120, 6, implode("\n", $descriptionLines), 0, 'L');
+    $pdf->SetX(20);
+    $pdf->Cell(2, 6, '', 0, 0); // petit padding gauche
+    $pdf->MultiCell(118, 6, implode("\n", $descriptionLines), 0, 'L');
     $endY = $pdf->GetY();
     $pdf->SetXY(140, $startY);
     $pdf->Cell(25, 6, '1', 0, 0, 'C');
@@ -732,57 +744,65 @@ function buildFacturePdf(array $f): array {
 
     $pdf->SetDrawColor(220, 226, 240);
     $pdf->SetLineWidth(0.2);
-    $pdf->Line(20, $pdf->GetY() + 2, 190, $pdf->GetY() + 2);
-    $pdf->Ln(6);
+    $pdf->Line(20, $pdf->GetY() + 3, 190, $pdf->GetY() + 3);
+    $pdf->Ln(8);
 
     // Total
+    $pdf->SetFillColor(247, 249, 252);
     $pdf->SetFont('Helvetica', 'B', 11);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(120, 8, '', 0, 0);
-    $pdf->Cell(25, 8, $tr('TOTAL'), 0, 0, 'R');
-    $pdf->Cell(25, 8, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
+    $pdf->Cell(120, 10, '', 0, 0);
+    $pdf->Cell(25, 10, $tr('TOTAL'), 0, 0, 'R', true);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(25, 10, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 8);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 4, $tr('TVA non applicable — art. 44 §2 4° CTVA (enseignement).'), 0, 1, 'R');
-    $pdf->Ln(8);
+    $pdf->Cell(0, 4, $tr('TVA non applicable (art. 44 §2 4° CTVA, enseignement).'), 0, 1, 'R');
+    $pdf->Ln(10);
 
     // Bloc paiement
     $startY = $pdf->GetY();
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.3);
-    $pdf->Rect(20, $startY, 170, 50, 'DF');
-    $pdf->SetXY(24, $startY + 4);
+    $pdf->Rect(20, $startY, 170, 54, 'DF');
+    $pdf->SetXY(24, $startY + 5);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 5, $tr('MODALITÉS DE PAIEMENT'), 0, 1);
+    $pdf->Ln(1);
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Bénéficiaire'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(45, 6, $tr('Bénéficiaire :'), 0, 0);
-    $pdf->Cell(0, 6, $tr('IPEC — Institut privé des études commerciales'), 0, 1);
+    $pdf->Cell(0, 6, $tr('IPEC, Institut privé des études commerciales'), 0, 1);
     $pdf->SetX(24);
-    $pdf->Cell(45, 6, $tr('IBAN :'), 0, 0);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('IBAN'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 6, $tr($iban), 0, 1);
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
-    $pdf->Cell(45, 6, $tr('BIC :'), 0, 0);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('BIC'), 0, 0);
+    $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 6, $tr($bic), 0, 1);
     $pdf->SetX(24);
-    $pdf->Cell(45, 6, $tr('Communication structurée :'), 0, 0);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Communication structurée'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
-    $pdf->SetX(24);
+
+    $pdf->SetY($startY + 60);
     $pdf->SetFont('Helvetica', 'I', 8);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->MultiCell(162, 4, $tr('Merci d\'utiliser exactement la communication structurée ci-dessus pour permettre un rapprochement automatique de votre paiement.'), 0, 'L');
-
-    $pdf->SetY($startY + 56);
+    $pdf->MultiCell(0, 4, $tr('Merci d\'utiliser exactement la communication structurée ci-dessus pour permettre un rapprochement automatique de votre paiement.'), 0, 'L');
+    $pdf->Ln(2);
     $pdf->SetFont('Helvetica', '', 9);
-    $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
         'Une fois le virement effectué, transmettez la preuve de paiement en réponse à l\'e-mail d\'accusé de réception, '
         . 'avec l\'ensemble des pièces de votre dossier de candidature.'
