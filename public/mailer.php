@@ -487,6 +487,27 @@ HTML;
         . "Adresse : $adresse\n\n"
         . "Message :\n" . ($message !== '' ? $message : '(aucun)') . "\n";
 
+    // Génération du PDF de candidature (preuve signée jointe à l'e-mail)
+    $pdfAttachment = buildCandidaturePdf([
+        'civilite'       => $civilite,
+        'prenom'         => $prenom,
+        'nom'            => $nom,
+        'dateNaissance'  => $dateNaissance,
+        'nationalite'    => $nationalite,
+        'email'          => $email,
+        'telephone'      => $telephone,
+        'adresse'        => $adresse,
+        'paysResidence'  => $paysResidence,
+        'programme'      => $programme,
+        'annee'          => $annee,
+        'specialisation' => $specialisation,
+        'rentree'        => $rentree,
+        'message'        => $message,
+        'ip'             => $ip,
+    ]);
+    $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
+    $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+
 } else { // type === 'contact'
     $prenom  = clean($data['prenom']  ?? '', 100);
     $nom     = clean($data['nom']     ?? '', 100);
