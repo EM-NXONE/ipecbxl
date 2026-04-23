@@ -522,7 +522,7 @@ function buildCandidaturePdf(array $f): string {
     $row('Civilité', $f['civilite']);
     $row('Prénom', $f['prenom']);
     $row('Nom', $f['nom']);
-    $row('Date de naissance', $f['dateNaissance']);
+    $row('Date de naissance', formatDateFr($f['dateNaissance'] ?? ''));
     $row('Nationalité', $f['nationalite']);
 
     // Coordonnées
