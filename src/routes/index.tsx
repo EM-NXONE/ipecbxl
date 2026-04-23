@@ -358,7 +358,7 @@ function Home() {
                   semaine d'intégration et lancement officiel des enseignements
                   pour l'année. C'est le moment où l'ensemble des promotions se
                   retrouvent sur le campus, où les nouveaux étudiants découvrent
-                  l'équipe pédagogique, leurs futurs camarades et le rythme
+                  l'équipe pédagogique, leurs futurs camarades et la cadence
                   de travail qui rythmera leur parcours à l'IPEC.
                 </p>
                 <ul className="space-y-2.5 pt-6 border-t border-border/40 mt-auto">
