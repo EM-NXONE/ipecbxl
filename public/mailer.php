@@ -283,7 +283,7 @@ if ($type === 'inscription') {
   <tr>
     <td style="padding:14px 18px;">
       <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Programme demandé</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:600;">
+      <div style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:500;letter-spacing:-0.01em;">
         {$h($programme)} <span style="color:#5B6478;font-weight:400;">— {$h($annee)}</span>
       </div>
       <div style="font-size:13px;color:#374151;margin-top:4px;">
@@ -354,24 +354,12 @@ HTML;
 
     $messageHtml = nl2br($h($message));
 
-    $sujetBanner = <<<HTML
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAF0FF;border-radius:6px;margin-bottom:8px;">
-  <tr>
-    <td style="padding:14px 18px;">
-      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Sujet</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:600;">{$h($sujet)}</div>
-    </td>
-  </tr>
-</table>
-HTML;
-
     $expediteur = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'
         . emailRow('Nom',    '<strong>' . $h($prenom) . ' ' . $h($nom) . '</strong>')
         . emailRow('E-mail', '<a href="mailto:' . $h($email) . '" style="color:#2C5DDB;text-decoration:none;font-weight:600;">' . $h($email) . '</a>')
         . '</table>';
 
-    $inner = $sujetBanner
-        . emailSectionTitle('Expéditeur')
+    $inner = emailSectionTitle('Expéditeur')
         . $expediteur
         . emailSectionTitle('Message')
         . emailMessageBlock($messageHtml);
