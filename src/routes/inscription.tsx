@@ -42,7 +42,7 @@ const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = 
 };
 
 function Inscription() {
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState(true); // TEMP: prévisualisation écran de confirmation
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
@@ -61,7 +61,7 @@ function Inscription() {
         setCountdown((c) => (c > 0 ? c - 1 : 0));
       }, 1000);
       const timer = setTimeout(() => {
-        navigate({ to: "/" });
+        // navigate({ to: "/" }); // TEMP désactivé pour prévisualisation
       }, 10000);
       return () => {
         clearTimeout(timer);
