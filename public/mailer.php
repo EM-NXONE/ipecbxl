@@ -831,12 +831,35 @@ $timestamps[] = $now;
 // ============================================================
 // 2e e-mail : ACCUSÉ DE RÉCEPTION envoyé AU CANDIDAT
 // (uniquement pour les candidatures, pas pour le formulaire de contact)
-// Expéditeur : admission@ipec.school — Reply-To : admission@ipec.school
-// Non-bloquant : si l'envoi échoue, l'API renvoie quand même ok=true
-// (l'admission a déjà été notifiée), mais on log l'erreur en debug.
+//
+// Expéditeur SMTP    : admission@ipec.school (vraie auth, pas d'usurpation)
+//                      Fallback : on réutilise les creds SMTP_* (process@)
+//                      tant que ADMISSION_SMTP_* ne sont pas configurés.
+// Reply-To           : admission@ipec.school
+// Archivage IMAP     : copie du message dans le dossier "Sent" de la boîte
+//                      admission@ → visible dans Roundcube comme un mail
+//                      envoyé normal. Nécessite l'extension PHP `imap`.
+//                      Non-bloquant : si ça échoue, le mail part quand même.
+//
+// Variables d'env attendues dans .ipec-mailer.env (toutes optionnelles) :
+//   ADMISSION_SMTP_USER=admission@ipec.school
+//   ADMISSION_SMTP_PASS=...
+//   ADMISSION_IMAP_HOST=mail.ipec.school   (défaut : SMTP_HOST)
+//   ADMISSION_IMAP_PORT=993                (défaut : 993)
+//   ADMISSION_IMAP_SENT_FOLDER=Sent        (défaut : Sent)
 // ============================================================
 $candidateMailError = null;
+$candidateImapError = null;
+$candidateImapArchived = false;
+
 if ($type === 'inscription') {
+    // Creds dédiés admission@ avec fallback sur process@ pour ne rien casser
+    $admissionUser = $env['ADMISSION_SMTP_USER'] ?? $smtpUser;
+    $admissionPass = $env['ADMISSION_SMTP_PASS'] ?? $smtpPass;
+    $imapHost      = $env['ADMISSION_IMAP_HOST'] ?? $smtpHost;
+    $imapPort      = (int)($env['ADMISSION_IMAP_PORT'] ?? 993);
+    $imapSentBox   = $env['ADMISSION_IMAP_SENT_FOLDER'] ?? 'Sent';
+
     try {
         $candidateHtml = buildCandidateConfirmationHtml([
             'prenom'         => $prenom,
@@ -862,13 +885,13 @@ if ($type === 'inscription') {
             . "— Le service des admissions de l'IPEC Bruxelles\n"
             . "admission@ipec.school\n";
 
-        // Nouveau PHPMailer dédié au candidat — on N'envoie PAS le PDF de candidature.
+        // PHPMailer dédié au candidat — auth en tant qu'admission@
         $candidateMail = new PHPMailer\PHPMailer\PHPMailer(true);
         $candidateMail->isSMTP();
         $candidateMail->Host       = $smtpHost;
         $candidateMail->SMTPAuth   = true;
-        $candidateMail->Username   = $smtpUser;
-        $candidateMail->Password   = $smtpPass;
+        $candidateMail->Username   = $admissionUser;
+        $candidateMail->Password   = $admissionPass;
         $candidateMail->SMTPSecure = $smtpSecure === 'tls'
             ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
             : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
@@ -876,12 +899,10 @@ if ($type === 'inscription') {
         $candidateMail->CharSet    = 'UTF-8';
         $candidateMail->Encoding   = 'base64';
 
-        // From = admission@ipec.school (mailbox dédiée, expéditeur "humain"
-        // côté candidat). Reply-To pareil pour que la réponse atterrisse au
-        // bon endroit (le candidat va répondre avec ses pièces jointes).
-        $candidateMail->setFrom('admission@ipec.school', 'IPEC — Service des admissions');
+        // From = même adresse que l'auth SMTP (pas d'usurpation, SPF/DKIM OK)
+        $candidateMail->setFrom($admissionUser, 'IPEC — Service des admissions');
         $candidateMail->addAddress($email, "$prenom $nom");
-        $candidateMail->addReplyTo('admission@ipec.school', 'IPEC — Service des admissions');
+        $candidateMail->addReplyTo($admissionUser, 'IPEC — Service des admissions');
 
         $candidateMail->isHTML(true);
         $candidateMail->Subject = "Votre demande d'admission à l'IPEC — procédure à suivre";
@@ -894,8 +915,46 @@ if ($type === 'inscription') {
         }
 
         $candidateMail->send();
+
+        // ----- Archivage IMAP : on dépose une copie dans "Sent" -----
+        // Pour que le mail apparaisse dans Roundcube comme un envoi normal.
+        // Nécessite l'extension PHP imap. Si absente ou si la connexion
+        // échoue, on log mais on ne bloque PAS la réponse.
+        if (function_exists('imap_open')) {
+            try {
+                // getSentMIMEMessage() = headers + body bruts, prêts pour APPEND IMAP.
+                // On le récupère APRÈS send() pour avoir Message-ID, Date, etc.
+                $rawMessage = $candidateMail->getSentMIMEMessage();
+
+                $mailbox = '{' . $imapHost . ':' . $imapPort . '/imap/ssl}' . $imapSentBox;
+                // Suppression temporaire du gestionnaire d'erreurs PHP : imap_open()
+                // remonte ses erreurs via imap_last_error(), pas via Throwable.
+                $imap = @imap_open($mailbox, $admissionUser, $admissionPass, OP_HALFOPEN);
+                if ($imap === false) {
+                    $candidateImapError = 'imap_open a échoué : ' . (imap_last_error() ?: 'raison inconnue');
+                } else {
+                    // Flag \Seen pour que le mail apparaisse "lu" dans Sent
+                    $appended = @imap_append($imap, $mailbox, $rawMessage, '\\Seen');
+                    if (!$appended) {
+                        $candidateImapError = 'imap_append a échoué : ' . (imap_last_error() ?: 'raison inconnue');
+                    } else {
+                        $candidateImapArchived = true;
+                    }
+                    @imap_close($imap);
+                }
+                // Vide la pile d'erreurs IMAP pour qu'elles ne remontent pas en
+                // notice PHP plus tard.
+                @imap_errors();
+                @imap_alerts();
+            } catch (\Throwable $imapErr) {
+                $candidateImapError = $imapErr->getMessage();
+                error_log('[mailer.php] Archivage IMAP échoué : ' . $candidateImapError);
+            }
+        } else {
+            $candidateImapError = "Extension PHP 'imap' non disponible — pas d'archivage Sent.";
+        }
     } catch (\Throwable $e) {
-        // On NE bloque PAS la réponse : l'admission a été notifiée, c'est ce qui compte.
+        // On NE bloque PAS la réponse : l'admission a déjà été notifiée.
         $candidateMailError = isset($candidateMail) ? ($candidateMail->ErrorInfo ?: $e->getMessage()) : $e->getMessage();
         error_log('[mailer.php] Échec envoi accusé candidat : ' . $candidateMailError);
     }
