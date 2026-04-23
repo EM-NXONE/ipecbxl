@@ -133,7 +133,7 @@ function Inscription() {
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Remplissez le formulaire ci-dessous pour engager votre dossier d'admission.
-            Notre équipe revient vers vous sous 7 jours pour la suite de la procédure.
+            Notre équipe revient vers vous sous 7 jours ouvrables pour la suite de la procédure.
           </p>
         </div>
       </section>
