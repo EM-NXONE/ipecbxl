@@ -164,8 +164,8 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
                   <td valign="middle">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td valign="middle" style="padding-right:12px;">
-                          <img src="https://ipec.school/apple-touch-icon.png" alt="IPEC" width="36" height="36" style="display:block;width:36px;height:36px;border:0;outline:none;text-decoration:none;border-radius:6px;">
+                        <td valign="middle" style="padding-right:14px;">
+                          <img src="cid:ipec-logo" alt="IPEC" width="44" height="44" style="display:block;width:44px;height:44px;border:0;outline:none;text-decoration:none;">
                         </td>
                         <td valign="middle" style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:600;color:#FFFFFF;letter-spacing:-0.01em;line-height:1;">
                           IPEC <span style="color:#9FB4E6;font-weight:400;">Bruxelles</span>
