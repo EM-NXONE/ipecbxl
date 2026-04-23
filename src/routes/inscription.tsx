@@ -389,7 +389,7 @@ function Inscription() {
                   />
                 </div>
 
-                <div className="flex items-start gap-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-3 text-sm text-muted-foreground p-4 rounded-sm border border-blue/30 bg-blue/5">
                   <input required id="rgpd" type="checkbox" className="mt-1 accent-blue" />
                   <label htmlFor="rgpd" className="leading-relaxed">
                     J'accepte que les informations saisies soient utilisées dans le cadre de ma candidature à l'IPEC.
