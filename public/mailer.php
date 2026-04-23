@@ -271,131 +271,92 @@ HTML;
 }
 
 /**
+ * Mini moteur de template HTML.
+ *  - {{var}}                  → remplacé par la valeur (échappée HTML)
+ *  - {{#var}}...{{/var}}      → bloc conservé uniquement si var est "truthy"
+ *                                (non vide, et != "0"/"false"/"non")
+ *
+ * Les variables non fournies sont remplacées par une chaîne vide.
+ */
+function renderEmailTemplate(string $templatePath, array $vars): string {
+    $html = @file_get_contents($templatePath);
+    if ($html === false) {
+        // Fallback minimal si le template est introuvable (ne doit pas casser l'envoi)
+        $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+        $prenom = $h($vars['prenom'] ?? '');
+        return "<p>Bonjour {$prenom},</p><p>Nous avons bien reçu votre candidature à l'IPEC. "
+             . "Notre équipe revient vers vous très prochainement.</p>"
+             . "<p>— Le service des admissions de l'IPEC Bruxelles</p>";
+    }
+
+    // 1) Blocs conditionnels {{#var}}...{{/var}}
+    $html = preg_replace_callback(
+        '/\{\{#([a-zA-Z0-9_]+)\}\}(.*?)\{\{\/\1\}\}/s',
+        function ($m) use ($vars) {
+            $key = $m[1];
+            $val = $vars[$key] ?? '';
+            if (is_string($val)) {
+                $val = trim($val);
+                $low = mb_strtolower($val, 'UTF-8');
+                if ($val === '' || in_array($low, ['0', 'false', 'non'], true)) {
+                    return '';
+                }
+            } elseif (!$val) {
+                return '';
+            }
+            return $m[2];
+        },
+        $html
+    );
+
+    // 2) Variables {{var}} — échappement HTML systématique
+    $html = preg_replace_callback(
+        '/\{\{([a-zA-Z0-9_]+)\}\}/',
+        function ($m) use ($vars) {
+            $val = $vars[$m[1]] ?? '';
+            if (!is_string($val)) {
+                $val = (string)$val;
+            }
+            return htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+        },
+        $html
+    );
+
+    return $html;
+}
+
+/**
  * E-mail HTML envoyé AU CANDIDAT (accusé de réception + procédure à suivre).
- * Expédié depuis admission@ipec.school après chaque candidature reçue.
+ * Charge le template public/templates/admission_candidat.html et y injecte
+ * les données du candidat. La mention de spécialisation n'apparaît que si
+ * un choix réel a été fait (différent de "Je ne sais pas encore").
  */
 function buildCandidateConfirmationHtml(array $f): string {
-    $h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
-    $prenom    = $h($f['prenom']);
-    $programme = $h($f['programme']);
-    $annee     = $h($f['annee']);
-    $specialisation = $h($f['specialisation']);
-    $rentree   = $h($f['rentree']);
+    // Données brutes (le moteur de template échappe lui-même)
+    $specialisationRaw = trim((string)($f['specialisation'] ?? ''));
+    $specLower = mb_strtolower($specialisationRaw, 'UTF-8');
+    $hasSpec = $specialisationRaw !== ''
+        && strpos($specLower, 'je ne sais pas') === false;
 
-    $programmeBanner = <<<HTML
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAF0FF;border-radius:6px;margin-bottom:8px;">
-  <tr>
-    <td style="padding:14px 18px;">
-      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:4px;">Votre candidature</div>
-      <div style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:18px;color:#0F1525;font-weight:500;letter-spacing:-0.01em;">
-        {$programme} <span style="color:#5B6478;font-weight:400;">— {$annee}</span>
-      </div>
-      <div style="font-size:13px;color:#374151;margin-top:4px;">
-        Spécialisation : <strong>{$specialisation}</strong> · Rentrée : <strong>{$rentree}</strong>
-      </div>
-    </td>
-  </tr>
-</table>
-HTML;
+    $vars = [
+        'prenom'              => (string)($f['prenom'] ?? ''),
+        'nom'                 => (string)($f['nom'] ?? ''),
+        'civilite'            => (string)($f['civilite'] ?? ''),
+        'date_naissance'      => (string)($f['date_naissance'] ?? ''),
+        'nationalite'         => (string)($f['nationalite'] ?? ''),
+        'email'               => (string)($f['email'] ?? ''),
+        'telephone'           => (string)($f['telephone'] ?? ''),
+        'adresse'             => (string)($f['adresse'] ?? ''),
+        'pays_residence'      => (string)($f['pays_residence'] ?? ''),
+        'rentree'             => (string)($f['rentree'] ?? ''),
+        'programme'           => (string)($f['programme'] ?? ''),
+        'annee'               => (string)($f['annee'] ?? ''),
+        'specialisation'      => $hasSpec ? $specialisationRaw : '',
+        'has_specialisation'  => $hasSpec ? '1' : '',
+    ];
 
-    $intro = <<<HTML
-<p style="margin:0 0 16px 0;">
-  Bonjour {$prenom},
-</p>
-<p style="margin:0 0 16px 0;">
-  L'<strong>Institut Privé des Études Commerciales</strong> (IPEC) vous remercie pour
-  l'intérêt que vous portez à nos programmes. Votre candidature a bien été enregistrée :
-  vous trouverez ci-dessous la procédure à suivre pour finaliser votre dossier.
-</p>
-HTML;
-
-    $step1 = emailSectionTitle('1. Préparez votre dossier')
-        . <<<HTML
-<p style="margin:0 0 12px 0;">
-  En réponse à cet e-mail, faites-nous parvenir votre dossier de candidature complet.
-  Veuillez y inclure les documents suivants :
-</p>
-<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
-  <li style="margin-bottom:6px;">un curriculum vitae à jour ;</li>
-  <li style="margin-bottom:6px;">une lettre de motivation exposant votre projet d'études ;</li>
-  <li style="margin-bottom:6px;">une copie de votre carte d'identité ou de votre passeport ;</li>
-  <li style="margin-bottom:6px;">les diplômes et relevés de notes relatifs à vos études antérieures ;</li>
-  <li style="margin-bottom:6px;">le cas échéant, les justificatifs des stages ou expériences professionnelles ;</li>
-  <li style="margin-bottom:6px;">la preuve de paiement des frais de dossier (400 €).</li>
-</ul>
-<p style="margin:0 0 16px 0;color:#5B6478;font-size:13px;">
-  Pour un traitement optimal, merci de n'inclure que les documents demandés.
-</p>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 8px 0;">
-  <tr>
-    <td style="background:#2C5DDB;border-radius:6px;">
-      <a href="mailto:admission@ipec.school?subject=Dossier%20de%20candidature%20-%20{$prenom}"
-         style="display:inline-block;padding:11px 22px;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;color:#FFFFFF;text-decoration:none;letter-spacing:0.02em;">
-        Envoyer mon dossier de candidature
-      </a>
-    </td>
-  </tr>
-</table>
-HTML;
-
-    $step2 = emailSectionTitle('2. Réglez les frais de dossier')
-        . <<<HTML
-<p style="margin:0 0 12px 0;">
-  Acquittez-vous des frais de dossier d'un montant de <strong>400 €</strong>
-  (non remboursables). Leur versement vous donne droit à l'examen de votre
-  candidature par la commission pédagogique et, le cas échéant, à un certificat
-  de préadmission.
-</p>
-<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Par virement bancaire :</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F9FC;border-radius:6px;margin:0 0 12px 0;">
-  <tr><td style="padding:14px 18px;font-size:14px;line-height:1.7;color:#1F2937;">
-    <strong>Bénéficiaire :</strong> IPEC Bruxelles<br>
-    <strong>IBAN :</strong> à demander à <a href="mailto:admission@ipec.school" style="color:#2C5DDB;text-decoration:none;">admission@ipec.school</a><br>
-    <strong>Montant :</strong> 400 €<br>
-    <strong>Communication :</strong> {$h($f['nom'])} — {$prenom} — {$programme} — {$specialisation}
-  </td></tr>
-</table>
-<p style="margin:0 0 16px 0;">
-  Dès réception de votre paiement et de votre dossier complet, votre candidature
-  sera examinée par la commission pédagogique de l'IPEC. La décision vous sera
-  communiquée par e-mail.
-</p>
-HTML;
-
-    $infos = emailSectionTitle('Informations générales')
-        . <<<HTML
-<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Dates de rentrée :</p>
-<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
-  <li style="margin-bottom:6px;">Rentrée académique : <strong>début octobre</strong></li>
-  <li style="margin-bottom:6px;">Rentrée décalée : <strong>début février</strong></li>
-</ul>
-<p style="margin:0 0 6px 0;font-weight:600;color:#0F1525;">Frais de scolarité annuels :</p>
-<ul style="margin:0 0 16px 18px;padding:0;color:#1F2937;">
-  <li style="margin-bottom:6px;">Programme <strong>PAA</strong> (BAC+1 à BAC+3) — <strong>4 900 €/an</strong></li>
-  <li style="margin-bottom:6px;">Programme <strong>PEA</strong> (BAC+4 et BAC+5) — <strong>5 900 €/an</strong></li>
-</ul>
-<p style="margin:0 0 16px 0;color:#5B6478;font-size:13px;">
-  Le règlement peut être effectué en deux tranches, selon un échéancier convenu
-  avec l'administration.
-</p>
-<p style="margin:0 0 16px 0;">
-  Notre équipe reste à votre disposition pour toute information,
-  du lundi au vendredi de 9 h 00 à 12 h 30 et de 13 h 30 à 17 h 00.
-</p>
-<p style="margin:24px 0 4px 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:17px;color:#0F1525;">
-  Nous espérons vous compter parmi nos étudiants très bientôt.
-</p>
-<p style="margin:0;color:#5B6478;font-size:13px;">
-  — Le service des admissions de l'IPEC Bruxelles
-</p>
-HTML;
-
-    $inner = $programmeBanner . $intro . $step1 . $step2 . $infos;
-
-    // On réutilise la coquille existante (header + footer + logo) mais en remplaçant
-    // l'eyebrow "Notification interne" par quelque chose de candidat-friendly.
-    $shell = emailShell('Votre candidature', "Votre demande d'admission à l'IPEC", $inner);
-    return str_replace('Notification interne', 'Accusé de réception', $shell);
+    $templatePath = __DIR__ . '/templates/admission_candidat.html';
+    return renderEmailTemplate($templatePath, $vars);
 }
 
 // ----- Génération du PDF de candidature (preuve signée) -----
