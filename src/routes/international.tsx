@@ -18,7 +18,7 @@ import brusselsImg from "@/assets/brussels.jpg";
 export const Route = createFileRoute("/international")({
   head: () => ({
     meta: [
-      { title: "Étudiants internationaux — Étudier en Belgique · IPEC Bruxelles" },
+      { title: "IPEC | International" },
       { name: "description", content: "Étudier en Belgique dans un institut privé à Bruxelles : informations pour les candidats hors UE, documents délivrés par l'IPEC et références officielles pour le visa long séjour." },
       { name: "keywords", content: "étudier à Bruxelles, étudier en Belgique, étudiants internationaux Bruxelles, étudiants internationaux Belgique, visa étudiant Belgique, visa étudiant Bruxelles, école privée internationale Bruxelles, école privée internationale Belgique, université privée Bruxelles étrangers, université privée Belgique étrangers, institut privé Bruxelles international, IPEC international" },
       { property: "og:title", content: "Étudier en Belgique — IPEC Bruxelles · Étudiants internationaux" },
