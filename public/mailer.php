@@ -163,8 +163,30 @@ function cleanMultiline(string $v, int $max = 2000): string {
     return mb_substr($v, 0, $max);
 }
 
-$h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+/**
+ * Formate une date au format jj/mm/aaaa.
+ * Accepte les formats ISO (aaaa-mm-jj), aaaa/mm/jj, jj-mm-aaaa, jj/mm/aaaa, etc.
+ * Renvoie la chaîne d'origine si le parsing échoue, et '' si l'entrée est vide.
+ */
+function formatDateFr(string $value): string {
+    $value = trim($value);
+    if ($value === '') return '';
+    $formats = ['Y-m-d', 'Y/m/d', 'd/m/Y', 'd-m-Y', 'd.m.Y', 'Y-m-d\TH:i:s', 'Y-m-d H:i:s'];
+    foreach ($formats as $fmt) {
+        $dt = DateTimeImmutable::createFromFormat($fmt, $value);
+        if ($dt instanceof DateTimeImmutable) {
+            return $dt->format('d/m/Y');
+        }
+    }
+    try {
+        $dt = new DateTimeImmutable($value);
+        return $dt->format('d/m/Y');
+    } catch (\Throwable $e) {
+        return $value;
+    }
+}
 
+$h = fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 // ----- Helpers de rendu HTML (email-safe, table-based, inline styles) -----
 function emailShell(string $eyebrow, string $title, string $innerHtml): string {
     return <<<HTML
@@ -522,7 +544,7 @@ function buildCandidaturePdf(array $f): string {
     $row('Civilité', $f['civilite']);
     $row('Prénom', $f['prenom']);
     $row('Nom', $f['nom']);
-    $row('Date de naissance', $f['dateNaissance']);
+    $row('Date de naissance', formatDateFr($f['dateNaissance'] ?? ''));
     $row('Nationalité', $f['nationalite']);
 
     // Coordonnées
