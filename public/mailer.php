@@ -583,6 +583,192 @@ function buildCandidaturePdf(array $f): string {
     return $pdf->Output('S');
 }
 
+/**
+ * Génère la facture des frais de dossier (400 €) pour le candidat.
+ * Numéro de facture déterministe = horodatage + initiales (lisible, unique
+ * en pratique pour un même candidat à la seconde près).
+ * Communication structurée belge (12 chiffres formatés +++AAA/BBBB/CCCDD+++)
+ * dérivée de l'horodatage pour faciliter le rapprochement bancaire.
+ */
+function buildFacturePdf(array $f): array {
+    if (!class_exists('IpecCandidaturePdf')) {
+        return ['', '', ''];
+    }
+
+    $tr = function (string $s): string {
+        $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+        return $out !== false ? $out : $s;
+    };
+
+    $now        = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
+    $dateStr    = $now->format('d/m/Y');
+    $numFacture = 'IPEC-' . $now->format('Ymd-His');
+
+    // Communication structurée belge : 12 chiffres → +++XXX/XXXX/XXXYY+++
+    // YY = (10 premiers chiffres) mod 97 (97 → 00). Standard belge.
+    $base10 = substr($now->format('YmdHis'), 0, 10); // 10 chiffres
+    $check  = (int)$base10 % 97;
+    if ($check === 0) { $check = 97; }
+    $digits12 = $base10 . str_pad((string)$check, 2, '0', STR_PAD_LEFT);
+    $commStruct = '+++' . substr($digits12, 0, 3) . '/'
+                . substr($digits12, 3, 4) . '/'
+                . substr($digits12, 7, 5) . '+++';
+
+    $iban = 'BE00 0000 0000 0000'; // TODO: remplacer par l'IBAN réel IPEC
+    $bic  = 'XXXXBEBB';            // TODO: remplacer par le BIC réel
+
+    $montant = 400.00;
+
+    $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+    $pdf->SetMargins(20, 20, 20);
+    $pdf->SetAutoPageBreak(true, 25);
+    $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
+    $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
+    $pdf->SetCreator('ipec.school');
+    $pdf->AddPage();
+
+    // En-tête : logo + IPEC
+    $logoPath = __DIR__ . '/ipec-logo-email.png';
+    if (is_file($logoPath)) {
+        try { $pdf->Image($logoPath, 20, 15, 18, 18); }
+        catch (\Throwable $e) { error_log('[mailer.php] Logo facture ignoré : ' . $e->getMessage()); }
+    }
+    $pdf->SetXY(44, 18);
+    $pdf->SetFont('Helvetica', 'B', 16);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
+    $pdf->SetX(44);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
+    $pdf->SetX(44);
+    $pdf->Cell(0, 5, $tr('admission@ipec.school · ipec.school'), 0, 2);
+
+    $pdf->SetY(40);
+    $pdf->SetDrawColor(44, 93, 219);
+    $pdf->SetLineWidth(0.6);
+    $pdf->Line(20, 40, 190, 40);
+
+    // Titre
+    $pdf->Ln(6);
+    $pdf->SetFont('Helvetica', 'B', 18);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 9, $tr('Facture — Frais de dossier'), 0, 1);
+
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(0, 5, $tr('N° ' . $numFacture . '  ·  Émise le ' . $dateStr), 0, 1);
+    $pdf->Ln(6);
+
+    // Bloc "Facturé à"
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 6, $tr('FACTURÉ À'), 0, 1);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 1);
+    if (!empty($f['adresse'])) {
+        $pdf->MultiCell(0, 5, $tr((string)$f['adresse']), 0, 'L');
+    }
+    if (!empty($f['paysResidence'])) {
+        $pdf->Cell(0, 5, $tr((string)$f['paysResidence']), 0, 1);
+    }
+    if (!empty($f['email'])) {
+        $pdf->Cell(0, 5, $tr((string)$f['email']), 0, 1);
+    }
+    $pdf->Ln(6);
+
+    // Tableau facture
+    $pdf->SetFillColor(234, 240, 255);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->Cell(120, 8, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
+    $pdf->Cell(25, 8, $tr('QTÉ'), 0, 0, 'C', true);
+    $pdf->Cell(25, 8, $tr('MONTANT'), 0, 1, 'R', true);
+
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $programme = trim(($f['programme'] ?? '') . ' — ' . ($f['annee'] ?? ''), ' —');
+    $descriptionLines = [
+        $tr('Frais de dossier — Candidature IPEC'),
+    ];
+    if ($programme !== '') {
+        $descriptionLines[] = $tr('Programme : ' . $programme);
+    }
+    if (!empty($f['rentree'])) {
+        $descriptionLines[] = $tr('Rentrée envisagée : ' . $f['rentree']);
+    }
+    $descriptionLines[] = $tr('Paiement unique, non remboursable (CGV art. 2).');
+
+    $startY = $pdf->GetY();
+    $pdf->MultiCell(120, 6, implode("\n", $descriptionLines), 0, 'L');
+    $endY = $pdf->GetY();
+    $pdf->SetXY(140, $startY);
+    $pdf->Cell(25, 6, '1', 0, 0, 'C');
+    $pdf->Cell(25, 6, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
+    $pdf->SetY($endY);
+
+    $pdf->SetDrawColor(220, 226, 240);
+    $pdf->SetLineWidth(0.2);
+    $pdf->Line(20, $pdf->GetY() + 2, 190, $pdf->GetY() + 2);
+    $pdf->Ln(6);
+
+    // Total
+    $pdf->SetFont('Helvetica', 'B', 11);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(120, 8, '', 0, 0);
+    $pdf->Cell(25, 8, $tr('TOTAL'), 0, 0, 'R');
+    $pdf->Cell(25, 8, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
+
+    $pdf->SetFont('Helvetica', '', 8);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(0, 4, $tr('TVA non applicable — art. 44 §2 4° CTVA (enseignement).'), 0, 1, 'R');
+    $pdf->Ln(8);
+
+    // Bloc paiement
+    $startY = $pdf->GetY();
+    $pdf->SetFillColor(247, 249, 252);
+    $pdf->SetDrawColor(44, 93, 219);
+    $pdf->SetLineWidth(0.3);
+    $pdf->Rect(20, $startY, 170, 50, 'DF');
+    $pdf->SetXY(24, $startY + 4);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 5, $tr('MODALITÉS DE PAIEMENT'), 0, 1);
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(45, 6, $tr('Bénéficiaire :'), 0, 0);
+    $pdf->Cell(0, 6, $tr('IPEC — Institut privé des études commerciales'), 0, 1);
+    $pdf->SetX(24);
+    $pdf->Cell(45, 6, $tr('IBAN :'), 0, 0);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->Cell(0, 6, $tr($iban), 0, 1);
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->Cell(45, 6, $tr('BIC :'), 0, 0);
+    $pdf->Cell(0, 6, $tr($bic), 0, 1);
+    $pdf->SetX(24);
+    $pdf->Cell(45, 6, $tr('Communication structurée :'), 0, 0);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', 'I', 8);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->MultiCell(162, 4, $tr('Merci d\'utiliser exactement la communication structurée ci-dessus pour permettre un rapprochement automatique de votre paiement.'), 0, 'L');
+
+    $pdf->SetY($startY + 56);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->MultiCell(0, 5, $tr(
+        'Une fois le virement effectué, transmettez la preuve de paiement en réponse à l\'e-mail d\'accusé de réception, '
+        . 'avec l\'ensemble des pièces de votre dossier de candidature.'
+    ), 0, 'L');
+
+    return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
+}
+
 // ----- Construction du message selon le type -----
 $pdfAttachment = '';
 $pdfFilename   = '';
