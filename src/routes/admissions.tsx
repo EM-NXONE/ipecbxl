@@ -287,20 +287,6 @@ function Admissions() {
             </div>
           </div>
 
-          <div className="mt-10 p-8 rounded-sm border border-blue/30 bg-blue/5">
-            <div className="flex items-start gap-4">
-              <CheckCircle2 className="text-blue shrink-0 mt-1" size={24} strokeWidth={1.5} />
-              <div>
-                <div className="text-xs uppercase tracking-[0.25em] text-blue mb-2">Tout inclus</div>
-                <h3 className="font-display text-xl text-cream mb-3">Aucun frais en cours d'année</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Les droits de scolarité couvrent l'ensemble des activités pédagogiques
-                  de l'année académique : cours, syllabi, séminaires, conférences et
-                  visites extérieures auprès des institutions européennes.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
