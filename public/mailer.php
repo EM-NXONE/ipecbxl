@@ -614,8 +614,8 @@ function buildFacturePdf(array $f): array {
                 . substr($digits12, 3, 4) . '/'
                 . substr($digits12, 7, 5) . '+++';
 
-    $iban = 'BE00 0000 0000 0000'; // TODO: remplacer par l'IBAN réel IPEC
-    $bic  = 'XXXXBEBB';            // TODO: remplacer par le BIC réel
+    $iban = getenv('IPEC_IBAN') ?: 'BE00 0000 0000 0000';
+    $bic  = getenv('IPEC_BIC')  ?: 'XXXXBEBB';
 
     $montant = 400.00;
 
