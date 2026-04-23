@@ -183,7 +183,10 @@ function CGV() {
             </ol>
             <p className="mt-6 p-4 rounded-sm border border-blue/30 bg-blue/5 text-cream">
               L'acceptation de ces conditions particulières est requise lors de la soumission du
-              formulaire d'inscription en ligne et vaut signature du candidat.
+              formulaire d'inscription en ligne. Cette validation électronique constitue une
+              signature électronique au sens du Règlement eIDAS (UE) n° 910/2014 et engage
+              le candidat au même titre qu'une signature manuscrite. L'horodatage et l'adresse
+              IP de la soumission sont conservés à des fins probatoires.
             </p>
           </section>
 
