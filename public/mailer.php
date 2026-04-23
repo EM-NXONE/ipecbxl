@@ -980,6 +980,9 @@ if ($type === 'inscription') {
         $candidateMail->Port       = $smtpPort;
         $candidateMail->CharSet    = 'UTF-8';
         $candidateMail->Encoding   = 'base64';
+        // Message-ID figé : doit être strictement identique à celui injecté
+        // dans le mailto: du CTA pour que la réponse s'attache au fil.
+        $candidateMail->MessageID  = $candidateMessageId;
 
         // From = même adresse que l'auth SMTP (pas d'usurpation, SPF/DKIM OK)
         $candidateMail->setFrom($admissionUser, 'IPEC — Service des admissions');
