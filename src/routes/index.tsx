@@ -293,7 +293,7 @@ function Home() {
                 n: "03",
                 t: "Relations Internationales",
                 icon: Globe,
-                d: "Naviguer la complexité géopolitique, comprendre les institutions et négocier à l'international.",
+                d: "Décrypter la complexité géopolitique, comprendre les institutions et négocier à l'international.",
                 skills: [],
               },
               {
