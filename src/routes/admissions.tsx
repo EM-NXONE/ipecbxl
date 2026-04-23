@@ -27,10 +27,10 @@ export const Route = createFileRoute("/admissions")({
 });
 
 const steps = [
-  { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez votre dossier en ligne et joignez vos pièces justificatives." },
+  { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez votre dossier en ligne, joignez vos pièces justificatives et réglez les frais de dossier." },
   { n: "02", icon: Mail, t: "Entretien personnel", d: "Échange avec notre équipe pédagogique pour préciser votre projet." },
-  { n: "03", icon: Calendar, t: "Réponse sous 7 jours", d: "Vous recevez la décision d'admission rapidement, par e-mail." },
-  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement des frais de dossier et de la première tranche de scolarité." },
+  { n: "03", icon: Calendar, t: "Réponse sous 7 jours", d: "Après réception des frais de dossier, vous recevez la décision d'admission par e-mail." },
+  { n: "04", icon: CreditCard, t: "Confirmation d'inscription", d: "Versement de la première tranche des frais de scolarité." },
 ];
 
 function Admissions() {
