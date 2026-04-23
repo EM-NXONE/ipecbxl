@@ -311,11 +311,16 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetCreator('ipec.school');
     $pdf->AddPage();
 
-    // En-tête : logo + titre
+    // En-tête : logo + titre — Image() peut planter sur certains PNG (palette / alpha
+     // / profondeur de bits incompatibles avec FPDF). On l'isole pour ne jamais bloquer
+     // la génération entière du PDF à cause du logo.
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
-        // Logo carré 18×18 mm pour préserver les proportions
-        $pdf->Image($logoPath, 20, 15, 18, 18);
+        try {
+            $pdf->Image($logoPath, 20, 15, 18, 18);
+        } catch (\Throwable $logoErr) {
+            error_log('[mailer.php] Logo PDF ignoré : ' . $logoErr->getMessage());
+        }
     }
     $pdf->SetXY(44, 18);
     $pdf->SetFont('Helvetica', 'B', 16);
