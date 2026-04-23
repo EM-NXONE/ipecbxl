@@ -49,6 +49,30 @@ const RATE_LIMIT_WINDOW = 600;
 const ENV_FILE = __DIR__ . '/../.ipec-mailer.env';
 // ============================================================
 
+// ----- Mode debug : ajoute ?debug=1 à l'URL pour voir les erreurs PHP -----
+// (à utiliser ponctuellement pour diagnostiquer un 500, à laisser en place sinon)
+$DEBUG = isset($_GET['debug']) && $_GET['debug'] === '1';
+if ($DEBUG) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
+
+// Capture toute erreur fatale et la renvoie en JSON lisible (au lieu d'un 500 vide)
+register_shutdown_function(function () use (&$DEBUG) {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode([
+            'error'   => 'Erreur serveur PHP',
+            'details' => $DEBUG ? $err : 'Activez ?debug=1 pour voir le détail',
+        ]);
+    }
+});
+
 header('Content-Type: application/json; charset=utf-8');
 
 // ----- CORS -----
@@ -247,12 +271,25 @@ HTML;
 }
 
 // ----- Génération du PDF de candidature (preuve signée) -----
+// Définition de la sous-classe au niveau global (PAS dans un eval — souvent bloqué chez les hébergeurs).
+// On la déclare via require conditionnel : la classe est chargée seulement si FPDF l'est aussi.
+if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) {
+    require_once __DIR__ . '/FPDF/fpdf.php';
+    class IpecCandidaturePdf extends FPDF {
+        public function Footer() {
+            $this->SetY(-18);
+            $this->SetFont('Helvetica', 'I', 8);
+            $this->SetTextColor(124, 138, 168);
+            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, 'C');
+            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, 'C');
+        }
+    }
+}
+
 function buildCandidaturePdf(array $f): string {
-    $fpdfPath = __DIR__ . '/FPDF/fpdf.php';
-    if (!is_file($fpdfPath)) {
+    if (!class_exists('IpecCandidaturePdf')) {
         return '';
     }
-    require_once $fpdfPath;
 
     // Conversion UTF-8 → CP1252 (Windows-1252) qui supporte le tiret cadratin —,
     // les guillemets typographiques, etc. — contrairement à ISO-8859-1 strict.
@@ -261,21 +298,6 @@ function buildCandidaturePdf(array $f): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
         return $out !== false ? $out : $s;
     };
-
-    // Sous-classe avec footer automatique sur chaque page
-    if (!class_exists('IpecCandidaturePdf')) {
-        eval('
-            class IpecCandidaturePdf extends FPDF {
-                public function Footer() {
-                    $this->SetY(-18);
-                    $this->SetFont("Helvetica", "I", 8);
-                    $this->SetTextColor(124, 138, 168);
-                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, "C");
-                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, "C");
-                }
-            }
-        ');
-    }
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->SetMargins(20, 20, 20);
@@ -504,25 +526,36 @@ HTML;
         . "Message :\n" . ($message !== '' ? $message : '(aucun)') . "\n";
 
     // Génération du PDF de candidature (preuve signée jointe à l'e-mail)
-    $pdfAttachment = buildCandidaturePdf([
-        'civilite'       => $civilite,
-        'prenom'         => $prenom,
-        'nom'            => $nom,
-        'dateNaissance'  => $dateNaissance,
-        'nationalite'    => $nationalite,
-        'email'          => $email,
-        'telephone'      => $telephone,
-        'adresse'        => $adresse,
-        'paysResidence'  => $paysResidence,
-        'programme'      => $programme,
-        'annee'          => $annee,
-        'specialisation' => $specialisation,
-        'rentree'        => $rentree,
-        'message'        => $message,
-        'ip'             => $ip,
-    ]);
-    $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
-    $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+    // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
+    $pdfAttachment = '';
+    $pdfFilename   = '';
+    try {
+        $pdfAttachment = buildCandidaturePdf([
+            'civilite'       => $civilite,
+            'prenom'         => $prenom,
+            'nom'            => $nom,
+            'dateNaissance'  => $dateNaissance,
+            'nationalite'    => $nationalite,
+            'email'          => $email,
+            'telephone'      => $telephone,
+            'adresse'        => $adresse,
+            'paysResidence'  => $paysResidence,
+            'programme'      => $programme,
+            'annee'          => $annee,
+            'specialisation' => $specialisation,
+            'rentree'        => $rentree,
+            'message'        => $message,
+            'ip'             => $ip,
+        ]);
+        if ($pdfAttachment !== '') {
+            $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
+            $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+        }
+    } catch (\Throwable $pdfErr) {
+        error_log('[mailer.php] Échec génération PDF : ' . $pdfErr->getMessage());
+        $pdfAttachment = '';
+        $pdfFilename   = '';
+    }
 
 } else { // type === 'contact'
     $prenom  = clean($data['prenom']  ?? '', 100);
