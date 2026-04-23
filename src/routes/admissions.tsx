@@ -104,14 +104,30 @@ function Admissions() {
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40">
-            {steps.map((s) => (
-              <div key={s.n} className="bg-background p-8 hover:bg-card transition-colors">
-                <s.icon className="text-blue mb-6" size={28} strokeWidth={1.5} />
-                <div className="text-xs text-blue uppercase tracking-widest mb-3">Étape {s.n}</div>
-                <h3 className="font-display text-xl text-cream mb-3">{s.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
-              </div>
-            ))}
+            {steps.map((s) =>
+              s.n === "01" ? (
+                <Link
+                  key={s.n}
+                  to="/inscription"
+                  className="group bg-background p-8 hover:bg-card transition-colors block"
+                >
+                  <s.icon className="text-blue mb-6" size={28} strokeWidth={1.5} />
+                  <div className="text-xs text-blue uppercase tracking-widest mb-3">Étape {s.n}</div>
+                  <h3 className="font-display text-xl text-cream mb-3">{s.t}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">{s.d}</p>
+                  <span className="inline-flex items-center gap-2 text-sm text-blue group-hover:gap-3 transition-all">
+                    Accéder au formulaire <ArrowRight size={16} />
+                  </span>
+                </Link>
+              ) : (
+                <div key={s.n} className="bg-background p-8 hover:bg-card transition-colors">
+                  <s.icon className="text-blue mb-6" size={28} strokeWidth={1.5} />
+                  <div className="text-xs text-blue uppercase tracking-widest mb-3">Étape {s.n}</div>
+                  <h3 className="font-display text-xl text-cream mb-3">{s.t}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
+                </div>
+              )
+            )}
           </div>
         </div>
       </section>
