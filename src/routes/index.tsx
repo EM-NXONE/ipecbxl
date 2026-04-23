@@ -287,21 +287,21 @@ function Home() {
                 t: "Marketing",
                 icon: Megaphone,
                 d: "Comprendre les marchés, construire des marques fortes et créer un lien durable avec les publics.",
-                skills: ["Brand", "Digital", "Études de marché"],
+                skills: [],
               },
               {
                 n: "03",
                 t: "Relations Internationales",
                 icon: Globe,
                 d: "Naviguer la complexité géopolitique, comprendre les institutions et négocier à l'international.",
-                skills: ["Diplomatie", "Géopolitique", "Négociation"],
+                skills: [],
               },
               {
                 n: "04",
                 t: "Économie & Finance",
                 icon: LineChart,
                 d: "Décrypter les flux économiques, gérer le risque et maîtriser la finance d'entreprise et de marché.",
-                skills: ["Macroéconomie", "Finance", "Analyse de données"],
+                skills: [],
               },
             ].map((s) => (
               <div key={s.n} className="bg-background p-8 lg:p-10 hover:bg-card transition-colors group flex flex-col">
