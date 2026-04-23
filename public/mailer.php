@@ -502,25 +502,36 @@ HTML;
         . "Message :\n" . ($message !== '' ? $message : '(aucun)') . "\n";
 
     // Génération du PDF de candidature (preuve signée jointe à l'e-mail)
-    $pdfAttachment = buildCandidaturePdf([
-        'civilite'       => $civilite,
-        'prenom'         => $prenom,
-        'nom'            => $nom,
-        'dateNaissance'  => $dateNaissance,
-        'nationalite'    => $nationalite,
-        'email'          => $email,
-        'telephone'      => $telephone,
-        'adresse'        => $adresse,
-        'paysResidence'  => $paysResidence,
-        'programme'      => $programme,
-        'annee'          => $annee,
-        'specialisation' => $specialisation,
-        'rentree'        => $rentree,
-        'message'        => $message,
-        'ip'             => $ip,
-    ]);
-    $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
-    $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+    // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
+    $pdfAttachment = '';
+    $pdfFilename   = '';
+    try {
+        $pdfAttachment = buildCandidaturePdf([
+            'civilite'       => $civilite,
+            'prenom'         => $prenom,
+            'nom'            => $nom,
+            'dateNaissance'  => $dateNaissance,
+            'nationalite'    => $nationalite,
+            'email'          => $email,
+            'telephone'      => $telephone,
+            'adresse'        => $adresse,
+            'paysResidence'  => $paysResidence,
+            'programme'      => $programme,
+            'annee'          => $annee,
+            'specialisation' => $specialisation,
+            'rentree'        => $rentree,
+            'message'        => $message,
+            'ip'             => $ip,
+        ]);
+        if ($pdfAttachment !== '') {
+            $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
+            $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+        }
+    } catch (\Throwable $pdfErr) {
+        error_log('[mailer.php] Échec génération PDF : ' . $pdfErr->getMessage());
+        $pdfAttachment = '';
+        $pdfFilename   = '';
+    }
 
 } else { // type === 'contact'
     $prenom  = clean($data['prenom']  ?? '', 100);
