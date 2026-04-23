@@ -150,6 +150,8 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{$title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 </head>
 <body style="margin:0;padding:0;background:#0F1525;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111827;">
   <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;font-size:1px;line-height:1px;overflow:hidden;">{$title} — IPEC Bruxelles</span>
@@ -164,16 +166,16 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
                   <td valign="middle">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td valign="middle" style="padding-right:14px;">
-                          <img src="cid:ipec-logo" alt="IPEC" width="44" height="44" style="display:block;width:44px;height:44px;border:0;outline:none;text-decoration:none;">
+                        <td valign="middle" style="background:#FFFFFF;border-radius:6px;padding:6px;">
+                          <img src="cid:ipec-logo" alt="IPEC" width="40" height="40" style="display:block;width:40px;height:40px;border:0;outline:none;text-decoration:none;">
                         </td>
-                        <td valign="middle" style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:600;color:#FFFFFF;letter-spacing:-0.01em;line-height:1;">
+                        <td valign="middle" style="padding-left:14px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:22px;font-weight:500;color:#FFFFFF;letter-spacing:-0.01em;line-height:1;">
                           IPEC <span style="color:#9FB4E6;font-weight:400;">Bruxelles</span>
                         </td>
                       </tr>
                     </table>
                   </td>
-                  <td align="right" valign="middle" style="font-size:11px;color:#9FB4E6;letter-spacing:0.18em;text-transform:uppercase;">
+                  <td align="right" valign="middle" style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#9FB4E6;letter-spacing:0.18em;text-transform:uppercase;">
                     Notification interne
                   </td>
                 </tr>
@@ -188,16 +190,16 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="padding:36px 40px 8px 40px;">
-                    <div style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:10px;">
+                    <div style="font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#2C5DDB;font-weight:600;margin-bottom:10px;">
                       — {$eyebrow}
                     </div>
-                    <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:500;color:#111827;letter-spacing:-0.01em;">
+                    <h1 style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:400;color:#111827;letter-spacing:-0.02em;">
                       {$title}
                     </h1>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:20px 40px 36px 40px;font-size:14px;line-height:1.6;color:#111827;">
+                  <td style="padding:20px 40px 36px 40px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:#111827;">
                     {$innerHtml}
                   </td>
                 </tr>
@@ -205,8 +207,8 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
             </td>
           </tr>
           <tr>
-            <td style="padding:24px 8px 0 8px;text-align:center;font-size:11px;color:#7C8AA8;line-height:1.6;">
-              IPEC — Institut privé, Bruxelles · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
+            <td style="padding:24px 8px 0 8px;text-align:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#7C8AA8;line-height:1.6;">
+              IPEC — Institut privé des études commerciales · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
               E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
             </td>
           </tr>
@@ -230,7 +232,7 @@ HTML;
 
 function emailSectionTitle(string $title): string {
     return <<<HTML
-<div style="margin:24px 0 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:16px;font-weight:600;color:#111827;border-left:3px solid #2C5DDB;padding-left:10px;">
+<div style="margin:24px 0 8px 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:16px;font-weight:500;color:#111827;border-left:3px solid #2C5DDB;padding-left:10px;letter-spacing:-0.01em;">
   {$title}
 </div>
 HTML;
