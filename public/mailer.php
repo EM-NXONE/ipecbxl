@@ -828,6 +828,64 @@ try {
 $timestamps[] = $now;
 @file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
+/**
+ * Archive une copie du message envoyé dans le dossier IMAP "Sent" de la
+ * boîte d'authentification SMTP utilisée pour l'envoi.
+ *
+ * - Non bloquant : toute erreur est capturée et retournée sous forme de string.
+ * - Renvoie [bool $archived, ?string $errorMessage].
+ * - Nécessite l'extension PHP `imap`. Sans elle, retourne (false, "...").
+ */
+function archiveToImapSent(
+    PHPMailer\PHPMailer\PHPMailer $sentMail,
+    string $imapHost,
+    int $imapPort,
+    string $imapSentBox,
+    string $imapUser,
+    string $imapPass
+): array {
+    if (!function_exists('imap_open')) {
+        return [false, "Extension PHP 'imap' non disponible — pas d'archivage Sent."];
+    }
+    try {
+        $rawMessage = $sentMail->getSentMIMEMessage();
+        $mailbox    = '{' . $imapHost . ':' . $imapPort . '/imap/ssl}' . $imapSentBox;
+        $imap       = @imap_open($mailbox, $imapUser, $imapPass, OP_HALFOPEN);
+        if ($imap === false) {
+            $err = imap_last_error() ?: 'raison inconnue';
+            @imap_errors(); @imap_alerts();
+            return [false, 'imap_open a échoué : ' . $err];
+        }
+        $appended = @imap_append($imap, $mailbox, $rawMessage, '\\Seen');
+        @imap_close($imap);
+        if (!$appended) {
+            $err = imap_last_error() ?: 'raison inconnue';
+            @imap_errors(); @imap_alerts();
+            return [false, 'imap_append a échoué : ' . $err];
+        }
+        @imap_errors(); @imap_alerts();
+        return [true, null];
+    } catch (\Throwable $imapErr) {
+        error_log('[mailer.php] Archivage IMAP échoué : ' . $imapErr->getMessage());
+        return [false, $imapErr->getMessage()];
+    }
+}
+
+// ----- Archivage IMAP du mail interne (process@ → Sent) -----
+// Pour conserver une trace du mail envoyé à admission@ / contact@ dans
+// Roundcube, dossier "Sent" de la boîte process@.
+$processImapHost    = $env['PROCESS_IMAP_HOST'] ?? $smtpHost;
+$processImapPort    = (int)($env['PROCESS_IMAP_PORT'] ?? 993);
+$processImapSentBox = $env['PROCESS_IMAP_SENT_FOLDER'] ?? 'Sent';
+[$processImapArchived, $processImapError] = archiveToImapSent(
+    $mail,
+    $processImapHost,
+    $processImapPort,
+    $processImapSentBox,
+    $smtpUser,
+    $smtpPass
+);
+
 // ============================================================
 // 2e e-mail : ACCUSÉ DE RÉCEPTION envoyé AU CANDIDAT
 // (uniquement pour les candidatures, pas pour le formulaire de contact)
@@ -916,43 +974,15 @@ if ($type === 'inscription') {
 
         $candidateMail->send();
 
-        // ----- Archivage IMAP : on dépose une copie dans "Sent" -----
-        // Pour que le mail apparaisse dans Roundcube comme un envoi normal.
-        // Nécessite l'extension PHP imap. Si absente ou si la connexion
-        // échoue, on log mais on ne bloque PAS la réponse.
-        if (function_exists('imap_open')) {
-            try {
-                // getSentMIMEMessage() = headers + body bruts, prêts pour APPEND IMAP.
-                // On le récupère APRÈS send() pour avoir Message-ID, Date, etc.
-                $rawMessage = $candidateMail->getSentMIMEMessage();
-
-                $mailbox = '{' . $imapHost . ':' . $imapPort . '/imap/ssl}' . $imapSentBox;
-                // Suppression temporaire du gestionnaire d'erreurs PHP : imap_open()
-                // remonte ses erreurs via imap_last_error(), pas via Throwable.
-                $imap = @imap_open($mailbox, $admissionUser, $admissionPass, OP_HALFOPEN);
-                if ($imap === false) {
-                    $candidateImapError = 'imap_open a échoué : ' . (imap_last_error() ?: 'raison inconnue');
-                } else {
-                    // Flag \Seen pour que le mail apparaisse "lu" dans Sent
-                    $appended = @imap_append($imap, $mailbox, $rawMessage, '\\Seen');
-                    if (!$appended) {
-                        $candidateImapError = 'imap_append a échoué : ' . (imap_last_error() ?: 'raison inconnue');
-                    } else {
-                        $candidateImapArchived = true;
-                    }
-                    @imap_close($imap);
-                }
-                // Vide la pile d'erreurs IMAP pour qu'elles ne remontent pas en
-                // notice PHP plus tard.
-                @imap_errors();
-                @imap_alerts();
-            } catch (\Throwable $imapErr) {
-                $candidateImapError = $imapErr->getMessage();
-                error_log('[mailer.php] Archivage IMAP échoué : ' . $candidateImapError);
-            }
-        } else {
-            $candidateImapError = "Extension PHP 'imap' non disponible — pas d'archivage Sent.";
-        }
+        // Archivage IMAP : copie dans le dossier "Sent" de admission@
+        [$candidateImapArchived, $candidateImapError] = archiveToImapSent(
+            $candidateMail,
+            $imapHost,
+            $imapPort,
+            $imapSentBox,
+            $admissionUser,
+            $admissionPass
+        );
     } catch (\Throwable $e) {
         // On NE bloque PAS la réponse : l'admission a déjà été notifiée.
         $candidateMailError = isset($candidateMail) ? ($candidateMail->ErrorInfo ?: $e->getMessage()) : $e->getMessage();
@@ -970,6 +1000,8 @@ if ($DEBUG) {
         'fpdf_loaded'              => class_exists('FPDF'),
         'iconv_loaded'             => function_exists('iconv'),
         'logo_exists'              => is_file(__DIR__ . '/ipec-logo-email.png'),
+        'process_imap_archived'    => $processImapArchived ?? false,
+        'process_imap_error'       => $processImapError ?? null,
         'candidate_mail_error'     => $candidateMailError ?? null,
         'candidate_imap_archived'  => $candidateImapArchived ?? false,
         'candidate_imap_error'     => $candidateImapError ?? null,
@@ -996,6 +1028,12 @@ echo json_encode($response);
  *      SMTP_USER=process@ipec.school
  *      SMTP_PASS=...
  *
+ *      # Archivage IMAP des mails envoyés par process@ (notifs internes)
+ *      # → visibles dans Roundcube, dossier Sent de process@.
+ *      PROCESS_IMAP_HOST=mail.ipec.school       # défaut : SMTP_HOST
+ *      PROCESS_IMAP_PORT=993                    # défaut : 993
+ *      PROCESS_IMAP_SENT_FOLDER=Sent            # défaut : Sent
+ *
  *      # Compte admission@ — utilisé pour l'accusé de réception envoyé
  *      # au candidat (vraie auth, pas d'usurpation) et pour archiver
  *      # une copie dans le dossier "Sent" visible dans Roundcube.
@@ -1013,8 +1051,8 @@ echo json_encode($response);
  * 4) Vérifier les DNS sur ipec.school : SPF, DKIM, DMARC
  *
  * 5) Vérifier que l'extension PHP `imap` est activée (php.ini → extension=imap)
- *    pour que les accusés candidats apparaissent dans Roundcube → dossier Sent.
- *    Sans elle, le mail part quand même mais n'est pas archivé.
- *    Pour diagnostiquer : appeler ?debug=1 et lire `imap_extension_loaded`
- *    et `candidate_imap_error` dans la réponse JSON.
+ *    pour que les mails apparaissent dans Roundcube → dossier Sent.
+ *    Sans elle, les mails partent quand même mais ne sont pas archivés.
+ *    Pour diagnostiquer : appeler ?debug=1 et lire `imap_extension_loaded`,
+ *    `process_imap_error` et `candidate_imap_error` dans la réponse JSON.
  * ========================================================================= */
