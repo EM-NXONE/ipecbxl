@@ -194,9 +194,11 @@ function Inscription() {
               >
                 <CheckCircle2 className="text-blue mx-auto mb-4" size={40} strokeWidth={1.5} />
                 <div className="font-display text-3xl text-gradient-blue mb-3">Candidature reçue</div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Merci ! Votre dossier d'inscription a bien été enregistré.
-                  Nous vous répondons par e-mail sous 7 jours.
+                <p className="text-muted-foreground leading-relaxed mb-3">
+                  Merci ! Votre dossier a bien été enregistré. Vous allez recevoir un e-mail de confirmation et notre équipe revient vers vous rapidement.
+                </p>
+                <p className="text-xs uppercase tracking-[0.25em] text-blue">
+                  Redirection vers l'accueil…
                 </p>
               </div>
             ) : (

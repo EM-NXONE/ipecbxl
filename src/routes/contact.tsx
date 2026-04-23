@@ -150,8 +150,13 @@ function Contact() {
                 aria-live="polite"
                 className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center scroll-mt-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/60"
               >
-                <div className="font-display text-3xl text-gradient-blue mb-3">Merci !</div>
-                <p className="text-muted-foreground">Votre message a bien été envoyé. Nous vous répondons sous 48h.</p>
+                <div className="font-display text-3xl text-gradient-blue mb-3">Message bien reçu</div>
+                <p className="text-muted-foreground leading-relaxed mb-3">
+                  Merci pour votre message. Vous allez recevoir un e-mail de confirmation et notre équipe revient vers vous rapidement.
+                </p>
+                <p className="text-xs uppercase tracking-[0.25em] text-blue">
+                  Redirection vers l'accueil…
+                </p>
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit} noValidate>
