@@ -27,7 +27,7 @@ export const Route = createFileRoute("/admissions")({
 });
 
 const steps = [
-  { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez le formulaire de candidature ci-dessous en quelques minutes." },
+  { n: "01", icon: FileText, t: "Candidature en ligne", d: "Remplissez le formulaire de candidature." },
   { n: "02", icon: Mail, t: "Suite par e-mail", d: "Vous recevez un e-mail récapitulatif détaillant la procédure à suivre et les pièces à transmettre." },
   { n: "03", icon: Calendar, t: "Entretien en visio", d: "Échange en visioconférence avec notre équipe pédagogique pour préciser votre projet." },
   { n: "04", icon: CreditCard, t: "Réponse d'admission", d: "Vous recevez la décision d'admission par e-mail, puis confirmez votre inscription." },
