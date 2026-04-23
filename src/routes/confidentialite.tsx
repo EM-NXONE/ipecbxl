@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/confidentialite")({
   head: () => ({
     meta: [
-      { title: "Politique de confidentialité — IPEC Bruxelles" },
+      { title: "IPEC | Confidentialité" },
       { name: "description", content: "Politique de protection des données personnelles de l'IPEC, conforme au RGPD. Institut privé en Belgique." },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Confidentialité — IPEC Bruxelles" },
