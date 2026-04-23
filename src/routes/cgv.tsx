@@ -106,19 +106,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">6. Signature électronique</h2>
-            <p>
-              L'acceptation des présentes conditions, formalisée par la validation électronique
-              du formulaire de candidature, constitue une signature électronique et produit les
-              mêmes effets juridiques qu'une signature manuscrite, conformément au Règlement
-              eIDAS (UE) n° 910/2014. À des fins probatoires, l'IPEC conserve l'horodatage
-              de la validation ainsi que l'adresse IP de connexion du candidat au moment de
-              la soumission du formulaire.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-2xl text-cream mb-4">7. Désistement et remboursement</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">6. Désistement et remboursement</h2>
             <p>
               En cas de désistement après la rentrée académique, les sommes versées au titre de la
               scolarité ne sont pas remboursables, sauf cas de force majeure dûment justifié.
@@ -127,7 +115,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">8. Retard de paiement</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">7. Retard de paiement</h2>
             <p>
               Tout retard de paiement peut entraîner la suspension de l'accès aux activités
               pédagogiques jusqu'à régularisation, sans préjudice de poursuites éventuelles.
@@ -135,7 +123,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">9. Conditions particulières d'admission</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">8. Conditions particulières d'admission</h2>
             <p className="mb-4">
               Le candidat-étudiant à l'IPEC reconnaît avoir été informé des conditions particulières
               suivantes, qui font partie intégrante de son engagement contractuel au moment de
@@ -201,7 +189,7 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">10. Droit applicable</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">9. Droit applicable</h2>
             <p>
               Les présentes CGV sont régies par le droit belge. Tout litige sera porté devant les
               tribunaux compétents de Bruxelles.
