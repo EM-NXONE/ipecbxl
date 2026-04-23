@@ -477,6 +477,7 @@ echo json_encode(['ok' => true]);
  *
  * 1) Uploader dans public_html/ :
  *      - mailer.php (ce fichier)
+ *      - ipec-logo-email.png  (logo embarqué dans les emails — IMPORTANT)
  *      - PHPMailer/src/Exception.php
  *      - PHPMailer/src/PHPMailer.php
  *      - PHPMailer/src/SMTP.php
