@@ -153,7 +153,7 @@ function Inscription() {
 
             <ol className="relative space-y-4 text-sm before:content-[''] before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-blue/60 before:via-blue/30 before:to-transparent">
               {[
-                { n: "01", t: "Candidature en ligne", d: "Remplissez votre dossier en ligne, joignez vos pièces justificatives et réglez les frais de dossier." },
+                { n: "01", t: "Candidature en ligne", d: "Remplissez le formulaire d'inscription et réglez les frais de dossier. Vous recevez ensuite un e-mail détaillant les pièces justificatives à transmettre." },
                 { n: "02", t: "Entretien en visio", d: "Échange en visioconférence avec notre équipe pédagogique pour préciser votre projet." },
                 { n: "03", t: "Réponse sous 7 jours", d: "Après réception des frais de dossier, vous recevez la décision d'admission par e-mail." },
                 { n: "04", t: "Confirmation d'inscription", d: "Versement de la première tranche des frais de scolarité." },
