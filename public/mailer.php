@@ -254,47 +254,69 @@ function buildCandidaturePdf(array $f): string {
     }
     require_once $fpdfPath;
 
-    // Conversion UTF-8 → ISO-8859-1 (FPDF n'accepte que du Latin-1 avec les polices intégrées)
+    // Conversion UTF-8 → CP1252 (Windows-1252) qui supporte le tiret cadratin —,
+    // les guillemets typographiques, etc. — contrairement à ISO-8859-1 strict.
+    // FPDF avec polices intégrées gère le CP1252 nativement.
     $tr = function (string $s): string {
-        return iconv('UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $s);
+        $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+        return $out !== false ? $out : $s;
     };
 
-    $pdf = new \FPDF('P', 'mm', 'A4');
+    // Sous-classe avec footer automatique sur chaque page
+    if (!class_exists('IpecCandidaturePdf')) {
+        eval('
+            class IpecCandidaturePdf extends FPDF {
+                public function Footer() {
+                    $this->SetY(-18);
+                    $this->SetFont("Helvetica", "I", 8);
+                    $this->SetTextColor(124, 138, 168);
+                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, "C");
+                    $this->Cell(0, 5, iconv("UTF-8", "CP1252//TRANSLIT//IGNORE", "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, "C");
+                }
+            }
+        ');
+    }
+
+    $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->SetMargins(20, 20, 20);
-    $pdf->SetAutoPageBreak(true, 20);
+    $pdf->SetAutoPageBreak(true, 25);
     $pdf->SetTitle($tr('Dossier de candidature IPEC'));
-    $pdf->SetAuthor('IPEC — Institut prive des etudes commerciales');
+    $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('ipec.school');
     $pdf->AddPage();
 
-    // En-tete : logo + titre
+    // En-tête : logo + titre
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
-        $pdf->Image($logoPath, 20, 15, 18);
+        // Logo carré 18×18 mm pour préserver les proportions
+        $pdf->Image($logoPath, 20, 15, 18, 18);
     }
-    $pdf->SetXY(42, 17);
+    $pdf->SetXY(44, 18);
     $pdf->SetFont('Helvetica', 'B', 16);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
-    $pdf->SetX(42);
+    $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('Institut prive des etudes commerciales'), 0, 2);
+    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
 
     $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
     $pdf->Line(20, 40, 190, 40);
 
-    // Bandeau de titre du document
+    // Titre du document
     $pdf->Ln(6);
     $pdf->SetFont('Helvetica', 'B', 18);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 9, $tr('Dossier de candidature'), 0, 1);
+
+    // Date de soumission — chaque caractère littéral des lettres "à", "heure de Bruxelles"
+    // doit être échappé avec \\ dans le format() pour ne pas être interprété comme un code.
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
     $submittedAt = (new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels')))
-        ->format('d/m/Y à H:i (Europe/Bruxelles)');
+        ->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
     $pdf->Cell(0, 5, $tr('Soumis le ' . $submittedAt), 0, 1);
     $pdf->Ln(4);
 
@@ -304,7 +326,7 @@ function buildCandidaturePdf(array $f): string {
         $pdf->SetFillColor(234, 240, 255);
         $pdf->SetTextColor(44, 93, 219);
         $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(0, 7, ' ' . $tr(strtoupper($title)), 0, 1, 'L', true);
+        $pdf->Cell(0, 7, '  ' . $tr(mb_strtoupper($title, 'UTF-8')), 0, 1, 'L', true);
         $pdf->Ln(2);
     };
 
@@ -320,24 +342,24 @@ function buildCandidaturePdf(array $f): string {
     };
 
     // Programme
-    $section('Programme demande');
+    $section('Programme demandé');
     $row('Programme', $f['programme'] . ' — ' . $f['annee']);
-    $row('Specialisation', $f['specialisation']);
-    $row('Rentree envisagee', $f['rentree']);
+    $row('Spécialisation', $f['specialisation']);
+    $row('Rentrée envisagée', $f['rentree']);
 
-    // Identite
-    $section('Identite du candidat');
-    $row('Civilite', $f['civilite']);
-    $row('Prenom', $f['prenom']);
+    // Identité
+    $section('Identité du candidat');
+    $row('Civilité', $f['civilite']);
+    $row('Prénom', $f['prenom']);
     $row('Nom', $f['nom']);
     $row('Date de naissance', $f['dateNaissance']);
-    $row('Nationalite', $f['nationalite']);
+    $row('Nationalité', $f['nationalite']);
 
-    // Contact
-    $section('Coordonnees');
+    // Coordonnées
+    $section('Coordonnées');
     $row('E-mail', $f['email']);
-    $row('Telephone', $f['telephone']);
-    $row('Pays de residence', $f['paysResidence']);
+    $row('Téléphone', $f['telephone']);
+    $row('Pays de résidence', $f['paysResidence']);
     $row('Adresse', $f['adresse']);
 
     // Message
@@ -348,51 +370,45 @@ function buildCandidaturePdf(array $f): string {
         $pdf->MultiCell(0, 5.5, $tr($f['message']), 0, 'L');
     }
 
-    // Engagements signes
-    $section('Engagements acceptes par le candidat');
-    $pdf->SetFont('Helvetica', '', 10);
-    $pdf->SetTextColor(15, 21, 37);
-
+    // Engagements signés
+    $section('Engagements acceptés par le candidat');
     $clauses = [
-        "Le candidat declare avoir pris connaissance et accepte sans reserve les conditions particulieres d'admission de l'IPEC, publiees sur https://ipec.school/cgv. Cette acceptation, formalisee par la validation electronique du formulaire de candidature, vaut signature au sens des articles XII.15 et suivants du Code de droit economique belge.",
-            "Le candidat autorise l'IPEC a traiter les informations personnelles transmises dans le cadre de l'examen de sa candidature, conformement au Reglement General sur la Protection des Donnees (RGPD - UE 2016/679) et a la politique de confidentialite publiee sur https://ipec.school/confidentialite.",
-            "Le candidat certifie sur l'honneur l'exactitude des informations communiquees. Toute declaration inexacte ou incomplete pourra entrainer le rejet de la candidature ou l'annulation d'une admission deja prononcee.",
+        "Le candidat déclare avoir pris connaissance et accepte sans réserve les conditions particulières d'admission de l'IPEC, publiées sur https://ipec.school/cgv. Cette acceptation, formalisée par la validation électronique du formulaire de candidature, vaut signature au sens des articles XII.15 et suivants du Code de droit économique belge.",
+        "Le candidat autorise l'IPEC à traiter les informations personnelles transmises dans le cadre de l'examen de sa candidature, conformément au Règlement Général sur la Protection des Données (RGPD — UE 2016/679) et à la politique de confidentialité publiée sur https://ipec.school/confidentialite.",
+        "Le candidat certifie sur l'honneur l'exactitude des informations communiquées. Toute déclaration inexacte ou incomplète pourra entraîner le rejet de la candidature ou l'annulation d'une admission déjà prononcée.",
     ];
     foreach ($clauses as $i => $c) {
         $pdf->SetFont('Helvetica', 'B', 10);
+        $pdf->SetTextColor(15, 21, 37);
         $pdf->Cell(6, 6, ($i + 1) . '.', 0, 0);
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->MultiCell(0, 5.5, $tr($c), 0, 'L');
         $pdf->Ln(2);
     }
 
-    // Bloc signature electronique
-    $pdf->Ln(4);
+    // Bloc signature électronique — saute en page suivante si pas assez de place
+    $pdf->Ln(2);
+    if ($pdf->GetY() > 230) {
+        $pdf->AddPage();
+    }
+    $startY = $pdf->GetY();
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.3);
-    $startY = $pdf->GetY();
-    $pdf->Rect(20, $startY, 170, 32, 'DF');
-    $pdf->SetXY(24, $startY + 3);
+    $pdf->Rect(20, $startY, 170, 34, 'DF');
+    $pdf->SetXY(24, $startY + 4);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(0, 5, $tr('SIGNATURE ELECTRONIQUE'), 0, 1);
+    $pdf->Cell(0, 5, $tr('SIGNATURE ÉLECTRONIQUE'), 0, 1);
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->MultiCell(160, 5, $tr(
-        'Signe electroniquement par ' . $f['prenom'] . ' ' . $f['nom']
+        'Signé électroniquement par ' . $f['prenom'] . ' ' . $f['nom']
         . ' le ' . $submittedAt . '.'
-        . ' Adresse e-mail confirmee : ' . $f['email'] . '.'
+        . ' Adresse e-mail confirmée : ' . $f['email'] . '.'
         . ' Adresse IP de soumission : ' . $f['ip'] . '.'
     ), 0, 'L');
-
-    // Pied de page
-    $pdf->SetY(-18);
-    $pdf->SetFont('Helvetica', 'I', 8);
-    $pdf->SetTextColor(124, 138, 168);
-    $pdf->Cell(0, 5, $tr('IPEC — Institut prive des etudes commerciales · ipec.school'), 0, 1, 'C');
-    $pdf->Cell(0, 5, $tr('Document genere automatiquement — preuve de candidature.'), 0, 1, 'C');
 
     return $pdf->Output('S');
 }
