@@ -538,6 +538,7 @@ HTML;
     // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
     $pdfAttachment = '';
     $pdfFilename   = '';
+    $pdfError      = null;
     try {
         $pdfAttachment = buildCandidaturePdf([
             'civilite'       => $civilite,
@@ -559,9 +560,12 @@ HTML;
         if ($pdfAttachment !== '') {
             $safeName = preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($prenom . '-' . $nom));
             $pdfFilename = 'candidature-IPEC-' . trim($safeName, '-') . '.pdf';
+        } else {
+            $pdfError = 'buildCandidaturePdf a renvoyé une chaîne vide (FPDF non chargé ?)';
         }
     } catch (\Throwable $pdfErr) {
-        error_log('[mailer.php] Échec génération PDF : ' . $pdfErr->getMessage());
+        $pdfError = $pdfErr->getMessage() . ' @ ' . $pdfErr->getFile() . ':' . $pdfErr->getLine();
+        error_log('[mailer.php] Échec génération PDF : ' . $pdfError);
         $pdfAttachment = '';
         $pdfFilename   = '';
     }
