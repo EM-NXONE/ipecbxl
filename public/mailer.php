@@ -828,6 +828,79 @@ try {
 $timestamps[] = $now;
 @file_put_contents($rateFile, json_encode(array_values($timestamps)), LOCK_EX);
 
+// ============================================================
+// 2e e-mail : ACCUSÉ DE RÉCEPTION envoyé AU CANDIDAT
+// (uniquement pour les candidatures, pas pour le formulaire de contact)
+// Expéditeur : admission@ipec.school — Reply-To : admission@ipec.school
+// Non-bloquant : si l'envoi échoue, l'API renvoie quand même ok=true
+// (l'admission a déjà été notifiée), mais on log l'erreur en debug.
+// ============================================================
+$candidateMailError = null;
+if ($type === 'inscription') {
+    try {
+        $candidateHtml = buildCandidateConfirmationHtml([
+            'prenom'         => $prenom,
+            'nom'            => $nom,
+            'programme'      => $programme,
+            'annee'          => $annee,
+            'specialisation' => $specialisation,
+            'rentree'        => $rentree,
+        ]);
+
+        $candidateText = "Bonjour $prenom,\n\n"
+            . "L'IPEC vous remercie pour votre candidature au programme $programme — $annee "
+            . "(spécialisation : $specialisation, rentrée : $rentree).\n\n"
+            . "Pour finaliser votre dossier :\n"
+            . "1. En réponse à cet e-mail, transmettez votre CV, lettre de motivation, "
+            . "copie de pièce d'identité, diplômes et relevés de notes, justificatifs "
+            . "de stages éventuels, et la preuve de paiement des frais de dossier (400 €).\n"
+            . "2. Réglez les frais de dossier de 400 € (non remboursables) par virement "
+            . "à l'IPEC Bruxelles. Demandez-nous l'IBAN à admission@ipec.school. "
+            . "Communication : $nom — $prenom — $programme — $specialisation.\n\n"
+            . "Dès réception du dossier complet et du paiement, votre candidature sera "
+            . "examinée par la commission pédagogique. La décision vous sera communiquée par e-mail.\n\n"
+            . "— Le service des admissions de l'IPEC Bruxelles\n"
+            . "admission@ipec.school\n";
+
+        // Nouveau PHPMailer dédié au candidat — on N'envoie PAS le PDF de candidature.
+        $candidateMail = new PHPMailer\PHPMailer\PHPMailer(true);
+        $candidateMail->isSMTP();
+        $candidateMail->Host       = $smtpHost;
+        $candidateMail->SMTPAuth   = true;
+        $candidateMail->Username   = $smtpUser;
+        $candidateMail->Password   = $smtpPass;
+        $candidateMail->SMTPSecure = $smtpSecure === 'tls'
+            ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
+            : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $candidateMail->Port       = $smtpPort;
+        $candidateMail->CharSet    = 'UTF-8';
+        $candidateMail->Encoding   = 'base64';
+
+        // From = admission@ipec.school (mailbox dédiée, expéditeur "humain"
+        // côté candidat). Reply-To pareil pour que la réponse atterrisse au
+        // bon endroit (le candidat va répondre avec ses pièces jointes).
+        $candidateMail->setFrom('admission@ipec.school', 'IPEC — Service des admissions');
+        $candidateMail->addAddress($email, "$prenom $nom");
+        $candidateMail->addReplyTo('admission@ipec.school', 'IPEC — Service des admissions');
+
+        $candidateMail->isHTML(true);
+        $candidateMail->Subject = "Votre demande d'admission à l'IPEC — procédure à suivre";
+        $candidateMail->Body    = $candidateHtml;
+        $candidateMail->AltBody = $candidateText;
+
+        // Logo embarqué (CID identique au mail interne)
+        if (is_file($logoPath)) {
+            $candidateMail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+        }
+
+        $candidateMail->send();
+    } catch (\Throwable $e) {
+        // On NE bloque PAS la réponse : l'admission a été notifiée, c'est ce qui compte.
+        $candidateMailError = isset($candidateMail) ? ($candidateMail->ErrorInfo ?: $e->getMessage()) : $e->getMessage();
+        error_log('[mailer.php] Échec envoi accusé candidat : ' . $candidateMailError);
+    }
+}
+
 $response = ['ok' => true];
 if ($DEBUG) {
     $response['debug'] = [
