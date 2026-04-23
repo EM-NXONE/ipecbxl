@@ -1249,6 +1249,8 @@ if ($DEBUG) {
         'candidate_mail_error'     => $candidateMailError ?? null,
         'candidate_imap_archived'  => $candidateImapArchived ?? false,
         'candidate_imap_error'     => $candidateImapError ?? null,
+        'facture_error'            => $factureError ?? null,
+        'facture_numero'           => $factureNumero ?? null,
         'imap_extension_loaded'    => function_exists('imap_open'),
     ];
 }
