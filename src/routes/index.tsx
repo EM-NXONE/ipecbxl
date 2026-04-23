@@ -280,7 +280,7 @@ function Home() {
                 t: "Management",
                 icon: Briefcase,
                 d: "Diriger des équipes, structurer des organisations, conduire le changement avec méthode et vision.",
-                skills: ["Stratégie", "Leadership", "RH"],
+                skills: [],
               },
               {
                 n: "02",
