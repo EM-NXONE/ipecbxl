@@ -47,6 +47,7 @@ function Inscription() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
+  const [countdown, setCountdown] = useState(10);
   const confirmationRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -54,10 +55,16 @@ function Inscription() {
     if (sent && confirmationRef.current) {
       confirmationRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       confirmationRef.current.focus();
+      const interval = setInterval(() => {
+        setCountdown((c) => (c > 0 ? c - 1 : 0));
+      }, 1000);
       const timer = setTimeout(() => {
         navigate({ to: "/" });
-      }, 5000);
-      return () => clearTimeout(timer);
+      }, 10000);
+      return () => {
+        clearTimeout(timer);
+        clearInterval(interval);
+      };
     }
   }, [sent, navigate]);
 
@@ -193,12 +200,12 @@ function Inscription() {
                 className="p-10 rounded-sm border border-blue/40 bg-blue/5 text-center scroll-mt-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue/60"
               >
                 <CheckCircle2 className="text-blue mx-auto mb-4" size={40} strokeWidth={1.5} />
-                <div className="font-display text-3xl text-gradient-blue mb-3">Candidature reçue</div>
+                <div className="font-display text-3xl text-gradient-blue mb-3">Candidature enregistrée</div>
                 <p className="text-muted-foreground leading-relaxed mb-3">
-                  Merci ! Votre dossier a bien été enregistré. Vous allez recevoir un e-mail de confirmation et notre équipe revient vers vous rapidement.
+                  Votre demande d'admission a bien été prise en compte. Un e-mail de confirmation vous a été envoyé.
                 </p>
                 <p className="text-xs uppercase tracking-[0.25em] text-blue">
-                  Redirection vers l'accueil…
+                  Redirection vers l'accueil dans {countdown}s…
                 </p>
               </div>
             ) : (
