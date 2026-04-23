@@ -48,6 +48,8 @@ function Inscription() {
   const [programme, setProgramme] = useState<Programme>("PAA");
   const [annee, setAnnee] = useState<string>("1");
   const [countdown, setCountdown] = useState(10);
+  const [rgpdChecked, setRgpdChecked] = useState(false);
+  const [conditionsChecked, setConditionsChecked] = useState(false);
   const confirmationRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -389,15 +391,29 @@ function Inscription() {
                   />
                 </div>
 
-                <div className="flex items-start gap-3 text-sm text-muted-foreground p-4 rounded-sm border border-blue/30 bg-blue/5">
-                  <input required id="rgpd" type="checkbox" className="mt-1 accent-blue" />
+                <div className={`flex items-start gap-3 text-sm p-4 rounded-sm border transition-colors ${rgpdChecked ? "border-success/50 bg-success/10 text-cream" : "border-blue/30 bg-blue/5 text-muted-foreground"}`}>
+                  <input
+                    required
+                    id="rgpd"
+                    type="checkbox"
+                    checked={rgpdChecked}
+                    onChange={(e) => setRgpdChecked(e.target.checked)}
+                    className={`mt-1 ${rgpdChecked ? "accent-success" : "accent-blue"}`}
+                  />
                   <label htmlFor="rgpd" className="leading-relaxed">
                     J'accepte que les informations saisies soient utilisées dans le cadre de ma candidature à l'IPEC.
                   </label>
                 </div>
 
-                <div className="flex items-start gap-3 text-sm text-muted-foreground p-4 rounded-sm border border-blue/30 bg-blue/5">
-                  <input required id="conditions" type="checkbox" className="mt-1 accent-blue" />
+                <div className={`flex items-start gap-3 text-sm p-4 rounded-sm border transition-colors ${conditionsChecked ? "border-success/50 bg-success/10 text-cream" : "border-blue/30 bg-blue/5 text-muted-foreground"}`}>
+                  <input
+                    required
+                    id="conditions"
+                    type="checkbox"
+                    checked={conditionsChecked}
+                    onChange={(e) => setConditionsChecked(e.target.checked)}
+                    className={`mt-1 ${conditionsChecked ? "accent-success" : "accent-blue"}`}
+                  />
                   <label htmlFor="conditions" className="leading-relaxed">
                     J'ai lu et j'accepte les{" "}
                     <Link to="/cgv" className="text-blue hover:underline">
