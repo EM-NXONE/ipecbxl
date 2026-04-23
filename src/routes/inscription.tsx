@@ -61,7 +61,7 @@ function Inscription() {
         setCountdown((c) => (c > 0 ? c - 1 : 0));
       }, 1000);
       const timer = setTimeout(() => {
-        navigate({ to: "/" });
+        // navigate({ to: "/" }); // TEMP désactivé pour prévisualisation
       }, 10000);
       return () => {
         clearTimeout(timer);
