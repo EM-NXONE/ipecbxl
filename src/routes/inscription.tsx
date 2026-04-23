@@ -153,7 +153,7 @@ function Inscription() {
 
             <ol className="relative space-y-4 text-sm before:content-[''] before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-blue/60 before:via-blue/30 before:to-transparent">
               {[
-                { n: "01", t: "Candidature en ligne", d: "Remplissez le formulaire de candidature ci-dessous en quelques minutes." },
+                { n: "01", t: "Candidature en ligne", d: "Remplissez le formulaire de candidature en quelques minutes." },
                 { n: "02", t: "Suite par e-mail", d: "Vous recevez un e-mail récapitulatif détaillant la procédure à suivre et les pièces à transmettre." },
                 { n: "03", t: "Entretien en visio", d: "Échange en visioconférence avec notre équipe pédagogique pour préciser votre projet." },
                 { n: "04", t: "Réponse d'admission", d: "Vous recevez la décision d'admission par e-mail, puis confirmez votre inscription." },
