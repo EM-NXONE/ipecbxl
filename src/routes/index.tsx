@@ -280,7 +280,7 @@ function Home() {
                 t: "Management",
                 icon: Briefcase,
                 d: "Diriger des équipes, structurer des organisations, conduire le changement avec méthode et vision.",
-                skills: ["Stratégie", "Leadership", "RH"],
+                skills: [],
               },
               {
                 n: "02",
@@ -311,14 +311,16 @@ function Home() {
                 </div>
                 <h3 className="font-display text-2xl text-cream mb-3 group-hover:text-gradient-blue transition-colors">{s.t}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6">{s.d}</p>
-                <ul className="mt-auto pt-5 border-t border-border/40 space-y-2">
-                  {s.skills.map((sk) => (
-                    <li key={sk} className="flex items-center gap-2.5 text-cream/90 text-xs">
-                      <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
-                      <span>{sk}</span>
-                    </li>
-                  ))}
-                </ul>
+                {s.skills.length > 0 && (
+                  <ul className="mt-auto pt-5 border-t border-border/40 space-y-2">
+                    {s.skills.map((sk) => (
+                      <li key={sk} className="flex items-center gap-2.5 text-cream/90 text-xs">
+                        <div className="w-1 h-1 rounded-full bg-blue shrink-0" />
+                        <span>{sk}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
