@@ -803,10 +803,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetFont('Helvetica', 'B', 11);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(120, 10, '', 0, 0);
-    $pdf->Cell(25, 10, $tr('TOTAL'), 0, 0, 'R', true);
+    $pdf->Cell(110, 10, '', 0, 0);
+    $pdf->Cell(30, 10, $tr('TOTAL'), 0, 0, 'R', true);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(25, 10, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R', true);
+    $pdf->Cell(30, 10, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 8);
     $pdf->SetTextColor(91, 100, 120);
