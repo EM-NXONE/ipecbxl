@@ -442,12 +442,29 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
     }
     require_once __DIR__ . '/FPDF/fpdf.php';
     class IpecCandidaturePdf extends FPDF {
+        /** @var string 'candidature' | 'facture' */
+        public $docKind = 'candidature';
         public function Footer() {
-            $this->SetY(-18);
+            $tr = function (string $s): string {
+                $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+                return $out !== false ? $out : $s;
+            };
+            $this->SetY(-22);
+            // Filet
+            $this->SetDrawColor(220, 226, 240);
+            $this->SetLineWidth(0.2);
+            $this->Line(20, $this->GetY(), 190, $this->GetY());
+            $this->Ln(2);
+            $this->SetFont('Helvetica', '', 8);
+            $this->SetTextColor(91, 100, 120);
+            $this->Cell(0, 4, $tr("Institut privé des études commerciales  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
+            $this->Cell(0, 4, $tr("admission@ipec.school  ·  www.ipec.school"), 0, 1, 'C');
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
-            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, 'C');
-            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, 'C');
+            $label = $this->docKind === 'facture'
+                ? "Document généré automatiquement — facture."
+                : "Document généré automatiquement — preuve de candidature.";
+            $this->Cell(0, 4, $tr($label), 0, 1, 'C');
         }
     }
 }
