@@ -827,36 +827,9 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
     $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
 
-    $pdf->SetFont('Helvetica', '', 10);
-    $pdf->SetTextColor(15, 21, 37);
-    $programmeCode    = trim((string)($f['programme'] ?? ''));
-    $anneeLabel       = trim((string)($f['annee'] ?? ''));
-    $specialisation   = trim((string)($f['specialisation'] ?? ''));
-
-    // Libellé complet du programme
-    $programmeFullMap = [
-        'PAA' => 'Programme en Administration des Affaires',
-        'PEA' => 'Programme Exécutif Avancé',
-    ];
-    $programmeFull = $programmeFullMap[strtoupper($programmeCode)] ?? $programmeCode;
-
-    // Normalise "1ʳᵉ année" → "1ère année" (et garde le reste tel quel, ex : "— PEA1 (Bac+3)")
-    $anneeNorm = $anneeLabel;
-    $anneeNorm = str_replace(['1ʳᵉ', '1ᵉʳ', '1er', '1ère'], '1ère', $anneeNorm);
-    $anneeNorm = preg_replace('/\s+—.*$/u', '', $anneeNorm); // retire suffixe " — PEA1 (...)" si présent
-    $anneeNorm = trim($anneeNorm);
-
-    // Première ligne : "Frais de dossier IPEC — 1ère année Programme en Administration des Affaires"
-    $firstLine = 'Frais de dossier IPEC';
-    $suffixParts = [];
-    if ($anneeNorm !== '')    $suffixParts[] = $anneeNorm;
-    if ($programmeFull !== '') $suffixParts[] = $programmeFull;
-    if (!empty($suffixParts)) {
-        $firstLine .= ' — ' . implode(' ', $suffixParts);
-    }
-
-    // Spécialité (facultatif si "Je ne sais pas encore")
-    $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
+    // Description simplifiée : uniquement "Frais de dossier IPEC — Année académique aaaa/aaaa"
+    // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
+    $firstLine = 'Frais de dossier IPEC — Année académique ' . $academicYear;
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
@@ -864,12 +837,6 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->MultiCell(138, 6, $tr($firstLine), 0, 'L');
-    if ($hasSpecialite) {
-        $pdf->SetX(22);
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->Cell(138, 6, $tr('Spécialité : ' . $specialisation), 0, 1, 'L');
-    }
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
