@@ -733,62 +733,65 @@ function buildFacturePdf(array $f): array {
     }
     $pdf->Ln(8);
 
-    // Tableau facture
+    // Tableau facture (sans colonne Quantité)
     $pdf->SetFillColor(44, 93, 219);
     $pdf->SetTextColor(255, 255, 255);
     $pdf->SetFont('Helvetica', 'B', 9);
-    $pdf->Cell(120, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
-    $pdf->Cell(25, 9, $tr('QUANTITÉ'), 0, 0, 'C', true);
-    $pdf->Cell(25, 9, $tr('MONTANT'), 0, 1, 'R', true);
+    $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
+    $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $programmeLabel = trim((string)($f['programme'] ?? ''));
-    $anneeLabel     = trim((string)($f['annee'] ?? ''));
-    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
+    $programmeCode    = trim((string)($f['programme'] ?? ''));
+    $anneeLabel       = trim((string)($f['annee'] ?? ''));
+    $specialisation   = trim((string)($f['specialisation'] ?? ''));
 
-    // Année académique : déduite de la rentrée si possible (ex : "Septembre 2026" → "2026-2027").
-    $academicYear = '';
-    if ($rentreeLabel !== '' && preg_match('/(\d{4})/', $rentreeLabel, $m)) {
-        $startY = (int)$m[1];
-        // Si la rentrée mentionne février/janvier, l'année académique a démarré l'année précédente.
-        if (preg_match('/janv|f[ée]vr/i', $rentreeLabel)) {
-            $startY -= 1;
-        }
-        $academicYear = $startY . '-' . ($startY + 1);
+    // Libellé complet du programme
+    $programmeFullMap = [
+        'PAA' => 'Programme en Administration des Affaires',
+        'PEA' => 'Programme Exécutif Avancé',
+    ];
+    $programmeFull = $programmeFullMap[strtoupper($programmeCode)] ?? $programmeCode;
+
+    // Normalise "1ʳᵉ année" → "1ère année" (et garde le reste tel quel, ex : "— PEA1 (Bac+3)")
+    $anneeNorm = $anneeLabel;
+    $anneeNorm = str_replace(['1ʳᵉ', '1ᵉʳ', '1er', '1ère'], '1ère', $anneeNorm);
+    $anneeNorm = preg_replace('/\s+—.*$/u', '', $anneeNorm); // retire suffixe " — PEA1 (...)" si présent
+    $anneeNorm = trim($anneeNorm);
+
+    // Première ligne : "Frais de dossier IPEC — 1ère année Programme en Administration des Affaires"
+    $firstLine = 'Frais de dossier IPEC';
+    $suffixParts = [];
+    if ($anneeNorm !== '')    $suffixParts[] = $anneeNorm;
+    if ($programmeFull !== '') $suffixParts[] = $programmeFull;
+    if (!empty($suffixParts)) {
+        $firstLine .= ' — ' . implode(' ', $suffixParts);
     }
 
-    // Première ligne : "Frais de dossier IPEC — Programme XXX, 1ère année, 2026-2027"
-    $firstLineParts = ['Frais de dossier IPEC'];
-    if ($programmeLabel !== '') {
-        $firstLineParts[] = 'Programme ' . $programmeLabel;
-    }
-    if ($anneeLabel !== '') {
-        $firstLineParts[] = $anneeLabel;
-    }
-    if ($academicYear !== '') {
-        $firstLineParts[] = $academicYear;
-    }
-    $firstLine = implode(', ', $firstLineParts);
-    // remplace la première virgule par un tiret pour garder "Frais de dossier IPEC — Programme ..."
-    $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
+    // Spécialité (facultatif si "Je ne sais pas encore")
+    $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
+    $pdf->MultiCell(138, 6, $tr($firstLine), 0, 'L');
+    if ($hasSpecialite) {
+        $pdf->SetX(22);
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(138, 6, $tr('Spécialité : ' . $specialisation), 0, 1, 'L');
+    }
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(118, 5, $tr('Frais unique'), 0, 1, 'L');
+    $pdf->Cell(138, 5, $tr('Frais unique'), 0, 1, 'L');
     $endY = $pdf->GetY();
-    $pdf->SetXY(140, $startYRow);
+    $pdf->SetXY(160, $startYRow);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(25, 6, '1', 0, 0, 'C');
-    $pdf->Cell(25, 6, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
+    $pdf->Cell(30, 6, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
     $pdf->SetY($endY);
 
     $pdf->SetDrawColor(220, 226, 240);
@@ -800,10 +803,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetFont('Helvetica', 'B', 11);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(120, 10, '', 0, 0);
-    $pdf->Cell(25, 10, $tr('TOTAL'), 0, 0, 'R', true);
+    $pdf->Cell(110, 10, '', 0, 0);
+    $pdf->Cell(30, 10, $tr('TOTAL'), 0, 0, 'R', true);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(25, 10, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R', true);
+    $pdf->Cell(30, 10, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 8);
     $pdf->SetTextColor(91, 100, 120);
