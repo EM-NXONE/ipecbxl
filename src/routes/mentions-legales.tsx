@@ -28,7 +28,7 @@ function MentionsLegales() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">Éditeur du site</h2>
             <p>
-              Le présent site est édité par l'<strong className="text-cream">Institut Privé des Études Commerciales (IPEC)</strong>,
+              Le présent site est édité par l'Institut Privé des Études Commerciales, en abrégé <strong className="text-cream">"IPEC"</strong>,
               établissement d'enseignement supérieur privé.
             </p>
             <ul className="mt-4 space-y-1">
