@@ -682,11 +682,11 @@ function buildFacturePdf(array $f): array {
         catch (\Throwable $e) { error_log('[mailer.php] Logo facture ignoré : ' . $e->getMessage()); }
     }
     // En-tête identique à celui du site : "IPEC" + sous-titre uppercase tracking-wide muted.
-    $pdf->SetXY(44, 19);
+    $pdf->SetXY(48, 19);
     $pdf->SetFont('Helvetica', 'B', 20);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
-    $pdf->SetX(44);
+    $pdf->SetX(48);
     $pdf->SetFont('Helvetica', '', 6.5);
     $pdf->SetTextColor(120, 130, 150);
     // Faux letter-spacing : on insère une fine espace entre chaque caractère
