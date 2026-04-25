@@ -666,6 +666,8 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
     $pdf->SetX(44);
+    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
+    $pdf->SetX(44);
     $pdf->Cell(0, 5, $tr('admission@ipec.school     ipec.school'), 0, 2);
 
     // Bloc identification facture (à droite)
