@@ -683,11 +683,12 @@ function buildFacturePdf(array $f): array {
     }
     // En-tête identique à celui du site : "IPEC" en serif regular + sous-titre uppercase tracking-wide muted.
     // Le site utilise Fraunces (serif) — Times est l'équivalent serif standard dispo dans FPDF.
-    $pdf->SetXY(48, 19);
+    // Logo : x=20→38 (largeur 18mm). Texte collé juste après avec ~3mm de respiration (gap-3 sur le site).
+    $pdf->SetXY(41, 19);
     $pdf->SetFont('Times', '', 18);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
-    $pdf->SetX(48);
+    $pdf->SetX(41);
     $pdf->SetFont('Helvetica', '', 6);
     $pdf->SetTextColor(120, 130, 150);
     // Faux letter-spacing : on insère une fine espace entre chaque caractère
