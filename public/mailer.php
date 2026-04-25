@@ -682,10 +682,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(130);
     $pdf->Cell(60, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
 
-    $pdf->SetY(42);
+    $pdf->SetY(46);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 42, 190, 42);
+    $pdf->Line(20, 46, 190, 46);
 
     // Bloc "Facturé à"
     $pdf->Ln(8);
