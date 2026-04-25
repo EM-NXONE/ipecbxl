@@ -444,6 +444,8 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
     class IpecCandidaturePdf extends FPDF {
         /** @var string 'candidature' | 'facture' */
         public $docKind = 'candidature';
+        /** @var string */
+        public $factureNumero = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
@@ -461,9 +463,13 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Cell(0, 4, $tr("admission@ipec.school  ·  www.ipec.school"), 0, 1, 'C');
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
-            $label = $this->docKind === 'facture'
-                ? "Document généré automatiquement — facture."
-                : "Document généré automatiquement — preuve de candidature.";
+            if ($this->docKind === 'facture') {
+                $label = $this->factureNumero !== ''
+                    ? 'Facture n° ' . $this->factureNumero
+                    : 'Facture';
+            } else {
+                $label = "Document généré automatiquement — preuve de candidature.";
+            }
             $this->Cell(0, 4, $tr($label), 0, 1, 'C');
         }
     }
@@ -661,6 +667,7 @@ function buildFacturePdf(array $f): array {
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
+    $pdf->factureNumero = $numFacture;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
@@ -744,7 +751,7 @@ function buildFacturePdf(array $f): array {
         $academicYear = $startY . '-' . ($startY + 1);
     }
 
-    // Première ligne : "Frais de dossier IPEC — Programme XXX, année académique YYYY-YYYY"
+    // Première ligne : "Frais de dossier IPEC — Programme XXX, 1ère année, 2026-2027"
     $firstLineParts = ['Frais de dossier IPEC'];
     if ($programmeLabel !== '') {
         $firstLineParts[] = 'Programme ' . $programmeLabel;
@@ -753,16 +760,16 @@ function buildFacturePdf(array $f): array {
         $firstLineParts[] = $anneeLabel;
     }
     if ($academicYear !== '') {
-        $firstLineParts[] = 'année académique ' . $academicYear;
+        $firstLineParts[] = $academicYear;
     }
     $firstLine = implode(', ', $firstLineParts);
-    // remplace la première virgule par un espace pour garder "Frais de dossier IPEC Programme ..."
+    // remplace la première virgule par un tiret pour garder "Frais de dossier IPEC — Programme ..."
     $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
     $pdf->SetX(22);
-    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
     $pdf->SetX(22);
@@ -833,14 +840,11 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
 
     $pdf->SetY($startY + 60);
-    $pdf->SetFont('Helvetica', 'I', 8);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->MultiCell(0, 4, $tr('Merci d\'utiliser exactement la communication structurée ci-dessus pour permettre un rapprochement automatique de votre paiement.'), 0, 'L');
-    $pdf->Ln(2);
     $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
-        'Une fois le virement effectué, transmettez la preuve de paiement en réponse à l\'e-mail d\'accusé de réception, '
-        . 'avec l\'ensemble des pièces de votre dossier de candidature.'
+        'Vous pouvez procéder au virement à votre convenance. Pensez à reporter la communication structurée '
+        . 'pour faciliter le rapprochement, puis joignez la preuve de paiement à votre dossier de candidature.'
     ), 0, 'L');
 
     return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
