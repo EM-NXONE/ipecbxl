@@ -38,7 +38,8 @@ export function Footer() {
             Contact
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>Bruxelles, Belgique</li>
+            <li>Chaussée d'Alsemberg 897</li>
+            <li>1180 Uccle, Belgique</li>
             <li>contact@ipec.school</li>
             <li>+32 2 000 00 00</li>
           </ul>
