@@ -501,21 +501,19 @@ function buildCandidaturePdf(array $f): string {
             error_log('[mailer.php] Logo PDF ignoré : ' . $logoErr->getMessage());
         }
     }
-    $pdf->SetXY(44, 18);
-    $pdf->SetFont('Helvetica', 'B', 16);
+    $pdf->SetXY(44, 20);
+    $pdf->SetFont('Helvetica', 'B', 18);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
+    $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
 
-    $pdf->SetY(44);
+    $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 44, 190, 44);
+    $pdf->Line(20, 40, 190, 40);
 
     // Titre du document
     $pdf->Ln(6);
