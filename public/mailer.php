@@ -494,10 +494,10 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetX(44);
     $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
 
-    $pdf->SetY(40);
+    $pdf->SetY(44);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 40, 190, 40);
+    $pdf->Line(20, 44, 190, 44);
 
     // Titre du document
     $pdf->Ln(6);
