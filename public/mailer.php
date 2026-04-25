@@ -731,30 +731,48 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $programmeLabel = trim((string)($f['programme'] ?? ''));
     $anneeLabel     = trim((string)($f['annee'] ?? ''));
-    $programme = $programmeLabel;
-    if ($programmeLabel !== '' && $anneeLabel !== '') {
-        $programme = $programmeLabel . ', ' . $anneeLabel;
-    } elseif ($anneeLabel !== '') {
-        $programme = $anneeLabel;
+    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
+
+    // Année académique : déduite de la rentrée si possible (ex : "Septembre 2026" → "2026-2027").
+    $academicYear = '';
+    if ($rentreeLabel !== '' && preg_match('/(\d{4})/', $rentreeLabel, $m)) {
+        $startY = (int)$m[1];
+        // Si la rentrée mentionne février/janvier, l'année académique a démarré l'année précédente.
+        if (preg_match('/janv|f[ée]vr/i', $rentreeLabel)) {
+            $startY -= 1;
+        }
+        $academicYear = $startY . '-' . ($startY + 1);
     }
-    $descriptionLines = [
-        $tr('Frais de dossier de candidature IPEC'),
-    ];
-    if ($programme !== '') {
-        $descriptionLines[] = $tr('Programme : ' . $programme);
+
+    // Première ligne : "Frais de dossier IPEC — Programme XXX, année académique YYYY-YYYY"
+    $firstLineParts = ['Frais de dossier IPEC'];
+    if ($programmeLabel !== '') {
+        $firstLineParts[] = 'Programme ' . $programmeLabel;
     }
-    if (!empty($f['rentree'])) {
-        $descriptionLines[] = $tr('Rentrée envisagée : ' . $f['rentree']);
+    if ($anneeLabel !== '') {
+        $firstLineParts[] = $anneeLabel;
     }
-    $descriptionLines[] = $tr('Paiement unique, non remboursable (CGV art. 2).');
+    if ($academicYear !== '') {
+        $firstLineParts[] = 'année académique ' . $academicYear;
+    }
+    $firstLine = implode(', ', $firstLineParts);
+    // remplace la première virgule par un espace pour garder "Frais de dossier IPEC Programme ..."
+    $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
 
     $pdf->Ln(2);
-    $startY = $pdf->GetY();
-    $pdf->SetX(20);
-    $pdf->Cell(2, 6, '', 0, 0); // petit padding gauche
-    $pdf->MultiCell(118, 6, implode("\n", $descriptionLines), 0, 'L');
+    $startYRow = $pdf->GetY();
+    $pdf->SetX(22);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
+    $pdf->SetX(22);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(118, 5, $tr('Frais unique'), 0, 1, 'L');
     $endY = $pdf->GetY();
-    $pdf->SetXY(140, $startY);
+    $pdf->SetXY(140, $startYRow);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(25, 6, '1', 0, 0, 'C');
     $pdf->Cell(25, 6, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
     $pdf->SetY($endY);
