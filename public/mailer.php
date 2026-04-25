@@ -255,6 +255,7 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
           <tr>
             <td style="padding:24px 8px 0 8px;text-align:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#7C8AA8;line-height:1.6;">
               IPEC — Institut privé des études commerciales · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
+              Chaussée d'Alsemberg 897, 1180 Uccle, Belgique<br>
               E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
             </td>
           </tr>
