@@ -48,7 +48,7 @@ export function Footer() {
       <div className="border-t border-border/40">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 py-6 flex flex-col gap-3 text-xs text-muted-foreground">
           <div className="flex flex-col md:flex-row justify-between gap-3">
-            <p>© {new Date().getFullYear()} IPEC — Institut Privé des Études Commerciales</p>
+            <p>© {new Date().getFullYear()} IPEC — Institut Privé des Études Commerciales ASBL</p>
             <nav className="flex flex-wrap gap-x-4 gap-y-1">
               <Link to="/mentions-legales" className="hover:text-blue">Mentions légales</Link>
               <span aria-hidden="true">·</span>
