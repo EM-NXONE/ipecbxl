@@ -681,14 +681,19 @@ function buildFacturePdf(array $f): array {
         try { $pdf->Image($logoPath, 20, 15, 18, 18); }
         catch (\Throwable $e) { error_log('[mailer.php] Logo facture ignoré : ' . $e->getMessage()); }
     }
-    $pdf->SetXY(44, 20);
-    $pdf->SetFont('Helvetica', 'B', 18);
+    // En-tête identique à celui du site : "IPEC" + sous-titre uppercase tracking-wide muted.
+    $pdf->SetXY(44, 19);
+    $pdf->SetFont('Helvetica', 'B', 20);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
     $pdf->SetX(44);
-    $pdf->SetFont('Helvetica', '', 9);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
+    $pdf->SetFont('Helvetica', '', 6.5);
+    $pdf->SetTextColor(120, 130, 150);
+    // Faux letter-spacing : on insère une fine espace entre chaque caractère
+    // pour reproduire le tracking-[0.2em] uppercase du header du site.
+    $subtitle = 'INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES';
+    $spaced   = implode(' ', preg_split('//u', $subtitle, -1, PREG_SPLIT_NO_EMPTY));
+    $pdf->Cell(0, 4, $tr($spaced), 0, 2);
 
     // Bloc identification facture (à droite)
     $pdf->SetXY(130, 20);
