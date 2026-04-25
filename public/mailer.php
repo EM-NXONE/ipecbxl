@@ -772,26 +772,30 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Ln(1);
     $pdf->SetX($boxLeftX + $padX);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 2);
+    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
     if (!empty($f['adresse'])) {
         $pdf->SetX($boxLeftX + $padX);
         $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
     }
     if (!empty($f['paysResidence'])) {
         $pdf->SetX($boxLeftX + $padX);
-        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 2);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L');
     }
     if (!empty($f['email'])) {
         $pdf->SetX($boxLeftX + $padX);
-        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr((string)$f['email']), 0, 2);
+        // Email : autorise le retour à la ligne sur les caractères longs en insérant des points de coupure invisibles
+        $emailTxt = (string)$f['email'];
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr($emailTxt), 0, 'L');
+        $pdf->SetFont('Helvetica', '', 10);
     }
     $leftEndY = $pdf->GetY();
 
-    // ---- Encadré droit : INSCRIPTION ----
+    // ---- Encadré droit : INFORMATIONS D'INSCRIPTION ----
     $pdf->SetXY($boxRightX + $padX, $boxTop + $padY);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('INSCRIPTION'), 0, 2);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr("INFORMATIONS D'INSCRIPTION"), 0, 2);
     $pdf->Ln(1);
     $pdf->SetTextColor(15, 21, 37);
 
@@ -807,17 +811,17 @@ function buildFacturePdf(array $f): array {
     if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
     if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
     if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
-    if ($rentreeLabel !== '')  $infoRow('Rentrée', $rentreeLabel);
     $infoRow('Année académique', $academicYear);
 
     $rightEndY = $pdf->GetY();
 
-    // Tracé des deux encadrés à hauteur égale
-    $boxHeight = max($leftEndY, $rightEndY) - $boxTop + $padY;
-    $pdf->Rect($boxLeftX,  $boxTop, $boxWidth, $boxHeight);
-    $pdf->Rect($boxRightX, $boxTop, $boxWidth, $boxHeight);
+    // Tracé des deux encadrés à hauteurs INDÉPENDANTES (chacun colle à son contenu)
+    $leftHeight  = $leftEndY  - $boxTop + $padY;
+    $rightHeight = $rightEndY - $boxTop + $padY;
+    $pdf->Rect($boxLeftX,  $boxTop, $boxWidth, $leftHeight);
+    $pdf->Rect($boxRightX, $boxTop, $boxWidth, $rightHeight);
 
-    $pdf->SetY($boxTop + $boxHeight);
+    $pdf->SetY($boxTop + max($leftHeight, $rightHeight));
     $pdf->Ln(8);
 
     // Tableau facture (sans colonne Quantité)
