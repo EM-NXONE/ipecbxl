@@ -37,7 +37,10 @@ const ORG_JSONLD = JSON.stringify({
   "description": "École supérieure de commerce privée à Bruxelles, Belgique. Programmes en management, marketing, relations internationales, économie et finance.",
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Bruxelles",
+    "streetAddress": "Chaussée d'Alsemberg 897",
+    "postalCode": "1180",
+    "addressLocality": "Uccle",
+    "addressRegion": "Bruxelles-Capitale",
     "addressCountry": "BE"
   },
   "email": "contact@ipec.school",

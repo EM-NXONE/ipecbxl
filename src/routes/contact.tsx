@@ -109,7 +109,7 @@ function Contact() {
                 <MapPin size={20} className="text-blue shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs uppercase tracking-widest text-blue mb-1">Adresse</div>
-                  <div className="text-cream leading-relaxed">Bruxelles<br />Belgique</div>
+                  <div className="text-cream leading-relaxed">Chaussée d'Alsemberg 897<br />1180 Uccle, Belgique</div>
                 </div>
               </li>
               <li className="flex gap-4">

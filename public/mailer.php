@@ -255,6 +255,7 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
           <tr>
             <td style="padding:24px 8px 0 8px;text-align:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#7C8AA8;line-height:1.6;">
               IPEC — Institut privé des études commerciales · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
+              Chaussée d'Alsemberg 897, 1180 Uccle, Belgique<br>
               E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
             </td>
           </tr>
@@ -491,11 +492,13 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
+    $pdf->SetX(44);
+    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
 
-    $pdf->SetY(40);
+    $pdf->SetY(44);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 40, 190, 40);
+    $pdf->Line(20, 44, 190, 44);
 
     // Titre du document
     $pdf->Ln(6);
@@ -664,6 +667,8 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
     $pdf->SetX(44);
+    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
+    $pdf->SetX(44);
     $pdf->Cell(0, 5, $tr('admission@ipec.school     ipec.school'), 0, 2);
 
     // Bloc identification facture (à droite)
@@ -678,10 +683,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(130);
     $pdf->Cell(60, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
 
-    $pdf->SetY(42);
+    $pdf->SetY(46);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 42, 190, 42);
+    $pdf->Line(20, 46, 190, 46);
 
     // Bloc "Facturé à"
     $pdf->Ln(8);
