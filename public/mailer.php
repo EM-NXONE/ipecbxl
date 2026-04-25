@@ -254,7 +254,7 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
           </tr>
           <tr>
             <td style="padding:24px 8px 0 8px;text-align:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#7C8AA8;line-height:1.6;">
-              IPEC — INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES ASBL · <a href="https://www.ipec.school" style="color:#9FB4E6;text-decoration:none;">www.ipec.school</a><br>
+              IPEC — Institut privé des études commerciales · <a href="https://www.ipec.school" style="color:#9FB4E6;text-decoration:none;">www.ipec.school</a><br>
               Chaussée d'Alsemberg 897, 1180 Uccle, Belgique<br>
               E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
             </td>
@@ -459,7 +459,7 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Ln(2);
             $this->SetFont('Helvetica', '', 8);
             $this->SetTextColor(91, 100, 120);
-            $this->Cell(0, 4, $tr("INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES ASBL  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
+            $this->Cell(0, 4, $tr("Institut privé des études commerciales  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
             $this->Cell(0, 4, $tr("admission@ipec.school  ·  www.ipec.school"), 0, 1, 'C');
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
@@ -492,7 +492,7 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Dossier de candidature IPEC'));
-    $pdf->SetAuthor($tr('IPEC — INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES ASBL'));
+    $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('ipec.school');
     $pdf->AddPage();
 
@@ -514,7 +514,7 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES'), 0, 2);
+    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
 
     $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
@@ -671,7 +671,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
-    $pdf->SetAuthor($tr('IPEC — INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES ASBL'));
+    $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
 
@@ -688,7 +688,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES'), 0, 2);
+    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
 
     // Bloc identification facture (à droite)
     $pdf->SetXY(130, 20);
@@ -819,7 +819,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Bénéficiaire'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES ASBL'), 0, 1);
+    $pdf->Cell(0, 6, $tr('Institut privé des études commerciales'), 0, 1);
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('IBAN'), 0, 0);
