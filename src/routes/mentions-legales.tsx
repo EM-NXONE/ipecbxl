@@ -4,7 +4,7 @@ export const Route = createFileRoute("/mentions-legales")({
   head: () => ({
     meta: [
       { title: "IPEC | Mentions légales" },
-      { name: "description", content: "Mentions légales de l'Institut Privé des Études Commerciales (IPEC), école supérieure privée à Bruxelles, Belgique." },
+      { name: "description", content: "Mentions légales de l'Institut Privé des Études Commerciales, en abrégé \"IPEC\", école supérieure privée à Bruxelles, Belgique." },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Mentions légales — IPEC Bruxelles" },
       { property: "og:description", content: "Informations légales relatives à l'éditeur du site IPEC." },
@@ -28,7 +28,7 @@ function MentionsLegales() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">Éditeur du site</h2>
             <p>
-              Le présent site est édité par l'<strong className="text-cream">Institut Privé des Études Commerciales (IPEC)</strong>,
+              Le présent site est édité par l'<strong className="text-cream">Institut Privé des Études Commerciales, en abrégé "IPEC"</strong>,
               établissement d'enseignement supérieur privé.
             </p>
             <ul className="mt-4 space-y-1">
