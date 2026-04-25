@@ -772,18 +772,22 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Ln(1);
     $pdf->SetX($boxLeftX + $padX);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 2);
+    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
     if (!empty($f['adresse'])) {
         $pdf->SetX($boxLeftX + $padX);
         $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
     }
     if (!empty($f['paysResidence'])) {
         $pdf->SetX($boxLeftX + $padX);
-        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 2);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L');
     }
     if (!empty($f['email'])) {
         $pdf->SetX($boxLeftX + $padX);
-        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr((string)$f['email']), 0, 2);
+        // Email : autorise le retour à la ligne sur les caractères longs en insérant des points de coupure invisibles
+        $emailTxt = (string)$f['email'];
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr($emailTxt), 0, 'L');
+        $pdf->SetFont('Helvetica', '', 10);
     }
     $leftEndY = $pdf->GetY();
 
