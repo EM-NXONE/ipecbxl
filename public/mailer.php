@@ -660,37 +660,34 @@ function buildFacturePdf(array $f): array {
     $montant = 400.00;
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+    $pdf->docKind = 'facture';
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 25);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
-    $pdf->SetCreator('ipec.school');
+    $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
 
-    // En-tête : logo + IPEC
+    // En-tête : logo + IPEC (les coordonnées vont dans le footer)
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
         try { $pdf->Image($logoPath, 20, 15, 18, 18); }
         catch (\Throwable $e) { error_log('[mailer.php] Logo facture ignoré : ' . $e->getMessage()); }
     }
-    $pdf->SetXY(44, 18);
-    $pdf->SetFont('Helvetica', 'B', 16);
+    $pdf->SetXY(44, 20);
+    $pdf->SetFont('Helvetica', 'B', 18);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
+    $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('admission@ipec.school     ipec.school'), 0, 2);
 
     // Bloc identification facture (à droite)
-    $pdf->SetXY(130, 18);
-    $pdf->SetFont('Helvetica', 'B', 11);
+    $pdf->SetXY(130, 20);
+    $pdf->SetFont('Helvetica', 'B', 13);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(60, 6, $tr('FACTURE'), 0, 2, 'R');
+    $pdf->Cell(60, 7, $tr('FACTURE'), 0, 2, 'R');
     $pdf->SetX(130);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
@@ -698,10 +695,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(130);
     $pdf->Cell(60, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
 
-    $pdf->SetY(46);
+    $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 46, 190, 46);
+    $pdf->Line(20, 40, 190, 40);
 
     // Bloc "Facturé à"
     $pdf->Ln(8);
