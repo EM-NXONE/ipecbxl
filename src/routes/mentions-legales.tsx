@@ -32,7 +32,7 @@ function MentionsLegales() {
               établissement d'enseignement supérieur privé.
             </p>
             <ul className="mt-4 space-y-1">
-              <li>Adresse : Bruxelles, Belgique</li>
+              <li>Adresse : Chaussée d'Alsemberg 897, 1180 Uccle, Belgique</li>
               <li>E-mail : contact@ipec.school</li>
               <li>Téléphone : +32 2 000 00 00</li>
             </ul>
