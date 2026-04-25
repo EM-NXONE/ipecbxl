@@ -751,7 +751,7 @@ function buildFacturePdf(array $f): array {
         $academicYear = $startY . '-' . ($startY + 1);
     }
 
-    // Première ligne : "Frais de dossier IPEC — Programme XXX, année académique YYYY-YYYY"
+    // Première ligne : "Frais de dossier IPEC — Programme XXX, 1ère année, 2026-2027"
     $firstLineParts = ['Frais de dossier IPEC'];
     if ($programmeLabel !== '') {
         $firstLineParts[] = 'Programme ' . $programmeLabel;
@@ -760,16 +760,16 @@ function buildFacturePdf(array $f): array {
         $firstLineParts[] = $anneeLabel;
     }
     if ($academicYear !== '') {
-        $firstLineParts[] = 'année académique ' . $academicYear;
+        $firstLineParts[] = $academicYear;
     }
     $firstLine = implode(', ', $firstLineParts);
-    // remplace la première virgule par un espace pour garder "Frais de dossier IPEC Programme ..."
+    // remplace la première virgule par un tiret pour garder "Frais de dossier IPEC — Programme ..."
     $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
     $pdf->SetX(22);
-    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
     $pdf->SetX(22);
