@@ -671,7 +671,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
-    $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
+    $pdf->SetAuthor($tr('IPEC — Institut Privé des Études Commerciales ASBL'));
     $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
 
@@ -714,142 +714,81 @@ function buildFacturePdf(array $f): array {
     $pdf->SetLineWidth(0.6);
     $pdf->Line(20, 40, 190, 40);
 
-    // Préparation données inscription
-    $programmeCode    = trim((string)($f['programme'] ?? ''));
-    $anneeLabel       = trim((string)($f['annee'] ?? ''));
-    $specialisation   = trim((string)($f['specialisation'] ?? ''));
-    $rentreeLabel     = trim((string)($f['rentree'] ?? ''));
-
-    $programmeFullMap = [
-        'PAA' => 'Programme en Administration des Affaires',
-        'PEA' => 'Programme Exécutif Avancé',
-    ];
-    $programmeFull = $programmeFullMap[strtoupper($programmeCode)] ?? $programmeCode;
-
-    $anneeNorm = $anneeLabel;
-    $anneeNorm = str_replace(['1ʳᵉ', '1ᵉʳ', '1er'], '1ère', $anneeNorm);
-    $anneeNorm = preg_replace('/\s+—.*$/u', '', $anneeNorm);
-    $anneeNorm = trim($anneeNorm);
-
-    $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
-
-    // Année académique aaaa/aaaa : on cherche un "20xx" dans la rentrée, sinon on calcule
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        $academicYear = $y . '/' . ($y + 1);
-    } else {
-        $now = time();
-        $curY = (int)date('Y', $now);
-        $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        // Si rentrée février → année académique en cours
-        if (preg_match('/f[ée]vrier/i', $rentreeLabel)) {
-            $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        } elseif (preg_match('/septembre/i', $rentreeLabel)) {
-            $startY = ((int)date('n', $now) >= 9) ? $curY : $curY;
-        }
-        $academicYear = $startY . '/' . ($startY + 1);
-    }
-
-    // Deux encadrés côte à côte : "Facturé à" (gauche) et "Inscription" (droite)
+    // Bloc "Facturé à"
     $pdf->Ln(8);
-    $boxTop    = $pdf->GetY();
-    $boxLeftX  = 20;
-    $boxRightX = 108;
-    $boxWidth  = 82;
-    $padX      = 4;
-    $padY      = 4;
-
-    $pdf->SetDrawColor(220, 226, 240);
-    $pdf->SetLineWidth(0.3);
-
-    // ---- Encadré gauche : FACTURÉ À ----
-    $pdf->SetXY($boxLeftX + $padX, $boxTop + $padY);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('FACTURÉ À'), 0, 2);
+    $pdf->Cell(0, 6, $tr('FACTURÉ À'), 0, 1);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Ln(1);
-    $pdf->SetX($boxLeftX + $padX);
-    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
+    $pdf->Cell(0, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 1);
     if (!empty($f['adresse'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
+        $pdf->MultiCell(0, 5, $tr((string)$f['adresse']), 0, 'L');
     }
     if (!empty($f['paysResidence'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L');
+        $pdf->Cell(0, 5, $tr((string)$f['paysResidence']), 0, 1);
     }
     if (!empty($f['email'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        // Email : autorise le retour à la ligne sur les caractères longs en insérant des points de coupure invisibles
-        $emailTxt = (string)$f['email'];
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr($emailTxt), 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->Cell(0, 5, $tr((string)$f['email']), 0, 1);
     }
-    $leftEndY = $pdf->GetY();
-
-    // ---- Encadré droit : INFORMATIONS D'INSCRIPTION ----
-    $pdf->SetXY($boxRightX + $padX, $boxTop + $padY);
-    $pdf->SetFont('Helvetica', 'B', 9);
-    $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr("INFORMATIONS D'INSCRIPTION"), 0, 2);
-    $pdf->Ln(1);
-    $pdf->SetTextColor(15, 21, 37);
-
-    $infoRow = function($label, $value) use ($pdf, $tr, $boxRightX, $boxWidth, $padX) {
-        $pdf->SetX($boxRightX + $padX);
-        $pdf->SetFont('Helvetica', 'B', 9);
-        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr($label), 0, 2);
-        $pdf->SetX($boxRightX + $padX);
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($value), 0, 'L');
-    };
-
-    if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
-    if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
-    if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
-    $infoRow('Année académique', $academicYear);
-
-    $rightEndY = $pdf->GetY();
-
-    // Tracé des deux encadrés à hauteurs INDÉPENDANTES (chacun colle à son contenu)
-    $leftHeight  = $leftEndY  - $boxTop + $padY;
-    $rightHeight = $rightEndY - $boxTop + $padY;
-    $pdf->Rect($boxLeftX,  $boxTop, $boxWidth, $leftHeight);
-    $pdf->Rect($boxRightX, $boxTop, $boxWidth, $rightHeight);
-
-    $pdf->SetY($boxTop + max($leftHeight, $rightHeight));
     $pdf->Ln(8);
 
-    // Tableau facture (sans colonne Quantité)
+    // Tableau facture
     $pdf->SetFillColor(44, 93, 219);
     $pdf->SetTextColor(255, 255, 255);
     $pdf->SetFont('Helvetica', 'B', 9);
-    $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
-    $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
+    $pdf->Cell(120, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
+    $pdf->Cell(25, 9, $tr('QUANTITÉ'), 0, 0, 'C', true);
+    $pdf->Cell(25, 9, $tr('MONTANT'), 0, 1, 'R', true);
 
-    // Description simplifiée : uniquement "Frais de dossier IPEC — Année académique aaaa/aaaa"
-    // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
-    $firstLine = 'Frais de dossier IPEC — Année académique ' . $academicYear;
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $programmeLabel = trim((string)($f['programme'] ?? ''));
+    $anneeLabel     = trim((string)($f['annee'] ?? ''));
+    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
+
+    // Année académique : déduite de la rentrée si possible (ex : "Septembre 2026" → "2026-2027").
+    $academicYear = '';
+    if ($rentreeLabel !== '' && preg_match('/(\d{4})/', $rentreeLabel, $m)) {
+        $startY = (int)$m[1];
+        // Si la rentrée mentionne février/janvier, l'année académique a démarré l'année précédente.
+        if (preg_match('/janv|f[ée]vr/i', $rentreeLabel)) {
+            $startY -= 1;
+        }
+        $academicYear = $startY . '-' . ($startY + 1);
+    }
+
+    // Première ligne : "Frais de dossier IPEC — Programme XXX, 1ère année, 2026-2027"
+    $firstLineParts = ['Frais de dossier IPEC'];
+    if ($programmeLabel !== '') {
+        $firstLineParts[] = 'Programme ' . $programmeLabel;
+    }
+    if ($anneeLabel !== '') {
+        $firstLineParts[] = $anneeLabel;
+    }
+    if ($academicYear !== '') {
+        $firstLineParts[] = $academicYear;
+    }
+    $firstLine = implode(', ', $firstLineParts);
+    // remplace la première virgule par un tiret pour garder "Frais de dossier IPEC — Programme ..."
+    $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->MultiCell(138, 6, $tr($firstLine), 0, 'L');
+    $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(138, 5, $tr('Frais unique'), 0, 1, 'L');
+    $pdf->Cell(118, 5, $tr('Frais unique'), 0, 1, 'L');
     $endY = $pdf->GetY();
-    $pdf->SetXY(160, $startYRow);
+    $pdf->SetXY(140, $startYRow);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(30, 6, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+    $pdf->Cell(25, 6, '1', 0, 0, 'C');
+    $pdf->Cell(25, 6, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
     $pdf->SetY($endY);
 
     $pdf->SetDrawColor(220, 226, 240);
@@ -861,10 +800,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetFont('Helvetica', 'B', 11);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(110, 10, '', 0, 0);
-    $pdf->Cell(30, 10, $tr('TOTAL'), 0, 0, 'R', true);
+    $pdf->Cell(120, 10, '', 0, 0);
+    $pdf->Cell(25, 10, $tr('TOTAL'), 0, 0, 'R', true);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(30, 10, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R', true);
+    $pdf->Cell(25, 10, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R', true);
 
     $pdf->SetFont('Helvetica', '', 8);
     $pdf->SetTextColor(91, 100, 120);
@@ -880,14 +819,14 @@ function buildFacturePdf(array $f): array {
     $pdf->SetXY(24, $startY + 5);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(0, 5, $tr('MODALITÉS DE PAIEMENT'), 0, 1);
+    $pdf->Cell(0, 5, $tr('INFORMATIONS DE PAIEMENT'), 0, 1);
     $pdf->Ln(1);
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Bénéficiaire'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('Institut privé des études commerciales'), 0, 1);
+    $pdf->Cell(0, 6, $tr('Institut Privé des Études Commerciales ASBL'), 0, 1);
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('IBAN'), 0, 0);
