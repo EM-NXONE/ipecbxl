@@ -254,7 +254,7 @@ function emailShell(string $eyebrow, string $title, string $innerHtml): string {
           </tr>
           <tr>
             <td style="padding:24px 8px 0 8px;text-align:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#7C8AA8;line-height:1.6;">
-              IPEC — Institut privé des études commerciales · <a href="https://ipec.school" style="color:#9FB4E6;text-decoration:none;">ipec.school</a><br>
+              IPEC — Institut privé des études commerciales · <a href="https://www.ipec.school" style="color:#9FB4E6;text-decoration:none;">www.ipec.school</a><br>
               Chaussée d'Alsemberg 897, 1180 Uccle, Belgique<br>
               E-mail automatique généré par le formulaire du site. Répondez directement pour contacter l'expéditeur.
             </td>
@@ -442,12 +442,29 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
     }
     require_once __DIR__ . '/FPDF/fpdf.php';
     class IpecCandidaturePdf extends FPDF {
+        /** @var string 'candidature' | 'facture' */
+        public $docKind = 'candidature';
         public function Footer() {
-            $this->SetY(-18);
+            $tr = function (string $s): string {
+                $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+                return $out !== false ? $out : $s;
+            };
+            $this->SetY(-22);
+            // Filet
+            $this->SetDrawColor(220, 226, 240);
+            $this->SetLineWidth(0.2);
+            $this->Line(20, $this->GetY(), 190, $this->GetY());
+            $this->Ln(2);
+            $this->SetFont('Helvetica', '', 8);
+            $this->SetTextColor(91, 100, 120);
+            $this->Cell(0, 4, $tr("Institut privé des études commerciales  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
+            $this->Cell(0, 4, $tr("admission@ipec.school  ·  www.ipec.school"), 0, 1, 'C');
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
-            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "IPEC \xE2\x80\x94 Institut priv\xC3\xA9 des \xC3\xA9tudes commerciales \xC2\xB7 ipec.school"), 0, 1, 'C');
-            $this->Cell(0, 5, iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', "Document g\xC3\xA9n\xC3\xA9r\xC3\xA9 automatiquement \xE2\x80\x94 preuve de candidature."), 0, 1, 'C');
+            $label = $this->docKind === 'facture'
+                ? "Document généré automatiquement — facture."
+                : "Document généré automatiquement — preuve de candidature.";
+            $this->Cell(0, 4, $tr($label), 0, 1, 'C');
         }
     }
 }
@@ -467,7 +484,7 @@ function buildCandidaturePdf(array $f): string {
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->SetMargins(20, 20, 20);
-    $pdf->SetAutoPageBreak(true, 25);
+    $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Dossier de candidature IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('ipec.school');
@@ -484,21 +501,19 @@ function buildCandidaturePdf(array $f): string {
             error_log('[mailer.php] Logo PDF ignoré : ' . $logoErr->getMessage());
         }
     }
-    $pdf->SetXY(44, 18);
-    $pdf->SetFont('Helvetica', 'B', 16);
+    $pdf->SetXY(44, 20);
+    $pdf->SetFont('Helvetica', 'B', 18);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
+    $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
 
-    $pdf->SetY(44);
+    $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 44, 190, 44);
+    $pdf->Line(20, 40, 190, 40);
 
     // Titre du document
     $pdf->Ln(6);
@@ -645,37 +660,34 @@ function buildFacturePdf(array $f): array {
     $montant = 400.00;
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+    $pdf->docKind = 'facture';
     $pdf->SetMargins(20, 20, 20);
-    $pdf->SetAutoPageBreak(true, 25);
+    $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
-    $pdf->SetCreator('ipec.school');
+    $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
 
-    // En-tête : logo + IPEC
+    // En-tête : logo + IPEC (les coordonnées vont dans le footer)
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
         try { $pdf->Image($logoPath, 20, 15, 18, 18); }
         catch (\Throwable $e) { error_log('[mailer.php] Logo facture ignoré : ' . $e->getMessage()); }
     }
-    $pdf->SetXY(44, 18);
-    $pdf->SetFont('Helvetica', 'B', 16);
+    $pdf->SetXY(44, 20);
+    $pdf->SetFont('Helvetica', 'B', 18);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('IPEC Bruxelles'), 0, 2);
+    $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
     $pdf->SetX(44);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('Chaussée d\'Alsemberg 897, 1180 Uccle, Belgique'), 0, 2);
-    $pdf->SetX(44);
-    $pdf->Cell(0, 5, $tr('admission@ipec.school     ipec.school'), 0, 2);
 
     // Bloc identification facture (à droite)
-    $pdf->SetXY(130, 18);
-    $pdf->SetFont('Helvetica', 'B', 11);
+    $pdf->SetXY(130, 20);
+    $pdf->SetFont('Helvetica', 'B', 13);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(60, 6, $tr('FACTURE'), 0, 2, 'R');
+    $pdf->Cell(60, 7, $tr('FACTURE'), 0, 2, 'R');
     $pdf->SetX(130);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
@@ -683,10 +695,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(130);
     $pdf->Cell(60, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
 
-    $pdf->SetY(46);
+    $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
-    $pdf->Line(20, 46, 190, 46);
+    $pdf->Line(20, 40, 190, 40);
 
     // Bloc "Facturé à"
     $pdf->Ln(8);
@@ -719,30 +731,48 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $programmeLabel = trim((string)($f['programme'] ?? ''));
     $anneeLabel     = trim((string)($f['annee'] ?? ''));
-    $programme = $programmeLabel;
-    if ($programmeLabel !== '' && $anneeLabel !== '') {
-        $programme = $programmeLabel . ', ' . $anneeLabel;
-    } elseif ($anneeLabel !== '') {
-        $programme = $anneeLabel;
+    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
+
+    // Année académique : déduite de la rentrée si possible (ex : "Septembre 2026" → "2026-2027").
+    $academicYear = '';
+    if ($rentreeLabel !== '' && preg_match('/(\d{4})/', $rentreeLabel, $m)) {
+        $startY = (int)$m[1];
+        // Si la rentrée mentionne février/janvier, l'année académique a démarré l'année précédente.
+        if (preg_match('/janv|f[ée]vr/i', $rentreeLabel)) {
+            $startY -= 1;
+        }
+        $academicYear = $startY . '-' . ($startY + 1);
     }
-    $descriptionLines = [
-        $tr('Frais de dossier de candidature IPEC'),
-    ];
-    if ($programme !== '') {
-        $descriptionLines[] = $tr('Programme : ' . $programme);
+
+    // Première ligne : "Frais de dossier IPEC — Programme XXX, année académique YYYY-YYYY"
+    $firstLineParts = ['Frais de dossier IPEC'];
+    if ($programmeLabel !== '') {
+        $firstLineParts[] = 'Programme ' . $programmeLabel;
     }
-    if (!empty($f['rentree'])) {
-        $descriptionLines[] = $tr('Rentrée envisagée : ' . $f['rentree']);
+    if ($anneeLabel !== '') {
+        $firstLineParts[] = $anneeLabel;
     }
-    $descriptionLines[] = $tr('Paiement unique, non remboursable (CGV art. 2).');
+    if ($academicYear !== '') {
+        $firstLineParts[] = 'année académique ' . $academicYear;
+    }
+    $firstLine = implode(', ', $firstLineParts);
+    // remplace la première virgule par un espace pour garder "Frais de dossier IPEC Programme ..."
+    $firstLine = preg_replace('/, /', ' — ', $firstLine, 1);
 
     $pdf->Ln(2);
-    $startY = $pdf->GetY();
-    $pdf->SetX(20);
-    $pdf->Cell(2, 6, '', 0, 0); // petit padding gauche
-    $pdf->MultiCell(118, 6, implode("\n", $descriptionLines), 0, 'L');
+    $startYRow = $pdf->GetY();
+    $pdf->SetX(22);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->MultiCell(118, 6, $tr($firstLine), 0, 'L');
+    $pdf->SetX(22);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(118, 5, $tr('Frais unique'), 0, 1, 'L');
     $endY = $pdf->GetY();
-    $pdf->SetXY(140, $startY);
+    $pdf->SetXY(140, $startYRow);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(25, 6, '1', 0, 0, 'C');
     $pdf->Cell(25, 6, number_format($montant, 2, ',', ' ') . ' EUR', 0, 1, 'R');
     $pdf->SetY($endY);
@@ -782,7 +812,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Bénéficiaire'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('IPEC, Institut privé des études commerciales'), 0, 1);
+    $pdf->Cell(0, 6, $tr('Institut privé des études commerciales'), 0, 1);
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('IBAN'), 0, 0);
