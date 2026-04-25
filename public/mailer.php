@@ -444,6 +444,8 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
     class IpecCandidaturePdf extends FPDF {
         /** @var string 'candidature' | 'facture' */
         public $docKind = 'candidature';
+        /** @var string */
+        public $factureNumero = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
@@ -461,9 +463,13 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Cell(0, 4, $tr("admission@ipec.school  ·  www.ipec.school"), 0, 1, 'C');
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
-            $label = $this->docKind === 'facture'
-                ? "Document généré automatiquement — facture."
-                : "Document généré automatiquement — preuve de candidature.";
+            if ($this->docKind === 'facture') {
+                $label = $this->factureNumero !== ''
+                    ? 'Facture n° ' . $this->factureNumero
+                    : 'Facture';
+            } else {
+                $label = "Document généré automatiquement — preuve de candidature.";
+            }
             $this->Cell(0, 4, $tr($label), 0, 1, 'C');
         }
     }
