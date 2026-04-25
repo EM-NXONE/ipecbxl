@@ -484,7 +484,7 @@ function buildCandidaturePdf(array $f): string {
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->SetMargins(20, 20, 20);
-    $pdf->SetAutoPageBreak(true, 25);
+    $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Dossier de candidature IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('ipec.school');
@@ -662,7 +662,7 @@ function buildFacturePdf(array $f): array {
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
     $pdf->SetMargins(20, 20, 20);
-    $pdf->SetAutoPageBreak(true, 25);
+    $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
     $pdf->SetCreator('www.ipec.school');
