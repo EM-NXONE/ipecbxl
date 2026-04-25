@@ -840,14 +840,11 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
 
     $pdf->SetY($startY + 60);
-    $pdf->SetFont('Helvetica', 'I', 8);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->MultiCell(0, 4, $tr('Merci d\'utiliser exactement la communication structurée ci-dessus pour permettre un rapprochement automatique de votre paiement.'), 0, 'L');
-    $pdf->Ln(2);
     $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
-        'Une fois le virement effectué, transmettez la preuve de paiement en réponse à l\'e-mail d\'accusé de réception, '
-        . 'avec l\'ensemble des pièces de votre dossier de candidature.'
+        'Vous pouvez procéder au virement à votre convenance. Pensez à reporter la communication structurée '
+        . 'pour faciliter le rapprochement, puis joignez la preuve de paiement à votre dossier de candidature.'
     ), 0, 'L');
 
     return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
