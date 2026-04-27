@@ -65,14 +65,19 @@ function CGV() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">4. Modalités de paiement</h2>
             <p className="mb-3">
-              Les droits de scolarité sont réglés en deux tranches :
+              Les droits de scolarité sont réglés en trois versements :
             </p>
             <ul className="space-y-2 list-disc list-inside">
               <li>1ʳᵉ tranche de 3 000 € à la confirmation d'inscription</li>
               <li>
-                2ᵉ tranche — solde (2 950 € en PAA, 4 150 € en PEA) : avant le début
-                effectif des cours pour les étudiants en présentiel ; à l'arrivée à
-                l'institut pour les étudiants internationaux soumis à une procédure de visa
+                2ᵉ tranche (1 475 € en PAA, 2 075 € en PEA) : avant le début
+                effectif des cours pour les étudiants en présentiel ; à
+                l'arrivée à l'institut pour les étudiants internationaux soumis
+                à une procédure de visa
+              </li>
+              <li>
+                3ᵉ tranche — solde (1 475 € en PAA, 2 075 € en PEA) : exigible
+                avant les examens du second semestre
               </li>
             </ul>
             <div className="mt-6 p-5 rounded-sm border border-blue/30 bg-blue/5">
