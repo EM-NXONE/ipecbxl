@@ -630,7 +630,7 @@ function buildCandidaturePdf(array $f): string {
 }
 
 /**
- * Génère la facture des frais de dossier (400 €) pour le candidat.
+ * Génère la facture des frais de dossier (500 €) pour le candidat.
  * Numéro de facture déterministe = horodatage + initiales (lisible, unique
  * en pratique pour un même candidat à la seconde près).
  * Communication structurée belge (12 chiffres formatés +++AAA/BBBB/CCCDD+++)
