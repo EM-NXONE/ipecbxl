@@ -482,148 +482,285 @@ function buildCandidaturePdf(array $f): string {
 
     // Conversion UTF-8 → CP1252 (Windows-1252) qui supporte le tiret cadratin —,
     // les guillemets typographiques, etc. — contrairement à ISO-8859-1 strict.
-    // FPDF avec polices intégrées gère le CP1252 nativement.
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
         return $out !== false ? $out : $s;
     };
 
+    $now           = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
+    $dateStr       = $now->format('d/m/Y');
+    $numCandidature = 'IPEC-CAND-' . $now->format('Ymd-His');
+    $submittedAt   = $now->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
+
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+    $pdf->docKind = 'candidature';
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
-    $pdf->SetTitle($tr('Dossier de candidature IPEC'));
+    $pdf->SetTitle($tr('Confirmation de candidature IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut privé des études commerciales'));
-    $pdf->SetCreator('ipec.school');
+    $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
 
-    // En-tête : logo + titre — Image() peut planter sur certains PNG (palette / alpha
-     // / profondeur de bits incompatibles avec FPDF). On l'isole pour ne jamais bloquer
-     // la génération entière du PDF à cause du logo.
+    // ===== EN-TÊTE (identique à la facture) =====
     $logoPath = __DIR__ . '/ipec-logo-email.png';
     if (is_file($logoPath)) {
-        try {
-            $pdf->Image($logoPath, 20, 15, 18, 18);
-        } catch (\Throwable $logoErr) {
-            error_log('[mailer.php] Logo PDF ignoré : ' . $logoErr->getMessage());
-        }
+        try { $pdf->Image($logoPath, 20, 15, 18, 18); }
+        catch (\Throwable $e) { error_log('[mailer.php] Logo candidature ignoré : ' . $e->getMessage()); }
     }
-    $pdf->SetXY(44, 20);
-    $pdf->SetFont('Helvetica', 'B', 18);
+    $pdf->SetXY(41, 19);
+    $pdf->SetFont('Times', '', 18);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
-    $pdf->SetX(44);
+    $pdf->SetX(41);
+    $pdf->SetFont('Helvetica', '', 6);
+    $pdf->SetTextColor(120, 130, 150);
+    $subtitle = 'INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES';
+    $spaced   = implode(' ', preg_split('//u', $subtitle, -1, PREG_SPLIT_NO_EMPTY));
+    $pdf->Cell(0, 4, $tr($spaced), 0, 2);
+
+    // Bloc identification document (à droite)
+    $pdf->SetXY(120, 20);
+    $pdf->SetFont('Helvetica', 'B', 13);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(70, 7, $tr('CONFIRMATION DE CANDIDATURE'), 0, 2, 'R');
+    $pdf->SetX(120);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 5, $tr('Institut privé des études commerciales'), 0, 2);
+    $pdf->Cell(70, 5, $tr('N° ' . $numCandidature), 0, 2, 'R');
+    $pdf->SetX(120);
+    $pdf->Cell(70, 5, $tr('Date : ' . $dateStr), 0, 2, 'R');
 
     $pdf->SetY(40);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.6);
     $pdf->Line(20, 40, 190, 40);
 
-    // Titre du document
-    $pdf->Ln(6);
-    $pdf->SetFont('Helvetica', 'B', 18);
-    $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 9, $tr('Dossier de candidature'), 0, 1);
+    // ===== Préparation données =====
+    $programmeCode  = trim((string)($f['programme'] ?? ''));
+    $anneeLabel     = trim((string)($f['annee'] ?? ''));
+    $specialisation = trim((string)($f['specialisation'] ?? ''));
+    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
 
-    // Date de soumission — chaque caractère littéral des lettres "à", "heure de Bruxelles"
-    // doit être échappé avec \\ dans le format() pour ne pas être interprété comme un code.
-    $pdf->SetFont('Helvetica', '', 10);
-    $pdf->SetTextColor(91, 100, 120);
-    $submittedAt = (new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels')))
-        ->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
-    $pdf->Cell(0, 5, $tr('Soumis le ' . $submittedAt), 0, 1);
-    $pdf->Ln(4);
+    $programmeFullMap = [
+        'PAA' => 'Programme en Administration des Affaires',
+        'PEA' => 'Programme Exécutif Avancé',
+    ];
+    $programmeFull = $programmeFullMap[strtoupper($programmeCode)] ?? $programmeCode;
 
-    // Helper : section
-    $section = function (string $title) use ($pdf, $tr) {
-        $pdf->Ln(2);
-        $pdf->SetFillColor(234, 240, 255);
-        $pdf->SetTextColor(44, 93, 219);
-        $pdf->SetFont('Helvetica', 'B', 10);
-        $pdf->Cell(0, 7, '  ' . $tr(mb_strtoupper($title, 'UTF-8')), 0, 1, 'L', true);
-        $pdf->Ln(2);
-    };
+    $anneeNorm = $anneeLabel;
+    $anneeNorm = str_replace(['1ʳᵉ', '1ᵉʳ', '1er'], '1ère', $anneeNorm);
+    $anneeNorm = preg_replace('/\s+—.*$/u', '', $anneeNorm);
+    $anneeNorm = trim($anneeNorm);
 
-    // Helper : ligne label / valeur
-    $row = function (string $label, string $value) use ($pdf, $tr) {
-        $pdf->SetFont('Helvetica', 'B', 9);
-        $pdf->SetTextColor(91, 100, 120);
-        $pdf->Cell(50, 6, $tr($label), 0, 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->MultiCell(0, 6, $tr($value !== '' ? $value : '—'), 0, 'L');
-        $pdf->Ln(0.5);
-    };
+    $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
-    // Programme
-    $section('Programme demandé');
-    $row('Programme', $f['programme'] . ' — ' . $f['annee']);
-    $row('Spécialisation', $f['specialisation']);
-    $row('Rentrée envisagée', $f['rentree']);
-
-    // Identité
-    $section('Identité du candidat');
-    $row('Civilité', $f['civilite']);
-    $row('Prénom', $f['prenom']);
-    $row('Nom', $f['nom']);
-    $row('Date de naissance', formatDateFr($f['dateNaissance'] ?? ''));
-    $row('Nationalité', $f['nationalite']);
-
-    // Coordonnées
-    $section('Coordonnées');
-    $row('E-mail', $f['email']);
-    $row('Téléphone', $f['telephone']);
-    $row('Pays de résidence', $f['paysResidence']);
-    $row('Adresse', $f['adresse']);
-
-    // Message
-    if ($f['message'] !== '') {
-        $section('Message du candidat');
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->MultiCell(0, 5.5, $tr($f['message']), 0, 'L');
+    $academicYear = '';
+    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
+        $y = (int)$m[1];
+        $academicYear = $y . '/' . ($y + 1);
+    } else {
+        $curY = (int)$now->format('Y');
+        $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
+        $academicYear = $startY . '/' . ($startY + 1);
     }
 
-    // Engagements signés
-    $section('Engagements acceptés par le candidat');
+    // ===== Deux encadrés côte à côte : CANDIDAT (gauche) / CANDIDATURE (droite) =====
+    $pdf->Ln(8);
+    $boxTop    = $pdf->GetY();
+    $boxLeftX  = 20;
+    $boxRightX = 108;
+    $boxWidth  = 82;
+    $padX      = 4;
+    $padY      = 4;
+
+    $pdf->SetDrawColor(220, 226, 240);
+    $pdf->SetLineWidth(0.3);
+
+    // ---- Encadré gauche : CANDIDAT ----
+    $pdf->SetXY($boxLeftX + $padX, $boxTop + $padY);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('CANDIDAT'), 0, 2);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Ln(1);
+    $pdf->SetX($boxLeftX + $padX);
+    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
+    if (!empty($f['dateNaissance'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr('Né·e le ' . formatDateFr((string)$f['dateNaissance'])), 0, 'L');
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->SetFont('Helvetica', '', 10);
+    }
+    if (!empty($f['nationalite'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr('Nationalité : ' . (string)$f['nationalite']), 0, 'L');
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->SetFont('Helvetica', '', 10);
+    }
+    if (!empty($f['adresse'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
+    }
+    if (!empty($f['paysResidence'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L');
+    }
+    if (!empty($f['email'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr((string)$f['email']), 0, 'L');
+        $pdf->SetFont('Helvetica', '', 10);
+    }
+    if (!empty($f['telephone'])) {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr((string)$f['telephone']), 0, 'L');
+        $pdf->SetFont('Helvetica', '', 10);
+    }
+    $leftEndY = $pdf->GetY();
+
+    // ---- Encadré droit : CANDIDATURE ----
+    $pdf->SetXY($boxRightX + $padX, $boxTop + $padY);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('CANDIDATURE'), 0, 2);
+    $pdf->Ln(1);
+    $pdf->SetTextColor(15, 21, 37);
+
+    $infoRow = function($label, $value) use ($pdf, $tr, $boxRightX, $boxWidth, $padX) {
+        $pdf->SetX($boxRightX + $padX);
+        $pdf->SetFont('Helvetica', 'B', 9);
+        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr($label), 0, 2);
+        $pdf->SetX($boxRightX + $padX);
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($value), 0, 'L');
+    };
+
+    if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
+    if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
+    if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
+    if ($rentreeLabel !== '')  $infoRow('Rentrée envisagée', $rentreeLabel);
+    $infoRow('Année académique', $academicYear);
+
+    $rightEndY = $pdf->GetY();
+
+    // Tracé des deux encadrés à hauteurs indépendantes
+    $leftHeight  = $leftEndY  - $boxTop + $padY;
+    $rightHeight = $rightEndY - $boxTop + $padY;
+    $pdf->Rect($boxLeftX,  $boxTop, $boxWidth, $leftHeight);
+    $pdf->Rect($boxRightX, $boxTop, $boxWidth, $rightHeight);
+
+    $pdf->SetY($boxTop + max($leftHeight, $rightHeight));
+    $pdf->Ln(8);
+
+    // ===== Bandeau bleu : OBJET =====
+    $pdf->SetFillColor(44, 93, 219);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->Cell(0, 9, '  ' . $tr('OBJET'), 0, 1, 'L', true);
+    $pdf->Ln(2);
+
+    $pdf->SetX(22);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->MultiCell(168, 5.5, $tr(
+        "Le présent document atteste de la soumission, par voie électronique, du dossier de candidature "
+        . "ci-dessus à l'Institut privé des études commerciales (IPEC). Il constitue la preuve formelle "
+        . "de l'enregistrement de la candidature et fait foi entre les parties."
+    ), 0, 'L');
+    $pdf->Ln(2);
+
+    // ===== Message du candidat (optionnel) =====
+    if (!empty($f['message'])) {
+        $pdf->Ln(3);
+        $pdf->SetFont('Helvetica', 'B', 9);
+        $pdf->SetTextColor(44, 93, 219);
+        $pdf->Cell(0, 6, $tr('MESSAGE DU CANDIDAT'), 0, 1);
+        $pdf->Ln(1);
+        $pdf->SetX(22);
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->MultiCell(168, 5.5, $tr((string)$f['message']), 0, 'L');
+    }
+
+    // ===== Engagements acceptés =====
+    $pdf->Ln(4);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 6, $tr('ENGAGEMENTS ACCEPTÉS PAR LE CANDIDAT'), 0, 1);
+    $pdf->Ln(1);
+
     $clauses = [
         "Le candidat déclare avoir pris connaissance et accepte sans réserve les conditions particulières d'admission de l'IPEC, publiées sur https://ipec.school/cgv. Cette acceptation, formalisée par la validation électronique du formulaire de candidature, vaut signature au sens des articles XII.15 et suivants du Code de droit économique belge.",
         "Le candidat autorise l'IPEC à traiter les informations personnelles transmises dans le cadre de l'examen de sa candidature, conformément au Règlement Général sur la Protection des Données (RGPD — UE 2016/679) et à la politique de confidentialité publiée sur https://ipec.school/confidentialite.",
         "Le candidat certifie sur l'honneur l'exactitude des informations communiquées. Toute déclaration inexacte ou incomplète pourra entraîner le rejet de la candidature ou l'annulation d'une admission déjà prononcée.",
     ];
     foreach ($clauses as $i => $c) {
+        $pdf->SetX(22);
         $pdf->SetFont('Helvetica', 'B', 10);
         $pdf->SetTextColor(15, 21, 37);
-        $pdf->Cell(6, 6, ($i + 1) . '.', 0, 0);
+        $pdf->Cell(6, 5.5, ($i + 1) . '.', 0, 0);
         $pdf->SetFont('Helvetica', '', 10);
-        $pdf->MultiCell(0, 5.5, $tr($c), 0, 'L');
-        $pdf->Ln(2);
+        $pdf->MultiCell(162, 5.5, $tr($c), 0, 'L');
+        $pdf->Ln(1.5);
     }
 
-    // Bloc signature électronique — saute en page suivante si pas assez de place
+    // ===== Bloc signature électronique (style "modalités" de la facture) =====
     $pdf->Ln(2);
-    if ($pdf->GetY() > 230) {
+    if ($pdf->GetY() > 220) {
         $pdf->AddPage();
     }
     $startY = $pdf->GetY();
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.3);
-    $pdf->Rect(20, $startY, 170, 34, 'DF');
-    $pdf->SetXY(24, $startY + 4);
+    $pdf->Rect(20, $startY, 170, 50, 'DF');
+    $pdf->SetXY(24, $startY + 5);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 5, $tr('SIGNATURE ÉLECTRONIQUE'), 0, 1);
+    $pdf->Ln(1);
+
     $pdf->SetX(24);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Signataire'), 0, 0);
+    $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->MultiCell(160, 5, $tr(
-        'Signé électroniquement par ' . $f['prenom'] . ' ' . $f['nom']
-        . ' le ' . $submittedAt . '.'
-        . ' Adresse e-mail confirmée : ' . $f['email'] . '.'
-        . ' Adresse IP de soumission : ' . $f['ip'] . '.'
+    $pdf->Cell(0, 6, $tr(trim(($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 1);
+
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Signé le'), 0, 0);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 6, $tr($submittedAt), 0, 1);
+
+    $pdf->SetX(24);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('E-mail confirmé'), 0, 0);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 6, $tr((string)($f['email'] ?? '')), 0, 1);
+
+    $pdf->SetX(24);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Adresse IP de soumission'), 0, 0);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 6, $tr((string)($f['ip'] ?? '')), 0, 1);
+
+    $pdf->SetY($startY + 56);
+    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->MultiCell(0, 5, $tr(
+        "Signature électronique apposée par validation du formulaire de candidature en ligne, "
+        . "au sens du Règlement eIDAS (UE 910/2014) et des articles XII.15 et suivants du Code de "
+        . "droit économique belge. L'IPEC conserve l'horodatage et l'adresse IP de la soumission."
     ), 0, 'L');
 
     return $pdf->Output('S');
