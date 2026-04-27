@@ -1,8 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Sparkles, Bus, ArrowRight, GraduationCap } from "lucide-react";
-import brukotLogo from "@/assets/logos/brukot.png";
-import immowebLogo from "@/assets/logos/immoweb.png";
-import ikotLogo from "@/assets/logos/ikot.png";
 
 export const Route = createFileRoute("/vie-etudiante")({
   head: () => ({
@@ -118,16 +115,7 @@ function VieEtudiante() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* BRUKOT */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <div className="h-16 mb-6 flex items-center">
-                <img
-                  src={brukotLogo}
-                  alt="Logo Brukot"
-                  loading="lazy"
-                  width={512}
-                  height={512}
-                  className="h-12 w-auto object-contain object-left"
-                />
-              </div>
+              <h3 className="font-display text-2xl text-cream mb-4">Brukot</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">Brukot</span> répertorie des
                 annonces de kots, studios et chambres à louer à Bruxelles,
@@ -147,16 +135,7 @@ function VieEtudiante() {
 
             {/* IMMOWEB */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <div className="h-16 mb-6 flex items-center">
-                <img
-                  src={immowebLogo}
-                  alt="Logo Immoweb"
-                  loading="lazy"
-                  width={512}
-                  height={512}
-                  className="h-12 w-auto object-contain object-left"
-                />
-              </div>
+              <h3 className="font-display text-2xl text-cream mb-4">Immoweb</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">Immoweb</span> est le principal
                 portail immobilier de Belgique. Vous y trouvez un large choix
@@ -175,16 +154,7 @@ function VieEtudiante() {
 
             {/* IKOT */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <div className="h-16 mb-6 flex items-center">
-                <img
-                  src={ikotLogo}
-                  alt="Logo iKot"
-                  loading="lazy"
-                  width={512}
-                  height={512}
-                  className="h-12 w-auto object-contain object-left"
-                />
-              </div>
+              <h3 className="font-display text-2xl text-cream mb-4">iKot</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">iKot</span> est une plateforme
                 dédiée aux logements étudiants en Belgique : kots, studios
