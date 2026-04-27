@@ -38,7 +38,7 @@ function VieEtudiante() {
       {/* AVANTAGES */}
       <section className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Partenaires & tarifs préférentiels</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Tarifs préférentiels</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-3xl text-balance">
             Des avantages concrets, dès l'inscription.
           </h2>
