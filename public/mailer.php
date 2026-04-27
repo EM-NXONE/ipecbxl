@@ -630,7 +630,7 @@ function buildCandidaturePdf(array $f): string {
 }
 
 /**
- * Génère la facture des frais de dossier (400 €) pour le candidat.
+ * Génère la facture des frais de dossier (500 €) pour le candidat.
  * Numéro de facture déterministe = horodatage + initiales (lisible, unique
  * en pratique pour un même candidat à la seconde près).
  * Communication structurée belge (12 chiffres formatés +++AAA/BBBB/CCCDD+++)
@@ -663,7 +663,7 @@ function buildFacturePdf(array $f): array {
     $iban = 'BE53 3770 8630 2553';
     $bic  = 'BBRUBEBB';
 
-    $montant = 400.00;
+    $montant = 500.00;
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
@@ -1293,8 +1293,8 @@ if ($type === 'inscription') {
             . "Pour finaliser votre dossier :\n"
             . "1. En réponse à cet e-mail, transmettez votre CV, lettre de motivation, "
             . "copie de pièce d'identité, diplômes et relevés de notes, justificatifs "
-            . "de stages éventuels, et la preuve de paiement des frais de dossier (400 €).\n"
-            . "2. Réglez les frais de dossier de 400 € (non remboursables) par virement "
+            . "de stages éventuels, et la preuve de paiement des frais de dossier (500 €).\n"
+            . "2. Réglez les frais de dossier de 500 € (non remboursables) par virement "
             . "à l'IPEC Bruxelles. Demandez-nous l'IBAN à admission@ipec.school. "
             . "Communication : $nom — $prenom — $programme — $specialisation.\n\n"
             . "Dès réception du dossier complet et du paiement, votre candidature sera "
@@ -1340,7 +1340,7 @@ if ($type === 'inscription') {
             $candidateMail->addStringAttachment($pdfAttachment, $pdfFilename, 'base64', 'application/pdf');
         }
 
-        // PJ #2 : facture des frais de dossier (400 €).
+        // PJ #2 : facture des frais de dossier (500 €).
         $factureError = null;
         try {
             [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
