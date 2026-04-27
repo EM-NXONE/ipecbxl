@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays, GraduationCap } from "lucide-react";
+import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays, GraduationCap, Sparkles, Bus } from "lucide-react";
 import {
   getNextSeptemberRentree,
   getNextFebruaryRentree,
@@ -292,6 +292,63 @@ function Admissions() {
                   <li className="flex gap-2"><CheckCircle2 size={16} className="text-blue shrink-0 mt-0.5" /><span>Espèces<span className="opacity-60"> (Limites légales)</span></span></li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4 bis. AVANTAGES ÉTUDIANTS */}
+      <section className="py-20 lg:py-32 border-t border-border/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Avantages étudiants</div>
+          <h2 className="font-display text-4xl md:text-5xl text-cream mb-4 max-w-3xl text-balance">
+            Le statut étudiant IPEC, <em className="text-gradient-blue not-italic">au-delà du campus</em>.
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl mb-12">
+            Inscrits à l'IPEC, vous accédez à une série de réductions et de tarifs
+            préférentiels au quotidien — du shopping aux transports bruxellois.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* UNiDAYS */}
+            <div className="p-8 rounded-sm border border-border/60 bg-card/50">
+              <Sparkles className="text-blue mb-5" size={28} strokeWidth={1.5} />
+              <h3 className="font-display text-2xl text-cream mb-3">Réductions UNiDAYS</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                L'IPEC est partenaire d'<span className="text-cream">UNiDAYS</span>, la
+                plateforme internationale de réductions étudiantes. Une fois votre adresse
+                e-mail institutionnelle activée, vous bénéficiez d'offres exclusives chez des
+                centaines de marques (mode, tech, voyage, abonnements, livraison…).
+              </p>
+              <a
+                href="https://www.myunidays.com/BE/fr-BE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
+              >
+                Découvrir les offres UNiDAYS <ArrowRight size={14} />
+              </a>
+            </div>
+
+            {/* STIB */}
+            <div className="p-8 rounded-sm border border-border/60 bg-card/50">
+              <Bus className="text-blue mb-5" size={28} strokeWidth={1.5} />
+              <h3 className="font-display text-2xl text-cream mb-3">Tarif étudiant STIB</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                En tant qu'étudiant inscrit à l'IPEC, vous avez droit au tarif préférentiel
+                <span className="text-cream"> STIB-MIVB</span> pour vos déplacements en
+                métro, tram et bus dans toute la Région bruxelloise. L'institut vous
+                délivrera, sur demande, l'attestation d'inscription nécessaire à
+                la souscription de l'abonnement.
+              </p>
+              <a
+                href="https://www.stib-mivb.be/article.html?l=fr&_guid=a2b6f410-b2b6-c8a9-4dc6-1a8e4b9c0a1f&news_rid=/STIB-MIVB/INTERNET/ACTUS/WEB_Article_1542637038829.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
+              >
+                Conditions et tarifs STIB <ArrowRight size={14} />
+              </a>
             </div>
           </div>
         </div>
