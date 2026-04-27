@@ -61,7 +61,7 @@ function VieEtudiante() {
                 href="https://www.myunidays.com/BE/fr-BE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-blue hover:underline mt-auto"
               >
                 Découvrir les offres UNiDAYS <ArrowRight size={14} />
               </a>
