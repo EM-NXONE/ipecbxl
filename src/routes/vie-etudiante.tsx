@@ -27,7 +27,7 @@ function VieEtudiante() {
             La vie <em className="text-gradient-blue not-italic">au-delà du campus</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
-            En tant qu'étudiant inscrit à l'IPEC, vous accédez à plusieurs dispositifs liés à la vie étudiante en Région bruxelloise, notamment les réductions UNiDAYS et le tarif préférentiel STIB-MIVB. À titre indicatif, cette page recense également quelques ressources utiles pour la recherche d'un logement à Bruxelles.
+            En tant qu'étudiant·e inscrit·e à l'IPEC, vous accédez à plusieurs dispositifs liés à la vie étudiante en Région bruxelloise, notamment les réductions UNiDAYS et le tarif préférentiel STIB-MIVB. À titre indicatif, cette page recense également quelques ressources utiles pour la recherche d'un logement à Bruxelles.
           </p>
         </div>
       </section>
@@ -70,7 +70,7 @@ function VieEtudiante() {
               <div className="text-xs uppercase tracking-widest text-blue mb-3">Transports bruxellois</div>
               <h3 className="font-display text-2xl text-cream mb-4">Tarif étudiant STIB-MIVB</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                En tant qu'étudiant inscrit à l'IPEC et jusqu'à l'âge de 24 ans,
+                En tant qu'étudiant·e inscrit·e à l'IPEC et jusqu'à l'âge de 24 ans,
                 vous avez droit au tarif préférentiel{" "}
                 <span className="text-cream">STIB-MIVB</span> pour vos
                 déplacements en métro, tram et bus dans toute la Région
@@ -92,7 +92,7 @@ function VieEtudiante() {
             Les conditions d'octroi, plafonds tarifaires et modalités d'usage
             relèvent exclusivement des partenaires et opérateurs concernés.
             L'IPEC se limite à délivrer les justificatifs d'inscription requis
-            et n'intervient pas dans la relation contractuelle entre l'étudiant
+            et n'intervient pas dans la relation contractuelle entre l'étudiant·e
             et le partenaire.
           </p>
         </div>
@@ -172,7 +172,7 @@ function VieEtudiante() {
 
           <p className="mt-10 text-xs text-muted-foreground leading-relaxed max-w-3xl">
             La recherche, la sélection et la signature du bail relèvent de la
-            seule responsabilité de l'étudiant et du bailleur. L'IPEC ne se
+            seule responsabilité de l'étudiant·e et du bailleur. L'IPEC ne se
             porte ni garant, ni intermédiaire, et n'intervient pas dans la
             relation contractuelle locative.
           </p>
