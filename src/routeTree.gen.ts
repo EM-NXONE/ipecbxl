@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VieEtudianteRouteImport } from './routes/vie-etudiante'
 import { Route as ProgrammesRouteImport } from './routes/programmes'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as InternationalRouteImport } from './routes/international'
@@ -21,6 +22,11 @@ import { Route as CguRouteImport } from './routes/cgu'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VieEtudianteRoute = VieEtudianteRouteImport.update({
+  id: '/vie-etudiante',
+  path: '/vie-etudiante',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgrammesRoute = ProgrammesRouteImport.update({
   id: '/programmes',
   path: '/programmes',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/vie-etudiante'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/vie-etudiante'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/vie-etudiante'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,10 +183,18 @@ export interface RootRouteChildren {
   InternationalRoute: typeof InternationalRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   ProgrammesRoute: typeof ProgrammesRoute
+  VieEtudianteRoute: typeof VieEtudianteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vie-etudiante': {
+      id: '/vie-etudiante'
+      path: '/vie-etudiante'
+      fullPath: '/vie-etudiante'
+      preLoaderRoute: typeof VieEtudianteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programmes': {
       id: '/programmes'
       path: '/programmes'
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   InternationalRoute: InternationalRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   ProgrammesRoute: ProgrammesRoute,
+  VieEtudianteRoute: VieEtudianteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
