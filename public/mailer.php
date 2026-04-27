@@ -701,56 +701,47 @@ function buildCandidaturePdf(array $f): string {
 
     // ===== Bloc signature électronique (style "modalités" de la facture) =====
     $pdf->Ln(2);
-    if ($pdf->GetY() > 220) {
+    if ($pdf->GetY() > 250) {
         $pdf->AddPage();
     }
     $startY = $pdf->GetY();
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.3);
-    $pdf->Rect(20, $startY, 170, 50, 'DF');
-    $pdf->SetXY(24, $startY + 5);
+    $pdf->Rect(20, $startY, 170, 36, 'DF');
+    $pdf->SetXY(24, $startY + 4);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 5, $tr('SIGNATURE ÉLECTRONIQUE'), 0, 1);
-    $pdf->Ln(1);
+    $pdf->Ln(0.5);
 
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(50, 6, $tr('Signataire'), 0, 0);
+    $pdf->Cell(50, 5.5, $tr('Signataire'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr(trim(($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 1);
+    $pdf->Cell(0, 5.5, $tr(trim(($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 1);
 
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(50, 6, $tr('Signé le'), 0, 0);
+    $pdf->Cell(50, 5.5, $tr('Signé le'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr($submittedAt), 0, 1);
+    $pdf->Cell(0, 5.5, $tr($submittedAt), 0, 1);
 
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(50, 6, $tr('E-mail confirmé'), 0, 0);
+    $pdf->Cell(50, 5.5, $tr('E-mail confirmé'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr((string)($f['email'] ?? '')), 0, 1);
+    $pdf->Cell(0, 5.5, $tr((string)($f['email'] ?? '')), 0, 1);
 
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(50, 6, $tr('Adresse IP de soumission'), 0, 0);
+    $pdf->Cell(50, 5.5, $tr('Adresse IP de soumission'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(0, 6, $tr((string)($f['ip'] ?? '')), 0, 1);
-
-    $pdf->SetY($startY + 56);
-    $pdf->SetFont('Helvetica', '', 9);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->MultiCell(0, 5, $tr(
-        "Signature électronique apposée par validation du formulaire de candidature en ligne, "
-        . "au sens du Règlement (UE) n° 910/2014 (« règlement eIDAS »). "
-        . "L'IPEC conserve l'horodatage et l'adresse IP de la soumission."
-    ), 0, 'L');
+    $pdf->Cell(0, 5.5, $tr((string)($f['ip'] ?? '')), 0, 1);
 
     return $pdf->Output('S');
 }
