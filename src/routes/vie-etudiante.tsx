@@ -45,7 +45,7 @@ function VieEtudiante() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* UNiDAYS */}
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
               <Sparkles className="text-blue mb-6" size={28} strokeWidth={1.5} />
               <div className="text-xs uppercase tracking-widest text-blue mb-3">Partenaire</div>
               <h3 className="font-display text-2xl text-cream mb-4">Réductions UNiDAYS</h3>
@@ -68,7 +68,7 @@ function VieEtudiante() {
             </div>
 
             {/* STIB */}
-            <div className="p-10 rounded-sm border border-border/60 bg-card/50">
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
               <Bus className="text-blue mb-6" size={28} strokeWidth={1.5} />
               <div className="text-xs uppercase tracking-widest text-blue mb-3">Transports bruxellois</div>
               <h3 className="font-display text-2xl text-cream mb-4">Tarif étudiant STIB-MIVB</h3>
