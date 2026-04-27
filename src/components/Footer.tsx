@@ -36,12 +36,11 @@ export function Footer() {
             Navigation
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/programmes" className="hover:text-blue">Programmes</Link></li>
-            <li><Link to="/admissions" className="hover:text-blue">Admissions</Link></li>
-            <li><Link to="/international" className="hover:text-blue">International</Link></li>
-            <li><Link to="/vie-etudiante" className="hover:text-blue">Vie étudiante</Link></li>
-            <li><Link to="/inscription" className="hover:text-blue">Inscription</Link></li>
-            <li><Link to="/contact" className="hover:text-blue">Contact</Link></li>
+            {NAV_LINKS.filter((l) => l.to !== pathname).map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="hover:text-blue">{l.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 
