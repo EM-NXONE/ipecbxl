@@ -27,7 +27,7 @@ function VieEtudiante() {
             <span className="text-xs uppercase tracking-[0.3em]">Vie étudiante</span>
           </div>
           <h1 className="font-display md:text-7xl text-cream leading-[1] max-w-4xl text-balance text-5xl">
-            Le statut étudiant IPEC, <em className="text-gradient-blue not-italic">au-delà du campus</em>.
+            <em className="text-gradient-blue not-italic">Au-delà du campus</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Inscrits à l'IPEC, vous bénéficiez d'une série de réductions et de
