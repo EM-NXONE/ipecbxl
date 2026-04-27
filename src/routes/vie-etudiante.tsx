@@ -40,7 +40,7 @@ function VieEtudiante() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Tarifs préférentiels</div>
           <h2 className="font-display text-4xl md:text-5xl text-cream mb-16 max-w-3xl text-balance">
-            Étudier à Bruxelles, à tarif étudiant.
+            La ville à portée d'étudiant.
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
