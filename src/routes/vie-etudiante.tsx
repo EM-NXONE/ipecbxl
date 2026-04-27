@@ -73,9 +73,10 @@ function VieEtudiante() {
               <div className="text-xs uppercase tracking-widest text-blue mb-3">Transports bruxellois</div>
               <h3 className="font-display text-2xl text-cream mb-4">Tarif étudiant STIB-MIVB</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                En tant qu'étudiant inscrit à l'IPEC, vous avez droit au tarif
-                préférentiel <span className="text-cream">STIB-MIVB</span> pour
-                vos déplacements en métro, tram et bus dans toute la Région
+                En tant qu'étudiant inscrit à l'IPEC et jusqu'à l'âge de 24 ans,
+                vous avez droit au tarif préférentiel{" "}
+                <span className="text-cream">STIB-MIVB</span> pour vos
+                déplacements en métro, tram et bus dans toute la Région
                 bruxelloise. L'institut vous délivre, sur demande, l'attestation
                 d'inscription nécessaire à la souscription de l'abonnement.
               </p>
