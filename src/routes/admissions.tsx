@@ -244,11 +244,12 @@ function Admissions() {
             <CreditCard className="text-blue mb-6" size={28} strokeWidth={1.5} />
             <h3 className="font-display text-2xl text-cream mb-3">Modalités de paiement</h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-              Les frais de scolarité sont réglés en deux tranches. Un échéancier
-              personnalisé peut être convenu, sur demande, avec le service administratif.
+              Les frais de scolarité sont réglés en trois versements pour étaler la
+              charge sur l'année. Un échéancier personnalisé peut également être
+              convenu, sur demande, avec le service administratif.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">1ʳᵉ tranche</div>
                 <div className="font-display text-xl text-cream mb-2">3 000 € à l'inscription</div>
@@ -257,11 +258,18 @@ function Admissions() {
                 </p>
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
-                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche — solde</div>
-                <div className="font-display text-xl text-cream mb-2">2 950 € (PAA) · 4 150 € (PEA)</div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche</div>
+                <div className="font-display text-xl text-cream mb-2">1 475 € (PAA) · 2 075 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Étudiants en présentiel : avant le début effectif des cours.
                   Étudiants internationaux : à l'arrivée à l'institut.
+                </p>
+              </div>
+              <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">3ᵉ tranche — solde</div>
+                <div className="font-display text-xl text-cream mb-2">1 475 € (PAA) · 2 075 € (PEA)</div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Exigible avant les examens du second semestre.
                 </p>
               </div>
             </div>

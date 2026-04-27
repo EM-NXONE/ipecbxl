@@ -50,26 +50,34 @@ function CGV() {
               <li>PEA — Programme Exécutif Avancé : 7 150 € / an</li>
             </ul>
             <p className="mt-3">
-              Une première tranche de 3 000 € est due à la confirmation d'inscription.
-              Le solde — soit 2 950 € en PAA et 4 150 € en PEA — est exigible avant le
-              début effectif des cours pour les étudiants en présentiel ; pour les
-              étudiants internationaux soumis à une procédure de visa, ce solde est dû
-              à l'arrivée à l'institut. Les sommes versées sont intégralement déduites
-              des droits de scolarité annuels.
+              Une première tranche de 3 000 € est due à la confirmation
+              d'inscription. Le solde — soit 2 950 € en PAA et 4 150 € en PEA —
+              est ensuite réparti en deux versements égaux : une deuxième
+              tranche (1 475 € en PAA, 2 075 € en PEA) exigible avant le début
+              effectif des cours pour les étudiants en présentiel, ou à
+              l'arrivée à l'institut pour les étudiants internationaux soumis à
+              une procédure de visa ; et une troisième tranche du même montant
+              exigible avant les examens du second semestre. Les sommes versées
+              sont intégralement déduites des droits de scolarité annuels.
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">4. Modalités de paiement</h2>
             <p className="mb-3">
-              Les droits de scolarité sont réglés en deux tranches :
+              Les droits de scolarité sont réglés en trois versements :
             </p>
             <ul className="space-y-2 list-disc list-inside">
               <li>1ʳᵉ tranche de 3 000 € à la confirmation d'inscription</li>
               <li>
-                2ᵉ tranche — solde (2 950 € en PAA, 4 150 € en PEA) : avant le début
-                effectif des cours pour les étudiants en présentiel ; à l'arrivée à
-                l'institut pour les étudiants internationaux soumis à une procédure de visa
+                2ᵉ tranche (1 475 € en PAA, 2 075 € en PEA) : avant le début
+                effectif des cours pour les étudiants en présentiel ; à
+                l'arrivée à l'institut pour les étudiants internationaux soumis
+                à une procédure de visa
+              </li>
+              <li>
+                3ᵉ tranche — solde (1 475 € en PAA, 2 075 € en PEA) : exigible
+                avant les examens du second semestre
               </li>
             </ul>
             <div className="mt-6 p-5 rounded-sm border border-blue/30 bg-blue/5">
