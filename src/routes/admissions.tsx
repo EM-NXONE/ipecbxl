@@ -216,7 +216,7 @@ function Admissions() {
           <div className="mb-6">
             <div className="p-8 rounded-sm border border-border/60 bg-card/50">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Frais de dossier</div>
-              <div className="font-display text-3xl text-cream mb-3">400 € <span className="text-base text-muted-foreground font-sans">· paiement unique</span></div>
+              <div className="font-display text-3xl text-cream mb-3">500 € <span className="text-base text-muted-foreground font-sans">· paiement unique</span></div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
                 Réglés une seule fois au dépôt de la candidature, ils couvrent l'instruction
                 administrative et pédagogique de votre dossier.
