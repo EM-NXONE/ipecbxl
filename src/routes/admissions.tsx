@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "IPEC | Admissions" },
-      { name: "description", content: "Admissions ouvertes à l'IPEC, institut privé en Belgique. Frais de dossier 500 €, scolarité PAA 5 950 €/an, PEA 7 150 €/an. Étudier à Bruxelles : candidatures belges et internationales." },
+      { name: "description", content: "Admissions ouvertes à l'IPEC, institut privé en Belgique. Frais de dossier 400 €, scolarité PAA 5 950 €/an, PEA 7 150 €/an. Étudier à Bruxelles : candidatures belges et internationales." },
       { name: "keywords", content: "admissions Bruxelles, admissions Belgique, candidature école privée Bruxelles, candidature école privée Belgique, inscription université privée Bruxelles, inscription université privée Belgique, institut privé Bruxelles admissions, institut privé Belgique admissions, frais scolarité Bruxelles, étudier à Bruxelles, étudier en Belgique, admission BAC+3 Bruxelles, admission BAC+5 Bruxelles, IPEC admissions" },
       { property: "og:title", content: "Admissions IPEC — Institut privé Belgique · Bruxelles" },
       { property: "og:description", content: "Process simple, frais transparents, accueil des étudiants belges et internationaux dans une école supérieure privée à Bruxelles." },
@@ -216,7 +216,7 @@ function Admissions() {
           <div className="mb-6">
             <div className="p-8 rounded-sm border border-border/60 bg-card/50">
               <div className="text-xs uppercase tracking-widest text-blue mb-2">Frais de dossier</div>
-              <div className="font-display text-3xl text-cream mb-3">500 € <span className="text-base text-muted-foreground font-sans">· paiement unique</span></div>
+              <div className="font-display text-3xl text-cream mb-3">400 € <span className="text-base text-muted-foreground font-sans">· paiement unique</span></div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
                 Réglés une seule fois au dépôt de la candidature, ils couvrent l'instruction
                 administrative et pédagogique de votre dossier.
