@@ -30,10 +30,7 @@ function VieEtudiante() {
             <em className="text-gradient-blue not-italic">Au-delà du campus</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
-            Inscrits à l'IPEC, vous bénéficiez d'une série de réductions et de
-            tarifs préférentiels au quotidien — du shopping aux transports
-            bruxellois — grâce à nos partenaires et au cadre belge applicable
-            aux étudiants de l'enseignement supérieur.
+            Inscrits à l'IPEC, vous bénéficiez d'une série de réductions et de tarifs préférentiels au quotidien, du shopping aux transports bruxellois, grâce à nos partenaires.
           </p>
         </div>
       </section>
