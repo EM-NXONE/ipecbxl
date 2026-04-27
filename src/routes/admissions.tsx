@@ -342,7 +342,7 @@ function Admissions() {
                 la souscription de l'abonnement.
               </p>
               <a
-                href="https://www.stib-mivb.be/article.html?l=fr&_guid=a2b6f410-b2b6-c8a9-4dc6-1a8e4b9c0a1f&news_rid=/STIB-MIVB/INTERNET/ACTUS/WEB_Article_1542637038829.xml"
+                href="https://www.stib-mivb.be/abonnements.html?l=fr"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
