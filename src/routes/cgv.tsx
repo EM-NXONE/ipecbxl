@@ -60,6 +60,11 @@ function CGV() {
               exigible avant les examens du second semestre. Les sommes versées
               sont intégralement déduites des droits de scolarité annuels.
             </p>
+            <p className="mt-3 text-cream">
+              L'ensemble des montants indiqués dans les présentes CGV — frais
+              de dossier comme frais de scolarité — s'entendent toutes taxes
+              comprises (TVA incluse, le cas échéant).
+            </p>
           </section>
 
           <section>
