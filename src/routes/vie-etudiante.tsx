@@ -106,8 +106,8 @@ function VieEtudiante() {
             Trouver un logement étudiant.
           </h2>
           <p className="max-w-3xl text-muted-foreground leading-relaxed text-base mb-16">
-            À titre informatif, si vous devez trouver une solution de logement durant vos études à
-            Bruxelles, voici quelques plateformes utiles.
+            À titre indicatif, si vous recherchez un logement durant vos études
+            à Bruxelles, voici quelques plateformes de référence.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
