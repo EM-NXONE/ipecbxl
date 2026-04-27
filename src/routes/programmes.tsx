@@ -183,7 +183,7 @@ function Programmes() {
               </p>
               <div className="inline-flex items-baseline gap-3 px-5 py-3 rounded-sm bg-card border border-border/60">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">Frais de scolarité</span>
-                <span className="font-display text-2xl text-gradient-blue">4 900 €</span>
+                <span className="font-display text-2xl text-gradient-blue">5 950 €</span>
                 <span className="text-xs text-muted-foreground">/ an</span>
               </div>
             </div>
@@ -221,7 +221,7 @@ function Programmes() {
               </p>
               <div className="inline-flex items-baseline gap-3 px-5 py-3 rounded-sm bg-card border border-border/60">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">Frais de scolarité</span>
-                <span className="font-display text-2xl text-gradient-blue">5 900 €</span>
+                <span className="font-display text-2xl text-gradient-blue">7 150 €</span>
                 <span className="text-xs text-muted-foreground">/ an</span>
               </div>
             </div>
