@@ -46,12 +46,12 @@ function CGV() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">3. Frais de scolarité</h2>
             <ul className="space-y-2 list-disc list-inside">
-              <li>PAA — Administration des Affaires : 4 900 € / an</li>
-              <li>PEA — Programme Exécutif Avancé : 5 900 € / an</li>
+              <li>PAA — Administration des Affaires : 5 950 € / an</li>
+              <li>PEA — Programme Exécutif Avancé : 7 150 € / an</li>
             </ul>
             <p className="mt-3">
               Une première tranche de 3 000 € est due à la confirmation d'inscription.
-              Le solde — soit 1 900 € en PAA et 2 900 € en PEA — est exigible avant le
+              Le solde — soit 2 950 € en PAA et 4 150 € en PEA — est exigible avant le
               début effectif des cours pour les étudiants en présentiel ; pour les
               étudiants internationaux soumis à une procédure de visa, ce solde est dû
               à l'arrivée à l'institut. Les sommes versées sont intégralement déduites
@@ -67,7 +67,7 @@ function CGV() {
             <ul className="space-y-2 list-disc list-inside">
               <li>1ʳᵉ tranche de 3 000 € à la confirmation d'inscription</li>
               <li>
-                2ᵉ tranche — solde (1 900 € en PAA, 2 900 € en PEA) : avant le début
+                2ᵉ tranche — solde (2 950 € en PAA, 4 150 € en PEA) : avant le début
                 effectif des cours pour les étudiants en présentiel ; à l'arrivée à
                 l'institut pour les étudiants internationaux soumis à une procédure de visa
               </li>

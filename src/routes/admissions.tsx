@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admissions")({
   head: () => ({
     meta: [
       { title: "IPEC | Admissions" },
-      { name: "description", content: "Admissions ouvertes à l'IPEC, institut privé en Belgique. Frais de dossier 500 €, scolarité PAA 4 900 €/an, PEA 5 900 €/an. Étudier à Bruxelles : candidatures belges et internationales." },
+      { name: "description", content: "Admissions ouvertes à l'IPEC, institut privé en Belgique. Frais de dossier 500 €, scolarité PAA 5 950 €/an, PEA 7 150 €/an. Étudier à Bruxelles : candidatures belges et internationales." },
       { name: "keywords", content: "admissions Bruxelles, admissions Belgique, candidature école privée Bruxelles, candidature école privée Belgique, inscription université privée Bruxelles, inscription université privée Belgique, institut privé Bruxelles admissions, institut privé Belgique admissions, frais scolarité Bruxelles, étudier à Bruxelles, étudier en Belgique, admission BAC+3 Bruxelles, admission BAC+5 Bruxelles, IPEC admissions" },
       { property: "og:title", content: "Admissions IPEC — Institut privé Belgique · Bruxelles" },
       { property: "og:description", content: "Process simple, frais transparents, accueil des étudiants belges et internationaux dans une école supérieure privée à Bruxelles." },
@@ -202,13 +202,13 @@ function Admissions() {
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PAA</div>
               <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+1 à BAC+3</div>
-              <div className="font-display text-6xl text-cream">4 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
+              <div className="font-display text-6xl text-cream">5 950 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme en Administration des Affaires</p>
             </div>
             <div className="p-10 rounded-sm border border-border/60 bg-card/50">
               <div className="font-display text-5xl text-gradient-blue mb-2">PEA</div>
               <div className="text-sm text-blue uppercase tracking-widest mb-8">BAC+4 et BAC+5</div>
-              <div className="font-display text-6xl text-cream">5 900 <span className="text-2xl text-muted-foreground">€/an</span></div>
+              <div className="font-display text-6xl text-cream">7 150 <span className="text-2xl text-muted-foreground">€/an</span></div>
               <p className="text-sm text-muted-foreground mt-6">Programme Exécutif Avancé</p>
             </div>
           </div>
@@ -258,7 +258,7 @@ function Admissions() {
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">2ᵉ tranche — solde</div>
-                <div className="font-display text-xl text-cream mb-2">1 900 € (PAA) · 2 900 € (PEA)</div>
+                <div className="font-display text-xl text-cream mb-2">2 950 € (PAA) · 4 150 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Étudiants en présentiel : avant le début effectif des cours.
                   Étudiants internationaux : à l'arrivée à l'institut.
