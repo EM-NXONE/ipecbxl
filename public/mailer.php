@@ -685,7 +685,7 @@ function buildCandidaturePdf(array $f): string {
     $pdf->Ln(1);
 
     $clauses = [
-        "Le candidat déclare avoir pris connaissance et accepte sans réserve les conditions particulières d'admission de l'IPEC, publiées sur https://ipec.school/cgv. Cette acceptation, formalisée par la validation électronique du formulaire de candidature, vaut signature au sens des articles XII.15 et suivants du Code de droit économique belge.",
+        "Le candidat déclare avoir pris connaissance des conditions particulières d'admission de l'IPEC, publiées sur https://ipec.school/cgv. La validation électronique du formulaire de candidature vaut signature électronique au sens du Règlement (UE) n° 910/2014 du Parlement européen et du Conseil du 23 juillet 2014 (« règlement eIDAS »).",
         "Le candidat autorise l'IPEC à traiter les informations personnelles transmises dans le cadre de l'examen de sa candidature, conformément au Règlement Général sur la Protection des Données (RGPD — UE 2016/679) et à la politique de confidentialité publiée sur https://ipec.school/confidentialite.",
         "Le candidat certifie sur l'honneur l'exactitude des informations communiquées. Toute déclaration inexacte ou incomplète pourra entraîner le rejet de la candidature ou l'annulation d'une admission déjà prononcée.",
     ];
