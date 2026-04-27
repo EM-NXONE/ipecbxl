@@ -580,47 +580,34 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetXY($boxLeftX + $padX, $boxTop + $padY);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('CANDIDAT'), 0, 2);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('CANDIDAT.E'), 0, 2);
+    $pdf->Ln(1);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Ln(1);
-    $pdf->SetX($boxLeftX + $padX);
-    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
-    if (!empty($f['dateNaissance'])) {
+
+    $candLine = function($value) use ($pdf, $tr, $boxLeftX, $boxWidth, $padX) {
         $pdf->SetX($boxLeftX + $padX);
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->SetTextColor(91, 100, 120);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr('Né·e le ' . formatDateFr((string)$f['dateNaissance'])), 0, 'L');
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$value), 0, 'L');
+    };
+
+    $candLine(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? '')));
+    if (!empty($f['dateNaissance'])) {
+        $candLine('Né·e le ' . formatDateFr((string)$f['dateNaissance']));
     }
     if (!empty($f['nationalite'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->SetTextColor(91, 100, 120);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr('Nationalité : ' . (string)$f['nationalite']), 0, 'L');
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->SetFont('Helvetica', '', 10);
+        $candLine('Nationalité : ' . (string)$f['nationalite']);
     }
     if (!empty($f['adresse'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
+        $candLine((string)$f['adresse']);
     }
     if (!empty($f['paysResidence'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L');
+        $candLine((string)$f['paysResidence']);
     }
     if (!empty($f['email'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr((string)$f['email']), 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
+        $candLine((string)$f['email']);
     }
     if (!empty($f['telephone'])) {
-        $pdf->SetX($boxLeftX + $padX);
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr((string)$f['telephone']), 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
+        $candLine((string)$f['telephone']);
     }
     $leftEndY = $pdf->GetY();
 
