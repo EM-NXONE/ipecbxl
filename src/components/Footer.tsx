@@ -1,7 +1,17 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { LogoIpec } from "@/components/LogoIpec";
 
+const NAV_LINKS = [
+  { to: "/programmes", label: "Programmes" },
+  { to: "/admissions", label: "Admissions" },
+  { to: "/international", label: "International" },
+  { to: "/vie-etudiante", label: "Vie étudiante" },
+  { to: "/inscription", label: "Inscription" },
+  { to: "/contact", label: "Contact" },
+] as const;
+
 export function Footer() {
+  const { pathname } = useLocation();
   return (
     <footer className="border-t border-border/40 bg-surface mt-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
@@ -26,12 +36,11 @@ export function Footer() {
             Navigation
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/programmes" className="hover:text-blue">Programmes</Link></li>
-            <li><Link to="/admissions" className="hover:text-blue">Admissions</Link></li>
-            <li><Link to="/international" className="hover:text-blue">International</Link></li>
-            <li><Link to="/vie-etudiante" className="hover:text-blue">Vie étudiante</Link></li>
-            <li><Link to="/inscription" className="hover:text-blue">Inscription</Link></li>
-            <li><Link to="/contact" className="hover:text-blue">Contact</Link></li>
+            {NAV_LINKS.filter((l) => l.to !== pathname).map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="hover:text-blue">{l.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 
