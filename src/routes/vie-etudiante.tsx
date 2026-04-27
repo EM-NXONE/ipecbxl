@@ -114,49 +114,68 @@ function VieEtudiante() {
             et la colocation, qui couvrent l'ensemble de la Région bruxelloise.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* BRUKOT */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
               <Home className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <div className="text-xs uppercase tracking-widest text-blue mb-3">Plateforme officielle</div>
-              <h3 className="font-display text-2xl text-cream mb-4">Brukot — Brik</h3>
+              <div className="text-xs uppercase tracking-widest text-blue mb-3">Logement étudiant</div>
+              <h3 className="font-display text-2xl text-cream mb-4">Brukot</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                <span className="text-cream">Brukot</span> est la plateforme de
-                logement étudiant gérée par <span className="text-cream">Brik</span>,
-                le centre d'information et de soutien aux étudiants de Bruxelles.
-                Vous y trouvez des kots, studios et chambres sélectionnés,
-                ainsi qu'un contrat-type, des conseils juridiques et un service
-                de médiation en cas de litige avec un propriétaire.
+                <span className="text-cream">Brukot</span> répertorie des
+                annonces de kots, studios et chambres à louer à Bruxelles,
+                spécifiquement orientées vers le public étudiant. Une bonne
+                porte d'entrée pour comparer les biens disponibles dans les
+                différentes communes bruxelloises.
               </p>
               <a
-                href="https://brukot.brussels/"
+                href="https://brukot.be/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-blue hover:underline mt-auto"
               >
-                Consulter Brukot.brussels <ArrowRight size={14} />
+                Consulter Brukot.be <ArrowRight size={14} />
               </a>
             </div>
 
-            {/* BRIK */}
+            {/* IMMOWEB */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
               <Building2 className="text-blue mb-6" size={28} strokeWidth={1.5} />
-              <div className="text-xs uppercase tracking-widest text-blue mb-3">Information & accompagnement</div>
-              <h3 className="font-display text-2xl text-cream mb-4">Brik — Student in Brussels</h3>
+              <div className="text-xs uppercase tracking-widest text-blue mb-3">Annonces immobilières</div>
+              <h3 className="font-display text-2xl text-cream mb-4">Immoweb</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                <span className="text-cream">Brik</span> accompagne les étudiants
-                dans toutes leurs démarches liées à la vie à Bruxelles : recherche
-                de logement, droit du bail étudiant, domiciliation, aides
-                financières et événements pour rencontrer d'autres étudiants.
-                Un point de référence incontournable pour s'installer sereinement.
+                <span className="text-cream">Immoweb</span> est le principal
+                portail immobilier de Belgique. Vous y trouvez un large choix
+                d'appartements, studios et colocations à louer à Bruxelles,
+                avec des filtres par budget, quartier et superficie.
               </p>
               <a
-                href="https://www.brik.be/fr"
+                href="https://www.immoweb.be/fr/recherche/maison-et-appartement/a-louer"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-blue hover:underline mt-auto"
               >
-                Découvrir Brik.be <ArrowRight size={14} />
+                Consulter Immoweb <ArrowRight size={14} />
+              </a>
+            </div>
+
+            {/* IKOT */}
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
+              <Home className="text-blue mb-6" size={28} strokeWidth={1.5} />
+              <div className="text-xs uppercase tracking-widest text-blue mb-3">Kots & colocations</div>
+              <h3 className="font-display text-2xl text-cream mb-4">iKot</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                <span className="text-cream">iKot</span> est une plateforme
+                dédiée aux logements étudiants en Belgique : kots, studios
+                meublés et colocations. L'interface permet de cibler rapidement
+                les biens proches de votre lieu d'études.
+              </p>
+              <a
+                href="https://www.ikot.be/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue hover:underline mt-auto"
+              >
+                Consulter iKot.be <ArrowRight size={14} />
               </a>
             </div>
           </div>
