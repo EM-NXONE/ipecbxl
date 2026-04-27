@@ -663,7 +663,7 @@ function buildFacturePdf(array $f): array {
     $iban = 'BE53 3770 8630 2553';
     $bic  = 'BBRUBEBB';
 
-    $montant = 400.00;
+    $montant = 500.00;
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
