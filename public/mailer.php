@@ -748,8 +748,8 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
         "Signature électronique apposée par validation du formulaire de candidature en ligne, "
-        . "au sens du Règlement eIDAS (UE 910/2014) et des articles XII.15 et suivants du Code de "
-        . "droit économique belge. L'IPEC conserve l'horodatage et l'adresse IP de la soumission."
+        . "au sens du Règlement (UE) n° 910/2014 (« règlement eIDAS »). "
+        . "L'IPEC conserve l'horodatage et l'adresse IP de la soumission."
     ), 0, 'L');
 
     return $pdf->Output('S');
