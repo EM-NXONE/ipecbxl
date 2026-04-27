@@ -669,9 +669,9 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->MultiCell(168, 5.5, $tr(
-        "Le présent document atteste de la soumission, par voie électronique, du dossier de candidature "
-        . "ci-dessus à l'Institut privé des études commerciales (IPEC). Il constitue la preuve formelle "
-        . "de l'enregistrement de la candidature et fait foi entre les parties."
+        "Le présent document atteste de la soumission, par voie électronique, de votre demande "
+        . "de candidature à l'Institut Privé des Études Commerciales (IPEC). Il constitue la preuve "
+        . "formelle de l'enregistrement de votre candidature et fait foi entre les parties."
     ), 0, 'L');
     $pdf->Ln(2);
 
