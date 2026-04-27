@@ -37,7 +37,7 @@ function CGV() {
           <section>
             <h2 className="font-display text-2xl text-cream mb-4">2. Frais de dossier</h2>
             <p>
-              Les frais de dossier s'élèvent à 400 €, réglés au
+              Les frais de dossier s'élèvent à 500 €, réglés au
               dépôt de la candidature. Ils couvrent l'instruction administrative et pédagogique du
               dossier et restent acquis à l'IPEC quelle que soit la décision d'admission.
             </p>
