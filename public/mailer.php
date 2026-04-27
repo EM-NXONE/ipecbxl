@@ -1340,7 +1340,7 @@ if ($type === 'inscription') {
             $candidateMail->addStringAttachment($pdfAttachment, $pdfFilename, 'base64', 'application/pdf');
         }
 
-        // PJ #2 : facture des frais de dossier (400 €).
+        // PJ #2 : facture des frais de dossier (500 €).
         $factureError = null;
         try {
             [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
