@@ -27,7 +27,7 @@ function VieEtudiante() {
             La vie <em className="text-gradient-blue not-italic">au-delà du campus</em>.
           </h1>
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
-            Étudier à l'IPEC, c'est aussi profiter de Bruxelles au quotidien : réductions UNiDAYS, tarif préférentiel STIB-MIVB et plateformes utiles pour trouver un logement étudiant dans la capitale.
+            En tant qu'étudiant inscrit à l'IPEC, vous accédez à plusieurs dispositifs liés à la vie étudiante en Région bruxelloise : réductions UNiDAYS, tarif préférentiel STIB-MIVB et ressources de référence pour la recherche d'un logement.
           </p>
         </div>
       </section>
