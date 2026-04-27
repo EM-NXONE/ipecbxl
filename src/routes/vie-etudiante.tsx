@@ -111,12 +111,8 @@ function VieEtudiante() {
             Trouver un logement étudiant.
           </h2>
           <p className="max-w-3xl text-muted-foreground leading-relaxed text-base mb-16">
-            L'IPEC ne dispose pas de résidence universitaire en propre. Si
-            vous avez besoin de vous loger durant vos études — pour toute la
-            durée de votre cursus ou simplement le temps d'une année
-            académique — nous vous orientons vers des plateformes reconnues,
-            spécialisées dans le logement étudiant et la colocation, qui
-            couvrent l'ensemble de la Région bruxelloise.
+            À titre informatif, si vous devez vous loger durant vos études à
+            Bruxelles, voici quelques plateformes utiles.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
