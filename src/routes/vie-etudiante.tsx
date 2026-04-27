@@ -115,7 +115,7 @@ function VieEtudiante() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* BRUKOT */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <h3 className="font-display text-2xl text-cream mb-4">Brukot</h3>
+              <h3 className="font-display text-2xl text-blue mb-4">Brukot</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">Brukot</span> répertorie des
                 annonces de kots, studios et chambres à louer à Bruxelles,
@@ -135,7 +135,7 @@ function VieEtudiante() {
 
             {/* IMMOWEB */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <h3 className="font-display text-2xl text-cream mb-4">Immoweb</h3>
+              <h3 className="font-display text-2xl text-blue mb-4">Immoweb</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">Immoweb</span> est le principal
                 portail immobilier de Belgique. Vous y trouvez un large choix
@@ -154,7 +154,7 @@ function VieEtudiante() {
 
             {/* IKOT */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
-              <h3 className="font-display text-2xl text-cream mb-4">iKot</h3>
+              <h3 className="font-display text-2xl text-blue mb-4">iKot</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                 <span className="text-cream">iKot</span> est une plateforme
                 dédiée aux logements étudiants en Belgique : kots, studios
