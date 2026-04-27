@@ -835,6 +835,11 @@ function buildFacturePdf(array $f): array {
     // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
     $firstLine = 'Frais de dossier IPEC — Année académique ' . $academicYear;
 
+    // Décomposition TVA : le montant indiqué est TTC, TVA belge 21%
+    $tauxTva = 0.21;
+    $montantHT  = round($montant / (1 + $tauxTva), 2);
+    $montantTVA = round($montant - $montantHT, 2);
+
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
     $pdf->SetX(22);
@@ -849,27 +854,41 @@ function buildFacturePdf(array $f): array {
     $pdf->SetXY(160, $startYRow);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(30, 6, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+    $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
     $pdf->SetY($endY);
 
     $pdf->SetDrawColor(220, 226, 240);
     $pdf->SetLineWidth(0.2);
     $pdf->Line(20, $pdf->GetY() + 3, 190, $pdf->GetY() + 3);
-    $pdf->Ln(8);
+    $pdf->Ln(4);
 
-    // Total
+    // Sous-total HT
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(110, 6, '', 0, 0);
+    $pdf->Cell(30, 6, $tr('Sous-total HT'), 0, 0, 'R');
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+
+    // TVA 21%
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(110, 6, '', 0, 0);
+    $pdf->Cell(30, 6, $tr('TVA 21%'), 0, 0, 'R');
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+
+    $pdf->Ln(2);
+
+    // Total TTC
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetFont('Helvetica', 'B', 11);
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(110, 10, '', 0, 0);
-    $pdf->Cell(30, 10, $tr('TOTAL'), 0, 0, 'R', true);
+    $pdf->Cell(30, 10, $tr('TOTAL TTC'), 0, 0, 'R', true);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(30, 10, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R', true);
 
-    $pdf->SetFont('Helvetica', '', 8);
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 4, $tr('TVA non applicable (art. 44 §2 4° CTVA, enseignement).'), 0, 1, 'R');
-    $pdf->Ln(10);
+    $pdf->Ln(6);
 
     // Bloc paiement
     $startY = $pdf->GetY();
