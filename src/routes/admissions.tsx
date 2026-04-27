@@ -254,7 +254,7 @@ function Admissions() {
                 <div className="text-xs uppercase tracking-widest text-blue mb-2">1ʳᵉ tranche</div>
                 <div className="font-display text-xl text-cream mb-2">3 000 € à l'inscription</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Versée à la confirmation d'inscription, elle valide définitivement votre place.
+                  Versée à la confirmation d'inscription, elle valide définitivement votre inscription.
                 </p>
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
