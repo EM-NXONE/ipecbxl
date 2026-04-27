@@ -681,7 +681,7 @@ function buildCandidaturePdf(array $f): string {
     $pdf->Ln(4);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(0, 6, $tr('ENGAGEMENTS ACCEPTÉS PAR LE CANDIDAT'), 0, 1);
+    $pdf->Cell(0, 6, $tr("CLAUSES D'INFORMATION"), 0, 1);
     $pdf->Ln(1);
 
     $clauses = [
