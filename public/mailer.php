@@ -631,8 +631,8 @@ function buildCandidaturePdf(array $f): string {
     if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
     if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
     if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
-    if ($rentreeLabel !== '')  $infoRow('Rentrée envisagée', $rentreeLabel);
-    $infoRow('Année académique', $academicYear);
+    $rentreeValue = trim(($rentreeLabel !== '' ? $rentreeLabel : '') . ($rentreeLabel !== '' ? ' — ' : '') . 'année académique ' . $academicYear);
+    $infoRow('Rentrée', $rentreeValue);
 
     $rightEndY = $pdf->GetY();
 
