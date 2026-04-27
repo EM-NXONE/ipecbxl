@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Bus, ArrowRight, GraduationCap } from "lucide-react";
+import { Sparkles, Bus, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/vie-etudiante")({
   head: () => ({
@@ -22,10 +22,7 @@ function VieEtudiante() {
       {/* HERO */}
       <section className="py-20 lg:py-32 border-b border-border/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="flex items-center gap-2 text-blue mb-6">
-            <GraduationCap size={16} />
-            <span className="text-xs uppercase tracking-[0.3em]">Vie étudiante</span>
-          </div>
+          <div className="text-xs uppercase tracking-[0.3em] text-blue mb-6">— Vie étudiante</div>
           <h1 className="font-display md:text-7xl text-cream leading-[1] max-w-4xl text-balance text-5xl">
             La vie <em className="text-gradient-blue not-italic">au-delà du campus</em>.
           </h1>
