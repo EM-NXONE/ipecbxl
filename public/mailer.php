@@ -675,18 +675,7 @@ function buildCandidaturePdf(array $f): string {
     ), 0, 'L');
     $pdf->Ln(2);
 
-    // ===== Message du candidat (optionnel) =====
-    if (!empty($f['message'])) {
-        $pdf->Ln(3);
-        $pdf->SetFont('Helvetica', 'B', 9);
-        $pdf->SetTextColor(44, 93, 219);
-        $pdf->Cell(0, 6, $tr('MESSAGE DU CANDIDAT'), 0, 1);
-        $pdf->Ln(1);
-        $pdf->SetX(22);
-        $pdf->SetFont('Helvetica', '', 10);
-        $pdf->SetTextColor(15, 21, 37);
-        $pdf->MultiCell(168, 5.5, $tr((string)$f['message']), 0, 'L');
-    }
+
 
     // ===== Engagements acceptés =====
     $pdf->Ln(4);
