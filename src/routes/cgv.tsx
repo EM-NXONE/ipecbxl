@@ -145,9 +145,10 @@ function CGV() {
             <ol className="space-y-4 list-decimal list-outside ml-5">
               <li>
                 Dès réception du dossier complet et du paiement des frais de dossier
-                (400 € pour l'année académique en cours),
-                l'IPEC délivre une attestation de préadmission dans un délai raisonnable.
-                Les frais de dossier ne sont en aucun cas remboursables.
+                (400 € pour l'année académique en cours), le candidat est convié à un
+                entretien d'admission. En cas de suite favorable à l'issue de cet
+                entretien, l'IPEC délivre une attestation de préadmission dans un
+                délai raisonnable. Les frais de dossier ne sont en aucun cas remboursables.
               </li>
               <li>
                 Formation et diplôme non reconnus par la
