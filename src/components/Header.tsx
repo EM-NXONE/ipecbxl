@@ -9,6 +9,7 @@ const links = [
   { to: "/programmes", label: "Programmes" },
   { to: "/admissions", label: "Admissions" },
   { to: "/international", label: "International" },
+  { to: "/vie-etudiante", label: "Vie étudiante" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
