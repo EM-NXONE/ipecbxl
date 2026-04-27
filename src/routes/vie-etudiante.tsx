@@ -80,10 +80,10 @@ function VieEtudiante() {
                 d'inscription nécessaire à la souscription de l'abonnement.
               </p>
               <a
-                href="https://www.stib-mivb.be/abonnements.html?l=fr"
+                href="https://www.stib-mivb.be/accueil/acheter/notre-catalogue-d-abonnements"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-blue hover:underline mt-auto"
               >
                 Conditions et tarifs STIB-MIVB <ArrowRight size={14} />
               </a>
