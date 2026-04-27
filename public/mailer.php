@@ -522,7 +522,7 @@ function buildCandidaturePdf(array $f): string {
     $pdf->SetXY(120, 20);
     $pdf->SetFont('Helvetica', 'B', 13);
     $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(70, 7, $tr('CONFIRMATION DE CANDIDATURE'), 0, 2, 'R');
+    $pdf->Cell(70, 7, $tr('CONFIRMATION'), 0, 2, 'R');
     $pdf->SetX(120);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
