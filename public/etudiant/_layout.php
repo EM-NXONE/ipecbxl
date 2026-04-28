@@ -116,7 +116,7 @@ function etu_layout_end(?array $user = null): void {
     <?php else: ?>
 </main>
     <?php endif; ?>
-<footer class="etu-footer">
+<footer class="site-footer">
     <div class="footer-inner">
         <span class="footer-brand">
             <?= etu_logo_svg('', 18) ?> IPEC
