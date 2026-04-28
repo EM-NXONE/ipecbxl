@@ -39,20 +39,19 @@ function Cookies() {
             <p>Le site de l'IPEC utilise les catégories de cookies suivantes :</p>
             <ul className="mt-3 space-y-2 list-disc list-inside">
               <li>
-                <strong className="text-cream">Cookies strictement nécessaires</strong> — indispensables
-                au fonctionnement du site (préférences d'affichage, thème clair/sombre).
+                Cookies strictement nécessaires — indispensables au fonctionnement du site
+                (préférences d'affichage, thème clair/sombre).
               </li>
               <li>
-                <strong className="text-cream">Cookies de mesure d'audience anonymisée</strong> —
-                permettent de comprendre l'usage du site afin de l'améliorer, sans identifier
-                personnellement les visiteurs.
+                Cookies de mesure d'audience anonymisée — permettent de comprendre l'usage du
+                site afin de l'améliorer, sans identifier personnellement les visiteurs.
               </li>
               <li>
-                <strong className="text-cream">Cookies tiers Google reCAPTCHA</strong> — déposés
-                par Google sur les pages comportant un formulaire (contact, inscription,
-                vérification de documents) afin de distinguer les utilisateurs humains des robots.
-                Ces cookies sont strictement nécessaires à la sécurité du site et ne servent ni
-                au profilage publicitaire, ni à la mesure d'audience. Voir la{" "}
+                Cookies tiers Google reCAPTCHA — déposés par Google sur les pages comportant un
+                formulaire (contact, inscription, vérification de documents) afin de distinguer
+                les utilisateurs humains des robots. Ces cookies sont strictement nécessaires à
+                la sécurité du site et ne servent ni au profilage publicitaire, ni à la mesure
+                d'audience. Voir la{" "}
                 <a href="/confidentialite" className="text-blue hover:underline">politique de confidentialité</a>{" "}
                 pour le détail des données transmises à Google.
               </li>
