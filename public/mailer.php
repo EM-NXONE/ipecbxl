@@ -73,6 +73,21 @@ register_shutdown_function(function () use (&$DEBUG) {
     }
 });
 
+// ----- Mode "library" : inclusion depuis l'admin pour réutiliser les builders -----
+// Si la constante IPEC_MAILER_AS_LIB est définie avant le require_once, on charge
+// uniquement les fonctions (buildCandidaturePdf, buildFacturePdf,
+// buildCandidateConfirmationHtml, etc.) sans exécuter le pipeline HTTP.
+if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
+    require_once __DIR__ . '/db_config.php';
+    require_once __DIR__ . '/PHPMailer/src/Exception.php';
+    require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
+    require_once __DIR__ . '/PHPMailer/src/SMTP.php';
+    if (is_file(__DIR__ . '/FPDF/fpdf.php')) {
+        require_once __DIR__ . '/FPDF/fpdf.php';
+    }
+    return; // stoppe l'évaluation du reste du fichier
+}
+
 header('Content-Type: application/json; charset=utf-8');
 
 // ----- Connexion base de données (PDO MySQL n0c) -----
