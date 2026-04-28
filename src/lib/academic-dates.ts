@@ -24,44 +24,49 @@ function formatFrenchDate(d: Date): string {
 
 /**
  * Determines the "current" academic year start year based on today.
- * If we're already past the second Monday of September, the current academic year
- * has started; otherwise the next academic year is the upcoming one.
+ * Bascule : le lendemain de la rentrée décalée (1er lundi de février),
+ * on considère que l'année académique suivante est désormais "en cours"
+ * pour les besoins d'affichage et des formulaires d'admission.
+ *
+ * Règle :
+ *  - jusqu'au lundi de la rentrée décalée (inclus) de l'année N → année N-1 / N
+ *  - à partir du mardi suivant → année N / N+1
  */
 export function getCurrentAcademicYearStart(today: Date = new Date()): number {
   const year = today.getFullYear();
-  const septemberStart = nthMondayOf(year, 8, 2); // 8 = September
-  // If we are still before the September rentrée, the current academic year started last September
-  return today < septemberStart ? year - 1 : year;
+  const februaryRentree = nthMondayOf(year, 1, 1); // 1er lundi de février année courante
+  // Date de bascule = lendemain de la rentrée décalée
+  const switchDate = new Date(
+    februaryRentree.getFullYear(),
+    februaryRentree.getMonth(),
+    februaryRentree.getDate() + 1,
+  );
+  return today < switchDate ? year - 1 : year;
 }
 
 /**
  * Returns the upcoming "rentrée principale" — second Monday of September.
- * If September's rentrée this year has already passed, returns next year's.
+ * Bascule le lendemain de la rentrée décalée : on cible alors le septembre suivant.
  */
 export function getNextSeptemberRentree(today: Date = new Date()): Date {
-  const year = today.getFullYear();
-  const candidate = nthMondayOf(year, 8, 2);
-  if (today <= candidate) return candidate;
-  return nthMondayOf(year + 1, 8, 2);
+  const startYear = getCurrentAcademicYearStart(today);
+  return nthMondayOf(startYear, 8, 2); // septembre = mois 8
 }
 
 /**
  * Returns the upcoming "rentrée décalée" — first Monday of February.
- * If February's rentrée this year has already passed, returns next year's.
+ * Bascule le lendemain de la rentrée décalée : on cible alors le février suivant.
  */
 export function getNextFebruaryRentree(today: Date = new Date()): Date {
-  const year = today.getFullYear();
-  const candidate = nthMondayOf(year, 1, 1); // 1 = February
-  if (today <= candidate) return candidate;
-  return nthMondayOf(year + 1, 1, 1);
+  const startYear = getCurrentAcademicYearStart(today);
+  return nthMondayOf(startYear + 1, 1, 1); // février de l'année suivant la rentrée de septembre
 }
 
 /**
  * Returns the academic year label for the upcoming September rentrée, e.g. "2026-2027".
  */
 export function getUpcomingAcademicYearLabel(today: Date = new Date()): string {
-  const sept = getNextSeptemberRentree(today);
-  const startYear = sept.getFullYear();
+  const startYear = getCurrentAcademicYearStart(today);
   return `${startYear}-${startYear + 1}`;
 }
 
