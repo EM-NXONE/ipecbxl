@@ -53,7 +53,15 @@ CREATE TABLE IF NOT EXISTS candidatures (
 
     PRIMARY KEY (id),
     UNIQUE KEY uniq_reference (reference),
+    UNIQUE KEY uniq_facture   (facture_numero),
     KEY idx_email     (email),
     KEY idx_created   (created_at),
     KEY idx_statut    (statut)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- MIGRATION (à exécuter une seule fois sur une base déjà créée) :
+-- Ajoute l'index unique sur facture_numero pour permettre la vérification
+-- d'authenticité par référence de facture (IPEC-FACT-AAAA-XXXXXX).
+-- ---------------------------------------------------------------------
+-- ALTER TABLE candidatures ADD UNIQUE KEY uniq_facture (facture_numero);
