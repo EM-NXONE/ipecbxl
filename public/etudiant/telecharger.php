@@ -98,8 +98,6 @@ try {
     if (!$d) { http_response_code(404); exit('Document introuvable.'); }
 
     // Régénération générique d'un document à partir de FPDF.
-    // Pour l'instant on rend une attestation simple à partir de `titre` + `description` + data_json,
-    // sans dépendre d'un système de templates complexe (à étendre quand de nouveaux templates seront créés).
     $data = [];
     if (!empty($d['data_json'])) {
         $tmp = json_decode($d['data_json'], true);
@@ -108,6 +106,28 @@ try {
 
     require_once __DIR__ . '/../FPDF/fpdf.php';
     require_once __DIR__ . '/../_pdf_classes.php';
+    require_once __DIR__ . '/../mailer.php'; // buildCandidaturePdf + autres builders
+
+    // ---- Template "recap_candidature" → builder dédié (PDF identique au mail historique) ----
+    if ($d['template'] === 'recap_candidature' && function_exists('buildCandidaturePdf')) {
+        $out = buildCandidaturePdf($data);
+        if ($out === '') { http_response_code(500); exit('PDF vide.'); }
+
+        $pdo->prepare("UPDATE documents
+                       SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                           nb_telechargements = nb_telechargements + 1
+                       WHERE id = ?")->execute([$id]);
+        $pdo->prepare("INSERT INTO etudiant_actions (etudiant_id, action, detail, ip)
+                       VALUES (?, 'download_doc', ?, ?)")
+            ->execute([$user['id'], 'Document ' . $d['reference'], $_SERVER['REMOTE_ADDR'] ?? null]);
+
+        $filename = safe_filename('candidature', (string)($data['reference'] ?? $d['reference']));
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
+
 
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
