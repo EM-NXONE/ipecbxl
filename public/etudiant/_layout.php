@@ -26,7 +26,7 @@ function etu_layout_start(string $title, ?array $user = null): void {
     $current = $_SERVER['REQUEST_URI'] ?? '';
     $isActive = function (string $href) use ($current) {
         $path = parse_url($current, PHP_URL_PATH) ?? '';
-        return str_ends_with($path, $href) ? ' aria-current="page"' : '';
+        return substr($path, -strlen($href)) === $href ? ' aria-current="page"' : '';
     };
     ?>
 <!DOCTYPE html>

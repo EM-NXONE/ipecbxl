@@ -19,11 +19,11 @@ Attends la propagation (jusqu'à 1 h, parfois plus).
 cPanel → **Domains** → **Create A New Domain**
 
   - Domain          : lms.ipec.school
-  - Document Root   : public_html/etudiant         ← CRUCIAL : pointe vers le dossier existant
+  - Document Root   : lms.ipec.school             ← CRUCIAL : dossier autonome, hors public_html
 
-➡️ Ne crée **pas** un nouveau dossier vide : on réutilise le code déjà en place
-   sous `public_html/etudiant/`. Ainsi rien n'est dupliqué et toute mise à jour
-   du code via FTP/Git est immédiatement visible aux deux endroits.
+➡️ Uploade le contenu de `public/etudiant/` directement dans ce dossier racine
+   du sous-domaine LMS. Il contient ses propres copies de `mailer.php`,
+   `db_config.php`, `FPDF/`, `PHPMailer/` et `site-style.css`.
 
 Décoche la case "Share document root" si elle est proposée.
 
@@ -48,9 +48,8 @@ ajoute dans `public/etudiant/.htaccess` :
 
 ## 5. Variables d'environnement / mailer
 
-Aucune modification nécessaire : le mailer (`public/mailer.php`) et la BDD
-(`public/db_config.php`) sont communs aux deux sous-domaines (admin, lms,
-ipec.school) puisque tout pointe vers le même filesystem.
+Aucune dépendance vers `public_html` : le LMS charge son `mailer.php` et son
+`db_config.php` locaux depuis la racine du sous-domaine.
 
 ## 6. Notes techniques
 
