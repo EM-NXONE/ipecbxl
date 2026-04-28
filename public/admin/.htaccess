@@ -1,0 +1,23 @@
+# Admin IPEC — interdit l'accès aux fichiers internes via HTTP
+<FilesMatch "^_">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(sql|env|md)$">
+    Require all denied
+</FilesMatch>
+
+# Force HTTPS (n0c termine le SSL en amont, vérif via X-Forwarded-Proto)
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Page d'accueil par défaut
+DirectoryIndex index.php login.php
+
+# Headers sécurité
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
