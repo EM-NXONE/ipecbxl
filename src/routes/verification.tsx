@@ -31,6 +31,8 @@ type VerifyResult = {
   valid: boolean;
   error?: string;
   reference?: string;
+  document_type?: "candidature" | "facture";
+  document_label?: string;
   candidat?: string;
   programme?: string;
   programme_code?: string;
@@ -38,8 +40,6 @@ type VerifyResult = {
   specialisation?: string | null;
   annee_academique?: string;
   rentree?: string;
-  statut?: string;
-  statut_label?: string;
   date_creation?: string;
 };
 
