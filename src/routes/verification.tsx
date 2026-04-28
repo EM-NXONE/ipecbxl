@@ -247,6 +247,14 @@ function VerificationPage() {
               par l'IPEC. La référence figure dans le pied de page de chaque document officiel.
               Aucune information personnelle complète n'est divulguée.
             </p>
+            <p className="text-xs text-muted-foreground/80 leading-relaxed mt-4 pt-4 border-t border-border/30">
+              <strong className="text-cream">Protection des données :</strong> conformément au RGPD,
+              le nom de famille est partiellement masqué et seules les informations strictement
+              nécessaires à l'authentification sont affichées. La vérification est protégée par
+              Google reCAPTCHA contre les usages automatisés. Pour plus d'informations, consultez
+              notre{" "}
+              <a href="/confidentialite" className="text-blue hover:underline">politique de confidentialité</a>.
+            </p>
           </div>
         </div>
       </section>
