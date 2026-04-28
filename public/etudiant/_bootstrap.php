@@ -167,9 +167,10 @@ function etu_session_create(int $etudiantId): string {
         mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
         $exp,
     ]);
+    $cookiePath = etu_base_path() === '' ? '/' : '/etudiant/';
     setcookie(ETU_COOKIE_NAME, $token, [
         'expires'  => time() + ETU_SESSION_LIFETIME,
-        'path'     => '/etudiant/',
+        'path'     => $cookiePath,
         'secure'   => !empty($_SERVER['HTTPS']),
         'httponly' => true,
         'samesite' => 'Lax',
@@ -184,9 +185,10 @@ function etu_session_destroy(): void {
             db()->prepare("DELETE FROM etudiant_sessions WHERE id = ?")->execute([$token]);
         } catch (\Throwable $e) {}
     }
+    $cookiePath = etu_base_path() === '' ? '/' : '/etudiant/';
     setcookie(ETU_COOKIE_NAME, '', [
         'expires'  => time() - 3600,
-        'path'     => '/etudiant/',
+        'path'     => $cookiePath,
         'secure'   => !empty($_SERVER['HTTPS']),
         'httponly' => true,
         'samesite' => 'Lax',
