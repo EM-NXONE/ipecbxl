@@ -111,6 +111,12 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
 
         $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
 
+        // Synchronise les "documents historiques" de la candidature dans les
+        // nouvelles tables `factures` + `documents` pour qu'ils apparaissent
+        // immédiatement dans l'espace étudiant. PDF jamais stockés : on n'écrit
+        // que les métadonnées + data_json (régénération à la volée).
+        etudiant_sync_documents_historiques($pdo, $etuId, $candidature, $adminUser);
+
         $pdo->commit();
         return [
             'etudiant_id'   => $etuId,
