@@ -62,6 +62,15 @@ function Contact() {
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
+
+    let recaptchaToken = "";
+    try {
+      recaptchaToken = await getRecaptchaToken("contact");
+    } catch {
+      // En cas d'échec du chargement reCAPTCHA, on laisse le backend décider
+      recaptchaToken = "";
+    }
+
     const payload = {
       type: "contact",
       prenom: String(fd.get("prenom") ?? ""),
@@ -70,6 +79,8 @@ function Contact() {
       sujet: String(fd.get("sujet") ?? ""),
       message: String(fd.get("message") ?? ""),
       website: "", // compat backend (ancien honeypot retiré du DOM)
+      recaptchaToken,
+      recaptchaAction: "contact",
     };
 
     try {
