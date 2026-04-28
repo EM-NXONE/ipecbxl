@@ -504,11 +504,15 @@ function buildCandidaturePdf(array $f): string {
 
     $now           = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr       = $now->format('d/m/Y');
-    $numCandidature = 'IPEC-CAND-' . $now->format('Ymd-His');
+    // Référence officielle stockée en base (IPEC-AAAA-XXXXXX). Fallback ancien
+    // format si non fournie (rétro-compat tests).
+    $reference     = trim((string)($f['reference'] ?? ''));
+    $numCandidature = $reference !== '' ? $reference : ('IPEC-CAND-' . $now->format('Ymd-His'));
     $submittedAt   = $now->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'candidature';
+    $pdf->reference = $reference;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Confirmation de candidature IPEC'));
