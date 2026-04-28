@@ -109,26 +109,19 @@ function CGV() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">5. Rétractation</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">5. Rétractation et remboursement</h2>
             <p>
               Conformément au Code de droit économique belge, l'étudiant dispose d'un délai de
-              14 jours à compter de la confirmation de son
-              inscription pour exercer son droit de rétractation, sauf renoncement exprès dans le
-              cas où la formation a déjà débuté à sa demande.
+              14 jours à compter de la confirmation de son inscription pour exercer son droit de
+              rétractation, sauf renoncement exprès dans le cas où la formation a déjà débuté à
+              sa demande. Passé ce délai, et notamment après la rentrée académique, les sommes
+              versées au titre de la scolarité ne sont pas remboursables, sauf cas de force
+              majeure dûment justifié. Les frais de dossier ne sont en aucun cas remboursables.
             </p>
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">6. Désistement et remboursement</h2>
-            <p>
-              En cas de désistement après la rentrée académique, les sommes versées au titre de la
-              scolarité ne sont pas remboursables, sauf cas de force majeure dûment justifié.
-              Les frais de dossier ne sont en aucun cas remboursables.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-display text-2xl text-cream mb-4">7. Retard de paiement</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">6. Retard de paiement</h2>
             <p>
               Tout retard de paiement peut entraîner la suspension de l'accès aux activités
               pédagogiques jusqu'à régularisation, sans préjudice de poursuites éventuelles.
