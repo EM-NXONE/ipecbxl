@@ -79,7 +79,7 @@ function admin_layout_start(string $title): void {
 function admin_layout_end(): void {
     ?>
 </main>
-<footer class="admin-footer">
+<footer class="site-footer">
     <div class="footer-inner">
         <span class="footer-brand">
             <?= admin_logo_svg('', 18) ?> IPEC
