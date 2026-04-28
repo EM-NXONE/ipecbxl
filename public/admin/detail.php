@@ -205,6 +205,13 @@ admin_flash();
                     <button type="submit" class="btn-secondary">↻ Régénérer le lien d'activation</button>
                 </form>
             <?php endif; ?>
+            <form method="POST" action="action.php" style="display:inline;"
+                  onsubmit="return confirm('Re-synchroniser la facture 400€ et le récap candidature dans l\'espace étudiant ? (sans doublon)');">
+                <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
+                <input type="hidden" name="do" value="sync_documents">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <button type="submit" class="btn-secondary">🔄 Synchroniser les documents</button>
+            </form>
         </div>
     <?php elseif ($etudiantHomonyme): ?>
         <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['email']) ?></strong>
