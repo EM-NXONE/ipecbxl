@@ -61,6 +61,8 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between gap-3">
             <p>© {new Date().getFullYear()} IPEC — Institut Privé des Études Commerciales ASBL</p>
             <nav className="flex flex-wrap gap-x-4 gap-y-1">
+              <Link to="/verification" className="hover:text-blue">Vérifier un document</Link>
+              <span aria-hidden="true">·</span>
               <Link to="/mentions-legales" className="hover:text-blue">Mentions légales</Link>
               <span aria-hidden="true">·</span>
               <Link to="/cgu" className="hover:text-blue">CGU</Link>

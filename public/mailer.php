@@ -75,6 +75,11 @@ register_shutdown_function(function () use (&$DEBUG) {
 
 header('Content-Type: application/json; charset=utf-8');
 
+// ----- Connexion base de données (PDO MySQL n0c) -----
+// Le fichier db_config.php est protégé par .htaccess (deny all en HTTP)
+// mais reste lisible côté PHP via require.
+require_once __DIR__ . '/db_config.php';
+
 // ----- CORS -----
 $allowedOrigins = [
     'https://ipecbxl.lovable.app',
@@ -446,12 +451,14 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
         public $docKind = 'candidature';
         /** @var string */
         public $factureNumero = '';
+        /** @var string Référence unique de candidature (IPEC-AAAA-XXXXXX) */
+        public $reference = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
                 return $out !== false ? $out : $s;
             };
-            $this->SetY(-22);
+            $this->SetY(-26);
             // Filet
             $this->SetDrawColor(220, 226, 240);
             $this->SetLineWidth(0.2);
@@ -462,7 +469,13 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Cell(0, 4, $tr("Institut Privé des Études Commerciales ASBL  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
             $contactEmail = $this->docKind === 'facture' ? 'finance@ipec.school' : 'admission@ipec.school';
             $this->Cell(0, 4, $tr($contactEmail . "  ·  www.ipec.school"), 0, 1, 'C');
-            $this->Ln(2);
+            // Mention de vérification d'authenticité (référence + URL)
+            if ($this->reference !== '') {
+                $this->SetFont('Helvetica', '', 7);
+                $this->SetTextColor(44, 93, 219);
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $this->reference), 0, 1, 'C');
+            }
+            $this->Ln(1);
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
             if ($this->docKind === 'facture') {
@@ -491,11 +504,15 @@ function buildCandidaturePdf(array $f): string {
 
     $now           = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr       = $now->format('d/m/Y');
-    $numCandidature = 'IPEC-CAND-' . $now->format('Ymd-His');
+    // Référence officielle stockée en base (IPEC-AAAA-XXXXXX). Fallback ancien
+    // format si non fournie (rétro-compat tests).
+    $reference     = trim((string)($f['reference'] ?? ''));
+    $numCandidature = $reference !== '' ? $reference : ('IPEC-CAND-' . $now->format('Ymd-His'));
     $submittedAt   = $now->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'candidature';
+    $pdf->reference = $reference;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Confirmation de candidature IPEC'));
@@ -797,6 +814,7 @@ function buildFacturePdf(array $f): array {
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
     $pdf->factureNumero = $numFacture;
+    $pdf->reference = trim((string)($f['reference'] ?? ''));
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
@@ -1185,6 +1203,67 @@ HTML;
         . "Adresse : $adresse\n\n"
         . "Message :\n" . ($message !== '' ? $message : '(aucun)') . "\n";
 
+    // ===== Enregistrement BDD : génère la référence officielle de candidature =====
+    // Cette référence (IPEC-AAAA-XXXXXX) est :
+    //   - imprimée sur les 2 PDFs (candidature + facture, en footer)
+    //   - vérifiable publiquement sur https://ipec.school/verification
+    // Non-bloquant : si la BDD est down, l'e-mail part quand même sans réf.
+    $candidatureReference = '';
+    $candidatureDbError   = null;
+    $candidatureDbId      = null;
+
+    // Calcul de l'année académique (cohérent avec ce qu'affichent les PDFs)
+    $academicYearForDb = '';
+    if (preg_match('/(20\d{2})/', $rentree, $mYr)) {
+        $yr = (int)$mYr[1];
+        $academicYearForDb = $yr . '/' . ($yr + 1);
+    }
+
+    try {
+        $pdo = db();
+        $candidatureReference = generateCandidatureReference($pdo);
+        $insert = $pdo->prepare(
+            'INSERT INTO candidatures
+                (reference, civilite, prenom, nom, date_naissance, nationalite,
+                 email, telephone, rue, numero, code_postal, ville, pays_residence,
+                 programme, annee, specialisation, rentree, annee_academique,
+                 message, ip, user_agent)
+             VALUES
+                (:reference, :civilite, :prenom, :nom, :date_naissance, :nationalite,
+                 :email, :telephone, :rue, :numero, :code_postal, :ville, :pays_residence,
+                 :programme, :annee, :specialisation, :rentree, :annee_academique,
+                 :message, :ip, :user_agent)'
+        );
+        $insert->execute([
+            ':reference'        => $candidatureReference,
+            ':civilite'         => $civilite ?: null,
+            ':prenom'           => $prenom,
+            ':nom'              => $nom,
+            ':date_naissance'   => $dateNaissance ?: null,
+            ':nationalite'      => $nationalite ?: null,
+            ':email'            => $email,
+            ':telephone'        => $telephone ?: null,
+            ':rue'              => $rue ?: null,
+            ':numero'           => $numero ?: null,
+            ':code_postal'      => $codePostal ?: null,
+            ':ville'            => $ville ?: null,
+            ':pays_residence'   => $paysResidence ?: null,
+            ':programme'        => $programme ?: null,
+            ':annee'            => $annee ?: null,
+            ':specialisation'   => $specialisation ?: null,
+            ':rentree'          => $rentree ?: null,
+            ':annee_academique' => $academicYearForDb ?: null,
+            ':message'          => $message ?: null,
+            ':ip'               => $ip ?: null,
+            ':user_agent'       => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
+        ]);
+        $candidatureDbId = (int)$pdo->lastInsertId();
+    } catch (\Throwable $dbErr) {
+        $candidatureDbError = $dbErr->getMessage();
+        error_log('[mailer.php] INSERT candidature échoué : ' . $candidatureDbError);
+        // On continue sans BDD : l'e-mail doit partir quoi qu'il arrive.
+    }
+
     // Génération du PDF de candidature (preuve signée jointe à l'e-mail)
     // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
     $pdfAttachment = '';
@@ -1192,6 +1271,7 @@ HTML;
     $pdfError      = null;
     try {
         $pdfAttachment = buildCandidaturePdf([
+            'reference'      => $candidatureReference,
             'civilite'       => $civilite,
             'prenom'         => $prenom,
             'nom'            => $nom,
@@ -1525,6 +1605,7 @@ if ($type === 'inscription') {
         $factureError = null;
         try {
             [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
+                'reference'     => $candidatureReference,
                 'civilite'      => $civilite,
                 'prenom'        => $prenom,
                 'nom'           => $nom,
@@ -1541,6 +1622,15 @@ if ($type === 'inscription') {
             ]);
             if ($facturePdf !== '' && $factureFilename !== '') {
                 $candidateMail->addStringAttachment($facturePdf, $factureFilename, 'base64', 'application/pdf');
+                // Sauvegarde du n° de facture dans la BDD pour traçabilité
+                if ($candidatureDbId !== null && $factureNumero !== '') {
+                    try {
+                        $upd = db()->prepare('UPDATE candidatures SET facture_numero = ? WHERE id = ?');
+                        $upd->execute([$factureNumero, $candidatureDbId]);
+                    } catch (\Throwable $updErr) {
+                        error_log('[mailer.php] UPDATE facture_numero échoué : ' . $updErr->getMessage());
+                    }
+                }
             } else {
                 $factureError = 'buildFacturePdf a renvoyé un résultat vide';
             }
@@ -1569,6 +1659,11 @@ if ($type === 'inscription') {
 }
 
 $response = ['ok' => true];
+// On expose la référence dans la réponse pour que le frontend puisse l'afficher
+// au candidat (ex: page de remerciement) — non-sensible, c'est la même que sur les PDFs.
+if (!empty($candidatureReference ?? '')) {
+    $response['reference'] = $candidatureReference;
+}
 if ($DEBUG) {
     $response['debug'] = [
         'pdf_attached'             => $pdfAttachment !== '',
@@ -1586,6 +1681,9 @@ if ($DEBUG) {
         'facture_error'            => $factureError ?? null,
         'facture_numero'           => $factureNumero ?? null,
         'imap_extension_loaded'    => function_exists('imap_open'),
+        'candidature_reference'    => $candidatureReference ?? null,
+        'candidature_db_id'        => $candidatureDbId ?? null,
+        'candidature_db_error'     => $candidatureDbError ?? null,
     ];
 }
 echo json_encode($response);
