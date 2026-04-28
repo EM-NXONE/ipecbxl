@@ -172,7 +172,56 @@ admin_flash();
     </dl>
 </div>
 
-<?php if ($c['message']): ?>
+<div class="card">
+    <h2 style="margin-top:0;">Espace étudiant</h2>
+    <?php if ($etudiant): ?>
+        <dl class="detail-grid">
+            <div>
+                <dt>Numéro étudiant</dt><dd class="mono"><?= admin_h($etudiant['numero_etudiant'] ?: '—') ?></dd>
+                <dt>E-mail du compte</dt><dd><?= admin_h($etudiant['email']) ?></dd>
+                <dt>Statut compte</dt>
+                <dd>
+                    <?php if ($etudiant['password_hash']): ?>
+                        <span class="badge badge-paid">Activé</span>
+                    <?php else: ?>
+                        <span class="badge badge-unpaid">En attente d'activation</span>
+                    <?php endif; ?>
+                </dd>
+            </div>
+            <div>
+                <dt>Créé le</dt><dd><?= admin_format_date($etudiant['created_at']) ?></dd>
+                <dt>Créé par</dt><dd><?= admin_h($etudiant['cree_par_admin'] ?: '—') ?></dd>
+                <dt>Dernière connexion</dt><dd><?= admin_format_date($etudiant['derniere_connexion']) ?></dd>
+            </div>
+        </dl>
+    <?php elseif ($etudiantHomonyme): ?>
+        <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['email']) ?></strong>
+           (n° <span class="mono"><?= admin_h($etudiantHomonyme['numero_etudiant']) ?></span>),
+           mais cette candidature n'y est pas rattachée.</p>
+        <form method="POST" action="action.php" style="display:inline;"
+              onsubmit="return confirm('Rattacher cette candidature au compte étudiant existant ?');">
+            <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
+            <input type="hidden" name="do" value="create_etudiant">
+            <input type="hidden" name="id" value="<?= $id ?>">
+            <button type="submit">🔗 Rattacher au compte existant</button>
+        </form>
+    <?php else: ?>
+        <p class="muted" style="margin-top:0;">
+            Aucun compte étudiant n'est encore associé à cette candidature.
+            La création génère un identifiant interne (IPEC-ETU-AAAA-XXXX) et un lien
+            d'activation à transmettre au candidat pour qu'il définisse son mot de passe.
+        </p>
+        <form method="POST" action="action.php" style="display:inline;"
+              onsubmit="return confirm('Créer un compte étudiant pour <?= admin_h($c['prenom'].' '.$c['nom']) ?> (<?= admin_h($c['email']) ?>) ?');">
+            <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
+            <input type="hidden" name="do" value="create_etudiant">
+            <input type="hidden" name="id" value="<?= $id ?>">
+            <button type="submit" class="btn-success">👤 Créer un compte étudiant</button>
+        </form>
+    <?php endif; ?>
+</div>
+
+
 <div class="card">
     <h2 style="margin-top:0;">Message du candidat</h2>
     <div style="white-space:pre-wrap;background:var(--bg);padding:12px;border-radius:4px;border:1px solid var(--border);">
