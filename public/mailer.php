@@ -597,7 +597,16 @@ function buildCandidaturePdf(array $f): string {
     if (!empty($f['nationalite'])) {
         $candLine('Nationalité : ' . (string)$f['nationalite']);
     }
-    if (!empty($f['adresse'])) {
+    $adrLigne1 = trim((string)($f['rue'] ?? '') . (!empty($f['numero']) ? ' ' . (string)$f['numero'] : ''));
+    $adrLigne2 = trim((string)($f['codePostal'] ?? '') . (!empty($f['ville']) ? ' ' . (string)$f['ville'] : ''));
+    if ($adrLigne1 !== '') {
+        $candLine($adrLigne1);
+    }
+    if ($adrLigne2 !== '') {
+        $candLine($adrLigne2);
+    }
+    // Rétro-compat : si aucun champ structuré n'est fourni, on retombe sur l'ancien champ "adresse" libre.
+    if ($adrLigne1 === '' && $adrLigne2 === '' && !empty($f['adresse'])) {
         $candLine((string)$f['adresse']);
     }
     if (!empty($f['paysResidence'])) {
@@ -877,7 +886,17 @@ function buildFacturePdf(array $f): array {
     $pdf->Ln(1);
     $pdf->SetX($boxLeftX + $padX);
     $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
-    if (!empty($f['adresse'])) {
+    $factLigne1 = trim((string)($f['rue'] ?? '') . (!empty($f['numero']) ? ' ' . (string)$f['numero'] : ''));
+    $factLigne2 = trim((string)($f['codePostal'] ?? '') . (!empty($f['ville']) ? ' ' . (string)$f['ville'] : ''));
+    if ($factLigne1 !== '') {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne1), 0, 'L');
+    }
+    if ($factLigne2 !== '') {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne2), 0, 'L');
+    }
+    if ($factLigne1 === '' && $factLigne2 === '' && !empty($f['adresse'])) {
         $pdf->SetX($boxLeftX + $padX);
         $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
     }
@@ -1158,6 +1177,10 @@ HTML;
             'email'          => $email,
             'telephone'      => $telephone,
             'adresse'        => $adresse,
+            'rue'            => $rue,
+            'numero'         => $numero,
+            'codePostal'     => $codePostal,
+            'ville'          => $ville,
             'paysResidence'  => $paysResidence,
             'programme'      => $programme,
             'annee'          => $annee,
@@ -1483,6 +1506,10 @@ if ($type === 'inscription') {
                 'prenom'        => $prenom,
                 'nom'           => $nom,
                 'adresse'       => $adresse,
+                'rue'           => $rue,
+                'numero'        => $numero,
+                'codePostal'    => $codePostal,
+                'ville'         => $ville,
                 'paysResidence' => $paysResidence,
                 'email'         => $email,
                 'programme'     => $programme,
