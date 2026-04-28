@@ -215,14 +215,16 @@ function Inscription() {
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
-                {/* Honeypot anti-bot — caché aux humains, rempli par les bots */}
+                {/* Honeypot anti-bot — caché aux humains, rempli par les bots.
+                    Nom volontairement neutre ("website" était auto-rempli par certains navigateurs/extensions). */}
                 <input
                   type="text"
                   name="website"
                   tabIndex={-1}
-                  autoComplete="off"
+                  autoComplete="new-password"
                   aria-hidden="true"
-                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                  defaultValue=""
+                  style={{ position: "absolute", left: "-9999px", top: "-9999px", width: "1px", height: "1px", opacity: 0, pointerEvents: "none" }}
                 />
 
                 <div>
