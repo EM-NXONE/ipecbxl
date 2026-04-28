@@ -20,6 +20,9 @@ if (!preg_match('#^/(?:etudiant/)?[A-Za-z0-9_./?=&-]*$#', $next)) {
 
 $error = null;
 $emailPrefill = '';
+$nomPrefill = '';
+$prenomPrefill = '';
+$dateNaissancePrefill = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -28,12 +31,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('Trop de tentatives. Réessaie dans quelques minutes.');
         }
         $email = trim(strtolower((string)($_POST['email'] ?? '')));
+        $prenom = trim((string)($_POST['prenom'] ?? ''));
+        $nom = trim((string)($_POST['nom'] ?? ''));
+        $dateNaissance = trim((string)($_POST['date_naissance'] ?? ''));
         $pwd   = (string)($_POST['password'] ?? '');
         $emailPrefill = $email;
-        if ($email === '' || $pwd === '') throw new RuntimeException('E-mail et mot de passe requis.');
+        $prenomPrefill = $prenom;
+        $nomPrefill = $nom;
+        $dateNaissancePrefill = $dateNaissance;
+        if ($email === '' || $prenom === '' || $nom === '' || $dateNaissance === '' || $pwd === '') {
+            throw new RuntimeException('E-mail, identité complète et mot de passe requis.');
+        }
 
-        $stmt = db()->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
-        $stmt->execute([$email]);
+        $stmt = db()->prepare("SELECT * FROM etudiants
+                               WHERE email = ?
+                                 AND LOWER(TRIM(prenom)) = LOWER(TRIM(?))
+                                 AND LOWER(TRIM(nom)) = LOWER(TRIM(?))
+                                 AND date_naissance = ?
+                               LIMIT 1");
+        $stmt->execute([$email, $prenom, $nom, $dateNaissance]);
         $etu = $stmt->fetch();
 
         // Message générique pour ne pas révéler l'existence du compte
@@ -81,6 +97,18 @@ etu_layout_start('Connexion');
         <div class="form-row">
             <label for="email">Adresse e-mail</label>
             <input id="email" type="email" name="email" autocomplete="email" required value="<?= etu_h($emailPrefill) ?>">
+        </div>
+        <div class="form-row">
+            <label for="prenom">Prénom de l'étudiant</label>
+            <input id="prenom" type="text" name="prenom" autocomplete="given-name" required value="<?= etu_h($prenomPrefill) ?>">
+        </div>
+        <div class="form-row">
+            <label for="nom">Nom de l'étudiant</label>
+            <input id="nom" type="text" name="nom" autocomplete="family-name" required value="<?= etu_h($nomPrefill) ?>">
+        </div>
+        <div class="form-row">
+            <label for="date_naissance">Date de naissance</label>
+            <input id="date_naissance" type="date" name="date_naissance" autocomplete="bday" required value="<?= etu_h($dateNaissancePrefill) ?>">
         </div>
         <div class="form-row">
             <label for="password">Mot de passe</label>

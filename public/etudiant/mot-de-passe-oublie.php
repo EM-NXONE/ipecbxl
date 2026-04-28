@@ -14,9 +14,14 @@ $done  = false;
 $error = null;
 $pdo   = db();
 
-function etudiant_find_by_email(PDO $pdo, string $email): ?array {
-    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
-    $stmt->execute([trim(strtolower($email))]);
+function etudiant_find_by_identity_for_reset(PDO $pdo, string $email, string $prenom, string $nom, string $dateNaissance): ?array {
+    $stmt = $pdo->prepare("SELECT * FROM etudiants
+                           WHERE email = ?
+                             AND LOWER(TRIM(prenom)) = LOWER(TRIM(?))
+                             AND LOWER(TRIM(nom)) = LOWER(TRIM(?))
+                             AND date_naissance = ?
+                           LIMIT 1");
+    $stmt->execute([trim(strtolower($email)), trim($prenom), trim($nom), trim($dateNaissance)]);
     $row = $stmt->fetch();
     return $row ?: null;
 }
@@ -28,9 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('Trop de demandes. Réessaie dans quelques minutes.');
         }
         $email = trim(strtolower((string)($_POST['email'] ?? '')));
-        if ($email === '') throw new RuntimeException('E-mail requis.');
+        $prenom = trim((string)($_POST['prenom'] ?? ''));
+        $nom = trim((string)($_POST['nom'] ?? ''));
+        $dateNaissance = trim((string)($_POST['date_naissance'] ?? ''));
+        if ($email === '' || $prenom === '' || $nom === '' || $dateNaissance === '') throw new RuntimeException('E-mail, prénom, nom et date de naissance requis.');
 
-        $etu = etudiant_find_by_email($pdo, $email);
+        $etu = etudiant_find_by_identity_for_reset($pdo, $email, $prenom, $nom, $dateNaissance);
         if ($etu && $etu['statut'] === 'actif') {
             $token = etu_create_or_reset_token($pdo, (int)$etu['id']);
             error_log('[etudiant] reset link for ' . $email . ' : ' . etu_absolute_url('/reset-mot-de-passe.php?token=' . $token));
@@ -58,7 +66,7 @@ etu_layout_start('Mot de passe oublié');
 ?>
 <div class="auth-card">
     <h1>Mot de passe oublié</h1>
-    <p class="lede">Indique ton e-mail : si un compte existe, un lien de réinitialisation te sera envoyé.</p>
+    <p class="lede">Indique l'e-mail et l'identité de l'étudiant : si le compte existe, un lien de réinitialisation sera envoyé.</p>
 
     <?php if ($error): ?><div class="flash flash-error"><?= etu_h($error) ?></div><?php endif; ?>
     <?php if ($done): ?>
@@ -72,6 +80,18 @@ etu_layout_start('Mot de passe oublié');
             <div class="form-row">
                 <label for="email">Adresse e-mail</label>
                 <input id="email" type="email" name="email" autocomplete="email" required>
+            </div>
+            <div class="form-row">
+                <label for="prenom">Prénom de l'étudiant</label>
+                <input id="prenom" type="text" name="prenom" autocomplete="given-name" required>
+            </div>
+            <div class="form-row">
+                <label for="nom">Nom de l'étudiant</label>
+                <input id="nom" type="text" name="nom" autocomplete="family-name" required>
+            </div>
+            <div class="form-row">
+                <label for="date_naissance">Date de naissance</label>
+                <input id="date_naissance" type="date" name="date_naissance" autocomplete="bday" required>
             </div>
             <button type="submit" style="width:100%;">Envoyer le lien</button>
         </form>

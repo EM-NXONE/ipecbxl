@@ -30,11 +30,20 @@ function etudiant_generate_numero(PDO $pdo): string {
 }
 
 /**
- * Cherche un étudiant par e-mail (insensible à la casse côté MySQL via collation).
+ * Cherche un étudiant par identité civile : prénom + nom + date de naissance.
+ * L'e-mail reste un contact/login, pas une clé d'identité.
  */
-function etudiant_find_by_email(PDO $pdo, string $email): ?array {
-    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
-    $stmt->execute([trim(strtolower($email))]);
+function etudiant_find_by_identity(PDO $pdo, string $prenom, string $nom, ?string $dateNaissance): ?array {
+    $dateNaissance = trim((string)$dateNaissance);
+    if (trim($prenom) === '' || trim($nom) === '' || $dateNaissance === '') {
+        return null;
+    }
+    $stmt = $pdo->prepare("SELECT * FROM etudiants
+                           WHERE LOWER(TRIM(prenom)) = LOWER(TRIM(?))
+                             AND LOWER(TRIM(nom)) = LOWER(TRIM(?))
+                             AND date_naissance = ?
+                           LIMIT 1");
+    $stmt->execute([trim($prenom), trim($nom), $dateNaissance]);
     $row = $stmt->fetch();
     return $row ?: null;
 }
@@ -67,8 +76,11 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
     if ($email === '') {
         throw new RuntimeException("La candidature n'a pas d'e-mail.");
     }
+    if (trim((string)($candidature['prenom'] ?? '')) === '' || trim((string)($candidature['nom'] ?? '')) === '' || trim((string)($candidature['date_naissance'] ?? '')) === '') {
+        throw new RuntimeException("Prénom, nom et date de naissance sont requis pour créer ou rattacher un compte étudiant.");
+    }
 
-    $existing = etudiant_find_by_email($pdo, $email);
+    $existing = etudiant_find_by_identity($pdo, (string)$candidature['prenom'], (string)$candidature['nom'], (string)$candidature['date_naissance']);
     if ($existing) {
         // Rattache la candidature s'il manque le lien
         if (empty($candidature['etudiant_id']) || (int)$candidature['etudiant_id'] !== (int)$existing['id']) {

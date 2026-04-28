@@ -203,7 +203,7 @@ try {
             $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
             if ($res['deja_existant']) {
                 admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
-                admin_set_flash('Un compte étudiant existait déjà pour ' . $c['email'] . ' — candidature rattachée (' . $res['numero'] . ').');
+                admin_set_flash('Un compte étudiant existait déjà pour ' . $c['prenom'] . ' ' . $c['nom'] . ' (' . $c['date_naissance'] . ') — candidature rattachée (' . $res['numero'] . ').');
             } else {
                 admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
                 // Le token d'activation est conservé en flash pour copie manuelle

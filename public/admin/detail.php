@@ -25,7 +25,7 @@ if (!$c) {
     exit;
 }
 
-// Étudiant rattaché (si déjà créé) — sinon on tente une détection par e-mail
+// Étudiant rattaché (si déjà créé) — sinon on tente une détection par identité civile
 $etudiant = null;
 if (!empty($c['etudiant_id'])) {
     $eStmt = $pdo->prepare("SELECT * FROM etudiants WHERE id = ?");
@@ -34,7 +34,7 @@ if (!empty($c['etudiant_id'])) {
 }
 $etudiantHomonyme = null;
 if (!$etudiant) {
-    $etudiantHomonyme = etudiant_find_by_email($pdo, (string)$c['email']);
+    $etudiantHomonyme = etudiant_find_by_identity($pdo, (string)$c['prenom'], (string)$c['nom'], (string)$c['date_naissance']);
 }
 
 // Historique des actions admin
@@ -214,7 +214,8 @@ admin_flash();
             </form>
         </div>
     <?php elseif ($etudiantHomonyme): ?>
-        <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['email']) ?></strong>
+        <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['prenom'] . ' ' . $etudiantHomonyme['nom']) ?></strong>
+           né(e) le <?= admin_h($etudiantHomonyme['date_naissance'] ?: '—') ?>
            (n° <span class="mono"><?= admin_h($etudiantHomonyme['numero_etudiant']) ?></span>),
            mais cette candidature n'y est pas rattachée.</p>
         <form method="POST" action="action.php" style="display:inline;"
