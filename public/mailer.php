@@ -141,10 +141,70 @@ if (!is_array($data)) {
     exit;
 }
 
-// Honeypot anti-bot
+// Honeypot anti-bot (compat avec anciennes versions du front)
 if (!empty($data['website'])) {
     echo json_encode(['ok' => true]);
     exit;
+}
+
+// ----- Vérification reCAPTCHA v3 -----
+// La clé secrète est lue depuis le .env (RECAPTCHA_SECRET).
+// Si elle n'est pas configurée, on n'applique pas la vérif (fallback dev).
+// Score minimal = 0.5 (Google recommandé). Action attendue selon le formulaire.
+function verifyRecaptcha(?string $token, string $expectedAction, string $secret, string $remoteIp): array {
+    if ($secret === '' || $token === null || $token === '') {
+        return ['ok' => false, 'reason' => 'missing_token'];
+    }
+    $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => http_build_query([
+            'secret'   => $secret,
+            'response' => $token,
+            'remoteip' => $remoteIp,
+        ]),
+        CURLOPT_TIMEOUT        => 8,
+    ]);
+    $body = curl_exec($ch);
+    $err  = curl_error($ch);
+    curl_close($ch);
+    if ($body === false) {
+        return ['ok' => false, 'reason' => 'network_error', 'details' => $err];
+    }
+    $resp = json_decode($body, true);
+    if (!is_array($resp) || empty($resp['success'])) {
+        return ['ok' => false, 'reason' => 'invalid', 'details' => $resp];
+    }
+    $score  = isset($resp['score'])  ? (float)$resp['score'] : 0.0;
+    $action = isset($resp['action']) ? (string)$resp['action'] : '';
+    if ($action !== $expectedAction) {
+        return ['ok' => false, 'reason' => 'action_mismatch', 'score' => $score, 'action' => $action];
+    }
+    if ($score < 0.5) {
+        return ['ok' => false, 'reason' => 'low_score', 'score' => $score];
+    }
+    return ['ok' => true, 'score' => $score];
+}
+
+// Lecture de la clé secrète depuis l'env (chargée plus haut via parse_ini_file).
+$recaptchaSecret = isset($_ENV['RECAPTCHA_SECRET']) ? (string)$_ENV['RECAPTCHA_SECRET'] : '';
+if ($recaptchaSecret === '' && isset($envConfig['RECAPTCHA_SECRET'])) {
+    $recaptchaSecret = (string)$envConfig['RECAPTCHA_SECRET'];
+}
+if ($recaptchaSecret !== '') {
+    $token  = isset($data['recaptchaToken'])  ? (string)$data['recaptchaToken']  : '';
+    $action = isset($data['recaptchaAction']) ? (string)$data['recaptchaAction'] : '';
+    $check  = verifyRecaptcha($token, $action, $recaptchaSecret, $clientIp ?? ($_SERVER['REMOTE_ADDR'] ?? ''));
+    if (!$check['ok']) {
+        http_response_code(403);
+        echo json_encode([
+            'error'   => 'Vérification anti-spam échouée. Veuillez réessayer.',
+            'reason'  => $check['reason'] ?? 'unknown',
+            'details' => $DEBUG ? $check : null,
+        ]);
+        exit;
+    }
 }
 
 // ----- Routage par type de formulaire -----
