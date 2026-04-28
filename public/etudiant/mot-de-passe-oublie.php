@@ -9,11 +9,17 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_layout.php';
-require_once __DIR__ . '/../admin/_etudiants.php';
 
 $done  = false;
 $error = null;
 $pdo   = db();
+
+function etudiant_find_by_email(PDO $pdo, string $email): ?array {
+    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
+    $stmt->execute([trim(strtolower($email))]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
