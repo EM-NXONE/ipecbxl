@@ -204,11 +204,13 @@ function VerificationPage() {
                   type="text"
                   required
                   value={reference}
-                  onChange={(e) => setReference(e.target.value)}
+                  onChange={handleReferenceChange}
                   placeholder="IPEC-CAND-2026-A1B2C3"
-                  maxLength={32}
+                  maxLength={24}
                   autoComplete="off"
-                  className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider focus:border-blue focus:outline-none transition-colors"
+                  inputMode="text"
+                  spellCheck={false}
+                  className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider font-mono focus:border-blue focus:outline-none transition-colors"
                 />
                 <button
                   type="submit"
