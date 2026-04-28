@@ -262,3 +262,8 @@
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out forwards; }
 .animate-shimmer { animation: shimmer 3s ease-in-out infinite; }
+
+/* Masquer le badge reCAPTCHA (mention obligatoire reportée dans les pages légales) */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
