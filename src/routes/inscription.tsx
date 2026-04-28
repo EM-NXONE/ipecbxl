@@ -51,7 +51,12 @@ function Inscription() {
   const [rgpdChecked, setRgpdChecked] = useState(false);
   const [conditionsChecked, setConditionsChecked] = useState(false);
   const confirmationRef = useRef<HTMLDivElement | null>(null);
+  const mountedAtRef = useRef<number>(Date.now());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
 
   useEffect(() => {
     if (sent && confirmationRef.current) {
@@ -87,6 +92,14 @@ function Inscription() {
     e.preventDefault();
     if (submitting) return;
     setErrorMsg(null);
+
+    // Anti-bot : temps minimum de remplissage (les bots soumettent en <1s)
+    const elapsed = Date.now() - mountedAtRef.current;
+    if (elapsed < 3000) {
+      setErrorMsg("Merci de prendre un instant pour vérifier votre dossier avant de l'envoyer.");
+      return;
+    }
+
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -112,7 +125,7 @@ function Inscription() {
       specialisation: String(fd.get("specialisation") ?? ""),
       rentree: String(fd.get("rentree") ?? ""),
       message: String(fd.get("message") ?? ""),
-      website: String(fd.get("website") ?? ""), // honeypot anti-bot
+      website: "", // compat backend (ancien honeypot retiré du DOM)
     };
 
     try {
@@ -215,18 +228,6 @@ function Inscription() {
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
-                {/* Honeypot anti-bot — caché aux humains, rempli par les bots.
-                    Nom volontairement neutre ("website" était auto-rempli par certains navigateurs/extensions). */}
-                <input
-                  type="text"
-                  name="website"
-                  tabIndex={-1}
-                  autoComplete="new-password"
-                  aria-hidden="true"
-                  defaultValue=""
-                  style={{ position: "absolute", left: "-9999px", top: "-9999px", width: "1px", height: "1px", opacity: 0, pointerEvents: "none" }}
-                />
-
                 <div>
                   <div className="text-xs uppercase tracking-[0.3em] text-blue mb-4">— Votre dossier</div>
                   <h2 className="font-display text-2xl text-cream mb-2">Renseignez vos informations</h2>
