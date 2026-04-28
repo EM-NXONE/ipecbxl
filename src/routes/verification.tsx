@@ -289,8 +289,8 @@ function VerificationPage() {
                   )}
 
                   <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    Pour des raisons de protection des données (RGPD), le nom de famille
-                    est partiellement masqué. Pour toute demande d'authentification plus
+                    Pour des raisons de protection des données (RGPD), le prénom et le nom
+                    sont partiellement masqués. Pour toute demande d'authentification plus
                     poussée par une autorité officielle, contactez{" "}
                     <a
                       href="mailto:admission@ipec.school"
@@ -328,7 +328,7 @@ function VerificationPage() {
               chaque document officiel. Aucune information personnelle complète n'est divulguée.
             </p>
             <p className="text-xs text-muted-foreground/80 leading-relaxed mt-4 pt-4 border-t border-border/30">
-              Protection des données : conformément au RGPD, le nom de famille est partiellement
+              Protection des données : conformément au RGPD, le prénom et le nom sont partiellement
               masqué et seules les informations strictement nécessaires à l'authentification sont
               affichées. La vérification est protégée par Google reCAPTCHA contre les usages
               automatisés. Pour plus d'informations, consultez notre{" "}
