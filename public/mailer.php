@@ -451,12 +451,14 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
         public $docKind = 'candidature';
         /** @var string */
         public $factureNumero = '';
+        /** @var string Référence unique de candidature (IPEC-AAAA-XXXXXX) */
+        public $reference = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
                 return $out !== false ? $out : $s;
             };
-            $this->SetY(-22);
+            $this->SetY(-26);
             // Filet
             $this->SetDrawColor(220, 226, 240);
             $this->SetLineWidth(0.2);
@@ -467,7 +469,13 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Cell(0, 4, $tr("Institut Privé des Études Commerciales ASBL  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
             $contactEmail = $this->docKind === 'facture' ? 'finance@ipec.school' : 'admission@ipec.school';
             $this->Cell(0, 4, $tr($contactEmail . "  ·  www.ipec.school"), 0, 1, 'C');
-            $this->Ln(2);
+            // Mention de vérification d'authenticité (référence + URL)
+            if ($this->reference !== '') {
+                $this->SetFont('Helvetica', '', 7);
+                $this->SetTextColor(44, 93, 219);
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $this->reference), 0, 1, 'C');
+            }
+            $this->Ln(1);
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
             if ($this->docKind === 'facture') {
