@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShieldCheck, ShieldAlert, Search, Loader2 } from "lucide-react";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export const Route = createFileRoute("/verification")({
   head: () => ({
@@ -56,10 +57,22 @@ function VerificationPage() {
 
     setLoading(true);
     setResult(null);
+
+    let recaptchaToken = "";
+    try {
+      recaptchaToken = await getRecaptchaToken("verification");
+    } catch {
+      recaptchaToken = "";
+    }
+
     try {
       const res = await fetch(`${VERIFY_URL}?reference=${encodeURIComponent(ref)}`, {
         method: "GET",
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          "X-Recaptcha-Token": recaptchaToken,
+          "X-Recaptcha-Action": "verification",
+        },
       });
       const data: VerifyResult = await res.json().catch(() => ({
         valid: false,
