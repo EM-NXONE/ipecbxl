@@ -195,7 +195,7 @@ admin_flash();
             </div>
         </dl>
         <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-            <a class="btn-secondary btn" href="/etudiant/login.php" target="_blank" rel="noopener">🔗 Page de connexion étudiant</a>
+            <a class="btn-secondary btn" href="https://lms.ipec.school/login.php" target="_blank" rel="noopener">🔗 Page de connexion étudiant</a>
             <?php if (!$etudiant['password_hash']): ?>
                 <form method="POST" action="action.php" style="display:inline;"
                       onsubmit="return confirm('Régénérer un nouveau lien d\'activation (l\'ancien sera invalidé) ?');">

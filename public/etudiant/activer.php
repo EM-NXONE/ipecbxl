@@ -47,7 +47,7 @@ etu_layout_start('Activer mon compte');
         <h1>Lien invalide</h1>
         <p class="lede">Ce lien d'activation est invalide, expiré ou déjà utilisé.</p>
         <p>Contacte l'administration : <a href="mailto:admission@ipec.school">admission@ipec.school</a>.</p>
-        <p style="margin-top:20px;"><a class="btn btn-secondary" href="/etudiant/login.php">Retour à la connexion</a></p>
+        <p style="margin-top:20px;"><a class="btn btn-secondary" href="<?= etu_url('/login.php') ?>">Retour à la connexion</a></p>
     <?php else: ?>
         <h1>Activer mon compte</h1>
         <p class="lede">Bonjour <?= etu_h($row['prenom']) ?>, choisis un mot de passe pour activer ton espace étudiant.</p>

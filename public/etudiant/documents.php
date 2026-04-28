@@ -42,7 +42,7 @@ etu_layout_start('Mes documents', $user);
                     </td>
                     <td><?= etu_format_date($d['date_emission']) ?></td>
                     <td><?= etu_format_date($d['valide_jusqu_au']) ?></td>
-                    <td><a class="btn btn-ghost" href="/etudiant/telecharger.php?type=document&amp;id=<?= (int)$d['id'] ?>">PDF ↓</a></td>
+                    <td><a class="btn btn-ghost" href="<?= etu_url('/telecharger.php') ?>?type=document&amp;id=<?= (int)$d['id'] ?>">PDF ↓</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

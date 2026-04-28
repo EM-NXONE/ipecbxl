@@ -210,7 +210,7 @@ try {
                 // (l'envoi e-mail automatique sera ajouté quand l'espace étudiant sera en ligne).
                 $msg = 'Compte étudiant créé : ' . $res['numero']
                      . '. Lien d\'activation (à transmettre) : '
-                     . '/etudiant/activer.php?token=' . $res['token'];
+                     . 'https://lms.ipec.school/activer.php?token=' . $res['token'];
                 admin_set_flash($msg);
             }
             header('Location: detail.php?id=' . $id); exit;
@@ -226,7 +226,7 @@ try {
                 ->execute([$etuId]);
             $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
             admin_log_action($id, 'regen_activation', 'Étudiant #' . $etuId);
-            admin_set_flash('Nouveau lien d\'activation généré : /etudiant/activer.php?token=' . $token);
+            admin_set_flash('Nouveau lien d\'activation généré : https://lms.ipec.school/activer.php?token=' . $token);
             header('Location: detail.php?id=' . $id); exit;
         }
 

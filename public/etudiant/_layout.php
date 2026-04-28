@@ -264,7 +264,7 @@ footer.etu-footer {
 
 <header class="topbar">
     <div class="topbar-inner">
-        <a href="/etudiant/" class="brand">
+        <a href="<?= etu_url('/index.php') ?>" class="brand">
             <?= etu_logo_svg('logo-mark') ?>
             <div class="brand-text">
                 <div class="brand-name">IPEC</div>
@@ -277,11 +277,11 @@ footer.etu-footer {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
             <?php if ($user): ?>
-                <a class="user-pill" href="/etudiant/profil.php" title="Mon profil">
+                <a class="user-pill" href="<?= etu_url('/profil.php') ?>" title="Mon profil">
                     <span class="user-avatar"><?= $h(mb_strtoupper(mb_substr($user['prenom'] ?: $user['email'], 0, 1))) ?></span>
                     <span><?= $h($user['prenom']) ?></span>
                 </a>
-                <a class="btn-secondary btn" href="/etudiant/logout.php">Déconnexion</a>
+                <a class="btn-secondary btn" href="<?= etu_url('/logout.php') ?>">Déconnexion</a>
             <?php endif; ?>
         </div>
     </div>
@@ -291,16 +291,16 @@ footer.etu-footer {
 <div class="shell">
     <aside class="sidebar">
         <nav class="side-nav">
-            <a href="/etudiant/index.php"<?= $isActive('/etudiant/index.php') ?: $isActive('/etudiant/') ?>>
+            <a href="<?= etu_url('/index.php') ?>"<?= $isActive('/index.php') ?>>
                 <span class="ico">▤</span> Tableau de bord
             </a>
-            <a href="/etudiant/factures.php"<?= $isActive('/etudiant/factures.php') ?>>
+            <a href="<?= etu_url('/factures.php') ?>"<?= $isActive('/factures.php') ?>>
                 <span class="ico">€</span> Factures
             </a>
-            <a href="/etudiant/documents.php"<?= $isActive('/etudiant/documents.php') ?>>
+            <a href="<?= etu_url('/documents.php') ?>"<?= $isActive('/documents.php') ?>>
                 <span class="ico">▣</span> Documents
             </a>
-            <a href="/etudiant/profil.php"<?= $isActive('/etudiant/profil.php') ?>>
+            <a href="<?= etu_url('/profil.php') ?>"<?= $isActive('/profil.php') ?>>
                 <span class="ico">●</span> Mon profil
             </a>
         </nav>

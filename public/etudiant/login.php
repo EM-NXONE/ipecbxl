@@ -11,10 +11,11 @@ if ($u = etu_current()) {
     exit;
 }
 
-$next  = (string)($_GET['next'] ?? $_POST['next'] ?? '/etudiant/index.php');
-// Sécurité : on n'accepte que des redirections internes vers /etudiant/
-if (!preg_match('#^/etudiant/[A-Za-z0-9_./?=&-]*$#', $next)) {
-    $next = '/etudiant/index.php';
+$defaultNext = etu_url('/index.php');
+$next  = (string)($_GET['next'] ?? $_POST['next'] ?? $defaultNext);
+// Sécurité : on n'accepte que des redirections internes (relatives sous /etudiant/ OU /index.php, /factures.php, etc.)
+if (!preg_match('#^/(?:etudiant/)?[A-Za-z0-9_./?=&-]*$#', $next)) {
+    $next = $defaultNext;
 }
 
 $error = null;
@@ -89,7 +90,7 @@ etu_layout_start('Connexion');
     </form>
 
     <p style="margin-top:20px; text-align:center; font-size:13px;">
-        <a href="/etudiant/mot-de-passe-oublie.php">Mot de passe oublié ?</a>
+        <a href="<?= etu_url('/mot-de-passe-oublie.php') ?>">Mot de passe oublié ?</a>
     </p>
     <p style="text-align:center; font-size:12px; color:var(--muted); margin-top:24px;">
         Pas encore de compte ? Il est créé par l'administration de l'IPEC<br>

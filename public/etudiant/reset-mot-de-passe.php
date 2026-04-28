@@ -47,7 +47,7 @@ etu_layout_start('Réinitialiser mon mot de passe');
     <?php if (!$row): ?>
         <h1>Lien invalide</h1>
         <p class="lede">Ce lien de réinitialisation est invalide, expiré ou déjà utilisé.</p>
-        <p><a class="btn btn-secondary" href="/etudiant/mot-de-passe-oublie.php">Demander un nouveau lien</a></p>
+        <p><a class="btn btn-secondary" href="<?= etu_url('/mot-de-passe-oublie.php') ?>">Demander un nouveau lien</a></p>
     <?php else: ?>
         <h1>Nouveau mot de passe</h1>
         <p class="lede">Pour <?= etu_h($row['email']) ?>, choisis un nouveau mot de passe.</p>

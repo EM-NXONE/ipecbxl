@@ -11,5 +11,5 @@ etu_session_destroy();
 $_SESSION = [];
 session_destroy();
 
-header('Location: /etudiant/login.php');
+header('Location: ' . etu_url('/login.php'));
 exit;

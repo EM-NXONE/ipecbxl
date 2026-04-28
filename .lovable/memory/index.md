@@ -7,8 +7,8 @@ Bouton CTA mail = "Soumettez votre dossier complet" → mailto: avec In-Reply-To
 Backend = PHP sur n0c (mailer.php + FPDF + PHPMailer). Pas de stack Node/Cloud côté backend.
 Auth étudiant = PHP natif bcrypt + sessions BDD (cookie IPEC_ETU httpOnly, 30j rolling). Pas de Supabase.
 PDF jamais stockés sur disque : toujours régénérés à la volée depuis SQL + template FPDF.
-Espace étudiant en /etudiant/ : login, activer, mot-de-passe-oublie, reset, dashboard, factures, documents, profil, telecharger.
+Portail étudiant = sous-domaine **lms.ipec.school** (DocumentRoot n0c → public_html/etudiant). Liens internes via etu_url(), liens absolus (mail/admin) via https://lms.ipec.school. Cookie path adapté automatiquement (/etudiant/ legacy ou / sur lms).
 
 ## Memories
 - [DB schema étudiants](mem://features/db-schema-etudiants) — Tables etudiants, factures, documents, sessions, tokens, audit. Migration v2.
-- [Espace étudiant](mem://features/espace-etudiant) — Pages PHP, auth, génération PDF à la volée, lien admin.
+- [Espace étudiant](mem://features/espace-etudiant) — Pages PHP, auth, génération PDF à la volée, lien admin, sous-domaine lms.ipec.school.

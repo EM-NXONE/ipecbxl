@@ -74,7 +74,7 @@ etu_layout_start('Mes factures', $user);
                     <td><?= etu_format_date($f['date_echeance']) ?></td>
                     <td><strong><?= etu_money_cents((int)$f['montant_ttc_cents'], $f['devise']) ?></strong></td>
                     <td><span class="badge <?= etu_h($s[1]) ?>"><?= etu_h($s[0]) ?></span></td>
-                    <td><a class="btn btn-ghost" href="/etudiant/telecharger.php?type=facture&amp;id=<?= (int)$f['id'] ?>">PDF ↓</a></td>
+                    <td><a class="btn btn-ghost" href="<?= etu_url('/telecharger.php') ?>?type=facture&amp;id=<?= (int)$f['id'] ?>">PDF ↓</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
