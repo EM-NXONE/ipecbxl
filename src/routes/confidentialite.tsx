@@ -187,11 +187,6 @@ function Confidentialite() {
                 candidat est informé que la référence de son document permettra une vérification
                 limitée et anonymisée par des tiers en sa possession.
               </li>
-              <li>
-                Opposition : toute personne dont un document est vérifié peut demander la
-                désactivation de la vérification publique de sa référence en écrivant à{" "}
-                <a href="mailto:admission@ipec.school" className="text-blue hover:underline">admission@ipec.school</a>.
-              </li>
             </ul>
           </section>
         </div>
