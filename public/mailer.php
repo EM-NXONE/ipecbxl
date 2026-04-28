@@ -698,7 +698,7 @@ function buildCandidaturePdf(array $f): string {
     }
 
     // ===== Bloc signature électronique (style "modalités" de la facture) =====
-    $pdf->Ln(2);
+    $pdf->Ln(10);
     if ($pdf->GetY() > 250) {
         $pdf->AddPage();
     }
