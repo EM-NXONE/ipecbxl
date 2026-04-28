@@ -10,6 +10,8 @@
     Require all denied
 </FilesMatch>
 
-# Pas d'index automatique
-Options -Indexes
+# Pas d'index automatique — protégé pour éviter un 500 si Options est interdit par l'hébergeur
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
 DirectoryIndex index.php
