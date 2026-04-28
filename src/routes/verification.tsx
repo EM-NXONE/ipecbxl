@@ -44,10 +44,80 @@ type VerifyResult = {
   date_creation?: string;
 };
 
+/**
+ * Formate intelligemment la saisie utilisateur vers IPEC-{CAND|FACT}-AAAA-XXXXXX.
+ * - Majuscules, suppression des caractères non alphanumériques
+ * - Insertion automatique des tirets
+ * - Auto-complétion du type : "C" → CAND, "F" → FACT (dès la 1ère lettre)
+ * - Limite par segment : kind=4, year=4, suffix=6
+ */
+function formatReference(raw: string): string {
+  // 1) Nettoyage : majuscules + alphanumériques uniquement
+  const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+  // 2) Si l'utilisateur n'a pas encore tapé "IPEC", on l'aide en préfixant si possible
+  let rest = cleaned;
+  let prefix = "";
+  if (cleaned.startsWith("IPEC")) {
+    prefix = "IPEC";
+    rest = cleaned.slice(4);
+  } else if ("IPEC".startsWith(cleaned)) {
+    // L'utilisateur est en train d'écrire "I", "IP", "IPE", "IPEC"
+    return cleaned;
+  } else {
+    // L'utilisateur a tapé directement le type (ex: "C…", "F…", "CAND…")
+    prefix = "IPEC";
+    rest = cleaned;
+  }
+
+  // 3) Segment "kind" (CAND ou FACT)
+  // Détection intelligente : on isole les lettres en tête (max 4) puis on auto-complète
+  // si elles forment un préfixe valide de CAND ou FACT.
+  let kind = "";
+  let consumedFromRest = 0;
+  const leadingLettersMatch = rest.match(/^[A-Z]{1,4}/);
+  if (leadingLettersMatch) {
+    const letters = leadingLettersMatch[0];
+    consumedFromRest = letters.length;
+    if (letters[0] === "C" && "CAND".startsWith(letters)) {
+      kind = "CAND";
+    } else if (letters[0] === "F" && "FACT".startsWith(letters)) {
+      kind = "FACT";
+    } else {
+      // Préfixe inconnu : on garde tel quel pour ne pas piéger l'utilisateur
+      kind = letters;
+    }
+  }
+
+  const afterKind = rest.slice(consumedFromRest);
+
+  // 4) Segment "année" (4 chiffres)
+  const yearRaw = afterKind.slice(0, 4).replace(/[^0-9]/g, "");
+  const afterYear = afterKind.slice(yearRaw.length);
+
+  // 5) Segment "suffixe" (6 hex max)
+  const suffix = afterYear.slice(0, 6).replace(/[^0-9A-F]/g, "");
+
+  // 6) Reconstitution avec tirets, sans laisser de tiret pendant si segment vide
+  let out = prefix;
+  if (kind.length > 0) out += "-" + kind;
+  if (yearRaw.length > 0 || (kind.length === 4 && afterKind.length > 0)) {
+    out += "-" + yearRaw;
+  }
+  if (suffix.length > 0 || (yearRaw.length === 4 && afterYear.length > 0)) {
+    out += "-" + suffix;
+  }
+  return out;
+}
+
 function VerificationPage() {
   const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
+
+  const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReference(formatReference(e.target.value));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -126,11 +196,13 @@ function VerificationPage() {
                   type="text"
                   required
                   value={reference}
-                  onChange={(e) => setReference(e.target.value)}
+                  onChange={handleReferenceChange}
                   placeholder="IPEC-CAND-2026-A1B2C3"
-                  maxLength={32}
+                  maxLength={24}
                   autoComplete="off"
-                  className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider focus:border-blue focus:outline-none transition-colors"
+                  inputMode="text"
+                  spellCheck={false}
+                  className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider font-mono focus:border-blue focus:outline-none transition-colors"
                 />
                 <button
                   type="submit"
@@ -150,6 +222,11 @@ function VerificationPage() {
                   )}
                 </button>
               </div>
+              <p className="mt-3 text-xs text-muted-foreground/80">
+                Astuce : tirets, majuscules et préfixe <code className="text-cream/80">IPEC</code> sont
+                ajoutés automatiquement. Vous pouvez taper directement <code className="text-cream/80">C…</code>{" "}
+                pour une candidature ou <code className="text-cream/80">F…</code> pour une facture.
+              </p>
             </div>
           </form>
 
