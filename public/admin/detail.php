@@ -223,6 +223,7 @@ admin_flash();
 
 <?php if ($c['message']): ?>
 <div class="card">
+    <h2 style="margin-top:0;">Message du candidat</h2>
     <div style="white-space:pre-wrap;background:var(--bg);padding:12px;border-radius:4px;border:1px solid var(--border);">
         <?= admin_h($c['message']) ?>
     </div>
