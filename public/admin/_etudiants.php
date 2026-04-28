@@ -75,6 +75,8 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
             $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
                 ->execute([(int)$existing['id'], (int)$candidature['id']]);
         }
+        // (Re)synchronise les documents historiques pour cette candidature
+        etudiant_sync_documents_historiques($pdo, (int)$existing['id'], $candidature, $adminUser);
         return [
             'etudiant_id'   => (int)$existing['id'],
             'numero'        => (string)$existing['numero_etudiant'],
