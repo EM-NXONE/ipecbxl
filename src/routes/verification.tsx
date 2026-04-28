@@ -182,8 +182,12 @@ function VerificationPage() {
                   required
                   value={reference}
                   onChange={handleReferenceChange}
+                  onClick={protectPrefix}
+                  onKeyUp={protectPrefix}
+                  onFocus={protectPrefix}
+                  onSelect={protectPrefix}
                   placeholder="IPEC-CAND-2026-A1B2C3"
-                  maxLength={24}
+                  maxLength={REF_PREFIX.length + 4 + 1 + 4 + 1 + 6}
                   autoComplete="off"
                   inputMode="text"
                   spellCheck={false}
@@ -191,7 +195,7 @@ function VerificationPage() {
                 />
                 <button
                   type="submit"
-                  disabled={loading || reference.trim() === ""}
+                  disabled={loading || reference.trim() === REF_PREFIX || reference.trim() === ""}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {loading ? (
@@ -208,9 +212,8 @@ function VerificationPage() {
                 </button>
               </div>
               <p className="mt-3 text-xs text-muted-foreground/80">
-                Astuce : tirets, majuscules et préfixe <code className="text-cream/80">IPEC</code> sont
-                ajoutés automatiquement. Vous pouvez taper directement <code className="text-cream/80">C…</code>{" "}
-                pour une candidature ou <code className="text-cream/80">F…</code> pour une facture.
+                Les tirets sont insérés automatiquement. Tapez simplement le type de document
+                (4 lettres), l'année (4 chiffres) puis le code à 6 caractères figurant sur le document.
               </p>
             </div>
           </form>
