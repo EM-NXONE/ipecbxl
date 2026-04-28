@@ -73,6 +73,23 @@ register_shutdown_function(function () use (&$DEBUG) {
     }
 });
 
+// ----- Mode "library" : inclusion depuis l'admin pour réutiliser les builders -----
+// Quand IPEC_MAILER_AS_LIB est défini, on charge uniquement les dépendances et
+// on saute tout le pipeline HTTP procédural (CORS, rate-limit, envoi…). Les
+// fonctions (buildCandidaturePdf, buildFacturePdf, buildCandidateConfirmationHtml,
+// emailRow, h, clean, etc.) restent disponibles car elles sont déclarées au
+// top-level avec `function` (donc hoistées dès l'inclusion du fichier).
+if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
+    require_once __DIR__ . '/db_config.php';
+    require_once __DIR__ . '/PHPMailer/src/Exception.php';
+    require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
+    require_once __DIR__ . '/PHPMailer/src/SMTP.php';
+    if (is_file(__DIR__ . '/FPDF/fpdf.php')) {
+        require_once __DIR__ . '/FPDF/fpdf.php';
+    }
+    goto IPEC_MAILER_END; // saute jusqu'à l'étiquette en bas du fichier
+}
+
 header('Content-Type: application/json; charset=utf-8');
 
 // ----- Connexion base de données (PDO MySQL n0c) -----
@@ -1759,6 +1776,9 @@ if ($DEBUG) {
     ];
 }
 echo json_encode($response);
+
+// Étiquette de sortie pour le mode "library" (voir guard tout en haut du fichier).
+IPEC_MAILER_END:
 
 /* =========================================================================
  * INSTALLATION SUR n0c
