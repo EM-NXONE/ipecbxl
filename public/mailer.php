@@ -85,7 +85,17 @@ if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
     require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
     require_once __DIR__ . '/PHPMailer/src/SMTP.php';
     if (is_file(__DIR__ . '/FPDF/fpdf.php')) {
+        if (!defined('FPDF_FONTPATH')) {
+            define('FPDF_FONTPATH', __DIR__ . '/FPDF/font/');
+        }
         require_once __DIR__ . '/FPDF/fpdf.php';
+        // Charge aussi le fichier des classes IpecCandidaturePdf / IpecFacturePdf.
+        // Elles sont déclarées plus bas dans ce même fichier, dans un bloc
+        // procédural que le `goto` ci-dessous saute. Pour les rendre dispo
+        // en mode librairie, on require ce fichier-ci une seconde fois SANS
+        // la constante AS_LIB → mais ça relancerait le pipeline HTTP.
+        // Solution : déclarer les classes via une closure require'ée dédiée.
+        require_once __DIR__ . '/_pdf_classes.php';
     }
     goto IPEC_MAILER_END; // saute jusqu'à l'étiquette en bas du fichier
 }
