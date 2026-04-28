@@ -31,22 +31,35 @@ function db(): PDO {
 }
 
 /**
- * Génère une référence de candidature unique et lisible :
- *   IPEC-AAAA-XXXXXX
- * où XXXXXX = 6 caractères hexa aléatoires (majuscules).
+ * Génère une référence de document unique et lisible :
+ *   IPEC-{KIND}-AAAA-XXXXXX
+ *   - KIND = 'CAND' (candidature) ou 'FACT' (facture)
+ *   - XXXXXX = 6 caractères hexa aléatoires (majuscules)
  * Réessaie si collision (extrêmement improbable).
  */
-function generateCandidatureReference(PDO $pdo): string {
+function generateDocumentReference(PDO $pdo, string $kind = 'CAND'): string {
+    $kind = strtoupper($kind);
+    if (!in_array($kind, ['CAND', 'FACT'], true)) {
+        $kind = 'CAND';
+    }
+    $column = $kind === 'FACT' ? 'facture_numero' : 'reference';
     $year = date('Y');
     for ($i = 0; $i < 5; $i++) {
         $suffix = strtoupper(bin2hex(random_bytes(3))); // 6 hex chars
-        $ref = 'IPEC-' . $year . '-' . $suffix;
-        $stmt = $pdo->prepare('SELECT 1 FROM candidatures WHERE reference = ? LIMIT 1');
+        $ref = 'IPEC-' . $kind . '-' . $year . '-' . $suffix;
+        $stmt = $pdo->prepare("SELECT 1 FROM candidatures WHERE $column = ? LIMIT 1");
         $stmt->execute([$ref]);
         if (!$stmt->fetchColumn()) {
             return $ref;
         }
     }
     // Fallback ultra-improbable : on ajoute le timestamp
-    return 'IPEC-' . $year . '-' . strtoupper(bin2hex(random_bytes(3))) . dechex(time());
+    return 'IPEC-' . $kind . '-' . $year . '-' . strtoupper(bin2hex(random_bytes(3))) . dechex(time());
+}
+
+/**
+ * @deprecated Conservé pour rétro-compat. Utilisez generateDocumentReference().
+ */
+function generateCandidatureReference(PDO $pdo): string {
+    return generateDocumentReference($pdo, 'CAND');
 }

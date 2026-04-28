@@ -2,32 +2,18 @@
 /**
  * IPEC — Endpoint public de vérification d'authenticité d'un document.
  *
- * Permet à toute autorité (université, employeur, ambassade, police…) de
- * vérifier qu'un PDF reçu correspond bien à une candidature enregistrée
- * par l'IPEC.
+ * Chaque document émis par l'IPEC porte une référence préfixée par son type :
+ *   - IPEC-CAND-AAAA-XXXXXX  → confirmation de candidature
+ *   - IPEC-FACT-AAAA-XXXXXX  → facture des frais de dossier
  *
  * Usage :
- *   GET  /verify.php?reference=IPEC-2026-A1B2C3
- *   POST /verify.php  (JSON: {"reference":"IPEC-2026-A1B2C3"})
- *
- * Réponse JSON :
- *   { "valid": true,
- *     "reference": "IPEC-2026-A1B2C3",
- *     "candidat": "Jean D.",         (initiale du nom uniquement = RGPD)
- *     "programme": "PAA",
- *     "annee": "1ère année",
- *     "annee_academique": "2026/2027",
- *     "rentree": "Septembre 2026",
- *     "statut": "recue",
- *     "date_creation": "2026-04-28" }
- *
- *   { "valid": false, "error": "..." }   en cas d'échec
+ *   GET  /verify.php?reference=IPEC-CAND-2026-A1B2C3
+ *   POST /verify.php  (JSON: {"reference":"IPEC-FACT-2026-A1B2C3"})
  */
 
 declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
-// CORS large : l'endpoint est strictement public (lecture seule, données limitées)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -52,7 +38,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 if ($reference === '' && isset($_GET['reference'])) {
     $reference = (string)$_GET['reference'];
 }
-$reference = trim($reference);
+$reference = strtoupper(trim($reference));
 
 // ----- Validation du format -----
 if ($reference === '') {
@@ -60,25 +46,35 @@ if ($reference === '') {
     echo json_encode(['valid' => false, 'error' => 'Référence manquante.']);
     exit;
 }
-if (!preg_match('/^IPEC-\d{4}-[A-F0-9]{6,16}$/i', $reference)) {
+// Nouveau format : IPEC-CAND-AAAA-XXXXXX  ou  IPEC-FACT-AAAA-XXXXXX
+// Ancien format toléré : IPEC-AAAA-XXXXXX (assimilé à une candidature)
+if (!preg_match('/^IPEC-(CAND|FACT)-\d{4}-[A-F0-9]{6,16}$/', $reference)
+    && !preg_match('/^IPEC-\d{4}-[A-F0-9]{6,16}$/', $reference)) {
     echo json_encode([
         'valid' => false,
-        'error' => 'Format de référence invalide. Format attendu : IPEC-AAAA-XXXXXX.',
+        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX ou IPEC-FACT-AAAA-XXXXXX.',
     ]);
     exit;
 }
 
-$reference = strtoupper($reference);
+// Détermine le type de document à partir du préfixe
+$docType = 'candidature'; // défaut (et ancien format)
+if (strpos($reference, 'IPEC-FACT-') === 0) {
+    $docType = 'facture';
+} elseif (strpos($reference, 'IPEC-CAND-') === 0) {
+    $docType = 'candidature';
+}
 
-// ----- Lecture en base -----
+// ----- Lecture en base : on cherche dans la bonne colonne selon le type -----
 try {
     $pdo = db();
+    $column = $docType === 'facture' ? 'facture_numero' : 'reference';
     $stmt = $pdo->prepare(
-        'SELECT reference, prenom, nom, programme, annee, annee_academique,
-                specialisation, rentree, statut, created_at
+        "SELECT reference, facture_numero, prenom, nom, programme, annee, annee_academique,
+                specialisation, rentree, created_at
            FROM candidatures
-          WHERE reference = ?
-          LIMIT 1'
+          WHERE $column = ?
+          LIMIT 1"
     );
     $stmt->execute([$reference]);
     $row = $stmt->fetch();
@@ -97,8 +93,23 @@ if (!$row) {
     exit;
 }
 
-// ----- Anonymisation partielle (RGPD) : prénom + initiale du nom -----
-$nomAffiche = trim($row['prenom']) . ' ' . strtoupper(substr(trim($row['nom']), 0, 1)) . '.';
+// ----- Anonymisation RGPD : prénom + nom masqué (X***Y) -----
+function maskName(string $nom): string {
+    $nom = trim($nom);
+    $len = mb_strlen($nom, 'UTF-8');
+    if ($len === 0) return '';
+    if ($len === 1) return mb_strtoupper($nom, 'UTF-8');
+    if ($len === 2) {
+        return mb_strtoupper(mb_substr($nom, 0, 1, 'UTF-8'), 'UTF-8')
+             . mb_strtoupper(mb_substr($nom, 1, 1, 'UTF-8'), 'UTF-8');
+    }
+    $first = mb_strtoupper(mb_substr($nom, 0, 1, 'UTF-8'), 'UTF-8');
+    $last  = mb_strtoupper(mb_substr($nom, -1, 1, 'UTF-8'), 'UTF-8');
+    $stars = str_repeat('*', max(1, $len - 2));
+    return $first . $stars . $last;
+}
+
+$nomAffiche = trim($row['prenom']) . ' ' . maskName((string)$row['nom']);
 
 // Mappage code programme → nom complet
 $programmesFull = [
@@ -107,25 +118,27 @@ $programmesFull = [
 ];
 $programmeFull = $programmesFull[strtoupper((string)$row['programme'])] ?? (string)$row['programme'];
 
-$statutLabels = [
-    'recue'    => 'Reçue',
-    'en_cours' => 'En cours d\'examen',
-    'validee'  => 'Validée',
-    'refusee'  => 'Refusée',
-    'annulee'  => 'Annulée',
+// Filtre spécialisation : on l'omet si vide ou "Je ne sais pas encore"
+$specialisationRaw = trim((string)($row['specialisation'] ?? ''));
+$hasSpec = $specialisationRaw !== ''
+    && stripos($specialisationRaw, 'je ne sais pas') === false;
+
+$docTypeLabels = [
+    'candidature' => 'Confirmation de candidature',
+    'facture'     => 'Facture — frais de dossier',
 ];
 
 echo json_encode([
     'valid'             => true,
-    'reference'         => $row['reference'],
+    'reference'         => $reference,
+    'document_type'     => $docType,
+    'document_label'    => $docTypeLabels[$docType] ?? $docType,
     'candidat'          => $nomAffiche,
     'programme_code'    => $row['programme'],
     'programme'         => $programmeFull,
     'annee'             => $row['annee'],
-    'specialisation'    => $row['specialisation'] ?: null,
+    'specialisation'    => $hasSpec ? $specialisationRaw : null,
     'annee_academique'  => $row['annee_academique'],
     'rentree'           => $row['rentree'],
-    'statut'            => $row['statut'],
-    'statut_label'      => $statutLabels[$row['statut']] ?? $row['statut'],
     'date_creation'     => substr((string)$row['created_at'], 0, 10),
 ], JSON_UNESCAPED_UNICODE);

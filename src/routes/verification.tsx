@@ -31,6 +31,8 @@ type VerifyResult = {
   valid: boolean;
   error?: string;
   reference?: string;
+  document_type?: "candidature" | "facture";
+  document_label?: string;
   candidat?: string;
   programme?: string;
   programme_code?: string;
@@ -38,8 +40,6 @@ type VerifyResult = {
   specialisation?: string | null;
   annee_academique?: string;
   rentree?: string;
-  statut?: string;
-  statut_label?: string;
   date_creation?: string;
 };
 
@@ -114,7 +114,7 @@ function VerificationPage() {
                   required
                   value={reference}
                   onChange={(e) => setReference(e.target.value)}
-                  placeholder="IPEC-2026-A1B2C3"
+                  placeholder="IPEC-CAND-2026-A1B2C3"
                   maxLength={32}
                   autoComplete="off"
                   className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider focus:border-blue focus:outline-none transition-colors"
@@ -165,8 +165,8 @@ function VerificationPage() {
                   </div>
 
                   <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                    <Field label="Référence" value={result.reference} mono />
-                    <Field label="Statut" value={result.statut_label} />
+                    <Field label="Référence document" value={result.reference} mono />
+                    <Field label="Type de document" value={result.document_label} />
                     <Field label="Candidat·e" value={result.candidat} />
                     <Field label="Date d'enregistrement" value={result.date_creation} />
                     <Field
@@ -185,10 +185,21 @@ function VerificationPage() {
                     )}
                   </dl>
 
-                  <p className="mt-6 pt-6 border-t border-border/30 text-xs text-muted-foreground leading-relaxed">
-                    Pour des raisons de protection des données (RGPD), seules les initiales
-                    du nom de famille sont affichées. Pour toute demande d'authentification
-                    plus poussée par une autorité officielle, contactez{" "}
+                  {result.document_type === "candidature" && (
+                    <p className="mt-6 pt-6 border-t border-border/30 text-xs text-muted-foreground leading-relaxed">
+                      <strong className="text-cream">Important :</strong> ce document
+                      atteste uniquement de la <em>soumission</em> d'une candidature à
+                      l'IPEC. Il ne constitue en aucun cas une preuve d'inscription
+                      définitive ni d'admission au programme. L'admission n'est effective
+                      qu'après examen du dossier complet par la commission pédagogique et
+                      notification écrite officielle de l'IPEC.
+                    </p>
+                  )}
+
+                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+                    Pour des raisons de protection des données (RGPD), le nom de famille
+                    est partiellement masqué. Pour toute demande d'authentification plus
+                    poussée par une autorité officielle, contactez{" "}
                     <a
                       href="mailto:admission@ipec.school"
                       className="text-blue hover:underline"
