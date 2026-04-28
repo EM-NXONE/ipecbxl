@@ -23,6 +23,12 @@ function safe_filename(string $base, string $ref): string {
 }
 
 try {
+    // Charge les builders FPDF (mode "library" — pas de pipeline HTTP du mailer)
+    require_once __DIR__ . '/../FPDF/fpdf.php';
+    require_once __DIR__ . '/../_pdf_classes.php';
+    if (!defined('IPEC_MAILER_AS_LIB')) define('IPEC_MAILER_AS_LIB', true);
+    require_once __DIR__ . '/../mailer.php';
+
     if ($type === 'facture') {
         // Charge la facture + vérifie qu'elle appartient à l'étudiant connecté
         $stmt = $pdo->prepare(
