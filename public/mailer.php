@@ -1052,7 +1052,19 @@ if ($type === 'inscription') {
     $nationalite    = clean($data['nationalite']    ?? '', 100);
     $email          = clean($data['email']          ?? '', 255);
     $telephone      = clean($data['telephone']      ?? '', 30);
-    $adresse        = cleanMultiline($data['adresse'] ?? '', 250);
+    $rue            = clean($data['rue']            ?? '', 150);
+    $numero         = clean($data['numero']         ?? '', 20);
+    $codePostal     = clean($data['codePostal']     ?? '', 20);
+    $ville          = clean($data['ville']          ?? '', 100);
+    // Recomposition d'une adresse formatée sur 2 lignes pour les usages internes
+    // (PDF candidature, PDF facture, e-mail interne). Rétro-compatibilité : si
+    // un ancien client envoie encore "adresse" en un seul champ, on le respecte.
+    $legacyAdresse  = cleanMultiline($data['adresse'] ?? '', 250);
+    $ligne1 = trim($rue . ($numero !== '' ? ' ' . $numero : ''));
+    $ligne2 = trim($codePostal . ($ville !== '' ? ' ' . $ville : ''));
+    $adresse = $legacyAdresse !== ''
+        ? $legacyAdresse
+        : trim($ligne1 . ($ligne1 !== '' && $ligne2 !== '' ? "\n" : '') . $ligne2);
     $paysResidence  = clean($data['paysResidence']  ?? '', 100);
     $programme      = clean($data['programme']      ?? '', 10);
     $annee          = clean($data['annee']          ?? '', 80);
