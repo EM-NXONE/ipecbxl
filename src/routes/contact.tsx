@@ -28,7 +28,12 @@ function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const confirmationRef = useRef<HTMLDivElement | null>(null);
+  const mountedAtRef = useRef<number>(Date.now());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
 
   useEffect(() => {
     if (sent && confirmationRef.current) {
@@ -45,6 +50,14 @@ function Contact() {
     e.preventDefault();
     if (submitting) return;
     setErrorMsg(null);
+
+    // Anti-bot : temps minimum de remplissage (les bots soumettent en <1s)
+    const elapsed = Date.now() - mountedAtRef.current;
+    if (elapsed < 2000) {
+      setErrorMsg("Merci de prendre un instant pour vérifier votre message.");
+      return;
+    }
+
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -55,7 +68,7 @@ function Contact() {
       email: String(fd.get("email") ?? ""),
       sujet: String(fd.get("sujet") ?? ""),
       message: String(fd.get("message") ?? ""),
-      website: String(fd.get("website") ?? ""), // honeypot
+      website: "", // compat backend (ancien honeypot retiré du DOM)
     };
 
     try {
@@ -168,23 +181,6 @@ function Contact() {
                     </Link>
                   </p>
                 </div>
-
-                {/* Honeypot anti-bot — caché aux humains */}
-                <input
-                  type="text"
-                  name="website"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    left: "-9999px",
-                    width: 1,
-                    height: 1,
-                    opacity: 0,
-                    pointerEvents: "none",
-                  }}
-                />
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
