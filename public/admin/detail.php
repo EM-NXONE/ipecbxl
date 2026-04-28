@@ -194,6 +194,18 @@ admin_flash();
                 <dt>Dernière connexion</dt><dd><?= admin_format_date($etudiant['derniere_connexion']) ?></dd>
             </div>
         </dl>
+        <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <a class="btn-secondary btn" href="/etudiant/login.php" target="_blank" rel="noopener">🔗 Page de connexion étudiant</a>
+            <?php if (!$etudiant['password_hash']): ?>
+                <form method="POST" action="action.php" style="display:inline;"
+                      onsubmit="return confirm('Régénérer un nouveau lien d\'activation (l\'ancien sera invalidé) ?');">
+                    <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
+                    <input type="hidden" name="do" value="regen_activation">
+                    <input type="hidden" name="id" value="<?= $id ?>">
+                    <button type="submit" class="btn-secondary">↻ Régénérer le lien d'activation</button>
+                </form>
+            <?php endif; ?>
+        </div>
     <?php elseif ($etudiantHomonyme): ?>
         <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['email']) ?></strong>
            (n° <span class="mono"><?= admin_h($etudiantHomonyme['numero_etudiant']) ?></span>),
