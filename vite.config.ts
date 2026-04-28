@@ -31,6 +31,7 @@ const PRERENDER_ROUTES = [
   "/international",
   "/mentions-legales",
   "/programmes",
+  "/verification",
   "/vie-etudiante",
 ];
 
