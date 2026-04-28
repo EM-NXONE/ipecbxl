@@ -11,17 +11,20 @@ function admin_layout_start(string $title): void {
     $h = 'admin_h';
     ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= $h($title) ?> — Admin IPEC</title>
+<script>
+(function(){try{var t=localStorage.getItem('ipec-admin-theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
+:root, html[data-theme="light"] {
     /* Site palette — light editorial */
     --bg:        #FBFAF7;          /* paper */
     --surface:   #F4F2EC;          /* tinted band */
@@ -33,12 +36,14 @@ function admin_layout_start(string $title): void {
     --primary:   #1F3D8A;          /* deep editorial blue */
     --primary-hover: #16306E;
     --primary-soft:  rgba(31, 61, 138, 0.08);
+    --primary-on:    #ffffff;
     --success:   #2F8F5E;
     --success-soft: rgba(47, 143, 94, 0.10);
     --amber:     #B07B0A;
     --amber-soft: rgba(176, 123, 10, 0.12);
     --danger:    #B0332B;
     --danger-soft: rgba(176, 51, 43, 0.10);
+    --radial-tint: rgba(31, 61, 138, 0.05);
 
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
@@ -46,18 +51,52 @@ function admin_layout_start(string $title): void {
     --shadow-sm: 0 1px 2px rgba(27,31,42,0.04);
     --shadow-md: 0 1px 2px rgba(27,31,42,0.04), 0 8px 24px -10px rgba(27,31,42,0.10);
 }
+
+html[data-theme="dark"] {
+    /* Deep midnight palette aligned with site dark mode */
+    --bg:        #0F1320;
+    --surface:   #161B2C;
+    --card:      #1B2236;
+    --ink:       #ECEEF5;
+    --muted:     #98A0B5;
+    --hairline:  rgba(236, 238, 245, 0.10);
+    --hairline-strong: rgba(236, 238, 245, 0.18);
+    --primary:   #6B9BFF;
+    --primary-hover: #88B0FF;
+    --primary-soft:  rgba(107, 155, 255, 0.14);
+    --primary-on:    #0F1320;
+    --success:   #4FD18A;
+    --success-soft: rgba(79, 209, 138, 0.14);
+    --amber:     #F5B948;
+    --amber-soft: rgba(245, 185, 72, 0.14);
+    --danger:    #F26B63;
+    --danger-soft: rgba(242, 107, 99, 0.14);
+    --radial-tint: rgba(107, 155, 255, 0.10);
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+    --shadow-md: 0 1px 2px rgba(0,0,0,0.30), 0 12px 32px -10px rgba(0,0,0,0.55);
+}
+html[data-theme="dark"] header.topbar {
+    background: rgba(15, 19, 32, 0.78) !important;
+}
+html[data-theme="dark"] .form-row input,
+html[data-theme="dark"] .form-row select,
+html[data-theme="dark"] .form-row textarea {
+    background: var(--bg);
+}
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
     margin: 0; padding: 0;
     font-family: var(--font-body);
     background-color: var(--bg);
-    background-image: radial-gradient(ellipse at top, rgba(31,61,138,0.05), transparent 65%);
+    background-image: radial-gradient(ellipse at top, var(--radial-tint), transparent 65%);
     background-attachment: fixed;
     color: var(--ink);
     font-size: 14px; line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 a { color: var(--primary); text-decoration: none; }
 a:hover { color: var(--primary-hover); text-decoration: underline; }
@@ -73,6 +112,30 @@ header.topbar {
     justify-content: space-between; gap: 16px;
     position: sticky; top: 0; z-index: 50;
 }
+
+/* Theme toggle button */
+.theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; padding: 0;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.theme-toggle:hover {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--ink);
+    transform: none;
+    box-shadow: none;
+}
+.theme-toggle svg { width: 16px; height: 16px; display: block; }
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 header.topbar .brand {
     font-family: var(--font-display);
     font-weight: 500;
@@ -151,7 +214,7 @@ tbody tr:last-child td { border-bottom: none; }
 button, .btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 9px 16px; border-radius: 6px; border: 1px solid var(--primary);
-    background: var(--primary); color: #ffffff;
+    background: var(--primary); color: var(--primary-on);
     font-family: var(--font-body); font-size: 13px; font-weight: 500;
     letter-spacing: 0.01em;
     cursor: pointer; text-decoration: none;
@@ -160,7 +223,7 @@ button, .btn {
 }
 button:hover, .btn:hover {
     background: var(--primary-hover); border-color: var(--primary-hover);
-    text-decoration: none; color: #ffffff;
+    text-decoration: none; color: var(--primary-on);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
@@ -173,13 +236,13 @@ button.btn-secondary:hover, .btn-secondary:hover {
     border-color: var(--ink);
 }
 button.btn-danger, .btn-danger {
-    background: var(--danger); border-color: var(--danger);
+    background: var(--danger); border-color: var(--danger); color: #ffffff;
 }
-button.btn-danger:hover { background: #8E2620; border-color: #8E2620; }
+button.btn-danger:hover { background: var(--danger); border-color: var(--danger); filter: brightness(0.88); color: #ffffff; }
 button.btn-success, .btn-success {
     background: var(--success); border-color: var(--success); color: #ffffff;
 }
-button.btn-success:hover { background: #246E48; border-color: #246E48; color: #ffffff; }
+button.btn-success:hover { background: var(--success); border-color: var(--success); filter: brightness(0.92); color: #ffffff; }
 
 /* ---------- Forms ---------- */
 .form-row { margin-bottom: 14px; }
@@ -265,9 +328,16 @@ button.btn-success:hover { background: #246E48; border-color: #246E48; color: #f
     <nav>
         <a href="index.php">Candidatures</a>
         <a href="logout.php">Déconnexion</a>
+        <button type="button" class="theme-toggle" id="ipecThemeToggle" aria-label="Basculer le thème" title="Basculer clair / sombre">
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
         <span class="user"><?= $h(admin_current_user()) ?></span>
     </nav>
 </header>
+<script>
+(function(){var b=document.getElementById('ipecThemeToggle');if(!b)return;b.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',c);try{localStorage.setItem('ipec-admin-theme',c);}catch(e){}});})();
+</script>
 <main>
 <?php
 }
