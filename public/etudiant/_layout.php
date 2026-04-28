@@ -291,16 +291,16 @@ footer.etu-footer {
 <div class="shell">
     <aside class="sidebar">
         <nav class="side-nav">
-            <a href="<?= etu_url('/index.php') ?>"<?= $isActive('/etudiant/index.php') ?: $isActive('/etudiant/') ?>>
+            <a href="<?= etu_url('/index.php') ?>"<?= $isActive('/index.php') ?>>
                 <span class="ico">▤</span> Tableau de bord
             </a>
-            <a href="<?= etu_url('/factures.php') ?>"<?= $isActive('/etudiant/factures.php') ?>>
+            <a href="<?= etu_url('/factures.php') ?>"<?= $isActive('/factures.php') ?>>
                 <span class="ico">€</span> Factures
             </a>
-            <a href="<?= etu_url('/documents.php') ?>"<?= $isActive('/etudiant/documents.php') ?>>
+            <a href="<?= etu_url('/documents.php') ?>"<?= $isActive('/documents.php') ?>>
                 <span class="ico">▣</span> Documents
             </a>
-            <a href="<?= etu_url('/profil.php') ?>"<?= $isActive('/etudiant/profil.php') ?>>
+            <a href="<?= etu_url('/profil.php') ?>"<?= $isActive('/profil.php') ?>>
                 <span class="ico">●</span> Mon profil
             </a>
         </nav>
