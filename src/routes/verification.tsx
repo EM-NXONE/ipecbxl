@@ -222,6 +222,11 @@ function VerificationPage() {
                   )}
                 </button>
               </div>
+              <p className="mt-3 text-xs text-muted-foreground/80">
+                Astuce : tirets, majuscules et préfixe <code className="text-cream/80">IPEC</code> sont
+                ajoutés automatiquement. Vous pouvez taper directement <code className="text-cream/80">C…</code>{" "}
+                pour une candidature ou <code className="text-cream/80">F…</code> pour une facture.
+              </p>
             </div>
           </form>
 
