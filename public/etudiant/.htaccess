@@ -5,13 +5,13 @@
     Require all denied
 </FilesMatch>
 
+<FilesMatch "^(db_config\.php|mailer\.php)$">
+    Require all denied
+</FilesMatch>
+
 # Bloque les fichiers de config / migration
 <FilesMatch "\.(sql|md|env|json|lock)$">
     Require all denied
 </FilesMatch>
 
-# Pas d'index automatique — protégé pour éviter un 500 si Options est interdit par l'hébergeur
-<IfModule mod_autoindex.c>
-    Options -Indexes
-</IfModule>
 DirectoryIndex index.php
