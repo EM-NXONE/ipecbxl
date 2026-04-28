@@ -26,6 +26,47 @@ const ETU_SESSION_LIFETIME = 30 * 24 * 3600;  // 30 jours
 const ETU_SESSION_REFRESH  = 7 * 24 * 3600;   // refresh expiration toutes les 7 jours
 const ETU_RATE_LIMIT_DIR   = __DIR__ . '/../../.ipec-etu-ratelimit';
 
+// Hôte canonique du portail étudiant (LMS). Sert pour générer les liens
+// absolus envoyés par email (activation, reset).
+const ETU_CANONICAL_HOST   = 'lms.ipec.school';
+
+// ---------------------------------------------------------------------------
+// Détection du contexte (sous-domaine LMS vs /etudiant/ sur le site principal)
+// ---------------------------------------------------------------------------
+
+/**
+ * Renvoie le préfixe d'URL du portail étudiant pour le contexte courant.
+ *  - Sur lms.ipec.school                → ""           (les pages sont à la racine)
+ *  - Sur ipec.school (legacy)           → "/etudiant"
+ */
+function etu_base_path(): string {
+    $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    if ($host === ETU_CANONICAL_HOST || str_starts_with($host, 'lms.')) {
+        return '';
+    }
+    return '/etudiant';
+}
+
+/**
+ * Construit une URL relative correcte pour le contexte courant.
+ *   etu_url('/login.php') → "/login.php" (LMS) ou "/etudiant/login.php" (legacy)
+ */
+function etu_url(string $path): string {
+    if ($path === '' || $path[0] !== '/') $path = '/' . $path;
+    return etu_base_path() . $path;
+}
+
+/**
+ * URL absolue canonique (toujours sur le sous-domaine LMS).
+ * À utiliser pour les liens envoyés par e-mail (activation, reset).
+ */
+function etu_absolute_url(string $path): string {
+    if ($path === '' || $path[0] !== '/') $path = '/' . $path;
+    $scheme = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
+    return $scheme . '://' . ETU_CANONICAL_HOST . $path;
+}
+
+
 // ---------------------------------------------------------------------------
 // PHP session minimale (pour CSRF + flash)
 // ---------------------------------------------------------------------------
