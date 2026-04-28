@@ -319,12 +319,13 @@ function VerificationPage() {
           )}
 
           <div className="mt-16 p-6 rounded-sm border border-border/40 bg-card/50">
-            <h2 className="font-display text-lg text-cream mb-3">À l'attention des autorités</h2>
+            <h2 className="font-display text-lg text-cream mb-3">À l'attention des utilisateurs légitimes</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cet outil est mis à disposition des établissements, employeurs, ambassades et
-              autorités administratives souhaitant vérifier l'authenticité d'un document émis
-              par l'IPEC. La référence figure dans le pied de page de chaque document officiel.
-              Aucune information personnelle complète n'est divulguée.
+              Cet outil est mis à la disposition de toute personne ou organisation souhaitant
+              s'assurer de l'authenticité d'un document émis par l'IPEC : candidat·e·s,
+              familles, établissements scolaires, employeurs, ambassades, administrations
+              publiques ou partenaires. Le numéro de référence figure dans le pied de page de
+              chaque document officiel. Aucune information personnelle complète n'est divulguée.
             </p>
             <p className="text-xs text-muted-foreground/80 leading-relaxed mt-4 pt-4 border-t border-border/30">
               Protection des données : conformément au RGPD, le nom de famille est partiellement
