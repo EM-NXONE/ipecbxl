@@ -152,7 +152,7 @@ function maskName(string $nom): string {
     return $first . $stars . $last;
 }
 
-$nomAffiche = trim($row['prenom']) . ' ' . maskName((string)$row['nom']);
+$nomAffiche = maskName((string)$row['prenom']) . ' ' . maskName((string)$row['nom']);
 
 // Mappage code programme → nom complet
 $programmesFull = [
