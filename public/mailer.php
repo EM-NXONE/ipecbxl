@@ -1290,7 +1290,9 @@ HTML;
     $academicYearForDb = '';
     if (preg_match('/(20\d{2})/', $rentree, $mYr)) {
         $yr = (int)$mYr[1];
-        $academicYearForDb = $yr . '/' . ($yr + 1);
+        $isPrintempsDb = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentree);
+        $startYr = $isPrintempsDb ? ($yr - 1) : $yr;
+        $academicYearForDb = $startYr . '/' . ($startYr + 1);
     }
 
     try {
