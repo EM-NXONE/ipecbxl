@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_layout.php';
+require_once __DIR__ . '/_etudiants.php';
 admin_require_login();
 
 $id = (int)($_GET['id'] ?? 0);
@@ -22,6 +23,18 @@ if (!$c) {
     echo '<div class="card"><p>Candidature introuvable.</p><a href="index.php" class="btn">Retour</a></div>';
     admin_layout_end();
     exit;
+}
+
+// Étudiant rattaché (si déjà créé) — sinon on tente une détection par e-mail
+$etudiant = null;
+if (!empty($c['etudiant_id'])) {
+    $eStmt = $pdo->prepare("SELECT * FROM etudiants WHERE id = ?");
+    $eStmt->execute([(int)$c['etudiant_id']]);
+    $etudiant = $eStmt->fetch() ?: null;
+}
+$etudiantHomonyme = null;
+if (!$etudiant) {
+    $etudiantHomonyme = etudiant_find_by_email($pdo, (string)$c['email']);
 }
 
 // Historique des actions admin
