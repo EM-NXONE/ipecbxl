@@ -1031,7 +1031,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Bénéficiaire'), 0, 0);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr('Institut Privé des Études Commerciales'), 0, 1);
+    $pdf->Cell(0, 6, $tr('Institut Privé des Études Commerciales ASBL'), 0, 1);
     $pdf->SetX(24);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('IBAN'), 0, 0);
