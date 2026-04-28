@@ -110,10 +110,7 @@ try {
         if (is_array($tmp)) $data = $tmp;
     }
 
-    require_once __DIR__ . '/../FPDF/fpdf.php';
-    require_once __DIR__ . '/../_pdf_classes.php';
-    if (!defined('IPEC_MAILER_AS_LIB')) define('IPEC_MAILER_AS_LIB', true);
-    require_once __DIR__ . '/../mailer.php'; // mode lib : expose buildCandidaturePdf, buildFacturePdf
+    // (builders FPDF déjà chargés en haut du try)
 
     // ---- Template "recap_candidature" → builder dédié (PDF identique au mail historique) ----
     if ($d['template'] === 'recap_candidature' && function_exists('buildCandidaturePdf')) {
