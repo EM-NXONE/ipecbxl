@@ -45,69 +45,50 @@ type VerifyResult = {
 };
 
 /**
- * Formate intelligemment la saisie utilisateur vers IPEC-{CAND|FACT}-AAAA-XXXXXX.
- * - Majuscules, suppression des caractères non alphanumériques
- * - Insertion automatique des tirets
- * - Auto-complétion du type : "C" → CAND, "F" → FACT (dès la 1ère lettre)
- * - Limite par segment : kind=4, year=4, suffix=6
+ * Format attendu : IPEC-{4 lettres}-{4 chiffres}-{6 hex}
+ * Le préfixe "IPEC-" est figé, on n'ajoute que les tirets pendant la frappe.
  */
+const REF_PREFIX = "IPEC-";
+
 function formatReference(raw: string): string {
-  // 1) Nettoyage : majuscules + alphanumériques uniquement
-  const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  // Retire le préfixe figé s'il est présent puis ne garde que les caractères utiles
+  let body = raw.toUpperCase();
+  if (body.startsWith(REF_PREFIX)) body = body.slice(REF_PREFIX.length);
+  body = body.replace(/[^A-Z0-9]/g, "");
 
-  // 2) Si l'utilisateur n'a pas encore tapé "IPEC", on l'aide en préfixant si possible
-  let rest = cleaned;
-  let prefix = "";
-  if (cleaned.startsWith("IPEC")) {
-    prefix = "IPEC";
-    rest = cleaned.slice(4);
-  } else if ("IPEC".startsWith(cleaned)) {
-    // L'utilisateur est en train d'écrire "I", "IP", "IPE", "IPEC"
-    return cleaned;
-  } else {
-    // L'utilisateur a tapé directement le type (ex: "C…", "F…", "CAND…")
-    prefix = "IPEC";
-    rest = cleaned;
-  }
+  // Segment 1 : 4 lettres (type de document)
+  const kindMatch = body.match(/^[A-Z]{0,4}/);
+  const kind = kindMatch ? kindMatch[0] : "";
+  let after = body.slice(kind.length);
 
-  // 3) Segment "kind" (CAND ou FACT)
-  // Règle clé pour permettre l'effacement : on n'auto-complète le type
-  // QUE lorsque l'utilisateur a tapé un caractère "suivant" (un chiffre = début d'année).
-  // Tant qu'il n'y a que des lettres, on respecte exactement ce qu'il a tapé.
-  const leadingLettersMatch = rest.match(/^[A-Z]{1,4}/);
-  const letters = leadingLettersMatch ? leadingLettersMatch[0] : "";
-  const afterLetters = rest.slice(letters.length);
-  const userMovedPastKind = afterLetters.length > 0; // a tapé au moins un chiffre après
+  // Si l'utilisateur a tapé un chiffre alors que le segment lettres n'est pas plein,
+  // on ignore ce qui reste (sécurité), on prend juste 4 chiffres pour l'année
+  const yearRaw = after.replace(/[^0-9]/g, "").slice(0, 4);
+  // recompose après-année à partir des chiffres restants + lettres restantes (hex)
+  const consumedYear = (() => {
+    let n = 0, idx = 0;
+    while (idx < after.length && n < yearRaw.length) {
+      if (/[0-9]/.test(after[idx])) n++;
+      idx++;
+    }
+    return idx;
+  })();
+  const afterYear = after.slice(consumedYear).replace(/[^0-9A-F]/g, "");
+  const suffix = afterYear.slice(0, 6);
 
-  let kind = letters;
-  if (userMovedPastKind && letters.length > 0) {
-    if (letters[0] === "C" && "CAND".startsWith(letters)) kind = "CAND";
-    else if (letters[0] === "F" && "FACT".startsWith(letters)) kind = "FACT";
-  }
-
-  const afterKind = afterLetters;
-
-  // 4) Segment "année" (4 chiffres)
-  const yearRaw = afterKind.slice(0, 4).replace(/[^0-9]/g, "");
-  const afterYear = afterKind.slice(yearRaw.length);
-
-  // 5) Segment "suffixe" (6 hex max)
-  const suffix = afterYear.slice(0, 6).replace(/[^0-9A-F]/g, "");
-
-  // 6) Reconstitution avec tirets, sans laisser de tiret pendant si segment vide
-  let out = prefix;
-  if (kind.length > 0) out += "-" + kind;
-  if (yearRaw.length > 0 || (kind.length === 4 && afterKind.length > 0)) {
+  // Reconstruction avec tirets (segment vide → on n'ajoute pas le tiret suivant)
+  let out = REF_PREFIX + kind;
+  if (kind.length === 4 && (yearRaw.length > 0 || suffix.length > 0)) {
     out += "-" + yearRaw;
   }
-  if (suffix.length > 0 || (yearRaw.length === 4 && afterYear.length > 0)) {
+  if (yearRaw.length === 4 && suffix.length > 0) {
     out += "-" + suffix;
   }
   return out;
 }
 
 function VerificationPage() {
-  const [reference, setReference] = useState("");
+  const [reference, setReference] = useState(REF_PREFIX);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
 
@@ -115,11 +96,19 @@ function VerificationPage() {
     setReference(formatReference(e.target.value));
   };
 
+  // Empêche l'utilisateur de placer son curseur dans le préfixe figé
+  const protectPrefix = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    if ((input.selectionStart ?? 0) < REF_PREFIX.length) {
+      input.setSelectionRange(REF_PREFIX.length, Math.max(input.selectionEnd ?? 0, REF_PREFIX.length));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
     const ref = reference.trim().toUpperCase();
-    if (!ref) return;
+    if (!ref || ref === REF_PREFIX) return;
 
     setLoading(true);
     setResult(null);
