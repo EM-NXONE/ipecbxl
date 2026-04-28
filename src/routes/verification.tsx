@@ -51,10 +51,10 @@ type VerifyResult = {
 const REF_PREFIX = "IPEC-";
 
 function formatReference(raw: string): string {
-  // Retire le préfixe figé s'il est présent puis ne garde que les caractères utiles
-  let body = raw.toUpperCase();
-  if (body.startsWith(REF_PREFIX)) body = body.slice(REF_PREFIX.length);
-  body = body.replace(/[^A-Z0-9]/g, "");
+  // Ne garde que les caractères alphanumériques, peu importe l'état du préfixe
+  let body = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  // Retire toutes les occurrences de "IPEC" en tête (gère "IPEC", "IPECIPEC", "IPE", etc.)
+  while (body.startsWith("IPEC")) body = body.slice(4);
 
   // Segment 1 : 4 lettres (type de document)
   const kindMatch = body.match(/^[A-Z]{0,4}/);
@@ -101,6 +101,19 @@ function VerificationPage() {
     const input = e.currentTarget;
     if ((input.selectionStart ?? 0) < REF_PREFIX.length) {
       input.setSelectionRange(REF_PREFIX.length, Math.max(input.selectionEnd ?? 0, REF_PREFIX.length));
+    }
+  };
+
+  // Bloque Backspace/Delete quand le curseur est dans/au bord du préfixe
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const start = input.selectionStart ?? 0;
+    const end = input.selectionEnd ?? 0;
+    if (e.key === "Backspace" && start === end && start <= REF_PREFIX.length) {
+      e.preventDefault();
+    }
+    if (e.key === "Delete" && start === end && start < REF_PREFIX.length) {
+      e.preventDefault();
     }
   };
 
