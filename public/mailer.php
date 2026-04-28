@@ -1018,7 +1018,8 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFillColor(247, 249, 252);
     $pdf->SetDrawColor(44, 93, 219);
     $pdf->SetLineWidth(0.3);
-    $pdf->Rect(20, $startY, 170, 54, 'DF');
+    // Hauteur ajustée : titre (5) + Ln(1) + 5 lignes de 6 = 36 + padding (5 haut + 4 bas)
+    $pdf->Rect(20, $startY, 170, 45, 'DF');
     $pdf->SetXY(24, $startY + 5);
     $pdf->SetFont('Helvetica', 'B', 9);
     $pdf->SetTextColor(44, 93, 219);
@@ -1048,13 +1049,22 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
+    // Échéance : date de facture + 14 jours
+    $echeance = $now->modify('+14 days');
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(50, 6, $tr('Échéance'), 0, 0);
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 6, $tr($echeance->format('d/m/Y') . ' (sous 14 jours)'), 0, 1);
 
-    $pdf->SetY($startY + 60);
+    $pdf->SetY($startY + 51);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
-        'Vous pouvez procéder au virement à votre convenance. Pensez à reporter la communication structurée '
-        . 'pour faciliter le rapprochement, puis joignez la preuve de paiement à votre dossier de candidature.'
+        'Merci d\'effectuer le virement avant l\'échéance indiquée et de joindre la preuve de paiement '
+        . 'à votre dossier de candidature, en indiquant la communication structurée ci-dessus.'
     ), 0, 'L');
 
     return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
