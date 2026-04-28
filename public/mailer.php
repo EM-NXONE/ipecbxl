@@ -1615,7 +1615,8 @@ if ($type === 'inscription') {
         $factureError = null;
         try {
             [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
-                'reference'     => $candidatureReference,
+                'reference'           => $candidatureReference,
+                'reference_facture'   => $factureReference,
                 'civilite'      => $civilite,
                 'prenom'        => $prenom,
                 'nom'           => $nom,
@@ -1632,15 +1633,8 @@ if ($type === 'inscription') {
             ]);
             if ($facturePdf !== '' && $factureFilename !== '') {
                 $candidateMail->addStringAttachment($facturePdf, $factureFilename, 'base64', 'application/pdf');
-                // Sauvegarde du n° de facture dans la BDD pour traçabilité
-                if ($candidatureDbId !== null && $factureNumero !== '') {
-                    try {
-                        $upd = db()->prepare('UPDATE candidatures SET facture_numero = ? WHERE id = ?');
-                        $upd->execute([$factureNumero, $candidatureDbId]);
-                    } catch (\Throwable $updErr) {
-                        error_log('[mailer.php] UPDATE facture_numero échoué : ' . $updErr->getMessage());
-                    }
-                }
+                // Le n° de facture (IPEC-FACT-AAAA-XXXXXX) est déjà stocké en
+                // BDD lors de l'INSERT initial — pas d'UPDATE nécessaire ici.
             } else {
                 $factureError = 'buildFacturePdf a renvoyé un résultat vide';
             }
