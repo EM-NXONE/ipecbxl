@@ -216,6 +216,15 @@ try {
             header('Location: detail.php?id=' . $id); exit;
         }
 
+        case 'sync_documents': {
+            admin_csrf_check();
+            if (empty($c['etudiant_id'])) throw new RuntimeException('Aucun compte étudiant rattaché.');
+            etudiant_sync_documents_historiques($pdo, (int)$c['etudiant_id'], $c, admin_current_user());
+            admin_log_action($id, 'sync_documents', 'Étudiant #' . $c['etudiant_id']);
+            admin_set_flash('Documents synchronisés dans l\'espace étudiant (facture 400€ + récap candidature).');
+            header('Location: detail.php?id=' . $id); exit;
+        }
+
         case 'regen_activation': {
             admin_csrf_check();
             if (empty($c['etudiant_id'])) throw new RuntimeException('Aucun compte étudiant rattaché.');
