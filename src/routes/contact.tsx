@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Send, Mail, MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({

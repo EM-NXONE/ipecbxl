@@ -7,6 +7,7 @@ import {
   getNextFebruaryRentree,
   getUpcomingAcademicYearLabel,
 } from "@/lib/academic-dates";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export const Route = createFileRoute("/inscription")({
   head: () => ({
