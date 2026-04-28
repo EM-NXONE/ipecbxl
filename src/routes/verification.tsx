@@ -70,33 +70,25 @@ function formatReference(raw: string): string {
     rest = cleaned;
   }
 
-  // 3) Segment "kind" (CAND ou FACT) — 4 chars max
-  let kindRaw = rest.slice(0, 4);
-  let consumedFromRest = kindRaw.length;
-  let kind = kindRaw;
-
-  if (kindRaw.length > 0) {
-    const first = kindRaw[0];
-    if (first === "C") {
-      // On force CAND si la saisie est cohérente
-      if ("CAND".startsWith(kindRaw)) {
-        kind = "CAND";
-        // L'utilisateur a tapé `kindRaw.length` chars; on les considère consommés
-        // mais on n'en avale pas plus que ce qu'il a écrit
-      } else {
-        // Saisie incohérente avec CAND → on garde tel quel
-        kind = kindRaw;
-      }
-    } else if (first === "F") {
-      if ("FACT".startsWith(kindRaw)) {
-        kind = "FACT";
-      } else {
-        kind = kindRaw;
-      }
+  // 3) Segment "kind" (CAND ou FACT)
+  // Détection intelligente : on isole les lettres en tête (max 4) puis on auto-complète
+  // si elles forment un préfixe valide de CAND ou FACT.
+  let kind = "";
+  let consumedFromRest = 0;
+  const leadingLettersMatch = rest.match(/^[A-Z]{1,4}/);
+  if (leadingLettersMatch) {
+    const letters = leadingLettersMatch[0];
+    consumedFromRest = letters.length;
+    if (letters[0] === "C" && "CAND".startsWith(letters)) {
+      kind = "CAND";
+    } else if (letters[0] === "F" && "FACT".startsWith(letters)) {
+      kind = "FACT";
+    } else {
+      // Préfixe inconnu : on garde tel quel pour ne pas piéger l'utilisateur
+      kind = letters;
     }
   }
 
-  // Si "kind" a été auto-complété, le segment reste 4 chars mais l'utilisateur n'a tapé que `consumedFromRest` chars de rest
   const afterKind = rest.slice(consumedFromRest);
 
   // 4) Segment "année" (4 chiffres)
