@@ -99,6 +99,18 @@ etu_layout_start('Connexion');
             <input id="email" type="email" name="email" autocomplete="email" required value="<?= etu_h($emailPrefill) ?>">
         </div>
         <div class="form-row">
+            <label for="prenom">Prénom de l'étudiant</label>
+            <input id="prenom" type="text" name="prenom" autocomplete="given-name" required value="<?= etu_h($prenomPrefill) ?>">
+        </div>
+        <div class="form-row">
+            <label for="nom">Nom de l'étudiant</label>
+            <input id="nom" type="text" name="nom" autocomplete="family-name" required value="<?= etu_h($nomPrefill) ?>">
+        </div>
+        <div class="form-row">
+            <label for="date_naissance">Date de naissance</label>
+            <input id="date_naissance" type="date" name="date_naissance" autocomplete="bday" required value="<?= etu_h($dateNaissancePrefill) ?>">
+        </div>
+        <div class="form-row">
             <label for="password">Mot de passe</label>
             <input id="password" type="password" name="password" autocomplete="current-password" required>
         </div>
