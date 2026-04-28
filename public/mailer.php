@@ -1777,6 +1777,9 @@ if ($DEBUG) {
 }
 echo json_encode($response);
 
+// Étiquette de sortie pour le mode "library" (voir guard tout en haut du fichier).
+IPEC_MAILER_END:
+
 /* =========================================================================
  * INSTALLATION SUR n0c
  * =========================================================================
