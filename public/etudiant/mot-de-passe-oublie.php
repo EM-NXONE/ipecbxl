@@ -14,9 +14,14 @@ $done  = false;
 $error = null;
 $pdo   = db();
 
-function etudiant_find_by_email(PDO $pdo, string $email): ?array {
-    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
-    $stmt->execute([trim(strtolower($email))]);
+function etudiant_find_by_identity_for_reset(PDO $pdo, string $email, string $prenom, string $nom, string $dateNaissance): ?array {
+    $stmt = $pdo->prepare("SELECT * FROM etudiants
+                           WHERE email = ?
+                             AND LOWER(TRIM(prenom)) = LOWER(TRIM(?))
+                             AND LOWER(TRIM(nom)) = LOWER(TRIM(?))
+                             AND date_naissance = ?
+                           LIMIT 1");
+    $stmt->execute([trim(strtolower($email)), trim($prenom), trim($nom), trim($dateNaissance)]);
     $row = $stmt->fetch();
     return $row ?: null;
 }
@@ -28,9 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('Trop de demandes. Réessaie dans quelques minutes.');
         }
         $email = trim(strtolower((string)($_POST['email'] ?? '')));
-        if ($email === '') throw new RuntimeException('E-mail requis.');
+        $prenom = trim((string)($_POST['prenom'] ?? ''));
+        $nom = trim((string)($_POST['nom'] ?? ''));
+        $dateNaissance = trim((string)($_POST['date_naissance'] ?? ''));
+        if ($email === '' || $prenom === '' || $nom === '' || $dateNaissance === '') throw new RuntimeException('E-mail, prénom, nom et date de naissance requis.');
 
-        $etu = etudiant_find_by_email($pdo, $email);
+        $etu = etudiant_find_by_identity_for_reset($pdo, $email, $prenom, $nom, $dateNaissance);
         if ($etu && $etu['statut'] === 'actif') {
             $token = etu_create_or_reset_token($pdo, (int)$etu['id']);
             error_log('[etudiant] reset link for ' . $email . ' : ' . etu_absolute_url('/reset-mot-de-passe.php?token=' . $token));
