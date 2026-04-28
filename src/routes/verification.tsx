@@ -71,25 +71,21 @@ function formatReference(raw: string): string {
   }
 
   // 3) Segment "kind" (CAND ou FACT)
-  // Détection intelligente : on isole les lettres en tête (max 4) puis on auto-complète
-  // si elles forment un préfixe valide de CAND ou FACT.
-  let kind = "";
-  let consumedFromRest = 0;
+  // Règle clé pour permettre l'effacement : on n'auto-complète le type
+  // QUE lorsque l'utilisateur a tapé un caractère "suivant" (un chiffre = début d'année).
+  // Tant qu'il n'y a que des lettres, on respecte exactement ce qu'il a tapé.
   const leadingLettersMatch = rest.match(/^[A-Z]{1,4}/);
-  if (leadingLettersMatch) {
-    const letters = leadingLettersMatch[0];
-    consumedFromRest = letters.length;
-    if (letters[0] === "C" && "CAND".startsWith(letters)) {
-      kind = "CAND";
-    } else if (letters[0] === "F" && "FACT".startsWith(letters)) {
-      kind = "FACT";
-    } else {
-      // Préfixe inconnu : on garde tel quel pour ne pas piéger l'utilisateur
-      kind = letters;
-    }
+  const letters = leadingLettersMatch ? leadingLettersMatch[0] : "";
+  const afterLetters = rest.slice(letters.length);
+  const userMovedPastKind = afterLetters.length > 0; // a tapé au moins un chiffre après
+
+  let kind = letters;
+  if (userMovedPastKind && letters.length > 0) {
+    if (letters[0] === "C" && "CAND".startsWith(letters)) kind = "CAND";
+    else if (letters[0] === "F" && "FACT".startsWith(letters)) kind = "FACT";
   }
 
-  const afterKind = rest.slice(consumedFromRest);
+  const afterKind = afterLetters;
 
   // 4) Segment "année" (4 chiffres)
   const yearRaw = afterKind.slice(0, 4).replace(/[^0-9]/g, "");
