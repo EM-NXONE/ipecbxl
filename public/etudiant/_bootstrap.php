@@ -14,9 +14,9 @@
 
 declare(strict_types=1);
 
-// Builders PDF + DB (mailer.php expose buildCandidaturePdf / buildFacturePdf via db_config.php)
+// Builders PDF + DB (copie locale au dossier LMS, sans dépendance à public_html)
 define('IPEC_MAILER_AS_LIB', true);
-require_once __DIR__ . '/../mailer.php';
+require_once __DIR__ . '/mailer.php';
 
 // ---------------------------------------------------------------------------
 // Constantes
@@ -41,7 +41,7 @@ const ETU_CANONICAL_HOST   = 'lms.ipec.school';
  */
 function etu_base_path(): string {
     $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
-    if ($host === ETU_CANONICAL_HOST || str_starts_with($host, 'lms.')) {
+    if ($host === ETU_CANONICAL_HOST || strpos($host, 'lms.') === 0) {
         return '';
     }
     return '/etudiant';
