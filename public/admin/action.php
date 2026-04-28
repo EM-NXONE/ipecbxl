@@ -216,7 +216,20 @@ try {
             header('Location: detail.php?id=' . $id); exit;
         }
 
-        default:
+        case 'regen_activation': {
+            admin_csrf_check();
+            if (empty($c['etudiant_id'])) throw new RuntimeException('Aucun compte étudiant rattaché.');
+            $etuId = (int)$c['etudiant_id'];
+            // Invalide les tokens d'activation existants non utilisés
+            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
+                           WHERE etudiant_id=? AND type='activation' AND used_at IS NULL")
+                ->execute([$etuId]);
+            $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
+            admin_log_action($id, 'regen_activation', 'Étudiant #' . $etuId);
+            admin_set_flash('Nouveau lien d\'activation généré : /etudiant/activer.php?token=' . $token);
+            header('Location: detail.php?id=' . $id); exit;
+        }
+
             header('Location: detail.php?id=' . $id); exit;
     }
 } catch (\Throwable $e) {
