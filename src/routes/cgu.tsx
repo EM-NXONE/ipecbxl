@@ -81,7 +81,31 @@ function CGU() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-cream mb-4">7. Droit applicable</h2>
+            <h2 className="font-display text-2xl text-cream mb-4">7. Vérification de documents</h2>
+            <p>
+              L'IPEC met à disposition un outil de vérification permettant de contrôler
+              l'authenticité d'un document émis par l'institut (attestation, facture, courrier
+              officiel) à partir de sa référence unique. Cet outil est accessible aux tiers
+              légitimement destinataires d'un tel document (employeurs, administrations,
+              établissements partenaires, etc.).
+            </p>
+            <p className="mt-3">
+              L'utilisateur s'engage à n'utiliser ce service qu'à des fins légitimes de
+              vérification, à ne pas tenter d'énumérer ou de deviner des références, et à ne pas
+              automatiser les requêtes. Toute tentative d'accès frauduleux, d'extraction massive
+              ou de contournement des mécanismes de protection (notamment reCAPTCHA) pourra
+              donner lieu à un blocage immédiat et, le cas échéant, à des poursuites.
+            </p>
+            <p className="mt-3">
+              Le résultat affiché est limité aux informations strictement nécessaires à la
+              confirmation d'authenticité et n'a pas valeur de copie officielle du document.
+              L'IPEC ne garantit pas la disponibilité permanente du service et se réserve le
+              droit de le suspendre ou de le modifier à tout moment.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl text-cream mb-4">8. Droit applicable</h2>
             <p>
               Les présentes CGU sont soumises au droit belge. Tout litige relatif à leur interprétation
               ou à leur exécution relève de la compétence exclusive des tribunaux de Bruxelles.
