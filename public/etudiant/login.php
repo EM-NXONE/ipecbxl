@@ -20,6 +20,9 @@ if (!preg_match('#^/(?:etudiant/)?[A-Za-z0-9_./?=&-]*$#', $next)) {
 
 $error = null;
 $emailPrefill = '';
+$nomPrefill = '';
+$prenomPrefill = '';
+$dateNaissancePrefill = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -28,12 +31,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('Trop de tentatives. Réessaie dans quelques minutes.');
         }
         $email = trim(strtolower((string)($_POST['email'] ?? '')));
+        $prenom = trim((string)($_POST['prenom'] ?? ''));
+        $nom = trim((string)($_POST['nom'] ?? ''));
+        $dateNaissance = trim((string)($_POST['date_naissance'] ?? ''));
         $pwd   = (string)($_POST['password'] ?? '');
         $emailPrefill = $email;
-        if ($email === '' || $pwd === '') throw new RuntimeException('E-mail et mot de passe requis.');
+        $prenomPrefill = $prenom;
+        $nomPrefill = $nom;
+        $dateNaissancePrefill = $dateNaissance;
+        if ($email === '' || $prenom === '' || $nom === '' || $dateNaissance === '' || $pwd === '') {
+            throw new RuntimeException('E-mail, identité complète et mot de passe requis.');
+        }
 
-        $stmt = db()->prepare("SELECT * FROM etudiants WHERE email = ? LIMIT 1");
-        $stmt->execute([$email]);
+        $stmt = db()->prepare("SELECT * FROM etudiants
+                               WHERE email = ?
+                                 AND LOWER(TRIM(prenom)) = LOWER(TRIM(?))
+                                 AND LOWER(TRIM(nom)) = LOWER(TRIM(?))
+                                 AND date_naissance = ?
+                               LIMIT 1");
+        $stmt->execute([$email, $prenom, $nom, $dateNaissance]);
         $etu = $stmt->fetch();
 
         // Message générique pour ne pas révéler l'existence du compte
