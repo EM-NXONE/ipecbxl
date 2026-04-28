@@ -21,7 +21,7 @@ function admin_layout_start(string $title): void {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
+:root, html[data-theme="light"] {
     /* Site palette — light editorial */
     --bg:        #FBFAF7;          /* paper */
     --surface:   #F4F2EC;          /* tinted band */
@@ -33,18 +33,53 @@ function admin_layout_start(string $title): void {
     --primary:   #1F3D8A;          /* deep editorial blue */
     --primary-hover: #16306E;
     --primary-soft:  rgba(31, 61, 138, 0.08);
+    --primary-on:    #ffffff;
     --success:   #2F8F5E;
     --success-soft: rgba(47, 143, 94, 0.10);
     --amber:     #B07B0A;
     --amber-soft: rgba(176, 123, 10, 0.12);
     --danger:    #B0332B;
     --danger-soft: rgba(176, 51, 43, 0.10);
+    --radial-tint: rgba(31, 61, 138, 0.05);
 
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
     --shadow-sm: 0 1px 2px rgba(27,31,42,0.04);
     --shadow-md: 0 1px 2px rgba(27,31,42,0.04), 0 8px 24px -10px rgba(27,31,42,0.10);
+}
+
+html[data-theme="dark"] {
+    /* Deep midnight palette aligned with site dark mode */
+    --bg:        #0F1320;
+    --surface:   #161B2C;
+    --card:      #1B2236;
+    --ink:       #ECEEF5;
+    --muted:     #98A0B5;
+    --hairline:  rgba(236, 238, 245, 0.10);
+    --hairline-strong: rgba(236, 238, 245, 0.18);
+    --primary:   #6B9BFF;
+    --primary-hover: #88B0FF;
+    --primary-soft:  rgba(107, 155, 255, 0.14);
+    --primary-on:    #0F1320;
+    --success:   #4FD18A;
+    --success-soft: rgba(79, 209, 138, 0.14);
+    --amber:     #F5B948;
+    --amber-soft: rgba(245, 185, 72, 0.14);
+    --danger:    #F26B63;
+    --danger-soft: rgba(242, 107, 99, 0.14);
+    --radial-tint: rgba(107, 155, 255, 0.10);
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+    --shadow-md: 0 1px 2px rgba(0,0,0,0.30), 0 12px 32px -10px rgba(0,0,0,0.55);
+}
+html[data-theme="dark"] header.topbar {
+    background: rgba(15, 19, 32, 0.78) !important;
+}
+html[data-theme="dark"] .form-row input,
+html[data-theme="dark"] .form-row select,
+html[data-theme="dark"] .form-row textarea {
+    background: var(--bg);
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
