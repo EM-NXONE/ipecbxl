@@ -1203,6 +1203,67 @@ HTML;
         . "Adresse : $adresse\n\n"
         . "Message :\n" . ($message !== '' ? $message : '(aucun)') . "\n";
 
+    // ===== Enregistrement BDD : génère la référence officielle de candidature =====
+    // Cette référence (IPEC-AAAA-XXXXXX) est :
+    //   - imprimée sur les 2 PDFs (candidature + facture, en footer)
+    //   - vérifiable publiquement sur https://ipec.school/verification
+    // Non-bloquant : si la BDD est down, l'e-mail part quand même sans réf.
+    $candidatureReference = '';
+    $candidatureDbError   = null;
+    $candidatureDbId      = null;
+
+    // Calcul de l'année académique (cohérent avec ce qu'affichent les PDFs)
+    $academicYearForDb = '';
+    if (preg_match('/(20\d{2})/', $rentree, $mYr)) {
+        $yr = (int)$mYr[1];
+        $academicYearForDb = $yr . '/' . ($yr + 1);
+    }
+
+    try {
+        $pdo = db();
+        $candidatureReference = generateCandidatureReference($pdo);
+        $insert = $pdo->prepare(
+            'INSERT INTO candidatures
+                (reference, civilite, prenom, nom, date_naissance, nationalite,
+                 email, telephone, rue, numero, code_postal, ville, pays_residence,
+                 programme, annee, specialisation, rentree, annee_academique,
+                 message, ip, user_agent)
+             VALUES
+                (:reference, :civilite, :prenom, :nom, :date_naissance, :nationalite,
+                 :email, :telephone, :rue, :numero, :code_postal, :ville, :pays_residence,
+                 :programme, :annee, :specialisation, :rentree, :annee_academique,
+                 :message, :ip, :user_agent)'
+        );
+        $insert->execute([
+            ':reference'        => $candidatureReference,
+            ':civilite'         => $civilite ?: null,
+            ':prenom'           => $prenom,
+            ':nom'              => $nom,
+            ':date_naissance'   => $dateNaissance ?: null,
+            ':nationalite'      => $nationalite ?: null,
+            ':email'            => $email,
+            ':telephone'        => $telephone ?: null,
+            ':rue'              => $rue ?: null,
+            ':numero'           => $numero ?: null,
+            ':code_postal'      => $codePostal ?: null,
+            ':ville'            => $ville ?: null,
+            ':pays_residence'   => $paysResidence ?: null,
+            ':programme'        => $programme ?: null,
+            ':annee'            => $annee ?: null,
+            ':specialisation'   => $specialisation ?: null,
+            ':rentree'          => $rentree ?: null,
+            ':annee_academique' => $academicYearForDb ?: null,
+            ':message'          => $message ?: null,
+            ':ip'               => $ip ?: null,
+            ':user_agent'       => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
+        ]);
+        $candidatureDbId = (int)$pdo->lastInsertId();
+    } catch (\Throwable $dbErr) {
+        $candidatureDbError = $dbErr->getMessage();
+        error_log('[mailer.php] INSERT candidature échoué : ' . $candidatureDbError);
+        // On continue sans BDD : l'e-mail doit partir quoi qu'il arrive.
+    }
+
     // Génération du PDF de candidature (preuve signée jointe à l'e-mail)
     // Non-bloquant : si FPDF est manquant ou plante, l'e-mail part quand même sans PJ.
     $pdfAttachment = '';
@@ -1210,6 +1271,7 @@ HTML;
     $pdfError      = null;
     try {
         $pdfAttachment = buildCandidaturePdf([
+            'reference'      => $candidatureReference,
             'civilite'       => $civilite,
             'prenom'         => $prenom,
             'nom'            => $nom,
