@@ -214,7 +214,8 @@ admin_flash();
             </form>
         </div>
     <?php elseif ($etudiantHomonyme): ?>
-        <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['email']) ?></strong>
+        <p>Un compte étudiant existe déjà pour <strong><?= admin_h($etudiantHomonyme['prenom'] . ' ' . $etudiantHomonyme['nom']) ?></strong>
+           né(e) le <?= admin_h($etudiantHomonyme['date_naissance'] ?: '—') ?>
            (n° <span class="mono"><?= admin_h($etudiantHomonyme['numero_etudiant']) ?></span>),
            mais cette candidature n'y est pas rattachée.</p>
         <form method="POST" action="action.php" style="display:inline;"
