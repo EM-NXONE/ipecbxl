@@ -797,7 +797,10 @@ function buildFacturePdf(array $f): array {
 
     $now        = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr    = $now->format('d/m/Y');
-    $numFacture = 'IPEC-' . $now->format('Ymd-His');
+    // Numéro de facture officiel (IPEC-FACT-AAAA-XXXXXX) fourni par l'appelant.
+    // Fallback historique (timestamp) uniquement si non fourni.
+    $referenceFacture = trim((string)($f['reference_facture'] ?? ''));
+    $numFacture = $referenceFacture !== '' ? $referenceFacture : ('IPEC-FACT-' . $now->format('Ymd-His'));
 
     // Communication structurée belge : 12 chiffres → +++XXX/XXXX/XXXYY+++
     // YY = (10 premiers chiffres) mod 97 (97 → 00). Standard belge.
@@ -818,6 +821,7 @@ function buildFacturePdf(array $f): array {
     $pdf->docKind = 'facture';
     $pdf->factureNumero = $numFacture;
     $pdf->reference = trim((string)($f['reference'] ?? ''));
+    $pdf->referenceFacture = $numFacture;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
     $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
