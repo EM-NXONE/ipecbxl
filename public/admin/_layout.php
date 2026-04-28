@@ -328,9 +328,16 @@ button.btn-success:hover { background: var(--success); border-color: var(--succe
     <nav>
         <a href="index.php">Candidatures</a>
         <a href="logout.php">Déconnexion</a>
+        <button type="button" class="theme-toggle" id="ipecThemeToggle" aria-label="Basculer le thème" title="Basculer clair / sombre">
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
         <span class="user"><?= $h(admin_current_user()) ?></span>
     </nav>
 </header>
+<script>
+(function(){var b=document.getElementById('ipecThemeToggle');if(!b)return;b.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',c);try{localStorage.setItem('ipec-admin-theme',c);}catch(e){}});})();
+</script>
 <main>
 <?php
 }
