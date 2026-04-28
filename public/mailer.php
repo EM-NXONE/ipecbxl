@@ -1659,6 +1659,11 @@ if ($type === 'inscription') {
 }
 
 $response = ['ok' => true];
+// On expose la référence dans la réponse pour que le frontend puisse l'afficher
+// au candidat (ex: page de remerciement) — non-sensible, c'est la même que sur les PDFs.
+if (!empty($candidatureReference ?? '')) {
+    $response['reference'] = $candidatureReference;
+}
 if ($DEBUG) {
     $response['debug'] = [
         'pdf_attached'             => $pdfAttachment !== '',
@@ -1676,6 +1681,9 @@ if ($DEBUG) {
         'facture_error'            => $factureError ?? null,
         'facture_numero'           => $factureNumero ?? null,
         'imap_extension_loaded'    => function_exists('imap_open'),
+        'candidature_reference'    => $candidatureReference ?? null,
+        'candidature_db_id'        => $candidatureDbId ?? null,
+        'candidature_db_error'     => $candidatureDbError ?? null,
     ];
 }
 echo json_encode($response);
