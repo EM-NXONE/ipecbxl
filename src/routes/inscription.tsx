@@ -7,6 +7,7 @@ import {
   getNextFebruaryRentree,
   getUpcomingAcademicYearLabel,
 } from "@/lib/academic-dates";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export const Route = createFileRoute("/inscription")({
   head: () => ({
@@ -106,6 +107,13 @@ function Inscription() {
     const annee = String(fd.get("annee") ?? "");
     const anneeLabel = years.find((y) => y.value === annee)?.label ?? annee;
 
+    let recaptchaToken = "";
+    try {
+      recaptchaToken = await getRecaptchaToken("inscription");
+    } catch {
+      recaptchaToken = "";
+    }
+
     const payload = {
       type: "inscription",
       civilite: String(fd.get("civilite") ?? ""),
@@ -126,6 +134,8 @@ function Inscription() {
       rentree: String(fd.get("rentree") ?? ""),
       message: String(fd.get("message") ?? ""),
       website: "", // compat backend (ancien honeypot retiré du DOM)
+      recaptchaToken,
+      recaptchaAction: "inscription",
     };
 
     try {
