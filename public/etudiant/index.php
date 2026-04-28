@@ -127,7 +127,7 @@ etu_layout_start('Tableau de bord', $user);
 
 <div class="card">
     <h2 style="display:flex; align-items:center; justify-content:space-between;">
-        Dernières factures <a class="btn btn-ghost" href="/etudiant/factures.php">Tout voir →</a>
+        Dernières factures <a class="btn btn-ghost" href="<?= etu_url('/factures.php') ?>">Tout voir →</a>
     </h2>
     <?php if (!$lastFact): ?>
         <p class="muted">Aucune facture pour l'instant.</p>
@@ -144,7 +144,7 @@ etu_layout_start('Tableau de bord', $user);
                     <td><?= etu_format_date($f['date_emission']) ?></td>
                     <td><strong><?= etu_money_cents((int)$f['montant_ttc_cents'], $f['devise']) ?></strong></td>
                     <td><span class="badge <?= etu_h($s[1]) ?>"><?= etu_h($s[0]) ?></span></td>
-                    <td><a class="btn btn-ghost" href="/etudiant/telecharger.php?type=facture&amp;id=<?= (int)$f['id'] ?>">PDF ↓</a></td>
+                    <td><a class="btn btn-ghost" href="<?= etu_url('/telecharger.php') ?>?type=facture&amp;id=<?= (int)$f['id'] ?>">PDF ↓</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -154,7 +154,7 @@ etu_layout_start('Tableau de bord', $user);
 
 <div class="card">
     <h2 style="display:flex; align-items:center; justify-content:space-between;">
-        Derniers documents <a class="btn btn-ghost" href="/etudiant/documents.php">Tout voir →</a>
+        Derniers documents <a class="btn btn-ghost" href="<?= etu_url('/documents.php') ?>">Tout voir →</a>
     </h2>
     <?php if (!$lastDocs): ?>
         <p class="muted">Aucun document pour l'instant.</p>
@@ -168,7 +168,7 @@ etu_layout_start('Tableau de bord', $user);
                     <td><span class="badge badge-muted"><?= etu_h(str_replace('_',' ',$d['type'])) ?></span></td>
                     <td><?= etu_h($d['titre']) ?></td>
                     <td><?= etu_format_date($d['date_emission']) ?></td>
-                    <td><a class="btn btn-ghost" href="/etudiant/telecharger.php?type=document&amp;id=<?= (int)$d['id'] ?>">PDF ↓</a></td>
+                    <td><a class="btn btn-ghost" href="<?= etu_url('/telecharger.php') ?>?type=document&amp;id=<?= (int)$d['id'] ?>">PDF ↓</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

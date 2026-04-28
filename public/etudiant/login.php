@@ -89,7 +89,7 @@ etu_layout_start('Connexion');
     </form>
 
     <p style="margin-top:20px; text-align:center; font-size:13px;">
-        <a href="/etudiant/mot-de-passe-oublie.php">Mot de passe oublié ?</a>
+        <a href="<?= etu_url('/mot-de-passe-oublie.php') ?>">Mot de passe oublié ?</a>
     </p>
     <p style="text-align:center; font-size:12px; color:var(--muted); margin-top:24px;">
         Pas encore de compte ? Il est créé par l'administration de l'IPEC<br>

@@ -59,7 +59,7 @@ etu_layout_start('Mot de passe oublié');
         <div class="flash flash-success">
             Si un compte est associé à cette adresse, tu recevras un e-mail dans quelques minutes.
         </div>
-        <p><a class="btn btn-secondary" href="/etudiant/login.php">← Retour à la connexion</a></p>
+        <p><a class="btn btn-secondary" href="<?= etu_url('/login.php') ?>">← Retour à la connexion</a></p>
     <?php else: ?>
         <form method="POST" novalidate>
             <input type="hidden" name="csrf" value="<?= etu_h(etu_csrf_token()) ?>">
@@ -70,7 +70,7 @@ etu_layout_start('Mot de passe oublié');
             <button type="submit" style="width:100%;">Envoyer le lien</button>
         </form>
         <p style="margin-top:20px; text-align:center; font-size:13px;">
-            <a href="/etudiant/login.php">← Retour à la connexion</a>
+            <a href="<?= etu_url('/login.php') ?>">← Retour à la connexion</a>
         </p>
     <?php endif; ?>
 </div>
