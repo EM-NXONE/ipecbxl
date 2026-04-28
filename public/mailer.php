@@ -907,11 +907,8 @@ function buildFacturePdf(array $f): array {
     }
     if (!empty($f['email'])) {
         $pdf->SetX($boxLeftX + $padX);
-        // Email : autorise le retour à la ligne sur les caractères longs en insérant des points de coupure invisibles
         $emailTxt = (string)$f['email'];
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr($emailTxt), 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($emailTxt), 0, 'L');
     }
     $leftEndY = $pdf->GetY();
 
