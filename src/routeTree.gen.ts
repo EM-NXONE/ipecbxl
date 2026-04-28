@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VieEtudianteRouteImport } from './routes/vie-etudiante'
+import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as ProgrammesRouteImport } from './routes/programmes'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as InternationalRouteImport } from './routes/international'
@@ -25,6 +26,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const VieEtudianteRoute = VieEtudianteRouteImport.update({
   id: '/vie-etudiante',
   path: '/vie-etudiante',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificationRoute = VerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgrammesRoute = ProgrammesRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
   '/programmes': typeof ProgrammesRoute
+  '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/verification'
     | '/vie-etudiante'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/verification'
     | '/vie-etudiante'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/international'
     | '/mentions-legales'
     | '/programmes'
+    | '/verification'
     | '/vie-etudiante'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   InternationalRoute: typeof InternationalRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   ProgrammesRoute: typeof ProgrammesRoute
+  VerificationRoute: typeof VerificationRoute
   VieEtudianteRoute: typeof VieEtudianteRoute
 }
 
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/vie-etudiante'
       fullPath: '/vie-etudiante'
       preLoaderRoute: typeof VieEtudianteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/programmes': {
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   InternationalRoute: InternationalRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
   ProgrammesRoute: ProgrammesRoute,
+  VerificationRoute: VerificationRoute,
   VieEtudianteRoute: VieEtudianteRoute,
 }
 export const routeTree = rootRouteImport
