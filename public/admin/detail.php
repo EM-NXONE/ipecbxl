@@ -25,7 +25,7 @@ if (!$c) {
     exit;
 }
 
-// Étudiant rattaché (si déjà créé) — sinon on tente une détection par e-mail
+// Étudiant rattaché (si déjà créé) — sinon on tente une détection par identité civile
 $etudiant = null;
 if (!empty($c['etudiant_id'])) {
     $eStmt = $pdo->prepare("SELECT * FROM etudiants WHERE id = ?");
@@ -34,7 +34,7 @@ if (!empty($c['etudiant_id'])) {
 }
 $etudiantHomonyme = null;
 if (!$etudiant) {
-    $etudiantHomonyme = etudiant_find_by_email($pdo, (string)$c['email']);
+    $etudiantHomonyme = etudiant_find_by_identity($pdo, (string)$c['prenom'], (string)$c['nom'], (string)$c['date_naissance']);
 }
 
 // Historique des actions admin
