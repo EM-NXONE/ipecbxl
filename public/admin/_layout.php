@@ -316,14 +316,60 @@ button.btn-success:hover { background: var(--success); border-color: var(--succe
 }
 .pagination a:hover { border-color: var(--primary); color: var(--primary); text-decoration: none; }
 .pagination .current {
-    background: var(--primary); color: #ffffff; border-color: var(--primary);
+    background: var(--primary); color: var(--primary-on); border-color: var(--primary);
 }
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; padding: 0;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.theme-toggle:hover {
+    background: var(--surface);
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: none;
+    box-shadow: none;
+}
+.theme-toggle svg { width: 16px; height: 16px; display: block; }
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+/* ---------- Footer ---------- */
+footer.admin-footer {
+    border-top: 1px solid var(--hairline);
+    background: var(--surface);
+    margin-top: 64px;
+}
+footer.admin-footer .footer-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 24px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px;
+    font-size: 12px; color: var(--muted);
+}
+footer.admin-footer .footer-brand {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-display); color: var(--ink);
+}
+footer.admin-footer .footer-brand svg { color: var(--primary); }
 
 @media (max-width: 720px) {
     .detail-grid { grid-template-columns: 1fr; gap: 16px; }
-    main { padding: 20px 16px 48px; }
-    header.topbar { padding: 12px 16px; flex-wrap: wrap; }
-    header.topbar .user { display: none; }
+    main { padding: 24px 16px 48px; }
+    header.topbar .topbar-inner { padding: 0 16px; height: 64px; }
+    header.topbar .brand .brand-sub { display: none; }
+    header.topbar nav { gap: 0; }
+    header.topbar nav a { padding: 8px 8px; font-size: 12px; }
+    header.topbar .user-pill { display: none; }
     table { font-size: 12px; }
     th, td { padding: 10px 8px; }
     h1 { font-size: 24px; }
@@ -332,16 +378,41 @@ button.btn-success:hover { background: var(--success); border-color: var(--succe
 </head>
 <body>
 <header class="topbar">
-    <div class="brand">IPEC<span class="dot"></span><em>Admin</em></div>
-    <nav>
-        <a href="index.php">Candidatures</a>
-        <a href="logout.php">Déconnexion</a>
-        <button type="button" class="theme-toggle" id="ipecThemeToggle" aria-label="Basculer le thème" title="Basculer clair / sombre">
-            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        </button>
-        <span class="user"><?= $h(admin_current_user()) ?></span>
-    </nav>
+    <div class="topbar-inner">
+        <a href="index.php" class="brand">
+            <?= admin_logo_svg('logo-mark') ?>
+            <div class="brand-text">
+                <div class="brand-name">IPEC</div>
+                <div class="brand-sub">
+                    Institut Privé des Études Commerciales
+                    <span class="sep">·</span>Admin
+                </div>
+            </div>
+        </a>
+        <nav>
+            <?php
+            $cur = basename($_SERVER['PHP_SELF'] ?? '');
+            $navItems = [
+                'index.php'  => 'Candidatures',
+                'logout.php' => 'Déconnexion',
+            ];
+            foreach ($navItems as $href => $label) {
+                $isActive = ($cur === $href) || ($href === 'index.php' && $cur === 'detail.php');
+                echo '<a href="' . $h($href) . '"' . ($isActive ? ' class="active"' : '') . '>' . $h($label) . '</a>';
+            }
+            ?>
+            <button type="button" class="theme-toggle" id="ipecThemeToggle" aria-label="Basculer le thème" title="Basculer clair / sombre">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            </button>
+            <?php $u = admin_current_user(); if ($u !== ''): ?>
+                <span class="user-pill">
+                    <span class="avatar"><?= $h(mb_substr($u, 0, 1)) ?></span>
+                    <?= $h($u) ?>
+                </span>
+            <?php endif; ?>
+        </nav>
+    </div>
 </header>
 <script>
 (function(){var b=document.getElementById('ipecThemeToggle');if(!b)return;b.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',c);try{localStorage.setItem('ipec-admin-theme',c);}catch(e){}});})();
@@ -353,6 +424,14 @@ button.btn-success:hover { background: var(--success); border-color: var(--succe
 function admin_layout_end(): void {
     ?>
 </main>
+<footer class="admin-footer">
+    <div class="footer-inner">
+        <span class="footer-brand">
+            <?= admin_logo_svg('', 18) ?> IPEC
+        </span>
+        <span>© <?= date('Y') ?> IPEC — Institut Privé des Études Commerciales ASBL · Espace Admin</span>
+    </div>
+</footer>
 </body>
 </html>
 <?php
