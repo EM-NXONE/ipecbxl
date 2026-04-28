@@ -43,7 +43,7 @@ function etu_layout_start(string $title, ?array $user = null): void {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= etu_base_path() ?>/_site-style.css?v=2">
+<link rel="stylesheet" href="<?= etu_base_path() ?>/site-style.css?v=2">
 </head>
 <body>
 
