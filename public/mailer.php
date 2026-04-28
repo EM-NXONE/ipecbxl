@@ -645,7 +645,10 @@ function buildCandidaturePdf(array $f): string {
     $academicYear = '';
     if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
         $y = (int)$m[1];
-        $academicYear = $y . '/' . ($y + 1);
+        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
+        $isFevrier = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
+        $startY = $isFevrier ? ($y - 1) : $y;
+        $academicYear = $startY . '/' . ($startY + 1);
     } else {
         $curY = (int)$now->format('Y');
         $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
