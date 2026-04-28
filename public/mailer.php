@@ -597,7 +597,16 @@ function buildCandidaturePdf(array $f): string {
     if (!empty($f['nationalite'])) {
         $candLine('Nationalité : ' . (string)$f['nationalite']);
     }
-    if (!empty($f['adresse'])) {
+    $adrLigne1 = trim((string)($f['rue'] ?? '') . (!empty($f['numero']) ? ' ' . (string)$f['numero'] : ''));
+    $adrLigne2 = trim((string)($f['codePostal'] ?? '') . (!empty($f['ville']) ? ' ' . (string)$f['ville'] : ''));
+    if ($adrLigne1 !== '') {
+        $candLine($adrLigne1);
+    }
+    if ($adrLigne2 !== '') {
+        $candLine($adrLigne2);
+    }
+    // Rétro-compat : si aucun champ structuré n'est fourni, on retombe sur l'ancien champ "adresse" libre.
+    if ($adrLigne1 === '' && $adrLigne2 === '' && !empty($f['adresse'])) {
         $candLine((string)$f['adresse']);
     }
     if (!empty($f['paysResidence'])) {
