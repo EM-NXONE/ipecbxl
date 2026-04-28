@@ -242,7 +242,7 @@ function etu_require_login(): array {
     $u = etu_current();
     if (!$u) {
         $next = $_SERVER['REQUEST_URI'] ?? '/etudiant/';
-        header('Location: /etudiant/login.php?next=' . urlencode($next));
+        header('Location: ' . etu_url('/login.php') . '?next=' . urlencode($next));
         exit;
     }
     return $u;

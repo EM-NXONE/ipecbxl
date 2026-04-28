@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $etu = etudiant_find_by_email($pdo, $email);
         if ($etu && $etu['statut'] === 'actif') {
             $token = etu_create_or_reset_token($pdo, (int)$etu['id']);
-            error_log('[etudiant] reset link for ' . $email . ' : /etudiant/reset-mot-de-passe.php?token=' . $token);
+            error_log('[etudiant] reset link for ' . $email . ' : ' . etu_absolute_url('/reset-mot-de-passe.php?token=' . $token));
             etu_log_action((int)$etu['id'], 'request_reset');
         }
         $done = true;

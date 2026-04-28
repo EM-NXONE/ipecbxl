@@ -11,10 +11,11 @@ if ($u = etu_current()) {
     exit;
 }
 
-$next  = (string)($_GET['next'] ?? $_POST['next'] ?? '/etudiant/index.php');
-// Sécurité : on n'accepte que des redirections internes vers /etudiant/
-if (!preg_match('#^/etudiant/[A-Za-z0-9_./?=&-]*$#', $next)) {
-    $next = '/etudiant/index.php';
+$defaultNext = etu_url('/index.php');
+$next  = (string)($_GET['next'] ?? $_POST['next'] ?? $defaultNext);
+// Sécurité : on n'accepte que des redirections internes (relatives sous /etudiant/ OU /index.php, /factures.php, etc.)
+if (!preg_match('#^/(?:etudiant/)?[A-Za-z0-9_./?=&-]*$#', $next)) {
+    $next = $defaultNext;
 }
 
 $error = null;
