@@ -77,6 +77,27 @@ export function Footer() {
           <p className="text-[11px] italic opacity-80">
             Établissement, formations et diplômes non reconnus par la Communauté française de Belgique.
           </p>
+          <p className="text-[11px] opacity-70">
+            Ce site est protégé par reCAPTCHA et la{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-blue"
+            >
+              Politique de confidentialité
+            </a>{" "}
+            et les{" "}
+            <a
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-blue"
+            >
+              Conditions d'utilisation
+            </a>{" "}
+            de Google s'appliquent.
+          </p>
         </div>
       </div>
     </footer>
