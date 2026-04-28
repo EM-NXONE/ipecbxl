@@ -114,7 +114,7 @@ function VerificationPage() {
                   required
                   value={reference}
                   onChange={(e) => setReference(e.target.value)}
-                  placeholder="IPEC-2026-A1B2C3"
+                  placeholder="IPEC-CAND-2026-A1B2C3"
                   maxLength={32}
                   autoComplete="off"
                   className="flex-1 bg-card border border-border/60 px-4 py-3 rounded-sm text-cream uppercase tracking-wider focus:border-blue focus:outline-none transition-colors"
