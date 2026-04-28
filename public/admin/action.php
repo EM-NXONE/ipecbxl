@@ -230,6 +230,7 @@ try {
             header('Location: detail.php?id=' . $id); exit;
         }
 
+        default:
             header('Location: detail.php?id=' . $id); exit;
     }
 } catch (\Throwable $e) {
