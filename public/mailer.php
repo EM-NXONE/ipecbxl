@@ -907,11 +907,8 @@ function buildFacturePdf(array $f): array {
     }
     if (!empty($f['email'])) {
         $pdf->SetX($boxLeftX + $padX);
-        // Email : autorise le retour à la ligne sur les caractères longs en insérant des points de coupure invisibles
         $emailTxt = (string)$f['email'];
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->MultiCell($boxWidth - 2 * $padX, 4.5, $tr($emailTxt), 0, 'L');
-        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($emailTxt), 0, 'L');
     }
     $leftEndY = $pdf->GetY();
 
@@ -955,9 +952,9 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
     $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
 
-    // Description simplifiée : uniquement "Frais de dossier IPEC — Année académique aaaa/aaaa"
+    // Description simplifiée : uniquement "Frais de dossier IPEC — aaaa/aaaa"
     // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
-    $firstLine = 'Frais de dossier IPEC — Année académique ' . $academicYear;
+    $firstLine = 'Frais de dossier IPEC — ' . $academicYear;
 
     // Décomposition TVA : le montant indiqué est TTC, TVA belge 21%
     $tauxTva = 0.21;
