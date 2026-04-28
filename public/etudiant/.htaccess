@@ -1,0 +1,15 @@
+# IPEC — Espace étudiant
+# Bloque tout accès direct aux fichiers internes.
+
+<FilesMatch "^_">
+    Require all denied
+</FilesMatch>
+
+# Bloque les fichiers de config / migration
+<FilesMatch "\.(sql|md|env|json|lock)$">
+    Require all denied
+</FilesMatch>
+
+# Pas d'index automatique
+Options -Indexes
+DirectoryIndex index.php
