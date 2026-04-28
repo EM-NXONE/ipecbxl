@@ -87,12 +87,13 @@ body {
     margin: 0; padding: 0;
     font-family: var(--font-body);
     background-color: var(--bg);
-    background-image: radial-gradient(ellipse at top, rgba(31,61,138,0.05), transparent 65%);
+    background-image: radial-gradient(ellipse at top, var(--radial-tint), transparent 65%);
     background-attachment: fixed;
     color: var(--ink);
     font-size: 14px; line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 a { color: var(--primary); text-decoration: none; }
 a:hover { color: var(--primary-hover); text-decoration: underline; }
@@ -108,6 +109,30 @@ header.topbar {
     justify-content: space-between; gap: 16px;
     position: sticky; top: 0; z-index: 50;
 }
+
+/* Theme toggle button */
+.theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; padding: 0;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--hairline-strong);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.theme-toggle:hover {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--ink);
+    transform: none;
+    box-shadow: none;
+}
+.theme-toggle svg { width: 16px; height: 16px; display: block; }
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 header.topbar .brand {
     font-family: var(--font-display);
     font-weight: 500;
@@ -186,7 +211,7 @@ tbody tr:last-child td { border-bottom: none; }
 button, .btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 9px 16px; border-radius: 6px; border: 1px solid var(--primary);
-    background: var(--primary); color: #ffffff;
+    background: var(--primary); color: var(--primary-on);
     font-family: var(--font-body); font-size: 13px; font-weight: 500;
     letter-spacing: 0.01em;
     cursor: pointer; text-decoration: none;
@@ -195,7 +220,7 @@ button, .btn {
 }
 button:hover, .btn:hover {
     background: var(--primary-hover); border-color: var(--primary-hover);
-    text-decoration: none; color: #ffffff;
+    text-decoration: none; color: var(--primary-on);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
@@ -208,13 +233,13 @@ button.btn-secondary:hover, .btn-secondary:hover {
     border-color: var(--ink);
 }
 button.btn-danger, .btn-danger {
-    background: var(--danger); border-color: var(--danger);
+    background: var(--danger); border-color: var(--danger); color: #ffffff;
 }
-button.btn-danger:hover { background: #8E2620; border-color: #8E2620; }
+button.btn-danger:hover { background: var(--danger); border-color: var(--danger); filter: brightness(0.88); color: #ffffff; }
 button.btn-success, .btn-success {
     background: var(--success); border-color: var(--success); color: #ffffff;
 }
-button.btn-success:hover { background: #246E48; border-color: #246E48; color: #ffffff; }
+button.btn-success:hover { background: var(--success); border-color: var(--success); filter: brightness(0.92); color: #ffffff; }
 
 /* ---------- Forms ---------- */
 .form-row { margin-bottom: 14px; }
