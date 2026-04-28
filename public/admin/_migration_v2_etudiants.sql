@@ -23,12 +23,12 @@
 CREATE TABLE IF NOT EXISTS etudiants (
     id                  INT UNSIGNED        NOT NULL AUTO_INCREMENT,
 
-    -- Identifiants de connexion
+    -- Identifiants de connexion/contact : plusieurs étudiants peuvent partager le même e-mail
     email               VARCHAR(255)        NOT NULL,
     password_hash       VARCHAR(255)        DEFAULT NULL,  -- bcrypt ; NULL = compte pas encore activé
     email_verifie       TINYINT(1)          NOT NULL DEFAULT 0,
 
-    -- Identité (dénormalisée depuis candidature pour rester stable même si la candidature change)
+    -- Identité : utilisée pour rattacher les candidatures à un étudiant réel
     civilite            VARCHAR(30)         DEFAULT NULL,
     prenom              VARCHAR(100)        NOT NULL,
     nom                 VARCHAR(100)        NOT NULL,
