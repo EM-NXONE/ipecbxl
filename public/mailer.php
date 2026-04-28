@@ -451,8 +451,10 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
         public $docKind = 'candidature';
         /** @var string */
         public $factureNumero = '';
-        /** @var string Référence unique de candidature (IPEC-AAAA-XXXXXX) */
+        /** @var string Référence unique de candidature (IPEC-CAND-AAAA-XXXXXX) */
         public $reference = '';
+        /** @var string Référence unique de facture (IPEC-FACT-AAAA-XXXXXX) */
+        public $referenceFacture = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
@@ -469,11 +471,12 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $this->Cell(0, 4, $tr("Institut Privé des Études Commerciales ASBL  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
             $contactEmail = $this->docKind === 'facture' ? 'finance@ipec.school' : 'admission@ipec.school';
             $this->Cell(0, 4, $tr($contactEmail . "  ·  www.ipec.school"), 0, 1, 'C');
-            // Mention de vérification d'authenticité (référence + URL)
-            if ($this->reference !== '') {
+            // Mention de vérification d'authenticité (référence propre au document)
+            $refToShow = $this->docKind === 'facture' ? $this->referenceFacture : $this->reference;
+            if ($refToShow !== '') {
                 $this->SetFont('Helvetica', '', 7);
                 $this->SetTextColor(44, 93, 219);
-                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $this->reference), 0, 1, 'C');
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
             }
             $this->Ln(1);
             $this->SetFont('Helvetica', 'I', 8);
