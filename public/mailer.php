@@ -75,6 +75,11 @@ register_shutdown_function(function () use (&$DEBUG) {
 
 header('Content-Type: application/json; charset=utf-8');
 
+// ----- Connexion base de données (PDO MySQL n0c) -----
+// Le fichier db_config.php est protégé par .htaccess (deny all en HTTP)
+// mais reste lisible côté PHP via require.
+require_once __DIR__ . '/db_config.php';
+
 // ----- CORS -----
 $allowedOrigins = [
     'https://ipecbxl.lovable.app',
