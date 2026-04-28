@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/_layout.php';
+require_once __DIR__ . '/_etudiants.php';
 admin_require_login();
 
 $do = (string)($_REQUEST['do'] ?? '');
@@ -194,6 +195,24 @@ try {
             $mail->send();
             admin_log_action($id, 'resend_email', 'Renvoyé à ' . $c['email']);
             admin_set_flash('E-mail renvoyé à ' . $c['email'] . '.');
+            header('Location: detail.php?id=' . $id); exit;
+        }
+
+        case 'create_etudiant': {
+            admin_csrf_check();
+            $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
+            if ($res['deja_existant']) {
+                admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
+                admin_set_flash('Un compte étudiant existait déjà pour ' . $c['email'] . ' — candidature rattachée (' . $res['numero'] . ').');
+            } else {
+                admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
+                // Le token d'activation est conservé en flash pour copie manuelle
+                // (l'envoi e-mail automatique sera ajouté quand l'espace étudiant sera en ligne).
+                $msg = 'Compte étudiant créé : ' . $res['numero']
+                     . '. Lien d\'activation (à transmettre) : '
+                     . '/etudiant/activer.php?token=' . $res['token'];
+                admin_set_flash($msg);
+            }
             header('Location: detail.php?id=' . $id); exit;
         }
 
