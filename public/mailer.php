@@ -1076,8 +1076,8 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->MultiCell(0, 5, $tr(
-        'Merci d\'effectuer le virement avant l\'échéance indiquée et de joindre la preuve de paiement '
-        . 'à votre dossier de candidature, en indiquant la communication structurée ci-dessus.'
+        'Afin de garantir un traitement optimal de votre dossier, merci d\'effectuer le virement '
+        . 'avant l\'échéance indiquée, en indiquant la communication structurée ci-dessus.'
     ), 0, 'L');
 
     return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
