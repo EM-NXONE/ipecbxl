@@ -44,10 +44,88 @@ type VerifyResult = {
   date_creation?: string;
 };
 
+/**
+ * Formate intelligemment la saisie utilisateur vers IPEC-{CAND|FACT}-AAAA-XXXXXX.
+ * - Majuscules, suppression des caractères non alphanumériques
+ * - Insertion automatique des tirets
+ * - Auto-complétion du type : "C" → CAND, "F" → FACT (dès la 1ère lettre)
+ * - Limite par segment : kind=4, year=4, suffix=6
+ */
+function formatReference(raw: string): string {
+  // 1) Nettoyage : majuscules + alphanumériques uniquement
+  const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+  // 2) Si l'utilisateur n'a pas encore tapé "IPEC", on l'aide en préfixant si possible
+  let rest = cleaned;
+  let prefix = "";
+  if (cleaned.startsWith("IPEC")) {
+    prefix = "IPEC";
+    rest = cleaned.slice(4);
+  } else if ("IPEC".startsWith(cleaned)) {
+    // L'utilisateur est en train d'écrire "I", "IP", "IPE", "IPEC"
+    return cleaned;
+  } else {
+    // L'utilisateur a tapé directement le type (ex: "C…", "F…", "CAND…")
+    prefix = "IPEC";
+    rest = cleaned;
+  }
+
+  // 3) Segment "kind" (CAND ou FACT) — 4 chars max
+  let kindRaw = rest.slice(0, 4);
+  let consumedFromRest = kindRaw.length;
+  let kind = kindRaw;
+
+  if (kindRaw.length > 0) {
+    const first = kindRaw[0];
+    if (first === "C") {
+      // On force CAND si la saisie est cohérente
+      if ("CAND".startsWith(kindRaw)) {
+        kind = "CAND";
+        // L'utilisateur a tapé `kindRaw.length` chars; on les considère consommés
+        // mais on n'en avale pas plus que ce qu'il a écrit
+      } else {
+        // Saisie incohérente avec CAND → on garde tel quel
+        kind = kindRaw;
+      }
+    } else if (first === "F") {
+      if ("FACT".startsWith(kindRaw)) {
+        kind = "FACT";
+      } else {
+        kind = kindRaw;
+      }
+    }
+  }
+
+  // Si "kind" a été auto-complété, le segment reste 4 chars mais l'utilisateur n'a tapé que `consumedFromRest` chars de rest
+  const afterKind = rest.slice(consumedFromRest);
+
+  // 4) Segment "année" (4 chiffres)
+  const yearRaw = afterKind.slice(0, 4).replace(/[^0-9]/g, "");
+  const afterYear = afterKind.slice(yearRaw.length);
+
+  // 5) Segment "suffixe" (6 hex max)
+  const suffix = afterYear.slice(0, 6).replace(/[^0-9A-F]/g, "");
+
+  // 6) Reconstitution avec tirets, sans laisser de tiret pendant si segment vide
+  let out = prefix;
+  if (kind.length > 0) out += "-" + kind;
+  if (yearRaw.length > 0 || (kind.length === 4 && afterKind.length > 0)) {
+    out += "-" + yearRaw;
+  }
+  if (suffix.length > 0 || (yearRaw.length === 4 && afterYear.length > 0)) {
+    out += "-" + suffix;
+  }
+  return out;
+}
+
 function VerificationPage() {
   const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
+
+  const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReference(formatReference(e.target.value));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
