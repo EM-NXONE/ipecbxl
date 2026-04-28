@@ -960,17 +960,14 @@ function buildFacturePdf(array $f): array {
     $academicYear = '';
     if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
         $y = (int)$m[1];
-        $academicYear = $y . '/' . ($y + 1);
+        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
+        $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
+        $startY = $isPrintemps ? ($y - 1) : $y;
+        $academicYear = $startY . '/' . ($startY + 1);
     } else {
         $now = time();
         $curY = (int)date('Y', $now);
         $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        // Si rentrée février → année académique en cours
-        if (preg_match('/f[ée]vrier/i', $rentreeLabel)) {
-            $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        } elseif (preg_match('/septembre/i', $rentreeLabel)) {
-            $startY = ((int)date('n', $now) >= 9) ? $curY : $curY;
-        }
         $academicYear = $startY . '/' . ($startY + 1);
     }
 
