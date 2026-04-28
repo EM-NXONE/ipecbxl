@@ -1216,6 +1216,7 @@ HTML;
     //   - vérifiable publiquement sur https://ipec.school/verification
     // Non-bloquant : si la BDD est down, l'e-mail part quand même sans réf.
     $candidatureReference = '';
+    $factureReference     = '';
     $candidatureDbError   = null;
     $candidatureDbId      = null;
 
@@ -1228,21 +1229,23 @@ HTML;
 
     try {
         $pdo = db();
-        $candidatureReference = generateCandidatureReference($pdo);
+        $candidatureReference = generateDocumentReference($pdo, 'CAND');
+        $factureReference     = generateDocumentReference($pdo, 'FACT');
         $insert = $pdo->prepare(
             'INSERT INTO candidatures
-                (reference, civilite, prenom, nom, date_naissance, nationalite,
+                (reference, facture_numero, civilite, prenom, nom, date_naissance, nationalite,
                  email, telephone, rue, numero, code_postal, ville, pays_residence,
                  programme, annee, specialisation, rentree, annee_academique,
                  message, ip, user_agent)
              VALUES
-                (:reference, :civilite, :prenom, :nom, :date_naissance, :nationalite,
+                (:reference, :facture_numero, :civilite, :prenom, :nom, :date_naissance, :nationalite,
                  :email, :telephone, :rue, :numero, :code_postal, :ville, :pays_residence,
                  :programme, :annee, :specialisation, :rentree, :annee_academique,
                  :message, :ip, :user_agent)'
         );
         $insert->execute([
             ':reference'        => $candidatureReference,
+            ':facture_numero'   => $factureReference,
             ':civilite'         => $civilite ?: null,
             ':prenom'           => $prenom,
             ':nom'              => $nom,
