@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS etudiants (
                                             ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    UNIQUE KEY uniq_email (email),
+    KEY idx_email (email),
+    KEY idx_identite (nom, prenom, date_naissance),
     UNIQUE KEY uniq_numero_etudiant (numero_etudiant),
     KEY idx_statut (statut)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
