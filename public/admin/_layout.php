@@ -101,68 +101,76 @@ body {
 a { color: var(--primary); text-decoration: none; }
 a:hover { color: var(--primary-hover); text-decoration: underline; }
 
-/* ---------- Topbar ---------- */
+/* ---------- Topbar (aligned with site Header.tsx) ---------- */
 header.topbar {
-    background: rgba(251, 250, 247, 0.85);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(251, 250, 247, 0.70);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--hairline);
-    padding: 14px 28px;
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 16px;
     position: sticky; top: 0; z-index: 50;
 }
-
-/* Theme toggle button */
-.theme-toggle {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 34px; height: 34px; padding: 0;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid var(--hairline-strong);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s ease;
+header.topbar .topbar-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 0 24px;
+    height: 80px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.theme-toggle:hover {
-    background: var(--surface);
-    color: var(--ink);
-    border-color: var(--ink);
-    transform: none;
-    box-shadow: none;
+@media (min-width: 1024px) {
+    header.topbar .topbar-inner { padding: 0 40px; }
 }
-.theme-toggle svg { width: 16px; height: 16px; display: block; }
-.theme-toggle .icon-sun  { display: none; }
-.theme-toggle .icon-moon { display: block; }
-html[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
-html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 header.topbar .brand {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: inherit;
+}
+header.topbar .brand:hover { text-decoration: none; }
+header.topbar .brand .logo-mark {
+    width: 40px; height: 40px; flex-shrink: 0;
+    color: var(--primary);
+    display: block;
+}
+header.topbar .brand .brand-text { line-height: 1.1; }
+header.topbar .brand .brand-name {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-size: 19px;
-    letter-spacing: -0.01em;
+    font-size: 20px; font-weight: 400; letter-spacing: -0.01em;
     color: var(--ink);
 }
-header.topbar .brand .dot {
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--primary); margin: 0 10px 2px; vertical-align: middle;
+header.topbar .brand .brand-sub {
+    display: block;
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.20em; color: var(--muted);
+    margin-top: 2px;
 }
-header.topbar .brand em {
-    font-style: italic; font-weight: 400; color: var(--muted);
+header.topbar .brand .brand-sub .sep {
+    margin: 0 6px; opacity: 0.5;
 }
-header.topbar nav { display: flex; gap: 24px; align-items: center; }
+header.topbar nav { display: flex; gap: 4px; align-items: center; }
 header.topbar nav a {
+    padding: 8px 14px; border-radius: 6px;
     color: var(--muted); font-size: 13px; font-weight: 500;
     letter-spacing: 0.01em;
+    transition: color 0.15s ease;
 }
-header.topbar nav a:hover { color: var(--ink); text-decoration: none; }
-header.topbar .user {
+header.topbar nav a:hover { color: var(--primary); text-decoration: none; }
+header.topbar nav a.active { color: var(--primary); }
+header.topbar .user-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-left: 8px; padding: 6px 10px 6px 8px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
     font-size: 12px; color: var(--muted);
-    padding-left: 18px; border-left: 1px solid var(--hairline);
+}
+header.topbar .user-pill .avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--primary); color: var(--primary-on);
+    font-size: 11px; font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
 }
 
 /* ---------- Layout ---------- */
-main { max-width: 1320px; margin: 0 auto; padding: 32px 28px 64px; }
+main { max-width: 1280px; margin: 0 auto; padding: 40px 24px 64px; }
+@media (min-width: 1024px) { main { padding: 48px 40px 80px; } }
 
 h1 {
     font-family: var(--font-display);
