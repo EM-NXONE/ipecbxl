@@ -47,6 +47,15 @@ function Cookies() {
                 permettent de comprendre l'usage du site afin de l'améliorer, sans identifier
                 personnellement les visiteurs.
               </li>
+              <li>
+                <strong className="text-cream">Cookies tiers Google reCAPTCHA</strong> — déposés
+                par Google sur les pages comportant un formulaire (contact, inscription,
+                vérification de documents) afin de distinguer les utilisateurs humains des robots.
+                Ces cookies sont strictement nécessaires à la sécurité du site et ne servent ni
+                au profilage publicitaire, ni à la mesure d'audience. Voir la{" "}
+                <a href="/confidentialite" className="text-blue hover:underline">politique de confidentialité</a>{" "}
+                pour le détail des données transmises à Google.
+              </li>
             </ul>
             <p className="mt-3">
               Le site n'utilise <strong className="text-cream">aucun cookie publicitaire</strong> ni
