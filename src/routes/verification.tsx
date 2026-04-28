@@ -197,6 +197,7 @@ function VerificationPage() {
                   onChange={handleReferenceChange}
                   onClick={protectPrefix}
                   onKeyUp={protectPrefix}
+                  onKeyDown={handleKeyDown}
                   onFocus={protectPrefix}
                   onSelect={protectPrefix}
                   placeholder="IPEC-CAND-2026-A1B2C3"
