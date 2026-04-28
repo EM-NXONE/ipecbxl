@@ -16,7 +16,7 @@ declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, X-Recaptcha-Token, X-Recaptcha-Action');
 header('Access-Control-Max-Age: 86400');
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
@@ -45,6 +45,49 @@ if ($reference === '') {
     http_response_code(400);
     echo json_encode(['valid' => false, 'error' => 'Référence manquante.']);
     exit;
+}
+
+// ----- Vérification reCAPTCHA v3 (anti-abus / scraping) -----
+$recaptchaSecret = '';
+$envFile = __DIR__ . '/../.ipec-mailer.env';
+if (is_file($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $envLine) {
+        $envLine = trim($envLine);
+        if ($envLine === '' || str_starts_with($envLine, '#') || !str_contains($envLine, '=')) continue;
+        [$ek, $ev] = explode('=', $envLine, 2);
+        if (trim($ek) === 'RECAPTCHA_SECRET') { $recaptchaSecret = trim($ev); break; }
+    }
+}
+if ($recaptchaSecret !== '') {
+    $token  = $_SERVER['HTTP_X_RECAPTCHA_TOKEN']  ?? '';
+    $action = $_SERVER['HTTP_X_RECAPTCHA_ACTION'] ?? 'verification';
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
+    if ($token === '') {
+        http_response_code(403);
+        echo json_encode(['valid' => false, 'error' => 'Vérification anti-spam requise.']);
+        exit;
+    }
+    $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => http_build_query([
+            'secret'   => $recaptchaSecret,
+            'response' => $token,
+            'remoteip' => $remoteIp,
+        ]),
+        CURLOPT_TIMEOUT        => 8,
+    ]);
+    $body = curl_exec($ch);
+    curl_close($ch);
+    $resp = is_string($body) ? json_decode($body, true) : null;
+    $score   = is_array($resp) && isset($resp['score'])  ? (float)$resp['score']  : 0.0;
+    $rAction = is_array($resp) && isset($resp['action']) ? (string)$resp['action'] : '';
+    if (!is_array($resp) || empty($resp['success']) || $rAction !== $action || $score < 0.3) {
+        http_response_code(403);
+        echo json_encode(['valid' => false, 'error' => 'Vérification anti-spam échouée. Réessayez.']);
+        exit;
+    }
 }
 // Nouveau format : IPEC-CAND-AAAA-XXXXXX  ou  IPEC-FACT-AAAA-XXXXXX
 // Ancien format toléré : IPEC-AAAA-XXXXXX (assimilé à une candidature)
