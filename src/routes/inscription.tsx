@@ -297,16 +297,26 @@ function Inscription() {
                 </div>
 
                 {/* Adresse */}
-                <div>
-                  <label className="block text-xs uppercase tracking-widest text-blue mb-3">Adresse</label>
-                  <textarea
-                    required
-                    name="adresse"
-                    rows={2}
-                    maxLength={250}
-                    placeholder="Rue, numéro, code postal, ville"
-                    className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors resize-none"
-                  />
+                <div className="grid md:grid-cols-[1fr_140px] gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Rue</label>
+                    <input required name="rue" type="text" maxLength={150} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Numéro</label>
+                    <input required name="numero" type="text" maxLength={20} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-[160px_1fr] gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Code postal</label>
+                    <input required name="codePostal" type="text" maxLength={20} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-widest text-blue mb-3">Ville</label>
+                    <input required name="ville" type="text" maxLength={100} className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors" />
+                  </div>
                 </div>
 
                 <div>
