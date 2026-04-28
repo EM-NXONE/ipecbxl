@@ -886,7 +886,17 @@ function buildFacturePdf(array $f): array {
     $pdf->Ln(1);
     $pdf->SetX($boxLeftX + $padX);
     $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
-    if (!empty($f['adresse'])) {
+    $factLigne1 = trim((string)($f['rue'] ?? '') . (!empty($f['numero']) ? ' ' . (string)$f['numero'] : ''));
+    $factLigne2 = trim((string)($f['codePostal'] ?? '') . (!empty($f['ville']) ? ' ' . (string)$f['ville'] : ''));
+    if ($factLigne1 !== '') {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne1), 0, 'L');
+    }
+    if ($factLigne2 !== '') {
+        $pdf->SetX($boxLeftX + $padX);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne2), 0, 'L');
+    }
+    if ($factLigne1 === '' && $factLigne2 === '' && !empty($f['adresse'])) {
         $pdf->SetX($boxLeftX + $padX);
         $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
     }
