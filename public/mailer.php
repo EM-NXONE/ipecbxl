@@ -187,15 +187,21 @@ function verifyRecaptcha(?string $token, string $expectedAction, string $secret,
     return ['ok' => true, 'score' => $score];
 }
 
-// Lecture de la clé secrète depuis l'env (chargée plus haut via parse_ini_file).
-$recaptchaSecret = isset($_ENV['RECAPTCHA_SECRET']) ? (string)$_ENV['RECAPTCHA_SECRET'] : '';
-if ($recaptchaSecret === '' && isset($envConfig['RECAPTCHA_SECRET'])) {
-    $recaptchaSecret = (string)$envConfig['RECAPTCHA_SECRET'];
+// Lecture inline de la clé secrète depuis le .env (loadEnv() est définie plus bas
+// dans le fichier mais on a besoin du secret AVANT l'envoi → on relit ici).
+$recaptchaSecret = '';
+if (is_file(ENV_FILE)) {
+    foreach (file(ENV_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $envLine) {
+        $envLine = trim($envLine);
+        if ($envLine === '' || str_starts_with($envLine, '#') || !str_contains($envLine, '=')) continue;
+        [$ek, $ev] = explode('=', $envLine, 2);
+        if (trim($ek) === 'RECAPTCHA_SECRET') { $recaptchaSecret = trim($ev); break; }
+    }
 }
 if ($recaptchaSecret !== '') {
     $token  = isset($data['recaptchaToken'])  ? (string)$data['recaptchaToken']  : '';
     $action = isset($data['recaptchaAction']) ? (string)$data['recaptchaAction'] : '';
-    $check  = verifyRecaptcha($token, $action, $recaptchaSecret, $clientIp ?? ($_SERVER['REMOTE_ADDR'] ?? ''));
+    $check  = verifyRecaptcha($token, $action, $recaptchaSecret, $ip);
     if (!$check['ok']) {
         http_response_code(403);
         echo json_encode([
