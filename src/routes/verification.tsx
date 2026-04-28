@@ -157,7 +157,7 @@ function VerificationPage() {
           <p className="mt-8 max-w-2xl text-muted-foreground leading-relaxed text-base">
             Saisissez le numéro de référence indiqué en bas du document (format{" "}
             <code className="text-cream bg-card px-1.5 py-0.5 rounded text-sm">
-              IPEC-AAAA-XXXXXX
+              IPEC-XXXX-AAAA-XXXXXX
             </code>
             ) pour confirmer son authenticité auprès de nos services.
           </p>
