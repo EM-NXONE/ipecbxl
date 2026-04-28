@@ -74,9 +74,11 @@ register_shutdown_function(function () use (&$DEBUG) {
 });
 
 // ----- Mode "library" : inclusion depuis l'admin pour réutiliser les builders -----
-// Si la constante IPEC_MAILER_AS_LIB est définie avant le require_once, on charge
-// uniquement les fonctions (buildCandidaturePdf, buildFacturePdf,
-// buildCandidateConfirmationHtml, etc.) sans exécuter le pipeline HTTP.
+// Quand IPEC_MAILER_AS_LIB est défini, on charge uniquement les dépendances et
+// on saute tout le pipeline HTTP procédural (CORS, rate-limit, envoi…). Les
+// fonctions (buildCandidaturePdf, buildFacturePdf, buildCandidateConfirmationHtml,
+// emailRow, h, clean, etc.) restent disponibles car elles sont déclarées au
+// top-level avec `function` (donc hoistées dès l'inclusion du fichier).
 if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
     require_once __DIR__ . '/db_config.php';
     require_once __DIR__ . '/PHPMailer/src/Exception.php';
@@ -85,7 +87,7 @@ if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
     if (is_file(__DIR__ . '/FPDF/fpdf.php')) {
         require_once __DIR__ . '/FPDF/fpdf.php';
     }
-    return; // stoppe l'évaluation du reste du fichier
+    goto IPEC_MAILER_END; // saute jusqu'à l'étiquette en bas du fichier
 }
 
 header('Content-Type: application/json; charset=utf-8');
