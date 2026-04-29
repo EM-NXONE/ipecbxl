@@ -196,15 +196,13 @@ admin_flash();
         </dl>
         <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
             <a class="btn-secondary btn" href="https://lms.ipec.school/login.php" target="_blank" rel="noopener">🔗 Page de connexion étudiant</a>
-            <?php if (!$etudiant['password_hash']): ?>
-                <form method="POST" action="action.php" style="display:inline;"
-                      onsubmit="return confirm('Régénérer un nouveau lien d\'activation (l\'ancien sera invalidé) ?');">
-                    <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
-                    <input type="hidden" name="do" value="regen_activation">
-                    <input type="hidden" name="id" value="<?= $id ?>">
-                    <button type="submit" class="btn-secondary">↻ Régénérer le lien d'activation</button>
-                </form>
-            <?php endif; ?>
+            <form method="POST" action="action.php" style="display:inline;"
+                  onsubmit="return confirm('Réinitialiser le mot de passe de cet étudiant à &quot;Student1&quot; ?');">
+                <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">
+                <input type="hidden" name="do" value="reset_password_etudiant">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <button type="submit" class="btn-secondary">🔑 Reset mdp (Student1)</button>
+            </form>
             <form method="POST" action="action.php" style="display:inline;"
                   onsubmit="return confirm('Re-synchroniser la facture 400€ et le récap candidature dans l\'espace étudiant ? (sans doublon)');">
                 <input type="hidden" name="csrf" value="<?= admin_h($csrf) ?>">

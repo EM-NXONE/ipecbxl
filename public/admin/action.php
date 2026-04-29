@@ -216,12 +216,7 @@ try {
                 admin_set_flash('Un compte étudiant existait déjà pour ' . $c['prenom'] . ' ' . $c['nom'] . ' (' . $c['date_naissance'] . ') — candidature rattachée (' . $res['numero'] . ').');
             } else {
                 admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
-                // Le token d'activation est conservé en flash pour copie manuelle
-                // (l'envoi e-mail automatique sera ajouté quand l'espace étudiant sera en ligne).
-                $msg = 'Compte étudiant créé : ' . $res['numero']
-                     . '. Lien d\'activation (à transmettre) : '
-                     . 'https://lms.ipec.school/activer.php?token=' . $res['token'];
-                admin_set_flash($msg);
+                admin_set_flash('Compte étudiant créé : ' . $res['numero'] . '. Mot de passe par défaut : ' . $res['default_password']);
             }
             header('Location: detail.php?id=' . $id); exit;
         }
@@ -235,17 +230,15 @@ try {
             header('Location: detail.php?id=' . $id); exit;
         }
 
-        case 'regen_activation': {
+        case 'reset_password_etudiant': {
             admin_csrf_check();
             if (empty($c['etudiant_id'])) throw new RuntimeException('Aucun compte étudiant rattaché.');
             $etuId = (int)$c['etudiant_id'];
-            // Invalide les tokens d'activation existants non utilisés
-            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
-                           WHERE etudiant_id=? AND type='activation' AND used_at IS NULL")
-                ->execute([$etuId]);
-            $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
-            admin_log_action($id, 'regen_activation', 'Étudiant #' . $etuId);
-            admin_set_flash('Nouveau lien d\'activation généré : https://lms.ipec.school/activer.php?token=' . $token);
+            $pdo->prepare("UPDATE etudiants SET password_hash=?, statut='actif' WHERE id=?")
+                ->execute([password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT), $etuId]);
+            $pdo->prepare("DELETE FROM etudiant_sessions WHERE etudiant_id=?")->execute([$etuId]);
+            admin_log_action($id, 'reset_password_etudiant', 'Étudiant #' . $etuId);
+            admin_set_flash('Mot de passe réinitialisé à : ' . ETU_DEFAULT_PASSWORD);
             header('Location: detail.php?id=' . $id); exit;
         }
 

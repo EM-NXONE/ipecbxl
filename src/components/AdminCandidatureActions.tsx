@@ -4,14 +4,14 @@ import { adminApi } from "@/lib/api";
 
 export interface AdminActionResult {
   message?: string;
-  activation_url?: string | null;
+  default_password?: string | null;
 }
 
 export function adminActionMessage(result: AdminActionResult): string {
   return [
     result.message || "Action effectuée.",
-    result.activation_url ? `Lien généré : ${result.activation_url}` : "",
-  ].filter(Boolean).join(" ");
+    result.default_password ? `Mot de passe : ${result.default_password}` : "",
+  ].filter(Boolean).join(" — ");
 }
 
 interface AdminCandidatureActionsProps {
@@ -41,7 +41,7 @@ export function AdminCandidatureActions({
 }: AdminCandidatureActionsProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [showPayModal, setShowPayModal] = useState(false);
-  const [lastLink, setLastLink] = useState<string | null>(null);
+  const [lastPwd, setLastPwd] = useState<string | null>(null);
   const [moyen, setMoyen] = useState<string>("virement");
   const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const isPaid = Boolean(Number(paid));
@@ -54,7 +54,7 @@ export function AdminCandidatureActions({
         action,
         ...body,
       });
-      setLastLink(result.activation_url || null);
+      setLastPwd(result.default_password || null);
       onDone?.(result, action);
     } catch (e) {
       onError?.(e instanceof Error ? e.message : "Échec de l'action.", action);
@@ -113,12 +113,12 @@ export function AdminCandidatureActions({
           <button
             type="button"
             onClick={() => {
-              if (!confirm("Réinitialiser le mot de passe de cet étudiant ? Un nouveau lien sera généré.")) return;
+              if (!confirm('Réinitialiser le mot de passe de cet étudiant à "Student1" ?')) return;
               runAction("reset_password_etudiant");
             }}
             disabled={busy !== null}
             className={buttonClass}
-            title="Réinitialiser le mot de passe étudiant"
+            title='Réinitialiser au mot de passe par défaut "Student1"'
             aria-label="Réinitialiser le mot de passe étudiant"
           >
             <KeyRound size={compact ? 14 : 15} />
@@ -127,13 +127,13 @@ export function AdminCandidatureActions({
         )}
       </div>
 
-      {lastLink && !compact && (
+      {lastPwd && !compact && (
         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-sm border border-blue/30 bg-blue/5 px-3 py-2 text-xs">
-          <span className="text-muted-foreground">Lien à envoyer :</span>
-          <code className="min-w-0 flex-1 break-all text-blue">{lastLink}</code>
+          <span className="text-muted-foreground">Mot de passe à communiquer :</span>
+          <code className="min-w-0 flex-1 break-all text-blue">{lastPwd}</code>
           <button
             type="button"
-            onClick={() => navigator.clipboard?.writeText(lastLink)}
+            onClick={() => navigator.clipboard?.writeText(lastPwd)}
             className="inline-flex items-center gap-1 rounded-sm border border-border/40 px-2 py-1 text-cream hover:border-blue/40"
           >
             <Copy size={12} /> Copier

@@ -5,10 +5,13 @@
  * Régles :
  *  - Création MANUELLE par l'admin depuis une fiche candidature.
  *  - Auth = PHP natif bcrypt (pas de Supabase).
- *  - Le compte est créé sans mot de passe (password_hash NULL) et un token
- *    d'activation est généré ; l'étudiant définira son mdp via le lien reçu.
+ *  - Le compte est créé ACTIF avec le mot de passe par défaut "Student1".
+ *    L'étudiant peut le changer ensuite depuis son espace (/etudiant/profil).
  *  - Numéro étudiant format IPEC-ETU-AAAA-XXXX (4 hex majuscules).
  */
+
+/** Mot de passe par défaut pour tout compte étudiant créé/réinitialisé par l'admin. */
+const ETU_DEFAULT_PASSWORD = 'Student1';
 
 declare(strict_types=1);
 
@@ -49,11 +52,11 @@ function etudiant_find_by_identity(PDO $pdo, string $prenom, string $nom, ?strin
 }
 
 /**
- * Crée un token d'activation (ou reset) à usage unique.
- * Renvoie le token EN CLAIR (à envoyer par e-mail) ; en BDD on stocke le sha256.
+ * Crée un token de réinitialisation (legacy — conservé pour compat reset_password
+ * éventuel). N'est plus utilisé pour l'activation initiale (mdp par défaut).
  */
-function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'activation', int $ttlSeconds = 7 * 24 * 3600): string {
-    if (!in_array($type, ['activation', 'reset_password'], true)) {
+function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'reset_password', int $ttlSeconds = 7 * 24 * 3600): string {
+    if (!in_array($type, ['reset_password'], true)) {
         throw new InvalidArgumentException('Type token invalide.');
     }
     $token = bin2hex(random_bytes(32));
@@ -69,7 +72,7 @@ function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'activa
 /**
  * Crée un compte étudiant à partir d'une candidature et le rattache.
  *
- * @return array{etudiant_id:int, numero:string, token:string, deja_existant:bool}
+ * @return array{etudiant_id:int, numero:string, default_password:string, deja_existant:bool}
  */
 function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $adminUser): array {
     $email = trim(strtolower((string)$candidature['email']));
@@ -87,35 +90,35 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
             $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
                 ->execute([(int)$existing['id'], (int)$candidature['id']]);
         }
-        $token = '';
+        // Si le compte existait sans mot de passe (cas legacy), on lui pose le mot de passe par défaut.
         if (empty($existing['password_hash'])) {
-            $pdo->prepare("UPDATE etudiant_tokens SET used_at = NOW()
-                           WHERE etudiant_id = ? AND type = 'activation' AND used_at IS NULL")
-                ->execute([(int)$existing['id']]);
-            $token = etudiant_create_token($pdo, (int)$existing['id'], 'activation', 14 * 24 * 3600);
+            $pdo->prepare("UPDATE etudiants SET password_hash=?, email_verifie=1, statut='actif' WHERE id=?")
+                ->execute([password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT), (int)$existing['id']]);
         }
         // (Re)synchronise les documents historiques pour cette candidature
         etudiant_sync_documents_historiques($pdo, (int)$existing['id'], $candidature, $adminUser);
         return [
-            'etudiant_id'   => (int)$existing['id'],
-            'numero'        => (string)$existing['numero_etudiant'],
-            'token'         => $token,
-            'deja_existant' => true,
+            'etudiant_id'      => (int)$existing['id'],
+            'numero'           => (string)$existing['numero_etudiant'],
+            'default_password' => ETU_DEFAULT_PASSWORD,
+            'deja_existant'    => true,
         ];
     }
 
     $pdo->beginTransaction();
     try {
         $numero = etudiant_generate_numero($pdo);
+        $hash   = password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT);
         $stmt = $pdo->prepare(
             "INSERT INTO etudiants
                 (email, password_hash, email_verifie,
                  civilite, prenom, nom, date_naissance, nationalite, telephone,
                  numero_etudiant, statut, cree_par_admin)
-             VALUES (?, NULL, 0, ?, ?, ?, ?, ?, ?, ?, 'actif', ?)"
+             VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'actif', ?)"
         );
         $stmt->execute([
             $email,
+            $hash,
             $candidature['civilite'] ?: null,
             $candidature['prenom'],
             $candidature['nom'],
@@ -130,20 +133,15 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
         $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
             ->execute([$etuId, (int)$candidature['id']]);
 
-        $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
-
-        // Synchronise les "documents historiques" de la candidature dans les
-        // nouvelles tables `factures` + `documents` pour qu'ils apparaissent
-        // immédiatement dans l'espace étudiant. PDF jamais stockés : on n'écrit
-        // que les métadonnées + data_json (régénération à la volée).
+        // Synchronise les documents historiques de la candidature dans factures + documents.
         etudiant_sync_documents_historiques($pdo, $etuId, $candidature, $adminUser);
 
         $pdo->commit();
         return [
-            'etudiant_id'   => $etuId,
-            'numero'        => $numero,
-            'token'         => $token,
-            'deja_existant' => false,
+            'etudiant_id'      => $etuId,
+            'numero'           => $numero,
+            'default_password' => ETU_DEFAULT_PASSWORD,
+            'deja_existant'    => false,
         ];
     } catch (\Throwable $e) {
         $pdo->rollBack();

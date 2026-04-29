@@ -3,7 +3,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { KeyRound, Mail, Search } from "lucide-react";
+import { KeyRound, Search } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 
@@ -28,7 +28,7 @@ interface Etu {
 
 interface ActionResult {
   message?: string;
-  activation_url?: string | null;
+  default_password?: string | null;
 }
 
 function AdminEtudiantsPage() {
@@ -52,15 +52,14 @@ function AdminEtudiantsPage() {
     return () => clearTimeout(t);
   }, [q, reload]);
 
-  const runAction = async (etuId: number, action: "reset_password" | "regen_activation", confirmMsg: string) => {
+  const runAction = async (etuId: number, action: "reset_password", confirmMsg: string) => {
     if (!confirm(confirmMsg)) return;
     setBusy(`${etuId}:${action}`);
     setError(null);
     setMsg(null);
     try {
       const res = await adminApi.post<ActionResult>("/etudiant-action.php", { id: etuId, action });
-      const link = res.activation_url ? ` Lien : ${res.activation_url}` : "";
-      setMsg((res.message || "Action effectuée.") + link);
+      setMsg(res.message || "Action effectuée.");
       reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Échec de l'action.");
@@ -130,22 +129,11 @@ function AdminEtudiantsPage() {
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex justify-end gap-1.5">
-                      {!active && (
-                        <button
-                          type="button"
-                          onClick={() => runAction(e.id, "regen_activation", `Générer un nouveau lien d'activation pour ${e.prenom} ${e.nom} ?`)}
-                          disabled={busy !== null}
-                          title="Régénérer le lien d'activation"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border/40 text-muted-foreground hover:text-blue hover:border-blue/40 disabled:opacity-50"
-                        >
-                          <Mail size={14} />
-                        </button>
-                      )}
                       <button
                         type="button"
-                        onClick={() => runAction(e.id, "reset_password", `Réinitialiser le mot de passe de ${e.prenom} ${e.nom} ? L'ancien mot de passe sera invalidé.`)}
+                        onClick={() => runAction(e.id, "reset_password", `Réinitialiser le mot de passe de ${e.prenom} ${e.nom} au mot de passe par défaut "Student1" ?`)}
                         disabled={busy !== null}
-                        title="Réinitialiser le mot de passe"
+                        title='Réinitialiser au mot de passe "Student1"'
                         className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border/40 text-muted-foreground hover:text-blue hover:border-blue/40 disabled:opacity-50"
                       >
                         <KeyRound size={14} />
