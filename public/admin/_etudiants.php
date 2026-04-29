@@ -10,10 +10,10 @@
  *  - Numéro étudiant format IPEC-ETU-AAAA-XXXX (4 hex majuscules).
  */
 
+declare(strict_types=1);
+
 /** Mot de passe par défaut pour tout compte étudiant créé/réinitialisé par l'admin. */
 const ETU_DEFAULT_PASSWORD = 'Student1';
-
-declare(strict_types=1);
 
 /**
  * Génère un numéro étudiant unique : IPEC-ETU-AAAA-XXXX
