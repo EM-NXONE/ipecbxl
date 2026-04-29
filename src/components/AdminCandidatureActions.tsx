@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, KeyRound, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, KeyRound, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
 import { adminApi } from "@/lib/api";
 
 export interface AdminActionResult {
@@ -10,7 +10,7 @@ export interface AdminActionResult {
 export function adminActionMessage(result: AdminActionResult): string {
   return [
     result.message || "Action effectuée.",
-    result.activation_url ? `Lien : ${result.activation_url}` : "",
+    result.activation_url ? `Lien généré : ${result.activation_url}` : "",
   ].filter(Boolean).join(" ");
 }
 
@@ -41,6 +41,7 @@ export function AdminCandidatureActions({
 }: AdminCandidatureActionsProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [lastLink, setLastLink] = useState<string | null>(null);
   const [moyen, setMoyen] = useState<string>("virement");
   const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const isPaid = Boolean(Number(paid));
@@ -53,6 +54,7 @@ export function AdminCandidatureActions({
         action,
         ...body,
       });
+      setLastLink(result.activation_url || null);
       onDone?.(result, action);
     } catch (e) {
       onError?.(e instanceof Error ? e.message : "Échec de l'action.", action);
@@ -124,6 +126,20 @@ export function AdminCandidatureActions({
           </button>
         )}
       </div>
+
+      {lastLink && !compact && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-sm border border-blue/30 bg-blue/5 px-3 py-2 text-xs">
+          <span className="text-muted-foreground">Lien à envoyer :</span>
+          <code className="min-w-0 flex-1 break-all text-blue">{lastLink}</code>
+          <button
+            type="button"
+            onClick={() => navigator.clipboard?.writeText(lastLink)}
+            className="inline-flex items-center gap-1 rounded-sm border border-border/40 px-2 py-1 text-cream hover:border-blue/40"
+          >
+            <Copy size={12} /> Copier
+          </button>
+        </div>
+      )}
 
       {showPayModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowPayModal(false)}>
