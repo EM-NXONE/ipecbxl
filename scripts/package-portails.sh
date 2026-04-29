@@ -178,8 +178,8 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
+restrict_portal_root "$LMS" "etudiant assets _build index.html favicon.ico favicon.svg"
 purge_portal_subdir "$LMS/etudiant"
-for f in $SITE_ONLY_FILES; do rm -f "$LMS/$f"; done
 cat > "$LMS/index.html" <<'HTML'
 <!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
 <title>IPEC LMS</title>
