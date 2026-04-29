@@ -193,6 +193,15 @@ function AdminCandidatureDetailPage() {
         </Card>
       )}
 
+      <Card title="Traçabilité" className="mb-6">
+        <Field label="ID interne" value={c.id} />
+        <Field label="Référence" value={<span className="font-mono text-blue">{c.reference}</span>} />
+        <Field label="Créée le" value={formatDateTime(c.created_at)} />
+        <Field label="Modifiée le" value={c.updated_at ? formatDateTime(c.updated_at) : "—"} />
+        <Field label="IP" value={c.ip || "—"} />
+        <Field label="Navigateur" value={<span className="break-all">{c.user_agent || "—"}</span>} />
+      </Card>
+
       <Card title="Statut de la candidature" className="mb-6">
         <div className="flex flex-wrap gap-2">
           {Object.entries(data.statuts).map(([k, label]) => (
