@@ -73,6 +73,19 @@ function Move-BuildOutput {
     }
 }
 
+# Whitelist stricte pour les portails admin/lms : ne garde a la racine QUE
+# les fichiers/dossiers explicitement autorises. Tout le reste degage.
+# Le site (www) n'est PAS concerne par cette fonction.
+function Restrict-PortalRoot {
+    param([string]$Folder, [string[]]$KeepNames)
+    if (-not (Test-Path $Folder)) { return }
+    Get-ChildItem -Path $Folder -Force | ForEach-Object {
+        if ($KeepNames -notcontains $_.Name) {
+            Remove-Item $_.FullName -Recurse -Force
+        }
+    }
+}
+
 # Purge un sous-dossier de portail (etudiant/ ou admin/) en gardant UNIQUEMENT
 # les index.html (=pages prerendues TanStack) et en supprimant tout le legacy PHP
 # venu de public/ (mailer.php, FPDF/, PHPMailer/, *.php, *.css, *.md...).
