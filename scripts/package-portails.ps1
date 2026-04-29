@@ -1,8 +1,8 @@
 # IPEC - Genere 3 ZIP statiques distincts pour n0c (Windows PowerShell).
 #
-#   dist\site.zip   -> public_html\                (www.ipec.school)
-#   dist\admin.zip  -> docroot admin.ipec.school
-#   dist\lms.zip    -> docroot lms.ipec.school
+#   packages\site.zip   -> public_html\                (www.ipec.school)
+#   packages\admin.zip  -> docroot admin.ipec.school
+#   packages\lms.zip    -> docroot lms.ipec.school
 #
 # Strategie : 3 builds Vite distincts via la variable STATIC_BUILD lue par
 # vite.config.ts. Chaque build prerend uniquement les routes du portail
@@ -117,7 +117,7 @@ RewriteRule ^ index.html [L]
 Write-Utf8NoBom (Join-Path $SITE ".htaccess") $siteHt
 
 Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
-Write-Host "==> dist\site.zip OK"
+Write-Host "==> packages\site.zip OK"
 
 # -------------------------------------------------------------------
 # 2) admin.zip - admin.ipec.school  (STATIC_BUILD=admin)
@@ -160,7 +160,7 @@ Write-Utf8NoBom (Join-Path $ADMIN ".htaccess") $adminHt
 Write-Utf8NoBom (Join-Path $adminShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
-Write-Host "==> dist\admin.zip OK"
+Write-Host "==> packages\admin.zip OK"
 
 # -------------------------------------------------------------------
 # 3) lms.zip - lms.ipec.school  (STATIC_BUILD=etu)
@@ -200,7 +200,7 @@ Write-Utf8NoBom (Join-Path $LMS ".htaccess") $lmsHt
 Write-Utf8NoBom (Join-Path $lmsShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $LMS -ZipPath (Join-Path $DIST "lms.zip")
-Write-Host "==> dist\lms.zip OK"
+Write-Host "==> packages\lms.zip OK"
 
 Get-ChildItem $DIST | Format-Table Name, Length
 
