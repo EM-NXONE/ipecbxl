@@ -1,8 +1,18 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+/**
+ * Les sous-domaines admin.ipec.school et lms.ipec.school servent les builds
+ * dédiés (STATIC_BUILD=admin|etu). Ils ne doivent JAMAIS afficher l'entête
+ * ni le footer du site public — chaque portail apporte son propre PortalLayout
+ * (logo IPEC + topbar + sidebar + hamburger).
+ */
+function isPortalPath(pathname: string): boolean {
+  return pathname.startsWith("/admin") || pathname.startsWith("/etudiant");
+}
 
 function NotFoundComponent() {
   return (
@@ -103,6 +113,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Sur /admin/* et /etudiant/* on n'affiche AUCUN chrome du site public :
+  // les portails fournissent leur propre layout complet (PortalLayout / PortalAuthShell).
+  if (isPortalPath(pathname)) {
+    return <Outlet />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
