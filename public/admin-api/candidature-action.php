@@ -79,16 +79,31 @@ try {
     switch ($action) {
 
         case 'mark_paid': {
+            $moyen = trim((string)($body['moyen_paiement'] ?? ''));
+            $date  = trim((string)($body['date_paiement'] ?? ''));
+            $allowedMoyens = ['virement', 'carte', 'especes', 'cheque', 'autre'];
+            if ($moyen === '' || !in_array($moyen, $allowedMoyens, true)) {
+                api_error('Moyen de paiement requis (virement, carte, especes, cheque, autre).', 400);
+            }
+            // Date au format YYYY-MM-DD ; on prend NOW() à défaut
+            $payeAt = null;
+            if ($date !== '') {
+                $d = DateTime::createFromFormat('Y-m-d', $date);
+                if (!$d) api_error('Date de paiement invalide (format YYYY-MM-DD).', 400);
+                $payeAt = $d->format('Y-m-d') . ' 12:00:00';
+            } else {
+                $payeAt = date('Y-m-d H:i:s');
+            }
             $pdo->prepare("UPDATE candidatures
-                           SET facture_payee=1, facture_payee_at=NOW(), facture_payee_par=?
+                           SET facture_payee=1, facture_payee_at=?, facture_payee_par=?
                            WHERE id=?")
-                ->execute([admin_current_user(), $id]);
+                ->execute([$payeAt, admin_current_user(), $id]);
             $pdo->prepare("UPDATE factures
-                           SET statut_paiement='payee', paye_at=NOW(), paye_par_admin=?
+                           SET statut_paiement='payee', paye_at=?, paye_par_admin=?, moyen_paiement=?
                            WHERE candidature_id=? AND type='frais_dossier'")
-                ->execute([admin_current_user(), $id]);
-            admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? ''));
-            api_json(['ok' => true, 'message' => 'Facture marquée comme payée.']);
+                ->execute([$payeAt, admin_current_user(), $moyen, $id]);
+            admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? '') . ' — ' . $moyen . ' le ' . substr($payeAt, 0, 10));
+            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').']);
         }
 
         case 'mark_unpaid': {
