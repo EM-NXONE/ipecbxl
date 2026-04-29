@@ -32,7 +32,7 @@ type VerifyResult = {
   valid: boolean;
   error?: string;
   reference?: string;
-  document_type?: "candidature" | "facture";
+  document_type?: "candidature" | "facture" | "recu";
   document_label?: string;
   candidat?: string;
   programme?: string;
