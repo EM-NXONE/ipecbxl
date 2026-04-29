@@ -175,14 +175,11 @@ Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
 # Garde uniquement index.html (SPA fallback) et 404/200 a la racine.
 Move-BuildOutput -BuildOutput $out -Dest $ADMIN -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidAdmin
 
+# Whitelist racine : seules ces entrees survivent (api/ sera ajoute juste apres)
+Restrict-PortalRoot $ADMIN @("admin","assets","_build","index.html","favicon.ico","favicon.svg")
+
 # Purge admin/ : on jette le legacy public/admin/*.php et on garde uniquement les index.html prerendus
 Purge-PortalSubdir (Join-Path $ADMIN "admin")
-
-# Vire les fichiers du SITE qui n'ont rien a faire ici (deposes par Vite depuis public/)
-foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt","ipec-logo-email.png","android-chrome-192x192.png","android-chrome-512x512.png","apple-touch-icon.png","favicon-16x16.png","favicon-32x32.png","favicon-96x96.png","site.webmanifest")) {
-    $p = Join-Path $ADMIN $f
-    if (Test-Path $p) { Remove-Item $p -Force }
-}
 
 # Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /admin/login
 $adminIndex = @"
