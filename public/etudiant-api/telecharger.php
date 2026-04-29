@@ -12,7 +12,7 @@ $pdo  = db();
 
 $type = (string)($_GET['type'] ?? '');
 $id   = (int)($_GET['id'] ?? 0);
-if ($id <= 0 || !in_array($type, ['facture', 'document'], true)) {
+if ($id <= 0 || !in_array($type, ['facture', 'recu', 'document'], true)) {
     http_response_code(400); header('Content-Type: text/plain'); exit('Requête invalide.');
 }
 
