@@ -248,6 +248,17 @@ $lmsIndex = @"
 <a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
 "@
 Write-Utf8NoBom (Join-Path $LMS "index.html") $lmsIndex
+
+$lmsApi    = Join-Path $LMS "api"
+$lmsShared = Join-Path $lmsApi "_shared"
+New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
+
+Copy-Item (Join-Path $PUB "etudiant-api\*.php") $lmsApi    -Force
+Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared -Force
+Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse -Force
 Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse -Force
 
 $lmsHt = @"
