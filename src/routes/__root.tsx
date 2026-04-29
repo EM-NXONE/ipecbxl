@@ -58,13 +58,22 @@ const ORG_JSONLD = JSON.stringify({
   "sameAs": []
 });
 
+// Périmètre du build courant. Injecté par vite.config.ts via define.
+// "site" = ipec.school | "admin" = admin.ipec.school | "etu" = lms.ipec.school
+const PORTAL = (import.meta.env.VITE_PORTAL as "site" | "admin" | "etu" | undefined) ?? "site";
+const IS_PORTAL_BUILD = PORTAL === "admin" || PORTAL === "etu";
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "IPEC Bruxelles" },
-      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+      // Sur admin/lms : noindex/nofollow STRICT, jamais d'indexation possible.
+      // Sur le site vitrine : indexation normale.
+      IS_PORTAL_BUILD
+        ? { name: "robots", content: "noindex, nofollow, noarchive, nosnippet, noimageindex" }
+        : { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { name: "theme-color", content: "#0a1628" },
       { name: "format-detection", content: "telephone=no" },
       { name: "geo.region", content: "BE-BRU" },
@@ -83,9 +92,8 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
     ],
-    scripts: [
-      { type: "application/ld+json", children: ORG_JSONLD },
-    ],
+    // JSON-LD Organization seulement sur le site vitrine.
+    scripts: IS_PORTAL_BUILD ? [] : [{ type: "application/ld+json", children: ORG_JSONLD }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
