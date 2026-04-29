@@ -89,16 +89,20 @@ function Zip-Folder {
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
-# Site public : exclut les sous-dossiers admin/ et etudiant/ (au cas ou le crawl en aurait genere).
-Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant")
+# Site public : exclut les portails ET les dossiers backend reserves aux autres ZIPs.
+Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant","admin-api","etudiant-api","_shared")
 
-# Backend PHP du site public
+# Nettoie les fichiers PHP/SQL deposes par Vite a la racine et qui ne servent qu'au site
+foreach ($f in @("cors.php","schema.sql","admin","etudiant")) {
+    $p = Join-Path $SITE $f
+    if (Test-Path $p) { Remove-Item $p -Recurse -Force }
+}
+
 # Backend PHP du site public (Force pour ecraser ce que le build aurait copie depuis public/)
 Copy-Item (Join-Path $PUB "mailer.php")        $SITE -Force
 Copy-Item (Join-Path $PUB "db_config.php")     $SITE -Force
 Copy-Item (Join-Path $PUB "verify.php")        $SITE -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE -Force
-Copy-Item (Join-Path $PUB "_shared\cors.php")  $SITE -Force
 if (Test-Path (Join-Path $SITE "FPDF"))      { Remove-Item (Join-Path $SITE "FPDF")      -Recurse -Force }
 if (Test-Path (Join-Path $SITE "PHPMailer")) { Remove-Item (Join-Path $SITE "PHPMailer") -Recurse -Force }
 Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse -Force
