@@ -2,5 +2,9 @@ User-agent: *
 Allow: /
 Disallow: /mailer.php
 Disallow: /PHPMailer/
+Disallow: /admin/
+Disallow: /etudiant/
+Disallow: /admin-api/
+Disallow: /etudiant-api/
 
 Sitemap: https://ipec.school/sitemap.xml
