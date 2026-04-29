@@ -89,7 +89,8 @@ function Zip-Folder {
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
-Move-BuildOutput -BuildOutput $out -Dest $SITE
+# Site public : exclut les sous-dossiers admin/ et etudiant/ (au cas ou le crawl en aurait genere).
+Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant")
 
 # Backend PHP du site public
 Copy-Item (Join-Path $PUB "mailer.php")        $SITE
