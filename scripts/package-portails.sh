@@ -58,6 +58,18 @@ move_output() {
     # fichiers caches a la racine (ex: .vite, etc) - skip
 }
 
+# Purge un sous-dossier de portail (etudiant/ ou admin/) en gardant UNIQUEMENT
+# les index.html prerendus et en supprimant tout le legacy PHP venu de public/.
+purge_portal_subdir() {
+    local folder="$1"
+    [ -d "$folder" ] || return 0
+    find "$folder" -type f ! -name "index.html" -delete
+    find "$folder" -depth -type d -empty -delete
+}
+
+# Liste des fichiers du SITE qui n'ont rien a faire dans admin/lms
+SITE_ONLY_FILES="mailer.php verify.php cors.php db_config.php schema.sql _pdf_classes.php sitemap.xml robots.txt ipec-logo-email.png android-chrome-192x192.png android-chrome-512x512.png apple-touch-icon.png favicon-16x16.png favicon-32x32.png favicon-96x96.png site.webmanifest"
+
 # ---------------------------------------------------------------------------
 # 1) site.zip — www.ipec.school
 # ---------------------------------------------------------------------------
@@ -104,6 +116,17 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
+purge_portal_subdir "$ADMIN/admin"
+for f in $SITE_ONLY_FILES; do rm -f "$ADMIN/$f"; done
+cat > "$ADMIN/index.html" <<'HTML'
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC Admin</title>
+<meta http-equiv="refresh" content="0; url=/admin/login">
+<link rel="canonical" href="/admin/login"></head>
+<body><script>location.replace('/admin/login')</script>
+<a href="/admin/login">Acceder a l'espace admin</a></body></html>
+HTML
+
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
 cp "$PUB/db_config.php"         "$ADMIN/api/_shared/"
@@ -140,6 +163,17 @@ for d in "$OUT"/*/; do
     case "$name" in etudiant|assets|_build) ;; *) forbid="$forbid $name" ;; esac
 done
 move_output "$OUT" "$LMS" "index 404 200" "$forbid"
+
+purge_portal_subdir "$LMS/etudiant"
+for f in $SITE_ONLY_FILES; do rm -f "$LMS/$f"; done
+cat > "$LMS/index.html" <<'HTML'
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC LMS</title>
+<meta http-equiv="refresh" content="0; url=/etudiant/login">
+<link rel="canonical" href="/etudiant/login"></head>
+<body><script>location.replace('/etudiant/login')</script>
+<a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
+HTML
 
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"
