@@ -93,13 +93,16 @@ $SITE = Join-Path $BUILD "site"
 Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant")
 
 # Backend PHP du site public
-Copy-Item (Join-Path $PUB "mailer.php")        $SITE
-Copy-Item (Join-Path $PUB "db_config.php")     $SITE
-Copy-Item (Join-Path $PUB "verify.php")        $SITE
-Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE
-Copy-Item (Join-Path $PUB "_shared\cors.php")  $SITE
-Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse
-Copy-Item (Join-Path $PUB "PHPMailer")         $SITE -Recurse
+# Backend PHP du site public (Force pour ecraser ce que le build aurait copie depuis public/)
+Copy-Item (Join-Path $PUB "mailer.php")        $SITE -Force
+Copy-Item (Join-Path $PUB "db_config.php")     $SITE -Force
+Copy-Item (Join-Path $PUB "verify.php")        $SITE -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")  $SITE -Force
+if (Test-Path (Join-Path $SITE "FPDF"))      { Remove-Item (Join-Path $SITE "FPDF")      -Recurse -Force }
+if (Test-Path (Join-Path $SITE "PHPMailer")) { Remove-Item (Join-Path $SITE "PHPMailer") -Recurse -Force }
+Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse -Force
+Copy-Item (Join-Path $PUB "PHPMailer")         $SITE -Recurse -Force
 
 $siteHt = @"
 # IPEC - www.ipec.school
