@@ -168,6 +168,26 @@ foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sq
     if (Test-Path $p) { Remove-Item $p -Force }
 }
 
+# Purge admin/ : on jette le legacy public/admin/*.php et on garde uniquement les index.html prerendus
+Purge-PortalSubdir (Join-Path $ADMIN "admin")
+
+# Vire les fichiers du SITE qui n'ont rien a faire ici (deposes par Vite depuis public/)
+foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt","ipec-logo-email.png","android-chrome-192x192.png","android-chrome-512x512.png","apple-touch-icon.png","favicon-16x16.png","favicon-32x32.png","favicon-96x96.png","site.webmanifest")) {
+    $p = Join-Path $ADMIN $f
+    if (Test-Path $p) { Remove-Item $p -Force }
+}
+
+# Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /admin/login
+$adminIndex = @"
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC Admin</title>
+<meta http-equiv="refresh" content="0; url=/admin/login">
+<link rel="canonical" href="/admin/login"></head>
+<body><script>location.replace('/admin/login')</script>
+<a href="/admin/login">Acceder a l'espace admin</a></body></html>
+"@
+Write-Utf8NoBom (Join-Path $ADMIN "index.html") $adminIndex
+
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
 New-Item -ItemType Directory -Path $adminShared -Force | Out-Null
@@ -209,22 +229,25 @@ Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
 }
 Move-BuildOutput -BuildOutput $out -Dest $LMS -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidLms
 
-# Nettoie les fichiers PHP/SQL deposes par Vite depuis public/ (reserves au site public)
-foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt")) {
+# Purge etudiant/ : on jette le legacy public/etudiant/*.php et on garde uniquement les index.html prerendus
+Purge-PortalSubdir (Join-Path $LMS "etudiant")
+
+# Vire les fichiers du SITE qui n'ont rien a faire ici
+foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt","ipec-logo-email.png","android-chrome-192x192.png","android-chrome-512x512.png","apple-touch-icon.png","favicon-16x16.png","favicon-32x32.png","favicon-96x96.png","site.webmanifest")) {
     $p = Join-Path $LMS $f
     if (Test-Path $p) { Remove-Item $p -Force }
 }
 
-$lmsApi    = Join-Path $LMS "api"
-$lmsShared = Join-Path $lmsApi "_shared"
-New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
-
-Copy-Item (Join-Path $PUB "etudiant-api\*.php") $lmsApi    -Force
-Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared -Force
-Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared -Force
-Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared -Force
-Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared -Force
-Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse -Force
+# Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /etudiant/login
+$lmsIndex = @"
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC LMS</title>
+<meta http-equiv="refresh" content="0; url=/etudiant/login">
+<link rel="canonical" href="/etudiant/login"></head>
+<body><script>location.replace('/etudiant/login')</script>
+<a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
+"@
+Write-Utf8NoBom (Join-Path $LMS "index.html") $lmsIndex
 Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse -Force
 
 $lmsHt = @"
