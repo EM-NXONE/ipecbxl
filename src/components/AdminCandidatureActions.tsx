@@ -207,7 +207,7 @@ export function AdminCandidatureActions({
       {showPayModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowPayModal(false)}>
           <div className="bg-card border border-border/40 rounded-md p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-display text-lg text-cream mb-4">Marquer la facture comme payée</h3>
+            <h3 className="font-display text-lg text-cream mb-4">{editMode ? "Modifier le paiement" : "Marquer la facture comme payée"}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">Moyen de paiement</label>
@@ -245,7 +245,7 @@ export function AdminCandidatureActions({
                   }}
                   className="px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
-                  {busy === "mark_paid" ? "Enregistrement…" : "Confirmer le paiement"}
+                  {busy === "mark_paid" ? "Enregistrement…" : (editMode ? "Enregistrer les modifications" : "Confirmer le paiement")}
                 </button>
               </div>
             </div>
