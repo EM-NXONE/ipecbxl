@@ -16,6 +16,23 @@ $stmt->execute([$id]);
 $cand = $stmt->fetch();
 if (!$cand) api_error('Candidature introuvable', 404);
 
+// Détails de la facture frais de dossier (moyen, dates) — pour le carton paiement
+$fStmt = $pdo->prepare("SELECT moyen_paiement, paye_at, statut_paiement
+                        FROM factures
+                        WHERE candidature_id = ? AND type = 'frais_dossier'
+                        ORDER BY id DESC LIMIT 1");
+$fStmt->execute([$id]);
+if ($f = $fStmt->fetch()) {
+    $cand['moyen_paiement']      = $f['moyen_paiement'] ?? null;
+    $cand['facture_statut']      = $f['statut_paiement'] ?? null;
+    if (!empty($f['paye_at']) && empty($cand['facture_payee_at'])) {
+        $cand['facture_payee_at'] = $f['paye_at'];
+    }
+} else {
+    $cand['moyen_paiement'] = null;
+    $cand['facture_statut'] = null;
+}
+
 // Étudiant rattaché
 $etudiant = null;
 if (!empty($cand['etudiant_id'])) {
