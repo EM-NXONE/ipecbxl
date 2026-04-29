@@ -102,7 +102,7 @@ try {
             $pdo->prepare("UPDATE factures
                            SET statut_paiement='payee', paye_at=NOW(), paye_par_admin=?
                            WHERE candidature_id=? AND type='frais_dossier'")
-                ->execute([$id]);
+                ->execute([admin_current_user(), $id]);
             admin_log_action($id, 'mark_paid', 'Facture ' . $c['facture_numero']);
             admin_set_flash('Facture marquée comme payée.');
             header('Location: detail.php?id=' . $id); exit;
