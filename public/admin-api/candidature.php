@@ -1,6 +1,10 @@
 <?php
-/** GET /api/candidature.php?id=123 → détail complet */
+/**
+ * GET /api/candidature.php?id=N → détail complet :
+ *   candidature, etudiant (si rattaché), etudiant_homonyme (si détecté), historique, statuts
+ */
 require_once __DIR__ . '/_bootstrap.php';
+require_once __DIR__ . '/../admin/_etudiants.php';
 api_method('GET');
 api_require_admin();
 
@@ -13,22 +17,37 @@ $stmt->execute([$id]);
 $cand = $stmt->fetch();
 if (!$cand) api_error('Candidature introuvable', 404);
 
-// Documents associés
-$dstmt = $pdo->prepare("SELECT id, type, libelle, statut, created_at
-                        FROM documents WHERE candidature_id = ?
-                        ORDER BY created_at DESC");
-$dstmt->execute([$id]);
-$docs = $dstmt->fetchAll();
+$etudiant = null;
+if (!empty($cand['etudiant_id'])) {
+    $eStmt = $pdo->prepare("SELECT id, numero_etudiant, civilite, prenom, nom, email,
+                                   date_naissance, statut, password_hash IS NOT NULL AS active,
+                                   derniere_connexion, cree_par_admin, created_at
+                            FROM etudiants WHERE id = ?");
+    $eStmt->execute([(int)$cand['etudiant_id']]);
+    $etudiant = $eStmt->fetch() ?: null;
+}
+$homonyme = null;
+if (!$etudiant) {
+    $h = etudiant_find_by_identity($pdo, (string)$cand['prenom'], (string)$cand['nom'], (string)$cand['date_naissance']);
+    if ($h) {
+        $homonyme = [
+            'id' => (int)$h['id'],
+            'numero_etudiant' => $h['numero_etudiant'],
+            'prenom' => $h['prenom'], 'nom' => $h['nom'],
+            'date_naissance' => $h['date_naissance'],
+        ];
+    }
+}
 
-// Factures
-$fstmt = $pdo->prepare("SELECT id, numero, type, montant_ttc_cents, statut_paiement, paye_at
-                        FROM factures WHERE candidature_id = ?
-                        ORDER BY date_emission DESC");
-$fstmt->execute([$id]);
-$facts = $fstmt->fetchAll();
+$histStmt = $pdo->prepare("SELECT id, action, detail, admin_user, ip, created_at
+                           FROM admin_actions WHERE candidature_id = ?
+                           ORDER BY created_at DESC LIMIT 50");
+$histStmt->execute([$id]);
 
 api_json([
     'candidature' => $cand,
-    'documents'   => $docs,
-    'factures'    => $facts,
+    'etudiant'    => $etudiant,
+    'homonyme'    => $homonyme,
+    'historique'  => $histStmt->fetchAll(),
+    'statuts'     => ADMIN_STATUTS,
 ]);

@@ -1,16 +1,58 @@
 <?php
-/** GET /api/candidatures.php → liste (stub initial, à enrichir) */
+/**
+ * GET /api/candidatures.php
+ * Query params: q, statut, payee (1|0), page, perPage (max 100)
+ * → { candidatures, total, page, perPage, pages, statuts }
+ */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
 api_require_admin();
 
-$pdo = db();
-$rows = $pdo->query(
-    "SELECT id, reference, prenom, nom, email, statut, programme, annee,
-            facture_payee, created_at
-     FROM candidatures
-     ORDER BY created_at DESC
-     LIMIT 200"
-)->fetchAll();
+$q       = trim((string)($_GET['q'] ?? ''));
+$statut  = (string)($_GET['statut'] ?? '');
+$payee   = (string)($_GET['payee'] ?? '');
+$page    = max(1, (int)($_GET['page'] ?? 1));
+$perPage = max(1, min(100, (int)($_GET['perPage'] ?? 30)));
+$offset  = ($page - 1) * $perPage;
 
-api_json(['candidatures' => $rows]);
+$where  = [];
+$params = [];
+if ($q !== '') {
+    $where[] = '(prenom LIKE :q OR nom LIKE :q OR email LIKE :q OR reference LIKE :q OR facture_numero LIKE :q)';
+    $params[':q'] = '%' . $q . '%';
+}
+if ($statut !== '' && isset(ADMIN_STATUTS[$statut])) {
+    $where[] = 'statut = :statut';
+    $params[':statut'] = $statut;
+}
+if ($payee === '1') {
+    $where[] = 'facture_payee = 1';
+} elseif ($payee === '0') {
+    $where[] = 'facture_payee = 0';
+}
+$whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+$pdo = db();
+$countStmt = $pdo->prepare("SELECT COUNT(*) FROM candidatures $whereSql");
+$countStmt->execute($params);
+$total = (int)$countStmt->fetchColumn();
+$pages = max(1, (int)ceil($total / $perPage));
+
+$sql = "SELECT id, reference, statut, prenom, nom, email, programme, annee,
+               annee_academique, facture_numero, facture_payee, facture_payee_at,
+               etudiant_id, created_at
+        FROM candidatures
+        $whereSql
+        ORDER BY created_at DESC
+        LIMIT $perPage OFFSET $offset";
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+
+api_json([
+    'candidatures' => $stmt->fetchAll(),
+    'total'        => $total,
+    'page'         => $page,
+    'perPage'      => $perPage,
+    'pages'        => $pages,
+    'statuts'      => ADMIN_STATUTS,
+]);
