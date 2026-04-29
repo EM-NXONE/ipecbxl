@@ -51,6 +51,7 @@ interface PortalLayoutProps {
 
 export function PortalLayout({
   brandSubtitle,
+  brandHref = "/",
   nav,
   userLabel,
   onLogout,
