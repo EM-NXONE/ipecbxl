@@ -130,12 +130,15 @@ try {
             $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
             if ($res['deja_existant']) {
                 admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
+                $url = $res['token'] !== '' ? etu_admin_activation_url($res['token']) : null;
                 api_json([
                     'ok' => true,
-                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
+                    'message' => $url
+                        ? "Compte existant non activé pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}). Nouveau lien d'activation généré."
+                        : "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
                     'etudiant_id' => $res['etudiant_id'],
                     'numero' => $res['numero'],
-                    'activation_url' => null,
+                    'activation_url' => $url,
                 ]);
             }
             $url = etu_admin_activation_url($res['token']);
