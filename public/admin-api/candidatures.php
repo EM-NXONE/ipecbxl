@@ -1,8 +1,8 @@
 <?php
 /**
  * GET /api/candidatures.php
- * Query params: q, statut, payee (1|0), page, perPage (max 100)
- * → { candidatures, total, page, perPage, pages, statuts }
+ * ?q=... &statut=... &payee=1|0 &page=1 &perPage=30
+ *   → { candidatures, total, page, perPage, pages, statuts }
  */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
@@ -25,11 +25,8 @@ if ($statut !== '' && isset(ADMIN_STATUTS[$statut])) {
     $where[] = 'statut = :statut';
     $params[':statut'] = $statut;
 }
-if ($payee === '1') {
-    $where[] = 'facture_payee = 1';
-} elseif ($payee === '0') {
-    $where[] = 'facture_payee = 0';
-}
+if ($payee === '1') $where[] = 'facture_payee = 1';
+elseif ($payee === '0') $where[] = 'facture_payee = 0';
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $pdo = db();
