@@ -41,19 +41,35 @@ function Invoke-TargetBuild {
         Pop-Location
     }
 
+    # TanStack Start v1 : sortie client = dist/client/, SSR = dist/server/ (jete).
+    $distClient   = Join-Path $ROOT "dist\client"
     $outputPublic = Join-Path $ROOT ".output\public"
-    $distFolder   = Join-Path $ROOT "dist"
+    if (Test-Path $distClient)   { return $distClient }
     if (Test-Path $outputPublic) { return $outputPublic }
-    if (Test-Path $distFolder)   { return $distFolder }
-    throw "Aucune sortie de build trouvee pour $Target"
+    throw "Aucune sortie de build trouvee pour $Target (ni dist\client ni .output\public)"
 }
 
 function Move-BuildOutput {
-    param([string]$BuildOutput, [string]$Dest)
+    param([string]$BuildOutput, [string]$Dest, [string[]]$AllowedHtml, [string[]]$ForbiddenSubdirs = @())
     if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    Get-ChildItem -Path $BuildOutput -Force | ForEach-Object {
-        Copy-Item $_.FullName $Dest -Recurse -Force
+    # Sous-dossiers : tout sauf ceux interdits
+    Get-ChildItem -Path $BuildOutput -Directory -Force | ForEach-Object {
+        if ($ForbiddenSubdirs -notcontains $_.Name) {
+            Copy-Item $_.FullName $Dest -Recurse -Force
+        }
+    }
+    # Fichiers racine : .html filtres, le reste copie tel quel
+    Get-ChildItem -Path $BuildOutput -File -Force | ForEach-Object {
+        $name = $_.Name
+        if ($name -like "*.html") {
+            $base = [System.IO.Path]::GetFileNameWithoutExtension($name)
+            if ($AllowedHtml -contains $base -or $AllowedHtml -contains "*") {
+                Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+            }
+        } else {
+            Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+        }
     }
 }
 
