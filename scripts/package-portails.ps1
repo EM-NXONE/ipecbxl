@@ -12,7 +12,14 @@
 #   - admin -> /admin/login prerendu, le reste en SPA fallback
 #   - etu   -> /etudiant/login + /etudiant/mot-de-passe-oublie prerendus
 #
-# Usage :  powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1
+# Usage :
+#   powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1
+#   powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1 -Target all|site|admin|lms
+
+param(
+    [ValidateSet("all","site","admin","lms","")]
+    [string]$Target = ""
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -21,9 +28,39 @@ $DIST  = Join-Path $ROOT "packages"   # IMPORTANT: pas "dist" car vite build ecr
 $PUB   = Join-Path $ROOT "public"
 $BUILD = Join-Path $ROOT "dist-build"
 
-if (Test-Path $DIST)  { Remove-Item $DIST  -Recurse -Force }
+# --- Selection de la cible ---------------------------------------------------
+if (-not $Target) {
+    Write-Host "Que veux-tu construire ?"
+    Write-Host "  1) all   - les 3 ZIP (site + admin + lms)"
+    Write-Host "  2) site  - uniquement www.ipec.school"
+    Write-Host "  3) admin - uniquement admin.ipec.school"
+    Write-Host "  4) lms   - uniquement lms.ipec.school"
+    $choice = Read-Host "Choix [1-4] (defaut 1)"
+    switch ($choice) {
+        ""      { $Target = "all" }
+        "1"     { $Target = "all" }
+        "all"   { $Target = "all" }
+        "2"     { $Target = "site" }
+        "site"  { $Target = "site" }
+        "3"     { $Target = "admin" }
+        "admin" { $Target = "admin" }
+        "4"     { $Target = "lms" }
+        "lms"   { $Target = "lms" }
+        default { throw "Choix invalide : $choice" }
+    }
+}
+function Should-Build([string]$Name) { return ($Target -eq "all" -or $Target -eq $Name) }
+Write-Host "==> Cible selectionnee : $Target"
+
 if (Test-Path $BUILD) { Remove-Item $BUILD -Recurse -Force }
-New-Item -ItemType Directory -Path $DIST, $BUILD | Out-Null
+New-Item -ItemType Directory -Path $DIST, $BUILD -Force | Out-Null
+# On preserve $DIST mais on supprime les zips qui vont etre reconstruits
+foreach ($n in @("site","admin","lms")) {
+    if (Should-Build $n) {
+        $z = Join-Path $DIST "$n.zip"
+        if (Test-Path $z) { Remove-Item $z -Force }
+    }
+}
 
 function Invoke-TargetBuild {
     param([string]$Target)
@@ -121,6 +158,7 @@ function Zip-Folder {
 # -------------------------------------------------------------------
 # 1) site.zip - www.ipec.school  (STATIC_BUILD=site)
 # -------------------------------------------------------------------
+if (Should-Build "site") {
 $out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
 # Site public : exclut les portails ET les dossiers backend reserves aux autres ZIPs.
@@ -159,10 +197,12 @@ Write-Utf8NoBom (Join-Path $SITE ".htaccess") $siteHt
 
 Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
 Write-Host "==> packages\site.zip OK"
+}
 
 # -------------------------------------------------------------------
 # 2) admin.zip - admin.ipec.school  (STATIC_BUILD=admin)
 # -------------------------------------------------------------------
+if (Should-Build "admin") {
 $out = Invoke-TargetBuild -Target "admin"
 $ADMIN = Join-Path $BUILD "admin"
 # Admin : on garde uniquement assets + sous-dossier admin/. On vire tout le reste.
@@ -215,10 +255,12 @@ Write-Utf8NoBom (Join-Path $adminShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
 Write-Host "==> packages\admin.zip OK"
+}
 
 # -------------------------------------------------------------------
 # 3) lms.zip - lms.ipec.school  (STATIC_BUILD=etu)
 # -------------------------------------------------------------------
+if (Should-Build "lms") {
 $out = Invoke-TargetBuild -Target "etu"
 $LMS = Join-Path $BUILD "lms"
 $forbidLms = @()
@@ -268,6 +310,7 @@ Write-Utf8NoBom (Join-Path $lmsShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $LMS -ZipPath (Join-Path $DIST "lms.zip")
 Write-Host "==> packages\lms.zip OK"
+}
 
 Get-ChildItem $DIST | Format-Table Name, Length
 

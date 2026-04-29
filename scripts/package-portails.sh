@@ -16,8 +16,39 @@ DIST="$ROOT/packages"
 PUB="$ROOT/public"
 BUILD="$ROOT/dist-build"
 
-rm -rf "$DIST" "$BUILD"
+# --- Selection de la cible ---------------------------------------------------
+# Usage : ./package-portails.sh [all|site|admin|lms]
+# Si aucun argument fourni -> menu interactif.
+TARGET_CHOICE="${1:-}"
+if [ -z "$TARGET_CHOICE" ]; then
+    echo "Que veux-tu construire ?"
+    echo "  1) all   - les 3 ZIP (site + admin + lms)"
+    echo "  2) site  - uniquement www.ipec.school"
+    echo "  3) admin - uniquement admin.ipec.school"
+    echo "  4) lms   - uniquement lms.ipec.school"
+    read -r -p "Choix [1-4] (defaut 1) : " CHOICE
+    case "${CHOICE:-1}" in
+        1|all)   TARGET_CHOICE="all" ;;
+        2|site)  TARGET_CHOICE="site" ;;
+        3|admin) TARGET_CHOICE="admin" ;;
+        4|lms)   TARGET_CHOICE="lms" ;;
+        *) echo "Choix invalide"; exit 1 ;;
+    esac
+fi
+case "$TARGET_CHOICE" in
+    all|site|admin|lms) ;;
+    *) echo "Cible invalide : $TARGET_CHOICE (attendu : all|site|admin|lms)"; exit 1 ;;
+esac
+should_build() { [ "$TARGET_CHOICE" = "all" ] || [ "$TARGET_CHOICE" = "$1" ]; }
+echo "==> Cible selectionnee : $TARGET_CHOICE"
+
 mkdir -p "$DIST" "$BUILD"
+rm -rf "$BUILD"
+mkdir -p "$BUILD"
+# On ne purge plus tout $DIST pour preserver les ZIP non reconstruits.
+should_build site  && rm -f "$DIST/site.zip"  || true
+should_build admin && rm -f "$DIST/admin.zip" || true
+should_build lms   && rm -f "$DIST/lms.zip"   || true
 
 build_target() {
     local target="$1"
@@ -87,6 +118,7 @@ SITE_ONLY_FILES="mailer.php verify.php cors.php db_config.php schema.sql _pdf_cl
 # ---------------------------------------------------------------------------
 # 1) site.zip — www.ipec.school
 # ---------------------------------------------------------------------------
+if should_build site; then
 OUT="$(build_target site)"
 SITE="$BUILD/site"
 move_output "$OUT" "$SITE" "*" "admin etudiant"
@@ -115,10 +147,12 @@ HT
 
 (cd "$SITE" && zip -rq "$DIST/site.zip" .)
 echo "==> packages/site.zip OK"
+fi
 
 # ---------------------------------------------------------------------------
 # 2) admin.zip — admin.ipec.school
 # ---------------------------------------------------------------------------
+if should_build admin; then
 OUT="$(build_target admin)"
 ADMIN="$BUILD/admin"
 # garde uniquement assets/, _build/ et admin/. Vire etudiant/ et tout autre.
@@ -166,10 +200,12 @@ echo "Require all denied" > "$ADMIN/api/_shared/.htaccess"
 
 (cd "$ADMIN" && zip -rq "$DIST/admin.zip" .)
 echo "==> packages/admin.zip OK"
+fi
 
 # ---------------------------------------------------------------------------
 # 3) lms.zip — lms.ipec.school
 # ---------------------------------------------------------------------------
+if should_build lms; then
 OUT="$(build_target etu)"
 LMS="$BUILD/lms"
 forbid=""
@@ -215,6 +251,7 @@ echo "Require all denied" > "$LMS/api/_shared/.htaccess"
 
 (cd "$LMS" && zip -rq "$DIST/lms.zip" .)
 echo "==> packages/lms.zip OK"
+fi
 
 ls -lh "$DIST"
 echo
