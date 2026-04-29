@@ -167,7 +167,13 @@ Write-Host "==> dist\admin.zip OK"
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "etu"
 $LMS = Join-Path $BUILD "lms"
-Move-BuildOutput -BuildOutput $out -Dest $LMS
+$forbidLms = @()
+Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
+    if ($_.Name -ne "etudiant" -and $_.Name -ne "assets" -and $_.Name -ne "_build") {
+        $forbidLms += $_.Name
+    }
+}
+Move-BuildOutput -BuildOutput $out -Dest $LMS -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidLms
 
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
