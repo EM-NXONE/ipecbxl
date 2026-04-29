@@ -108,6 +108,7 @@ export function PortalLayout({
                 {userLabel}
               </span>
             )}
+            <ThemeToggle />
             {onLogout && (
               <button
                 type="button"
