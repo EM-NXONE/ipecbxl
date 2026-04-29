@@ -6,8 +6,25 @@
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Sun, Moon } from "lucide-react";
 import { LogoIpec } from "./LogoIpec";
+import { useTheme } from "@/hooks/use-theme";
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  const isDark = theme === "dark";
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={isDark ? "Passer en thème clair" : "Passer en thème sombre"}
+      title={isDark ? "Thème clair" : "Thème sombre"}
+      className="inline-flex items-center justify-center h-8 w-8 rounded-sm text-muted-foreground hover:text-blue border border-border/40 hover:border-blue/40 transition-colors"
+    >
+      {isDark ? <Sun size={14} /> : <Moon size={14} />}
+    </button>
+  );
+}
 
 export interface PortalNavItem {
   to: string;
@@ -91,6 +108,7 @@ export function PortalLayout({
                 {userLabel}
               </span>
             )}
+            <ThemeToggle />
             {onLogout && (
               <button
                 type="button"
@@ -167,7 +185,7 @@ export function PortalAuthShell({
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-body">
       <header className="h-16 backdrop-blur-xl bg-background/80 border-b border-border/40">
-        <div className="h-full px-4 lg:px-6 flex items-center">
+        <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-3">
             <LogoIpec size={36} className="text-blue shrink-0" />
             <div className="leading-tight">
@@ -177,6 +195,7 @@ export function PortalAuthShell({
               </div>
             </div>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
