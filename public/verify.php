@@ -89,13 +89,13 @@ if ($recaptchaSecret !== '') {
         exit;
     }
 }
-// Nouveau format : IPEC-CAND-AAAA-XXXXXX  ou  IPEC-FACT-AAAA-XXXXXX
+// Nouveau format : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX, IPEC-RECU-AAAA-XXXXXX
 // Ancien format toléré : IPEC-AAAA-XXXXXX (assimilé à une candidature)
-if (!preg_match('/^IPEC-(CAND|FACT)-\d{4}-[A-F0-9]{6,16}$/', $reference)
+if (!preg_match('/^IPEC-(CAND|FACT|RECU)-\d{4}-[A-F0-9]{6,16}$/', $reference)
     && !preg_match('/^IPEC-\d{4}-[A-F0-9]{6,16}$/', $reference)) {
     echo json_encode([
         'valid' => false,
-        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX ou IPEC-FACT-AAAA-XXXXXX.',
+        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX ou IPEC-RECU-AAAA-XXXXXX.',
     ]);
     exit;
 }
@@ -104,23 +104,104 @@ if (!preg_match('/^IPEC-(CAND|FACT)-\d{4}-[A-F0-9]{6,16}$/', $reference)
 $docType = 'candidature'; // défaut (et ancien format)
 if (strpos($reference, 'IPEC-FACT-') === 0) {
     $docType = 'facture';
+} elseif (strpos($reference, 'IPEC-RECU-') === 0) {
+    $docType = 'recu';
 } elseif (strpos($reference, 'IPEC-CAND-') === 0) {
     $docType = 'candidature';
 }
 
-// ----- Lecture en base : on cherche dans la bonne colonne selon le type -----
+// ----- Lecture en base -----
 try {
     $pdo = db();
-    $column = $docType === 'facture' ? 'facture_numero' : 'reference';
-    $stmt = $pdo->prepare(
-        "SELECT reference, facture_numero, prenom, nom, programme, annee, annee_academique,
-                specialisation, rentree, created_at
-           FROM candidatures
-          WHERE $column = ?
-          LIMIT 1"
-    );
-    $stmt->execute([$reference]);
-    $row = $stmt->fetch();
+    $row = null;
+
+    if ($docType === 'recu') {
+        // Le numéro de reçu est déterministe : sha1('ipec-recu|' + numero_facture).
+        // On parcourt les factures payées (table LMS) ET les frais de dossier historiques
+        // (candidatures.facture_numero) pour retrouver celle dont le hash correspond.
+
+        // 1) Table `factures` (LMS) — uniquement statut 'payee'
+        try {
+            $stmtF = $pdo->query(
+                "SELECT f.numero, f.paye_at, f.created_at,
+                        e.prenom, e.nom,
+                        c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
+                   FROM factures f
+                   INNER JOIN etudiants e ON e.id = f.etudiant_id
+                   LEFT JOIN candidatures c ON c.id = f.candidature_id
+                  WHERE f.statut_paiement = 'payee' AND f.numero LIKE 'IPEC-FACT-%'"
+            );
+            while ($cand = $stmtF->fetch()) {
+                $hash = strtoupper(substr(hash('sha1', 'ipec-recu|' . $cand['numero']), 0, 6));
+                $year = substr($cand['paye_at'] ?: $cand['created_at'], 0, 4);
+                $expected = 'IPEC-RECU-' . $year . '-' . $hash;
+                if ($expected === $reference) {
+                    $row = [
+                        'reference'        => $cand['numero'],
+                        'facture_numero'   => $cand['numero'],
+                        'prenom'           => $cand['prenom'],
+                        'nom'              => $cand['nom'],
+                        'programme'        => $cand['programme'],
+                        'annee'            => $cand['annee'],
+                        'annee_academique' => $cand['annee_academique'],
+                        'specialisation'   => $cand['specialisation'],
+                        'rentree'          => $cand['rentree'],
+                        'created_at'       => $cand['paye_at'] ?: $cand['created_at'],
+                    ];
+                    break;
+                }
+            }
+        } catch (\Throwable $eF) {
+            error_log('[verify.php] factures lookup skipped: ' . $eF->getMessage());
+        }
+
+        // 2) Frais de dossier historiques (candidatures.facture_numero)
+        if (!$row) {
+            $stmtC = $pdo->query(
+                "SELECT reference, facture_numero, prenom, nom, programme, annee,
+                        annee_academique, specialisation, rentree, created_at
+                   FROM candidatures
+                  WHERE facture_numero IS NOT NULL AND facture_numero LIKE 'IPEC-FACT-%'"
+            );
+            while ($cand = $stmtC->fetch()) {
+                $hash = strtoupper(substr(hash('sha1', 'ipec-recu|' . $cand['facture_numero']), 0, 6));
+                $year = substr($cand['created_at'], 0, 4);
+                $expected = 'IPEC-RECU-' . $year . '-' . $hash;
+                if ($expected === $reference) {
+                    $row = $cand;
+                    break;
+                }
+            }
+        }
+    } else {
+        $column = $docType === 'facture' ? 'facture_numero' : 'reference';
+        $stmt = $pdo->prepare(
+            "SELECT reference, facture_numero, prenom, nom, programme, annee, annee_academique,
+                    specialisation, rentree, created_at
+               FROM candidatures
+              WHERE $column = ?
+              LIMIT 1"
+        );
+        $stmt->execute([$reference]);
+        $row = $stmt->fetch();
+
+        // Fallback : facture LMS (table `factures`) non liée à candidatures historiques
+        if (!$row && $docType === 'facture') {
+            try {
+                $stmt2 = $pdo->prepare(
+                    "SELECT f.numero AS facture_numero, f.numero AS reference, f.paye_at, f.created_at,
+                            e.prenom, e.nom,
+                            c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
+                       FROM factures f
+                       INNER JOIN etudiants e ON e.id = f.etudiant_id
+                       LEFT JOIN candidatures c ON c.id = f.candidature_id
+                      WHERE f.numero = ? LIMIT 1"
+                );
+                $stmt2->execute([$reference]);
+                $row = $stmt2->fetch();
+            } catch (\Throwable $e2) { /* table absente : ignorer */ }
+        }
+    }
 } catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['valid' => false, 'error' => 'Erreur serveur lors de la vérification.']);
