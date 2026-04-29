@@ -87,8 +87,8 @@ function AdminDashboardPage() {
                 Voir toutes →
               </Link>
             </div>
-            <div className="bg-card border border-border/40 rounded-md overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-card border border-border/40 rounded-md overflow-x-auto">
+              <table className="w-full text-sm min-w-[760px]">
                 <thead className="text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40">
                   <tr>
                     <th className="text-left px-4 py-2.5">Réf.</th>
