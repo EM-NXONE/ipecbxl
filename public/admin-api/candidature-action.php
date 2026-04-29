@@ -128,27 +128,24 @@ try {
 
         case 'create_etudiant': {
             $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
+            $pwd = $res['default_password'];
             if ($res['deja_existant']) {
                 admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
-                $url = $res['token'] !== '' ? etu_admin_activation_url($res['token']) : null;
                 api_json([
                     'ok' => true,
-                    'message' => $url
-                        ? "Compte existant non activé pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}). Nouveau lien d'activation généré."
-                        : "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
+                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
                     'etudiant_id' => $res['etudiant_id'],
                     'numero' => $res['numero'],
-                    'activation_url' => $url,
+                    'default_password' => $pwd,
                 ]);
             }
-            $url = etu_admin_activation_url($res['token']);
             admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
             api_json([
                 'ok' => true,
-                'message' => "Compte étudiant créé : {$res['numero']}.",
+                'message' => "Compte étudiant créé : {$res['numero']}. Mot de passe par défaut : {$pwd}.",
                 'etudiant_id' => $res['etudiant_id'],
                 'numero' => $res['numero'],
-                'activation_url' => $url,
+                'default_password' => $pwd,
             ]);
         }
 
@@ -159,36 +156,18 @@ try {
             api_json(['ok' => true, 'message' => 'Documents synchronisés (facture 400€ + récap candidature).']);
         }
 
-        case 'regen_activation': {
-            if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
-            $etuId = (int)$c['etudiant_id'];
-            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
-                           WHERE etudiant_id=? AND type='activation' AND used_at IS NULL")
-                ->execute([$etuId]);
-            $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
-            admin_log_action($id, 'regen_activation', 'Étudiant #' . $etuId);
-            api_json([
-                'ok' => true,
-                'message' => "Nouveau lien d'activation généré.",
-                'activation_url' => etu_admin_activation_url($token),
-            ]);
-        }
-
         case 'reset_password_etudiant': {
             if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
             $etuId = (int)$c['etudiant_id'];
-            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
-                           WHERE etudiant_id=? AND type='reset_password' AND used_at IS NULL")
-                ->execute([$etuId]);
-            // Bloque la connexion jusqu'à choix d'un nouveau mot de passe via le lien.
-            $pdo->prepare("UPDATE etudiants SET password_hash=NULL WHERE id=?")
-                ->execute([$etuId]);
-            $token = etudiant_create_token($pdo, $etuId, 'reset_password', 7 * 24 * 3600);
+            // Réinitialise au mot de passe par défaut "Student1" et invalide les sessions.
+            $pdo->prepare("UPDATE etudiants SET password_hash=?, statut='actif' WHERE id=?")
+                ->execute([password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT), $etuId]);
+            $pdo->prepare("DELETE FROM etudiant_sessions WHERE etudiant_id=?")->execute([$etuId]);
             admin_log_action($id, 'reset_password_etudiant', 'Étudiant #' . $etuId);
             api_json([
                 'ok' => true,
-                'message' => "Mot de passe réinitialisé. Communique le lien à l'étudiant.",
-                'activation_url' => 'https://lms.ipec.school/etudiant/reset/' . $token,
+                'message' => "Mot de passe réinitialisé à : " . ETU_DEFAULT_PASSWORD,
+                'default_password' => ETU_DEFAULT_PASSWORD,
             ]);
         }
 
