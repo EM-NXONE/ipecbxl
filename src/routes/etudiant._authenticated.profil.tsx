@@ -36,10 +36,18 @@ function EtudiantProfilPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError(null); setSuccess(null);
-    if (pwd !== pwd2) { setFormError("Les deux mots de passe ne correspondent pas."); return; }
+    // On compare les valeurs brutes (pas de trim : un mdp peut contenir des espaces)
+    if (pwd.length === 0) { setFormError("Le nouveau mot de passe est requis."); return; }
+    if (pwd !== pwd2) {
+      setFormError(
+        `Les deux mots de passe ne correspondent pas (saisi : ${pwd.length} caractères, confirmation : ${pwd2.length} caractères). Astuce : si votre navigateur a auto-rempli un champ, effacez-le et retapez les deux.`
+      );
+      return;
+    }
     setSubmitting(true);
     try {
-      await etuApi.post("/change-password.php", { current, password: pwd });
+      // On envoie aussi password2 pour que la validation serveur soit la source de vérité.
+      await etuApi.post("/change-password.php", { current, password: pwd, password2: pwd2 });
       setSuccess("Mot de passe mis à jour. Les autres sessions ont été déconnectées.");
       setCurrent(""); setPwd(""); setPwd2("");
     } catch (err) {
