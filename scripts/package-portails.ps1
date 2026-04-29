@@ -141,14 +141,14 @@ $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
 New-Item -ItemType Directory -Path $adminShared -Force | Out-Null
 
-Copy-Item (Join-Path $PUB "admin-api\*.php")        $adminApi
-Copy-Item (Join-Path $PUB "db_config.php")          $adminShared
-Copy-Item (Join-Path $PUB "mailer.php")             $adminShared
-Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared
-Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared
-Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared
-Copy-Item (Join-Path $PUB "FPDF")                   $adminShared -Recurse
-Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse
+Copy-Item (Join-Path $PUB "admin-api\*.php")        $adminApi    -Force
+Copy-Item (Join-Path $PUB "db_config.php")          $adminShared -Force
+Copy-Item (Join-Path $PUB "mailer.php")             $adminShared -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared -Force
+Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared -Force
+Copy-Item (Join-Path $PUB "FPDF")                   $adminShared -Recurse -Force
+Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse -Force
 
 $adminHt = @"
 # IPEC - admin.ipec.school
