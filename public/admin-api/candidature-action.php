@@ -174,6 +174,8 @@ try {
         }
 
         case 'resend_email': {
+            admin_require_mailer();
+
             $envFile = __DIR__ . '/../../.ipec-mailer.env';
             if (!is_file($envFile)) api_error('Fichier .ipec-mailer.env introuvable.', 500);
             $env = [];
