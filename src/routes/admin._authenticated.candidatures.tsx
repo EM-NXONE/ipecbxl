@@ -52,8 +52,6 @@ function AdminCandidaturesListPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  if (showingDetail) return <Outlet />;
-
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -71,6 +69,8 @@ function AdminCandidaturesListPage() {
     }, q ? 250 : 0);
     return () => clearTimeout(t);
   }, [q, statut, payee, page, refreshKey]);
+
+  if (showingDetail) return <Outlet />;
 
   return (
     <div>
