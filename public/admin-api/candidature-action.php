@@ -79,16 +79,31 @@ try {
     switch ($action) {
 
         case 'mark_paid': {
+            $moyen = trim((string)($body['moyen_paiement'] ?? ''));
+            $date  = trim((string)($body['date_paiement'] ?? ''));
+            $allowedMoyens = ['virement', 'carte', 'especes', 'cheque', 'autre'];
+            if ($moyen === '' || !in_array($moyen, $allowedMoyens, true)) {
+                api_error('Moyen de paiement requis (virement, carte, especes, cheque, autre).', 400);
+            }
+            // Date au format YYYY-MM-DD ; on prend NOW() à défaut
+            $payeAt = null;
+            if ($date !== '') {
+                $d = DateTime::createFromFormat('Y-m-d', $date);
+                if (!$d) api_error('Date de paiement invalide (format YYYY-MM-DD).', 400);
+                $payeAt = $d->format('Y-m-d') . ' 12:00:00';
+            } else {
+                $payeAt = date('Y-m-d H:i:s');
+            }
             $pdo->prepare("UPDATE candidatures
-                           SET facture_payee=1, facture_payee_at=NOW(), facture_payee_par=?
+                           SET facture_payee=1, facture_payee_at=?, facture_payee_par=?
                            WHERE id=?")
-                ->execute([admin_current_user(), $id]);
+                ->execute([$payeAt, admin_current_user(), $id]);
             $pdo->prepare("UPDATE factures
-                           SET statut_paiement='payee', paye_at=NOW(), paye_par_admin=?
+                           SET statut_paiement='payee', paye_at=?, paye_par_admin=?, moyen_paiement=?
                            WHERE candidature_id=? AND type='frais_dossier'")
-                ->execute([admin_current_user(), $id]);
-            admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? ''));
-            api_json(['ok' => true, 'message' => 'Facture marquée comme payée.']);
+                ->execute([$payeAt, admin_current_user(), $moyen, $id]);
+            admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? '') . ' — ' . $moyen . ' le ' . substr($payeAt, 0, 10));
+            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').']);
         }
 
         case 'mark_unpaid': {
@@ -153,6 +168,24 @@ try {
                 'ok' => true,
                 'message' => "Nouveau lien d'activation généré.",
                 'activation_url' => etu_admin_activation_url($token),
+            ]);
+        }
+
+        case 'reset_password_etudiant': {
+            if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
+            $etuId = (int)$c['etudiant_id'];
+            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
+                           WHERE etudiant_id=? AND type='reset_password' AND used_at IS NULL")
+                ->execute([$etuId]);
+            // Bloque la connexion jusqu'à choix d'un nouveau mot de passe via le lien.
+            $pdo->prepare("UPDATE etudiants SET password_hash=NULL WHERE id=?")
+                ->execute([$etuId]);
+            $token = etudiant_create_token($pdo, $etuId, 'reset_password', 7 * 24 * 3600);
+            admin_log_action($id, 'reset_password_etudiant', 'Étudiant #' . $etuId);
+            api_json([
+                'ok' => true,
+                'message' => "Mot de passe réinitialisé. Communique le lien à l'étudiant.",
+                'activation_url' => 'https://lms.ipec.school/etudiant/reset/' . $token,
             ]);
         }
 

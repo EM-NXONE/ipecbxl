@@ -15,10 +15,7 @@ export const Route = createFileRoute("/etudiant/login")({
 function EtudiantLoginPage() {
   const { user, loading, login } = useEtudiantAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [nom, setNom] = useState("");
-  const [dateNaissance, setDateNaissance] = useState("");
+  const [numero, setNumero] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -40,10 +37,7 @@ function EtudiantLoginPage() {
     setSubmitting(true);
     try {
       await login({
-        email: email.trim().toLowerCase(),
-        prenom: prenom.trim(),
-        nom: nom.trim(),
-        date_naissance: dateNaissance,
+        numero_etudiant: numero.trim().toUpperCase(),
         password,
       });
       navigate({ to: "/etudiant" });
@@ -69,11 +63,23 @@ function EtudiantLoginPage() {
         )}
 
         <form onSubmit={onSubmit} className="space-y-4">
-          <Field id="email" label="Adresse e-mail" type="email" autoComplete="email" value={email} onChange={setEmail} />
-          <Field id="prenom" label="Prénom de l'étudiant" type="text" autoComplete="given-name" value={prenom} onChange={setPrenom} />
-          <Field id="nom" label="Nom de l'étudiant" type="text" autoComplete="family-name" value={nom} onChange={setNom} />
-          <Field id="date_naissance" label="Date de naissance" type="date" autoComplete="bday" value={dateNaissance} onChange={setDateNaissance} />
-          <Field id="password" label="Mot de passe" type="password" autoComplete="current-password" value={password} onChange={setPassword} />
+          <Field
+            id="numero_etudiant"
+            label="Numéro étudiant"
+            type="text"
+            autoComplete="username"
+            value={numero}
+            onChange={setNumero}
+            placeholder="IPEC-ETU-2026-XXXX"
+          />
+          <Field
+            id="password"
+            label="Mot de passe"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={setPassword}
+          />
 
           <button
             type="submit"
@@ -85,9 +91,14 @@ function EtudiantLoginPage() {
         </form>
 
         <div className="mt-6 space-y-2 text-center text-xs">
-          <Link to="/etudiant/mot-de-passe-oublie" className="text-blue hover:underline">
-            Mot de passe oublié ?
-          </Link>
+          <p className="text-muted-foreground">
+            Mot de passe oublié ? Contacte{" "}
+            <a href="mailto:admission@ipec.school" className="text-blue hover:underline">
+              admission@ipec.school
+            </a>
+            <br />
+            pour recevoir un nouveau lien d'activation.
+          </p>
           <p className="text-muted-foreground">
             Pas encore de compte ? Il est créé par l'administration de l'IPEC<br />
             après réception de ta candidature.
@@ -105,6 +116,7 @@ function Field({
   autoComplete,
   value,
   onChange,
+  placeholder,
 }: {
   id: string;
   label: string;
@@ -112,6 +124,7 @@ function Field({
   autoComplete?: string;
   value: string;
   onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <div>
@@ -122,6 +135,7 @@ function Field({
         id={id}
         type={type}
         autoComplete={autoComplete}
+        placeholder={placeholder}
         required
         value={value}
         onChange={(e) => onChange(e.target.value)}

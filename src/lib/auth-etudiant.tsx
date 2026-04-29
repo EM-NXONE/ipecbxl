@@ -15,10 +15,7 @@ export interface EtudiantUser {
 }
 
 interface LoginPayload {
-  email: string;
-  prenom: string;
-  nom: string;
-  date_naissance: string;
+  numero_etudiant: string;
   password: string;
 }
 
