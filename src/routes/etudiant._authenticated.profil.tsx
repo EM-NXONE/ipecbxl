@@ -113,9 +113,25 @@ function Field({ id, label, type, autoComplete, value, onChange, hint }: {
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">{label}</label>
-      <input id={id} type={type} autoComplete={autoComplete} required value={value} onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2.5 bg-input/40 border border-border rounded-sm text-cream focus:outline-none focus:ring-2 focus:ring-ring" />
+      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center justify-between gap-2">
+        <span>{label}</span>
+        {type === "password" && value.length > 0 && (
+          <span className="text-[10px] normal-case tracking-normal text-muted-foreground/70">{value.length} car.</span>
+        )}
+      </label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-2.5 bg-input/40 border border-border rounded-sm text-cream focus:outline-none focus:ring-2 focus:ring-ring"
+      />
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
