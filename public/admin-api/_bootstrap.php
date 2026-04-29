@@ -1,91 +1,140 @@
 <?php
 /**
- * IPEC — API administrateur (JSON).
+ * IPEC — Bootstrap API admin (admin.ipec.school/api/*)
  *
- * Bootstrap commun à tous les endpoints sous /api/ de admin.ipec.school.
- *
- * Architecture :
- * - Le React buildé statique est servi à la racine de admin.ipec.school.
- * - Les endpoints PHP sont sous admin.ipec.school/api/*.php
- * - Le React appelle fetch('/api/login.php', { credentials: 'include' })
- *   → même origine, cookies SameSite=Lax suffisent.
- *
- * Si tu déploies le React ailleurs (ex: ipecbxl.lovable.app) qui appelle
- * cette API en cross-origin, ajuste CORS_ALLOWED_ORIGINS et passe les
- * cookies en SameSite=None; Secure (voir admin_session_create).
+ * - Renvoie systématiquement du JSON (pas de HTML).
+ * - Réutilise les helpers existants déposés dans ./_shared/ :
+ *     db_config.php       → db()
+ *     mailer.php (AS_LIB) → buildCandidaturePdf, buildFacturePdf, buildCandidateConfirmationHtml
+ *     _pdf_classes.php    → IpecCandidaturePdf
+ *     _etudiants.php      → etudiant_create_from_candidature, etudiant_create_token, etc.
+ * - Sessions : PHP natives (cookie IPEC_ADMIN, httpOnly, SameSite=Lax).
+ * - Authentification : ADMIN_USERS (login/hash bcrypt) — config dans ./_shared/admin_users.php
+ *   pour pouvoir versionner ce bootstrap sans exposer les hashes.
  */
 
 declare(strict_types=1);
 
-// Réutilise la BDD et helpers du dossier admin existant
-require_once __DIR__ . '/../admin/_bootstrap.php';
+// ---------- Constantes ----------
+const ADMIN_SESSION_LIFETIME = 4 * 3600; // 4 h
 
-// ---------------------------------------------------------------------------
-// CORS — origines autorisées
-// ---------------------------------------------------------------------------
-const CORS_ALLOWED_ORIGINS = [
-    'https://admin.ipec.school',
-    'https://ipec.school',
-    'https://www.ipec.school',
-    // Dev Lovable (à retirer en prod stricte)
-    'https://ipecbxl.lovable.app',
+// ---------- Chargement des dépendances partagées ----------
+$SHARED = __DIR__ . '/_shared';
+require_once $SHARED . '/db_config.php';
+
+// Mailer + builders PDF en mode librairie (saute le pipeline HTTP du mailer)
+if (!defined('IPEC_MAILER_AS_LIB')) define('IPEC_MAILER_AS_LIB', true);
+require_once $SHARED . '/mailer.php';
+
+require_once $SHARED . '/_etudiants.php';
+
+// Comptes admin (fichier non versionné, à créer sur n0c) :
+//   <?php return ['admin' => '$2y$12$...hash_bcrypt...'];
+$adminUsersFile = $SHARED . '/admin_users.php';
+$ADMIN_USERS = is_file($adminUsersFile) ? (array)require $adminUsersFile : [];
+
+// Statuts métier (mêmes labels que l'ancien admin)
+const ADMIN_STATUTS = [
+    'recue'    => "Reçue",
+    'en_cours' => "En cours d'étude",
+    'validee'  => "Validée",
+    'refusee'  => "Refusée",
+    'annulee'  => "Annulée",
 ];
 
-function api_cors(): void {
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    if (in_array($origin, CORS_ALLOWED_ORIGINS, true)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Access-Control-Allow-Credentials: true');
-        header('Vary: Origin');
-    }
+// ---------- Session admin ----------
+ini_set('session.use_strict_mode', '1');
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_samesite', 'Lax');
+if (!empty($_SERVER['HTTPS'])) ini_set('session.cookie_secure', '1');
+session_name('IPEC_ADMIN');
+session_start();
+
+// ---------- CORS (même origine en prod, mais utile en dev Lovable) ----------
+$allowedOrigins = [
+    'https://admin.ipec.school',
+    'https://ipecbxl.lovable.app',
+    'https://id-preview--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app',
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Accept');
-    header('Access-Control-Max-Age: 86400');
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
-        http_response_code(204);
-        exit;
-    }
+    header('Vary: Origin');
+}
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
 }
 
-// ---------------------------------------------------------------------------
-// Helpers JSON
-// ---------------------------------------------------------------------------
+header('Content-Type: application/json; charset=utf-8');
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store');
 
-function api_json(array $data, int $status = 200): void {
+// ---------- Helpers JSON ----------
+function api_json($data, int $status = 200): void {
     http_response_code($status);
-    header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
-function api_error(string $message, int $status = 400): void {
-    api_json(['error' => $message], $status);
+function api_error(string $message, int $status = 400, array $extra = []): void {
+    api_json(['error' => $message] + $extra, $status);
+}
+
+function api_method(string ...$allowed): void {
+    if (!in_array($_SERVER['REQUEST_METHOD'] ?? '', $allowed, true)) {
+        api_error('Method not allowed', 405);
+    }
 }
 
 function api_body(): array {
     $raw = file_get_contents('php://input');
-    if (!$raw) return [];
+    if ($raw === '' || $raw === false) return [];
     $data = json_decode($raw, true);
-    return is_array($data) ? $data : [];
+    if (!is_array($data)) api_error('Invalid JSON body', 400);
+    return $data;
 }
 
-function api_method(string ...$allowed): void {
-    $m = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    if (!in_array($m, $allowed, true)) {
-        api_error('Méthode non autorisée', 405);
+// ---------- Auth admin ----------
+function admin_users(): array {
+    global $ADMIN_USERS;
+    return $ADMIN_USERS ?: [];
+}
+
+function admin_is_logged_in(): bool {
+    if (empty($_SESSION['admin_user']) || empty($_SESSION['admin_login_at'])) return false;
+    if (time() - (int)$_SESSION['admin_login_at'] > ADMIN_SESSION_LIFETIME) {
+        $_SESSION = [];
+        session_destroy();
+        return false;
+    }
+    return true;
+}
+
+function api_require_admin(): void {
+    if (!admin_is_logged_in()) api_error('Non authentifié', 401);
+}
+
+function admin_current_user(): string {
+    return (string)($_SESSION['admin_user'] ?? '');
+}
+
+function admin_log_action(int $candidatureId, string $action, ?string $detail = null): void {
+    try {
+        db()->prepare(
+            "INSERT INTO admin_actions (candidature_id, action, detail, admin_user, ip)
+             VALUES (?, ?, ?, ?, ?)"
+        )->execute([
+            $candidatureId,
+            $action,
+            $detail !== null ? mb_substr($detail, 0, 255) : null,
+            admin_current_user(),
+            $_SERVER['REMOTE_ADDR'] ?? null,
+        ]);
+    } catch (\Throwable $e) {
+        error_log('[admin-api] log_action failed: ' . $e->getMessage());
     }
 }
-
-// ---------------------------------------------------------------------------
-// Auth admin — réutilise les helpers admin_* de admin/_bootstrap.php
-// (admin_is_logged_in, admin_current_user, ADMIN_USERS)
-// ---------------------------------------------------------------------------
-
-function api_require_admin(): string {
-    if (!admin_is_logged_in()) {
-        api_error('Non authentifié', 401);
-    }
-    return admin_current_user();
-}
-
-api_cors();

@@ -1,17 +1,20 @@
 <?php
-/** GET /api/profil.php → infos détaillées de l'étudiant connecté */
+/**
+ * GET  /api/profil.php             → étudiant + candidature(s) liée(s)
+ * POST /api/change-password.php    → cf. fichier dédié
+ */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
-$u = api_require_etu();
+$u = api_require_etudiant();
+$pdo = db();
 
-$stmt = db()->prepare(
-    "SELECT id, numero_etudiant, civilite, prenom, nom, email,
-            date_naissance, nationalite, telephone,
-            statut, email_verifie, derniere_connexion, created_at
-     FROM etudiants WHERE id = ? LIMIT 1"
+$stmt = $pdo->prepare(
+    "SELECT id, email, civilite, prenom, nom, date_naissance, nationalite,
+            telephone, numero_etudiant, statut, derniere_connexion, created_at
+     FROM etudiants WHERE id=?"
 );
 $stmt->execute([$u['id']]);
 $etu = $stmt->fetch();
-if (!$etu) api_error('Profil introuvable', 404);
+if (!$etu) api_error('Compte introuvable', 404);
 
-api_json(['profil' => $etu]);
+api_json(['etudiant' => $etu]);

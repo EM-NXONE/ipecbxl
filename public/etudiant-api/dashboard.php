@@ -1,52 +1,61 @@
 <?php
-/** GET /api/dashboard.php → KPIs résumé pour la page d'accueil étudiant */
+/** GET /api/dashboard.php → dashboard étudiant complet */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
-$u = api_require_etu();
-
+$u = api_require_etudiant();
 $pdo = db();
 
-// Solde et nb factures
-$f = $pdo->prepare(
-    "SELECT
-        SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee') THEN montant_ttc_cents ELSE 0 END) AS du,
-        SUM(CASE WHEN statut_paiement = 'payee' THEN montant_ttc_cents ELSE 0 END) AS paye,
-        COUNT(*) AS total
-     FROM factures WHERE etudiant_id = ? AND visible_etudiant = 1"
+// Candidatures rattachées
+$cStmt = $pdo->prepare(
+    "SELECT id, reference, statut, programme, annee, specialisation,
+            annee_academique, rentree, created_at,
+            facture_numero, facture_payee
+     FROM candidatures WHERE etudiant_id = ?
+     ORDER BY created_at DESC"
 );
-$f->execute([$u['id']]);
-$rowF = $f->fetch() ?: ['du' => 0, 'paye' => 0, 'total' => 0];
+$cStmt->execute([$u['id']]);
+$candidatures = $cStmt->fetchAll();
 
-// Documents publiés
-$d = $pdo->prepare(
-    "SELECT COUNT(*) AS n FROM documents
-     WHERE etudiant_id = ? AND visible_etudiant = 1 AND statut = 'publie'"
+// Factures ouvertes
+$oStmt = $pdo->prepare(
+    "SELECT COUNT(*) AS n, COALESCE(SUM(montant_ttc_cents),0) AS s
+     FROM factures
+     WHERE etudiant_id = ? AND visible_etudiant=1
+       AND statut_paiement IN ('en_attente','partiellement_payee')"
 );
-$d->execute([$u['id']]);
-$nbDocs = (int)($d->fetchColumn() ?: 0);
+$oStmt->execute([$u['id']]);
+$ouvertes = $oStmt->fetch() ?: ['n' => 0, 's' => 0];
 
-// Dernières factures (3) et derniers documents (3)
-$lf = $pdo->prepare(
-    "SELECT id, numero, libelle, montant_ttc_cents, statut_paiement, date_emission
-     FROM factures WHERE etudiant_id = ? AND visible_etudiant = 1
-     ORDER BY date_emission DESC, id DESC LIMIT 3"
-);
-$lf->execute([$u['id']]);
+// Compteur documents
+$nStmt = $pdo->prepare("SELECT COUNT(*) FROM documents
+                        WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'");
+$nStmt->execute([$u['id']]);
+$nbDocs = (int)$nStmt->fetchColumn();
 
-$ld = $pdo->prepare(
-    "SELECT id, reference, type, titre, date_emission
-     FROM documents WHERE etudiant_id = ? AND visible_etudiant = 1 AND statut = 'publie'
-     ORDER BY date_emission DESC, id DESC LIMIT 3"
-);
-$ld->execute([$u['id']]);
+// Dernières factures
+$fStmt = $pdo->prepare("SELECT * FROM factures
+                        WHERE etudiant_id=? AND visible_etudiant=1
+                        ORDER BY date_emission DESC, id DESC LIMIT 5");
+$fStmt->execute([$u['id']]);
+$lastFact = $fStmt->fetchAll();
+
+// Derniers documents
+$dStmt = $pdo->prepare("SELECT * FROM documents
+                        WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'
+                        ORDER BY date_emission DESC, id DESC LIMIT 5");
+$dStmt->execute([$u['id']]);
+$lastDocs = $dStmt->fetchAll();
 
 api_json([
     'kpis' => [
-        'total_du_cents'   => (int)($rowF['du'] ?? 0),
-        'total_paye_cents' => (int)($rowF['paye'] ?? 0),
-        'nb_factures'      => (int)($rowF['total'] ?? 0),
-        'nb_documents'     => $nbDocs,
+        'numero_etudiant' => $u['numero_etudiant'],
+        'nb_candidatures' => count($candidatures),
+        'statut_dossier'  => $candidatures[0]['statut'] ?? null,
+        'solde_du_cents'  => (int)$ouvertes['s'],
+        'nb_factures_ouvertes' => (int)$ouvertes['n'],
+        'nb_documents'    => $nbDocs,
     ],
-    'last_factures'  => $lf->fetchAll(),
-    'last_documents' => $ld->fetchAll(),
+    'candidatures'   => $candidatures,
+    'last_factures'  => $lastFact,
+    'last_documents' => $lastDocs,
 ]);

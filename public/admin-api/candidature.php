@@ -1,10 +1,9 @@
 <?php
 /**
- * GET /api/candidature.php?id=N → détail complet :
- *   candidature, etudiant (si rattaché), etudiant_homonyme (si détecté), historique, statuts
+ * GET /api/candidature.php?id=N
+ *   → { candidature, etudiant, homonyme, historique, statuts }
  */
 require_once __DIR__ . '/_bootstrap.php';
-require_once __DIR__ . '/../admin/_etudiants.php';
 api_method('GET');
 api_require_admin();
 
@@ -17,18 +16,24 @@ $stmt->execute([$id]);
 $cand = $stmt->fetch();
 if (!$cand) api_error('Candidature introuvable', 404);
 
+// Étudiant rattaché
 $etudiant = null;
 if (!empty($cand['etudiant_id'])) {
-    $eStmt = $pdo->prepare("SELECT id, numero_etudiant, civilite, prenom, nom, email,
-                                   date_naissance, statut, password_hash IS NOT NULL AS active,
-                                   derniere_connexion, cree_par_admin, created_at
-                            FROM etudiants WHERE id = ?");
+    $eStmt = $pdo->prepare(
+        "SELECT id, numero_etudiant, civilite, prenom, nom, email,
+                date_naissance, statut,
+                (password_hash IS NOT NULL) AS active,
+                derniere_connexion, cree_par_admin, created_at
+         FROM etudiants WHERE id = ?"
+    );
     $eStmt->execute([(int)$cand['etudiant_id']]);
     $etudiant = $eStmt->fetch() ?: null;
 }
+
+// Détection homonyme par identité civile (si pas déjà rattaché)
 $homonyme = null;
 if (!$etudiant) {
-    $h = etudiant_find_by_identity($pdo, (string)$cand['prenom'], (string)$cand['nom'], (string)$cand['date_naissance']);
+    $h = etudiant_find_by_identity($pdo, (string)$cand['prenom'], (string)$cand['nom'], (string)($cand['date_naissance'] ?? ''));
     if ($h) {
         $homonyme = [
             'id' => (int)$h['id'],
@@ -39,9 +44,12 @@ if (!$etudiant) {
     }
 }
 
-$histStmt = $pdo->prepare("SELECT id, action, detail, admin_user, ip, created_at
-                           FROM admin_actions WHERE candidature_id = ?
-                           ORDER BY created_at DESC LIMIT 50");
+// Historique
+$histStmt = $pdo->prepare(
+    "SELECT id, action, detail, admin_user, ip, created_at
+     FROM admin_actions WHERE candidature_id = ?
+     ORDER BY created_at DESC LIMIT 100"
+);
 $histStmt->execute([$id]);
 
 api_json([

@@ -1,5 +1,5 @@
 <?php
-/** GET /api/etudiants.php?q=... → liste des étudiants */
+/** GET /api/etudiants.php?q=... → liste des étudiants (max 200) */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
 api_require_admin();
@@ -15,7 +15,8 @@ if ($q !== '') {
 $pdo = db();
 $stmt = $pdo->prepare("
     SELECT id, numero_etudiant, civilite, prenom, nom, email,
-           date_naissance, statut, password_hash IS NOT NULL AS active,
+           date_naissance, statut,
+           (password_hash IS NOT NULL) AS active,
            derniere_connexion, created_at, cree_par_admin
     FROM etudiants
     $where
