@@ -28,7 +28,7 @@ function ActiverPage() {
     }
     setSubmitting(true);
     try {
-      await etuApi.post("/activer.php", { token, password: pwd });
+      await etuApi.post("/activer.php", { token, password: pwd, password2: pwd2 });
       navigate({ to: "/etudiant/login" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Lien invalide ou expiré.");
