@@ -16,7 +16,7 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
     }
 
     class IpecCandidaturePdf extends FPDF {
-        /** @var string 'candidature' | 'facture' */
+        /** @var string 'candidature' | 'facture' | 'recu' */
         public $docKind = 'candidature';
         /** @var string */
         public $factureNumero = '';
@@ -24,6 +24,8 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
         public $reference = '';
         /** @var string Référence unique de facture (IPEC-FACT-AAAA-XXXXXX) */
         public $referenceFacture = '';
+        /** @var string Référence unique de reçu de paiement (IPEC-RECU-AAAA-XXXXXX) */
+        public $recuNumero = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
