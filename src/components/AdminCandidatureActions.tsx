@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
+import { CheckCircle2, KeyRound, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
 import { adminApi } from "@/lib/api";
 
 export interface AdminActionResult {
@@ -10,7 +10,7 @@ export interface AdminActionResult {
 export function adminActionMessage(result: AdminActionResult): string {
   return [
     result.message || "Action effectuée.",
-    result.activation_url ? `Lien d'activation : ${result.activation_url}` : "",
+    result.activation_url ? `Lien : ${result.activation_url}` : "",
   ].filter(Boolean).join(" ");
 }
 
@@ -23,6 +23,14 @@ interface AdminCandidatureActionsProps {
   onError?: (message: string, action: string) => void;
 }
 
+const MOYENS = [
+  { value: "virement", label: "Virement bancaire" },
+  { value: "carte", label: "Carte bancaire" },
+  { value: "especes", label: "Espèces" },
+  { value: "cheque", label: "Chèque" },
+  { value: "autre", label: "Autre" },
+];
+
 export function AdminCandidatureActions({
   id,
   paid,
@@ -32,14 +40,18 @@ export function AdminCandidatureActions({
   onError,
 }: AdminCandidatureActionsProps) {
   const [busy, setBusy] = useState<string | null>(null);
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [moyen, setMoyen] = useState<string>("virement");
+  const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const isPaid = Boolean(Number(paid));
 
-  const runAction = async (action: string) => {
+  const runAction = async (action: string, body?: Record<string, unknown>) => {
     setBusy(action);
     try {
       const result = await adminApi.post<AdminActionResult>("/candidature-action.php", {
         id: Number(id),
         action,
+        ...body,
       });
       onDone?.(result, action);
     } catch (e) {
@@ -54,42 +66,113 @@ export function AdminCandidatureActions({
     : "inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40 disabled:opacity-50";
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <button
-        type="button"
-        onClick={() => runAction("resend_email")}
-        disabled={busy !== null}
-        className={buttonClass}
-        title="Renvoyer l'e-mail au candidat"
-        aria-label="Renvoyer l'e-mail au candidat"
-      >
-        <Mail size={compact ? 14 : 15} />
-        {!compact && <span>{busy === "resend_email" ? "…" : "Renvoyer e-mail"}</span>}
-      </button>
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => runAction("resend_email")}
+          disabled={busy !== null}
+          className={buttonClass}
+          title="Renvoyer l'e-mail au candidat"
+          aria-label="Renvoyer l'e-mail au candidat"
+        >
+          <Mail size={compact ? 14 : 15} />
+          {!compact && <span>{busy === "resend_email" ? "…" : "Renvoyer e-mail"}</span>}
+        </button>
 
-      <button
-        type="button"
-        onClick={() => runAction(isPaid ? "mark_unpaid" : "mark_paid")}
-        disabled={busy !== null}
-        className={buttonClass}
-        title={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
-        aria-label={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
-      >
-        {isPaid ? <XCircle size={compact ? 14 : 15} /> : <CheckCircle2 size={compact ? 14 : 15} />}
-        {!compact && <span>{busy === "mark_paid" || busy === "mark_unpaid" ? "…" : isPaid ? "Annuler paiement" : "Marquer payé"}</span>}
-      </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (isPaid) runAction("mark_unpaid");
+            else setShowPayModal(true);
+          }}
+          disabled={busy !== null}
+          className={buttonClass}
+          title={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
+          aria-label={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
+        >
+          {isPaid ? <XCircle size={compact ? 14 : 15} /> : <CheckCircle2 size={compact ? 14 : 15} />}
+          {!compact && <span>{busy === "mark_paid" || busy === "mark_unpaid" ? "…" : isPaid ? "Annuler paiement" : "Marquer payé"}</span>}
+        </button>
 
-      <button
-        type="button"
-        onClick={() => runAction(hasEtudiant ? "sync_documents" : "create_etudiant")}
-        disabled={busy !== null}
-        className={buttonClass}
-        title={hasEtudiant ? "Synchroniser les documents" : "Créer le compte étudiant"}
-        aria-label={hasEtudiant ? "Synchroniser les documents" : "Créer le compte étudiant"}
-      >
-        {hasEtudiant ? <RefreshCw size={compact ? 14 : 15} /> : <UserPlus size={compact ? 14 : 15} />}
-        {!compact && <span>{busy === "create_etudiant" || busy === "sync_documents" ? "…" : hasEtudiant ? "Sync documents" : "Créer étudiant"}</span>}
-      </button>
-    </div>
+        <button
+          type="button"
+          onClick={() => runAction(hasEtudiant ? "sync_documents" : "create_etudiant")}
+          disabled={busy !== null}
+          className={buttonClass}
+          title={hasEtudiant ? "Synchroniser les documents" : "Créer le compte étudiant"}
+          aria-label={hasEtudiant ? "Synchroniser les documents" : "Créer le compte étudiant"}
+        >
+          {hasEtudiant ? <RefreshCw size={compact ? 14 : 15} /> : <UserPlus size={compact ? 14 : 15} />}
+          {!compact && <span>{busy === "create_etudiant" || busy === "sync_documents" ? "…" : hasEtudiant ? "Sync documents" : "Créer étudiant"}</span>}
+        </button>
+
+        {hasEtudiant && (
+          <button
+            type="button"
+            onClick={() => {
+              if (!confirm("Réinitialiser le mot de passe de cet étudiant ? Un nouveau lien sera généré.")) return;
+              runAction("reset_password_etudiant");
+            }}
+            disabled={busy !== null}
+            className={buttonClass}
+            title="Réinitialiser le mot de passe étudiant"
+            aria-label="Réinitialiser le mot de passe étudiant"
+          >
+            <KeyRound size={compact ? 14 : 15} />
+            {!compact && <span>{busy === "reset_password_etudiant" ? "…" : "Reset mdp"}</span>}
+          </button>
+        )}
+      </div>
+
+      {showPayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowPayModal(false)}>
+          <div className="bg-card border border-border/40 rounded-md p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display text-lg text-cream mb-4">Marquer la facture comme payée</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">Moyen de paiement</label>
+                <select
+                  value={moyen}
+                  onChange={(e) => setMoyen(e.target.value)}
+                  className="w-full px-3 py-2 bg-input/40 border border-border rounded-sm text-cream text-sm"
+                >
+                  {MOYENS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">Date du paiement</label>
+                <input
+                  type="date"
+                  value={datePaiement}
+                  onChange={(e) => setDatePaiement(e.target.value)}
+                  className="w-full px-3 py-2 bg-input/40 border border-border rounded-sm text-cream text-sm"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPayModal(false)}
+                  className="px-3 py-2 rounded-sm border border-border/40 text-sm text-muted-foreground hover:text-cream"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  disabled={busy === "mark_paid"}
+                  onClick={async () => {
+                    await runAction("mark_paid", { moyen_paiement: moyen, date_paiement: datePaiement });
+                    setShowPayModal(false);
+                  }}
+                  className="px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                >
+                  {busy === "mark_paid" ? "Enregistrement…" : "Confirmer le paiement"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
