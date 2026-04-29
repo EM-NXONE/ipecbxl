@@ -151,13 +151,22 @@ function etu_layout_end(?array $user = null): void {
 <script>
 (function(){
     var btn = document.getElementById('etuThemeToggle');
-    if (!btn) return;
-    btn.addEventListener('click', function(){
+    if (btn) btn.addEventListener('click', function(){
         var cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
         var next = cur === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         try { localStorage.setItem('ipec-etu-theme', next); } catch(e){}
     });
+    var h=document.getElementById('etuHamburger'),
+        bd=document.getElementById('etuDrawerBackdrop'),
+        dr=document.getElementById('etuDrawer'),
+        cl=document.getElementById('etuDrawerClose');
+    function open(){document.body.classList.add('drawer-open');h&&h.setAttribute('aria-expanded','true');dr&&dr.setAttribute('aria-hidden','false');}
+    function close(){document.body.classList.remove('drawer-open');h&&h.setAttribute('aria-expanded','false');dr&&dr.setAttribute('aria-hidden','true');}
+    if(h)h.addEventListener('click',function(){document.body.classList.contains('drawer-open')?close():open();});
+    if(bd)bd.addEventListener('click',close);
+    if(cl)cl.addEventListener('click',close);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 })();
 </script>
 </body>
