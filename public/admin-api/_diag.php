@@ -40,6 +40,31 @@ foreach ($expected as $rel) {
     ];
 }
 
+// Test de chargement du bootstrap lui-même (capture toute sortie / erreur)
+$bootstrapPath = __DIR__ . '/_bootstrap.php';
+if (is_file($bootstrapPath)) {
+    ob_start();
+    $prevError = null;
+    set_error_handler(function($no, $msg, $file, $line) use (&$prevError) {
+        $prevError = "ERR $no: $msg @ $file:$line";
+        return true;
+    });
+    try {
+        // On ne peut pas réellement require _bootstrap (il enverrait headers/exit).
+        // À la place, on lit son contenu et vérifie un php -l logique : token_get_all + parse.
+        $code = file_get_contents($bootstrapPath);
+        $tokens = @token_get_all($code, TOKEN_PARSE);
+        $out['bootstrap_parse'] = is_array($tokens) ? 'OK (' . count($tokens) . ' tokens)' : 'PARSE FAILED';
+    } catch (\Throwable $e) {
+        $out['bootstrap_parse'] = 'THROW: ' . $e->getMessage();
+    }
+    restore_error_handler();
+    ob_end_clean();
+    if ($prevError) $out['bootstrap_parse_error'] = $prevError;
+} else {
+    $out['bootstrap_parse'] = 'MISSING';
+}
+
 // Test require de db_config + admin_users (les deux suspects principaux)
 foreach (['db_config.php', 'admin_users.php'] as $rel) {
     $path = $shared . '/' . $rel;
