@@ -49,7 +49,7 @@ function AdminCandidatureDetailPage() {
     setMsg(null);
     setError(null);
     try {
-      const res = await adminApi.post<{ message?: string; activation_url?: string | null }>("/candidature-action.php", { id: Number(id), action, ...body });
+      const res = await adminApi.post<{ message?: string; default_password?: string | null }>("/candidature-action.php", { id: Number(id), action, ...body });
       setMsg(adminActionMessage(res));
       reload();
     } catch (e) {
