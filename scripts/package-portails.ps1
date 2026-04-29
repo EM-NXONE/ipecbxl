@@ -17,8 +17,8 @@ if (Test-Path $DIST)  { Remove-Item $DIST  -Recurse -Force }
 if (Test-Path $BUILD) { Remove-Item $BUILD -Recurse -Force }
 New-Item -ItemType Directory -Path $DIST, $BUILD | Out-Null
 
-function Build-Static {
-    param([string]$Target, [string]$OutDir)
+function Invoke-Build {
+    param([string]$Target)
     Write-Host "==> Build statique [$Target]"
     if (Test-Path (Join-Path $ROOT "dist"))    { Remove-Item (Join-Path $ROOT "dist")    -Recurse -Force }
     if (Test-Path (Join-Path $ROOT ".output")) { Remove-Item (Join-Path $ROOT ".output") -Recurse -Force }
@@ -31,15 +31,40 @@ function Build-Static {
         Remove-Item Env:STATIC_BUILD -ErrorAction SilentlyContinue
         Pop-Location
     }
-    New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+}
+
+function Get-BuildOutputDir {
     $outputPublic = Join-Path $ROOT ".output\public"
     $distFolder   = Join-Path $ROOT "dist"
-    if (Test-Path $outputPublic) {
-        Copy-Item "$outputPublic\*" $OutDir -Recurse -Force
-    } elseif (Test-Path $distFolder) {
-        Copy-Item "$distFolder\*" $OutDir -Recurse -Force
-    } else {
-        throw "Aucune sortie de build trouvee pour $Target"
+    if (Test-Path $outputPublic) { return $outputPublic }
+    if (Test-Path $distFolder)   { return $distFolder }
+    throw "Aucune sortie de build trouvee"
+}
+
+# Copie le bundle, mais en ne gardant que les .html "autorises" a la racine.
+# Les assets JS/CSS/img (sous _build, assets, etc.) sont toujours copies tels quels.
+function Copy-BundleFiltered {
+    param(
+        [string]$Source,
+        [string]$Dest,
+        [string[]]$AllowedHtml  # noms de fichiers HTML autorises a la racine, ex: @("index.html","login.html")
+    )
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+
+    # 1) tous les sous-dossiers (assets etc.) : copie integrale
+    Get-ChildItem -Path $Source -Directory | ForEach-Object {
+        Copy-Item $_.FullName $Dest -Recurse -Force
+    }
+    # 2) fichiers a la racine : on filtre les .html
+    Get-ChildItem -Path $Source -File | ForEach-Object {
+        $name = $_.Name
+        if ($name -like "*.html") {
+            if ($AllowedHtml -contains $name) {
+                Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+            }
+        } else {
+            Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+        }
     }
 }
 
@@ -55,10 +80,14 @@ function Zip-Folder {
 }
 
 # -------------------------------------------------------------------
-# 1) site.zip - www.ipec.school
+# 1) site.zip - www.ipec.school  (toutes les pages publiques prerendues)
 # -------------------------------------------------------------------
 $SITE = Join-Path $BUILD "site"
-Build-Static -Target "site" -OutDir $SITE
+Invoke-Build -Target "site"
+$siteOut = Get-BuildOutputDir
+# Pour le site : on garde TOUS les .html (toutes les pages publiques sont prerendues)
+New-Item -ItemType Directory -Path $SITE -Force | Out-Null
+Copy-Item "$siteOut\*" $SITE -Recurse -Force
 
 Copy-Item (Join-Path $PUB "mailer.php")        $SITE
 Copy-Item (Join-Path $PUB "db_config.php")     $SITE
@@ -66,16 +95,14 @@ Copy-Item (Join-Path $PUB "verify.php")        $SITE
 Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE
 Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse
 Copy-Item (Join-Path $PUB "PHPMailer")         $SITE -Recurse
-Copy-Item (Join-Path $PUB "admin")             $SITE -Recurse
-Copy-Item (Join-Path $PUB "etudiant")          $SITE -Recurse
 
 $siteHt = @"
-# IPEC - www.ipec.school - pages prerendues + fallback SPA + endpoints PHP
+# IPEC - www.ipec.school
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
-RewriteRule ^(mailer\.php|verify\.php|admin(/|$)|etudiant(/|$)|FPDF/|PHPMailer/) - [L]
+RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
 <FilesMatch "(^db_config\.php$|^_etudiants\.php$|^_pdf_classes\.php$)">
@@ -88,10 +115,17 @@ Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
 Write-Host "==> dist\site.zip OK"
 
 # -------------------------------------------------------------------
-# 2) admin.zip - admin.ipec.school
+# 2) admin.zip - admin.ipec.school  (seul login.html prerendu, reste = SPA)
 # -------------------------------------------------------------------
 $ADMIN = Join-Path $BUILD "admin"
-Build-Static -Target "admin" -OutDir $ADMIN
+Invoke-Build -Target "admin"
+$adminOut = Get-BuildOutputDir
+# On copie uniquement les HTML utiles : index.html (SPA fallback) + admin/login si present
+Copy-BundleFiltered -Source $adminOut -Dest $ADMIN -AllowedHtml @("index.html", "200.html", "404.html")
+
+# Si TanStack a emis admin/login.html dans un sous-dossier, on le garde tel quel via la copie des dossiers,
+# sinon le fallback SPA prendra le relais.
+
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
 New-Item -ItemType Directory -Path $adminShared -Force | Out-Null
@@ -120,10 +154,13 @@ Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
 Write-Host "==> dist\admin.zip OK"
 
 # -------------------------------------------------------------------
-# 3) lms.zip - lms.ipec.school
+# 3) lms.zip - lms.ipec.school  (login + mot-de-passe-oublie prerendus, reste = SPA)
 # -------------------------------------------------------------------
 $LMS = Join-Path $BUILD "lms"
-Build-Static -Target "etu" -OutDir $LMS
+Invoke-Build -Target "etu"
+$lmsOut = Get-BuildOutputDir
+Copy-BundleFiltered -Source $lmsOut -Dest $LMS -AllowedHtml @("index.html", "200.html", "404.html")
+
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
 New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
