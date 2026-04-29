@@ -16,15 +16,30 @@ $cStmt = $pdo->prepare(
 $cStmt->execute([$u['id']]);
 $candidatures = $cStmt->fetchAll();
 
-// Factures ouvertes
-$oStmt = $pdo->prepare(
-    "SELECT COUNT(*) AS n, COALESCE(SUM(montant_ttc_cents),0) AS s
-     FROM factures
-     WHERE etudiant_id = ? AND visible_etudiant=1
-       AND statut_paiement IN ('en_attente','partiellement_payee')"
-);
-$oStmt->execute([$u['id']]);
-$ouvertes = $oStmt->fetch() ?: ['n' => 0, 's' => 0];
+// --- Agrégats factures ----------------------------------------------------
+// Total dû    = somme des factures visibles, hors annulées/remboursées
+// Total payé  = somme des factures visibles dont statut_paiement='payee'
+// Nb factures = toutes les factures visibles (sert au KPI "Factures")
+// Nb ouvertes = factures en attente / partiellement payées (compat)
+$aStmt = $pdo->prepare("
+    SELECT
+        COUNT(*)                                                        AS nb_total,
+        COALESCE(SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee','payee')
+                          THEN montant_ttc_cents ELSE 0 END), 0)        AS total_du,
+        COALESCE(SUM(CASE WHEN statut_paiement = 'payee'
+                          THEN montant_ttc_cents ELSE 0 END), 0)        AS total_paye,
+        SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee')
+                 THEN 1 ELSE 0 END)                                     AS nb_ouvertes,
+        COALESCE(SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee')
+                          THEN montant_ttc_cents ELSE 0 END), 0)        AS solde_du
+    FROM factures
+    WHERE etudiant_id = ? AND visible_etudiant = 1
+");
+$aStmt->execute([$u['id']]);
+$agg = $aStmt->fetch() ?: [
+    'nb_total' => 0, 'total_du' => 0, 'total_paye' => 0,
+    'nb_ouvertes' => 0, 'solde_du' => 0,
+];
 
 // Compteur documents
 $nStmt = $pdo->prepare("SELECT COUNT(*) FROM documents
@@ -47,13 +62,27 @@ $dStmt->execute([$u['id']]);
 $lastDocs = $dStmt->fetchAll();
 
 api_json([
+    // Profil light pour l'en-tête (le React utilise déjà /me.php, c'est en bonus)
+    'etudiant' => [
+        'id'               => (int)$u['id'],
+        'numero_etudiant'  => $u['numero_etudiant'] ?? null,
+        'prenom'           => $u['prenom'] ?? null,
+        'nom'              => $u['nom'] ?? null,
+        'email'            => $u['email'] ?? null,
+    ],
     'kpis' => [
-        'numero_etudiant' => $u['numero_etudiant'],
-        'nb_candidatures' => count($candidatures),
-        'statut_dossier'  => $candidatures[0]['statut'] ?? null,
-        'solde_du_cents'  => (int)$ouvertes['s'],
-        'nb_factures_ouvertes' => (int)$ouvertes['n'],
-        'nb_documents'    => $nbDocs,
+        // Nouveaux champs attendus par le React
+        'total_du_cents'        => (int)$agg['total_du'],
+        'total_paye_cents'      => (int)$agg['total_paye'],
+        'nb_factures'           => (int)$agg['nb_total'],
+        'nb_documents'          => $nbDocs,
+
+        // Champs historiques conservés pour rétro-compat (admin/PHP)
+        'numero_etudiant'       => $u['numero_etudiant'] ?? null,
+        'nb_candidatures'       => count($candidatures),
+        'statut_dossier'        => $candidatures[0]['statut'] ?? null,
+        'solde_du_cents'        => (int)$agg['solde_du'],
+        'nb_factures_ouvertes'  => (int)$agg['nb_ouvertes'],
     ],
     'candidatures'   => $candidatures,
     'last_factures'  => $lastFact,
