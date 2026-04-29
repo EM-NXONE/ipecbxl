@@ -174,6 +174,7 @@ cp "$PUB/mailer.php"            "$ADMIN/api/_shared/"
 cp "$PUB/_pdf_classes.php"      "$ADMIN/api/_shared/"
 cp "$PUB/_shared/cors.php"      "$ADMIN/api/_shared/"
 cp "$PUB/admin/_etudiants.php"  "$ADMIN/api/_shared/"
+cp "$PUB/ipec-logo-email.png"   "$ADMIN/api/_shared/"
 cp -R "$PUB/FPDF"               "$ADMIN/api/_shared/"
 cp -R "$PUB/PHPMailer"          "$ADMIN/api/_shared/"
 
