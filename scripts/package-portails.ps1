@@ -12,7 +12,14 @@
 #   - admin -> /admin/login prerendu, le reste en SPA fallback
 #   - etu   -> /etudiant/login + /etudiant/mot-de-passe-oublie prerendus
 #
-# Usage :  powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1
+# Usage :
+#   powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1
+#   powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1 -Target all|site|admin|lms
+
+param(
+    [ValidateSet("all","site","admin","lms","")]
+    [string]$Target = ""
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -21,9 +28,39 @@ $DIST  = Join-Path $ROOT "packages"   # IMPORTANT: pas "dist" car vite build ecr
 $PUB   = Join-Path $ROOT "public"
 $BUILD = Join-Path $ROOT "dist-build"
 
-if (Test-Path $DIST)  { Remove-Item $DIST  -Recurse -Force }
+# --- Selection de la cible ---------------------------------------------------
+if (-not $Target) {
+    Write-Host "Que veux-tu construire ?"
+    Write-Host "  1) all   - les 3 ZIP (site + admin + lms)"
+    Write-Host "  2) site  - uniquement www.ipec.school"
+    Write-Host "  3) admin - uniquement admin.ipec.school"
+    Write-Host "  4) lms   - uniquement lms.ipec.school"
+    $choice = Read-Host "Choix [1-4] (defaut 1)"
+    switch ($choice) {
+        ""      { $Target = "all" }
+        "1"     { $Target = "all" }
+        "all"   { $Target = "all" }
+        "2"     { $Target = "site" }
+        "site"  { $Target = "site" }
+        "3"     { $Target = "admin" }
+        "admin" { $Target = "admin" }
+        "4"     { $Target = "lms" }
+        "lms"   { $Target = "lms" }
+        default { throw "Choix invalide : $choice" }
+    }
+}
+function Should-Build([string]$Name) { return ($Target -eq "all" -or $Target -eq $Name) }
+Write-Host "==> Cible selectionnee : $Target"
+
 if (Test-Path $BUILD) { Remove-Item $BUILD -Recurse -Force }
-New-Item -ItemType Directory -Path $DIST, $BUILD | Out-Null
+New-Item -ItemType Directory -Path $DIST, $BUILD -Force | Out-Null
+# On preserve $DIST mais on supprime les zips qui vont etre reconstruits
+foreach ($n in @("site","admin","lms")) {
+    if (Should-Build $n) {
+        $z = Join-Path $DIST "$n.zip"
+        if (Test-Path $z) { Remove-Item $z -Force }
+    }
+}
 
 function Invoke-TargetBuild {
     param([string]$Target)
