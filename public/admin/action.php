@@ -94,6 +94,33 @@ try {
             echo $pdf; exit;
         }
 
+        case 'download_recu': {
+            $stmtF = $pdo->prepare(
+                "SELECT numero, montant_ttc_cents, paye_at, moyen_paiement, reference_paiement, statut_paiement
+                 FROM factures WHERE candidature_id = ? AND type = 'frais_dossier' LIMIT 1"
+            );
+            $stmtF->execute([$id]);
+            $fact = $stmtF->fetch();
+            if (!$fact) throw new RuntimeException('Facture introuvable pour cette candidature.');
+            if (($fact['statut_paiement'] ?? '') !== 'payee') {
+                throw new RuntimeException('La facture n\'est pas encore marquée comme payée.');
+            }
+            $recuFields = $factureFields;
+            $recuFields['reference_facture']  = $fact['numero'];
+            $recuFields['paye_at']            = $fact['paye_at'];
+            $recuFields['moyen_paiement']     = $fact['moyen_paiement'];
+            $recuFields['reference_paiement'] = $fact['reference_paiement'];
+            $recuFields['montant_ttc_cents']  = (int)$fact['montant_ttc_cents'];
+            $recuFields['specialisation']     = $c['specialisation'];
+            [$pdf, $filename, $recuNumero] = buildRecuPaiementPdf($recuFields);
+            if ($pdf === '') throw new RuntimeException('Génération PDF reçu vide.');
+            admin_log_action($id, 'download_recu', $filename);
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($pdf));
+            echo $pdf; exit;
+        }
+
         case 'mark_paid': {
             admin_csrf_check();
             $pdo->prepare("UPDATE candidatures SET facture_payee=1, facture_payee_at=NOW(), facture_payee_par=? WHERE id=?")

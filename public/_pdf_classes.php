@@ -16,7 +16,7 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
     }
 
     class IpecCandidaturePdf extends FPDF {
-        /** @var string 'candidature' | 'facture' */
+        /** @var string 'candidature' | 'facture' | 'recu' */
         public $docKind = 'candidature';
         /** @var string */
         public $factureNumero = '';
@@ -24,6 +24,8 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
         public $reference = '';
         /** @var string Référence unique de facture (IPEC-FACT-AAAA-XXXXXX) */
         public $referenceFacture = '';
+        /** @var string Référence unique de reçu de paiement (IPEC-RECU-AAAA-XXXXXX) */
+        public $recuNumero = '';
         public function Footer() {
             $tr = function (string $s): string {
                 $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
@@ -37,9 +39,15 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
             $this->SetFont('Helvetica', '', 8);
             $this->SetTextColor(91, 100, 120);
             $this->Cell(0, 4, $tr("Institut Privé des Études Commerciales ASBL  ·  Chaussée d'Alsemberg 897, 1180 Uccle, Belgique"), 0, 1, 'C');
-            $contactEmail = $this->docKind === 'facture' ? 'finance@ipec.school' : 'admission@ipec.school';
+            $contactEmail = ($this->docKind === 'facture' || $this->docKind === 'recu') ? 'finance@ipec.school' : 'admission@ipec.school';
             $this->Cell(0, 4, $tr($contactEmail . "  ·  www.ipec.school"), 0, 1, 'C');
-            $refToShow = $this->docKind === 'facture' ? $this->referenceFacture : $this->reference;
+            if ($this->docKind === 'recu') {
+                $refToShow = $this->recuNumero;
+            } elseif ($this->docKind === 'facture') {
+                $refToShow = $this->referenceFacture;
+            } else {
+                $refToShow = $this->reference;
+            }
             if ($refToShow !== '') {
                 $this->SetFont('Helvetica', '', 7);
                 $this->SetTextColor(44, 93, 219);
@@ -48,7 +56,11 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
             $this->Ln(1);
             $this->SetFont('Helvetica', 'I', 8);
             $this->SetTextColor(124, 138, 168);
-            if ($this->docKind === 'facture') {
+            if ($this->docKind === 'recu') {
+                $label = $this->recuNumero !== ''
+                    ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
+                    : 'Reçu de paiement — Pièce justificative';
+            } elseif ($this->docKind === 'facture') {
                 $label = $this->factureNumero !== ''
                     ? 'Facture n° ' . $this->factureNumero
                     : 'Facture';

@@ -60,6 +60,9 @@ admin_flash();
 <div class="actions-bar">
     <a class="btn" href="action.php?do=download_candidature&id=<?= $id ?>">📄 Télécharger PDF candidature</a>
     <a class="btn" href="action.php?do=download_facture&id=<?= $id ?>">🧾 Télécharger PDF facture</a>
+    <?php if ((int)$c['facture_payee'] === 1): ?>
+        <a class="btn" href="action.php?do=download_recu&id=<?= $id ?>">✅ Télécharger reçu de paiement</a>
+    <?php endif; ?>
 
     <form method="POST" action="action.php" style="display:inline;"
           onsubmit="return confirm('Renvoyer l\'e-mail de confirmation au candidat (avec les 2 PDF) ?');">

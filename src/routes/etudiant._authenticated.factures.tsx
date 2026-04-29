@@ -137,12 +137,22 @@ function EtudiantFacturesPage() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <a
-                            href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-                            className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
-                          >
-                            <Download size={12} /> PDF
-                          </a>
+                          <div className="flex flex-col items-end gap-1">
+                            <a
+                              href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
+                              className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
+                            >
+                              <Download size={12} /> Facture
+                            </a>
+                            {f.statut_paiement === "payee" && (
+                              <a
+                                href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
+                                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline"
+                              >
+                                <Download size={12} /> Reçu
+                              </a>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -173,12 +183,22 @@ function EtudiantFacturesPage() {
                         <Badge tone={s.tone}>{s.label}</Badge>
                         {info && <div className="text-[11px] text-muted-foreground mt-1">{info}</div>}
                       </div>
-                      <a
-                        href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-                        className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline shrink-0"
-                      >
-                        <Download size={12} /> PDF
-                      </a>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <a
+                          href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
+                          className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
+                        >
+                          <Download size={12} /> Facture
+                        </a>
+                        {f.statut_paiement === "payee" && (
+                          <a
+                            href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
+                            className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline"
+                          >
+                            <Download size={12} /> Reçu
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </li>
                 );

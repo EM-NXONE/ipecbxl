@@ -13,7 +13,7 @@ $pdo  = db();
 
 $type = (string)($_GET['type'] ?? '');
 $id   = (int)($_GET['id'] ?? 0);
-if ($id <= 0 || !in_array($type, ['facture', 'document'], true)) {
+if ($id <= 0 || !in_array($type, ['facture', 'recu', 'document'], true)) {
     http_response_code(400); exit('Requête invalide.');
 }
 
@@ -89,6 +89,51 @@ try {
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Length: ' . strlen($pdf));
         echo $pdf; exit;
+    }
+
+    if ($type === 'recu') {
+        $stmt = $pdo->prepare(
+            "SELECT f.*, e.civilite, e.prenom, e.nom, e.email,
+                    c.rue, c.numero AS num_rue, c.code_postal, c.ville, c.pays_residence,
+                    c.programme, c.annee, c.specialisation, c.rentree
+             FROM factures f
+             INNER JOIN etudiants e ON e.id = f.etudiant_id
+             LEFT JOIN candidatures c ON c.id = f.candidature_id
+             WHERE f.id = ? AND f.etudiant_id = ? AND f.visible_etudiant = 1
+             LIMIT 1"
+        );
+        $stmt->execute([$id, $user['id']]);
+        $f = $stmt->fetch();
+        if (!$f) { http_response_code(404); exit('Facture introuvable.'); }
+        if (($f['statut_paiement'] ?? '') !== 'payee') {
+            http_response_code(409);
+            exit('Reçu indisponible : la facture n\'est pas encore marquée comme payée.');
+        }
+
+        [$pdfRecu, $recuFilename, $recuNumero] = buildRecuPaiementPdf([
+            'reference' => $f['numero'], 'reference_facture' => $f['numero'],
+            'civilite' => $f['civilite'], 'prenom' => $f['prenom'], 'nom' => $f['nom'],
+            'rue' => $f['rue'], 'numero' => $f['num_rue'],
+            'codePostal' => $f['code_postal'], 'ville' => $f['ville'], 'paysResidence' => $f['pays_residence'],
+            'email' => $f['email'],
+            'programme' => $f['programme'], 'annee' => $f['annee'],
+            'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'],
+            'montant_ttc_cents' => (int)$f['montant_ttc_cents'],
+            'paye_at' => $f['paye_at'],
+            'moyen_paiement' => $f['moyen_paiement'],
+            'reference_paiement' => $f['reference_paiement'],
+        ]);
+        if ($pdfRecu === '') throw new RuntimeException('PDF reçu vide.');
+        $filename = safe_filename('recu-paiement', $recuNumero ?: $f['numero']);
+
+        $pdo->prepare("INSERT INTO etudiant_actions (etudiant_id, action, detail, ip)
+                       VALUES (?, 'view_recu', ?, ?)")
+            ->execute([$user['id'], 'Reçu paiement facture ' . $f['numero'], $_SERVER['REMOTE_ADDR'] ?? null]);
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($pdfRecu));
+        echo $pdfRecu; exit;
     }
 
     // type === 'document'
