@@ -7,7 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { etuApi, etuUrl } from "@/lib/api";
-import { formatMoneyCents, formatDate, formatDateTime, FACTURE_STATUTS } from "@/lib/format";
+import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/factures")({
   component: EtudiantFacturesPage,
