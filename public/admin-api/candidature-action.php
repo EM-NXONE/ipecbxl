@@ -240,7 +240,3 @@ try {
     error_log('[admin-api/action] ' . $action . ' #' . $id . ' : ' . $e->getMessage());
     api_error('Erreur : ' . $e->getMessage(), 500);
 }
-
-function etu_admin_activation_url(string $token): string {
-    return 'https://lms.ipec.school/etudiant/activer/' . $token;
-}
