@@ -1201,6 +1201,259 @@ function buildFacturePdf(array $f): array {
     return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
 }
 
+/**
+ * Construit un PDF "Reçu de paiement" — design strictement aligné sur la facture.
+ * Champs attendus en sus : reference_facture, paye_at, moyen_paiement,
+ * reference_paiement (optionnel), montant_ttc_cents (optionnel), recu_numero (optionnel).
+ * Retourne [pdfBinary, filename, recuNumero].
+ */
+function buildRecuPaiementPdf(array $f): array {
+    if (!class_exists('IpecCandidaturePdf')) return ['', '', ''];
+
+    $tr = function (string $s): string {
+        $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+        return $out !== false ? $out : $s;
+    };
+
+    $now     = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
+    $dateStr = $now->format('d/m/Y');
+
+    $numFacture = trim((string)($f['reference_facture'] ?? ''));
+    if ($numFacture === '') $numFacture = 'IPEC-FACT-' . $now->format('Ymd-His');
+
+    $recuNumero = trim((string)($f['recu_numero'] ?? ''));
+    if ($recuNumero === '') {
+        $hash = strtoupper(substr(hash('sha1', 'ipec-recu|' . $numFacture), 0, 6));
+        $recuNumero = 'IPEC-RECU-' . $now->format('Y') . '-' . $hash;
+    }
+    $verifCode = strtoupper(substr(hash('sha256', $numFacture . '|' . $recuNumero), 0, 4))
+               . '-' . strtoupper(substr(hash('sha256', $recuNumero . '|' . $numFacture), 0, 4));
+
+    $payeAtRaw = trim((string)($f['paye_at'] ?? ''));
+    $payeDate  = $dateStr;
+    if ($payeAtRaw !== '') { $ts = strtotime($payeAtRaw); if ($ts !== false) $payeDate = date('d/m/Y', $ts); }
+
+    $moyenRaw  = strtolower(trim((string)($f['moyen_paiement'] ?? '')));
+    $moyenMap  = [
+        'virement' => 'Virement bancaire', 'carte' => 'Carte bancaire', 'cb' => 'Carte bancaire',
+        'especes'  => 'Espèces', 'cheque' => 'Chèque', 'autre' => 'Autre',
+    ];
+    $moyenLabel  = $moyenMap[$moyenRaw] ?? ($moyenRaw !== '' ? ucfirst($moyenRaw) : 'Non précisé');
+    $refPaiement = trim((string)($f['reference_paiement'] ?? ''));
+
+    $montant = isset($f['montant_ttc_cents']) && (int)$f['montant_ttc_cents'] > 0
+        ? ((int)$f['montant_ttc_cents']) / 100 : 400.00;
+    $tauxTva    = 0.21;
+    $montantHT  = round($montant / (1 + $tauxTva), 2);
+    $montantTVA = round($montant - $montantHT, 2);
+
+    $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+    $pdf->docKind = 'recu';
+    $pdf->factureNumero = $numFacture;
+    $pdf->referenceFacture = $numFacture;
+    $pdf->recuNumero = $recuNumero;
+    $pdf->reference  = trim((string)($f['reference'] ?? ''));
+    $pdf->SetMargins(20, 20, 20);
+    $pdf->SetAutoPageBreak(true, 30);
+    $pdf->SetTitle($tr('Reçu de paiement IPEC'));
+    $pdf->SetAuthor($tr('IPEC — Institut Privé des Études Commerciales'));
+    $pdf->SetCreator('www.ipec.school');
+    $pdf->AddPage();
+
+    // En-tête identique à la facture
+    $logoPath = __DIR__ . '/ipec-logo-email.png';
+    if (is_file($logoPath)) {
+        try { $pdf->Image($logoPath, 20, 15, 18, 18); } catch (\Throwable $e) {}
+    }
+    $pdf->SetXY(41, 19);
+    $pdf->SetFont('Times', '', 18); $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
+    $pdf->SetX(41);
+    $pdf->SetFont('Helvetica', '', 6); $pdf->SetTextColor(120, 130, 150);
+    $subtitle = 'INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES';
+    $spaced   = implode(' ', preg_split('//u', $subtitle, -1, PREG_SPLIT_NO_EMPTY));
+    $pdf->Cell(0, 4, $tr($spaced), 0, 2);
+
+    // Bloc identification REÇU (vert)
+    $pdf->SetXY(130, 20);
+    $pdf->SetFont('Helvetica', 'B', 13); $pdf->SetTextColor(22, 132, 75);
+    $pdf->Cell(60, 7, $tr('REÇU DE PAIEMENT'), 0, 2, 'R');
+    $pdf->SetX(130);
+    $pdf->SetFont('Helvetica', '', 9); $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(60, 5, $tr('N° ' . $recuNumero), 0, 2, 'R');
+    $pdf->SetX(130);
+    $pdf->Cell(60, 5, $tr('Émis le : ' . $dateStr), 0, 2, 'R');
+
+    $pdf->SetY(40);
+    $pdf->SetDrawColor(22, 132, 75); $pdf->SetLineWidth(0.6);
+    $pdf->Line(20, 40, 190, 40);
+
+    // Filigrane "PAYÉ" très discret
+    $pdf->SetTextColor(232, 244, 237);
+    $pdf->SetFont('Helvetica', 'B', 90);
+    $pdf->SetXY(35, 130);
+    $pdf->Cell(140, 30, $tr('PAYÉ'), 0, 0, 'C');
+
+    // Données inscription
+    $programmeCode  = trim((string)($f['programme'] ?? ''));
+    $anneeLabel     = trim((string)($f['annee'] ?? ''));
+    $specialisation = trim((string)($f['specialisation'] ?? ''));
+    $rentreeLabel   = trim((string)($f['rentree'] ?? ''));
+    $programmeFullMap = ['PAA' => 'Programme en Administration des Affaires', 'PEA' => 'Programme Exécutif Avancé'];
+    $programmeFull = $programmeFullMap[strtoupper($programmeCode)] ?? $programmeCode;
+    $anneeNorm = preg_replace('/\s+—.*$/u', '', str_replace(['1ʳᵉ', '1ᵉʳ', '1er'], '1ère', $anneeLabel));
+    $anneeNorm = trim($anneeNorm);
+    $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
+    $academicYear = '';
+    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
+        $y = (int)$m[1];
+        $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
+        $startY = $isPrintemps ? ($y - 1) : $y;
+        $academicYear = $startY . '/' . ($startY + 1);
+    } else {
+        $curY = (int)$now->format('Y');
+        $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
+        $academicYear = $startY . '/' . ($startY + 1);
+    }
+
+    // Encadrés
+    $pdf->SetY(48);
+    $boxTop = $pdf->GetY();
+    $boxLeftX = 20; $boxRightX = 108; $boxWidth = 82; $padX = 4; $padY = 4;
+    $pdf->SetDrawColor(220, 226, 240); $pdf->SetLineWidth(0.3);
+
+    $pdf->SetXY($boxLeftX + $padX, $boxTop + $padY);
+    $pdf->SetFont('Helvetica', 'B', 9); $pdf->SetTextColor(22, 132, 75);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr('REÇU DE'), 0, 2);
+    $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(15, 21, 37); $pdf->Ln(1);
+    $pdf->SetX($boxLeftX + $padX);
+    $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr(trim(($f['civilite'] ?? '') . ' ' . ($f['prenom'] ?? '') . ' ' . ($f['nom'] ?? ''))), 0, 'L');
+    $factLigne1 = trim((string)($f['rue'] ?? '') . (!empty($f['numero']) ? ' ' . (string)$f['numero'] : ''));
+    $factLigne2 = trim((string)($f['codePostal'] ?? '') . (!empty($f['ville']) ? ' ' . (string)$f['ville'] : ''));
+    if ($factLigne1 !== '') { $pdf->SetX($boxLeftX + $padX); $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne1), 0, 'L'); }
+    if ($factLigne2 !== '') { $pdf->SetX($boxLeftX + $padX); $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($factLigne2), 0, 'L'); }
+    if ($factLigne1 === '' && $factLigne2 === '' && !empty($f['adresse'])) {
+        $pdf->SetX($boxLeftX + $padX); $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['adresse']), 0, 'L');
+    }
+    if (!empty($f['paysResidence'])) { $pdf->SetX($boxLeftX + $padX); $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['paysResidence']), 0, 'L'); }
+    if (!empty($f['email']))         { $pdf->SetX($boxLeftX + $padX); $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr((string)$f['email']), 0, 'L'); }
+    $leftEndY = $pdf->GetY();
+
+    $pdf->SetXY($boxRightX + $padX, $boxTop + $padY);
+    $pdf->SetFont('Helvetica', 'B', 9); $pdf->SetTextColor(22, 132, 75);
+    $pdf->Cell($boxWidth - 2 * $padX, 5, $tr("INFORMATIONS D'INSCRIPTION"), 0, 2);
+    $pdf->Ln(1); $pdf->SetTextColor(15, 21, 37);
+
+    $infoRow = function($label, $value) use ($pdf, $tr, $boxRightX, $boxWidth, $padX) {
+        $pdf->SetX($boxRightX + $padX);
+        $pdf->SetFont('Helvetica', 'B', 9);
+        $pdf->Cell($boxWidth - 2 * $padX, 5, $tr($label), 0, 2);
+        $pdf->SetX($boxRightX + $padX);
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->MultiCell($boxWidth - 2 * $padX, 5, $tr($value), 0, 'L');
+    };
+    if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
+    if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
+    if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
+    $infoRow('Année académique', $academicYear);
+    $rightEndY = $pdf->GetY();
+
+    $leftHeight  = $leftEndY  - $boxTop + $padY;
+    $rightHeight = $rightEndY - $boxTop + $padY;
+    $pdf->Rect($boxLeftX,  $boxTop, $boxWidth, $leftHeight);
+    $pdf->Rect($boxRightX, $boxTop, $boxWidth, $rightHeight);
+    $pdf->SetY($boxTop + max($leftHeight, $rightHeight));
+    $pdf->Ln(8);
+
+    // Tableau (en vert)
+    $pdf->SetFillColor(22, 132, 75); $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
+    $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
+
+    $firstLine = 'Frais de dossier IPEC — ' . $academicYear;
+    $pdf->Ln(2);
+    $startYRow = $pdf->GetY();
+    $pdf->SetX(22); $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(15, 21, 37);
+    $pdf->MultiCell(138, 6, $tr($firstLine), 0, 'L');
+    $pdf->SetX(22); $pdf->SetFont('Helvetica', '', 9); $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(138, 5, $tr('Acquittement de la facture n° ' . $numFacture), 0, 1, 'L');
+    $endY = $pdf->GetY();
+    $pdf->SetXY(160, $startYRow);
+    $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+    $pdf->SetY($endY);
+
+    $pdf->SetDrawColor(220, 226, 240); $pdf->SetLineWidth(0.2);
+    $pdf->Line(20, $pdf->GetY() + 3, 190, $pdf->GetY() + 3);
+    $pdf->Ln(4);
+
+    $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr('Sous-total HT'), 0, 0, 'R');
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+
+    $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr('TVA 21%'), 0, 0, 'R');
+    $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+
+    $pdf->Ln(2);
+
+    $pdf->SetFillColor(232, 244, 237);
+    $pdf->SetFont('Helvetica', 'B', 11); $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(110, 10, '', 0, 0);
+    $pdf->Cell(30, 10, $tr('TOTAL PAYÉ'), 0, 0, 'R', true);
+    $pdf->SetTextColor(22, 132, 75);
+    $pdf->Cell(30, 10, number_format($montant, 2, ',', ' ') . ' EUR  ', 0, 1, 'R', true);
+    $pdf->Ln(6);
+
+    // Bloc DÉTAILS DU PAIEMENT
+    $startY = $pdf->GetY();
+    $pdf->SetFillColor(243, 250, 246); $pdf->SetDrawColor(22, 132, 75);
+    $pdf->SetLineWidth(0.3); $pdf->Rect(20, $startY, 170, 51, 'DF');
+    $pdf->SetXY(24, $startY + 5);
+    $pdf->SetFont('Helvetica', 'B', 9); $pdf->SetTextColor(22, 132, 75);
+    $pdf->Cell(0, 5, $tr('DÉTAILS DU PAIEMENT'), 0, 1);
+    $pdf->Ln(1);
+    $payRow = function($label, $value, $bold = false) use ($pdf, $tr) {
+        $pdf->SetX(24); $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(55, 6, $tr($label), 0, 0);
+        $pdf->SetFont('Helvetica', $bold ? 'B' : '', 10); $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 6, $tr($value), 0, 1);
+    };
+    $payRow('Date de paiement', $payeDate, true);
+    $payRow('Moyen de paiement', $moyenLabel);
+    if ($refPaiement !== '') $payRow('Référence transaction', $refPaiement);
+    $payRow('Facture acquittée', $numFacture);
+    $payRow('Bénéficiaire', 'Institut Privé des Études Commerciales ASBL');
+
+    $pdf->SetY($startY + 57);
+    $pdf->SetFont('Helvetica', '', 9); $pdf->SetTextColor(91, 100, 120);
+    $pdf->MultiCell(0, 5, $tr(
+        'Ce reçu atteste de la bonne réception du paiement par l\'IPEC pour la facture mentionnée ci-dessus. '
+        . 'Il tient lieu de pièce justificative et peut être présenté à toute autorité ou organisme tiers.'
+    ), 0, 'L');
+
+    // Bloc CODE DE VÉRIFICATION
+    $pdf->Ln(4);
+    $verifY = $pdf->GetY();
+    $pdf->SetDrawColor(44, 93, 219); $pdf->SetFillColor(247, 249, 252);
+    $pdf->SetLineWidth(0.3); $pdf->Rect(20, $verifY, 170, 18, 'DF');
+    $pdf->SetXY(24, $verifY + 3);
+    $pdf->SetFont('Helvetica', 'B', 8); $pdf->SetTextColor(44, 93, 219);
+    $pdf->Cell(0, 4, $tr('CODE DE VÉRIFICATION'), 0, 1);
+    $pdf->SetX(24);
+    $pdf->SetFont('Courier', 'B', 13); $pdf->SetTextColor(15, 21, 37);
+    $pdf->Cell(0, 6, $tr($verifCode), 0, 1);
+    $pdf->SetX(24);
+    $pdf->SetFont('Helvetica', '', 8); $pdf->SetTextColor(91, 100, 120);
+    $pdf->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $recuNumero), 0, 1);
+
+    $filename = 'recu-paiement-IPEC-' . preg_replace('/[^A-Za-z0-9_-]+/', '-', $recuNumero) . '.pdf';
+    return [$pdf->Output('S'), $filename, $recuNumero];
+}
+
 // ----- Construction du message selon le type -----
 $pdfAttachment = '';
 $pdfFilename   = '';
