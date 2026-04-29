@@ -1,166 +1,97 @@
-# Déploiement des portails admin / étudiant sur n0c
+# IPEC — Déploiement des 3 portails sur n0c
 
-Ce projet produit **3 builds statiques** différents depuis le même code source,
-chacun destiné à un sous-domaine de n0c.
+3 sous-domaines, 1 base MySQL partagée, 0 build externe.
 
-| Cible           | Commande                              | Sous-domaine cible      |
-|-----------------|---------------------------------------|-------------------------|
-| Site public     | `STATIC_BUILD=site npm run build`     | `ipec.school`           |
-| Portail admin   | `STATIC_BUILD=admin npm run build`    | `admin.ipec.school`     |
-| Portail étudiant| `STATIC_BUILD=etu npm run build`      | `lms.ipec.school`       |
+```
+www.ipec.school    → public_html/                    (site vitrine + form candidature)
+admin.ipec.school  → docroot du sous-domaine admin   (dashboard interne)
+lms.ipec.school    → docroot du sous-domaine lms     (espace étudiant)
+```
 
-Chaque build produit `dist/` à uploader à la racine du sous-domaine
-correspondant, **avec en plus** :
-
-- les fichiers PHP de l'API (cf. ci-dessous)
-- un `.htaccess` SPA fallback (cf. ci-dessous)
-
----
-
-## 1. Site public → `ipec.school`
+## 1. Générer les ZIP
 
 ```bash
-STATIC_BUILD=site npm run build
+bash scripts/package-portails.sh
 ```
 
-Upload `dist/` à la racine. Les pages listées dans `SITE_ROUTES` sont
-prerendées en HTML, le reste est servi par fallback SPA.
+Produit `dist/site.zip`, `dist/admin.zip`, `dist/lms.zip`.
 
----
+## 2. Arborescence sur n0c (après dézippage)
 
-## 2. Portail admin → `admin.ipec.school`
-
-### a) Build React
-
-```bash
-STATIC_BUILD=admin npm run build
-```
-
-Upload `dist/` à la racine de `admin.ipec.school`.
-
-### b) API PHP
-
-Crée un dossier `/api/` à la racine de `admin.ipec.school` et upload tout le
-contenu de `public/admin-api/` dedans :
+### `admin.ipec.school` (idem pour `lms.ipec.school`)
 
 ```
-admin.ipec.school/
-├── index.html              ← React build
-├── assets/                 ← React build
-├── .htaccess               ← SPA fallback (voir plus bas)
+docroot/
+├── index.html              ← SPA TanStack (build Vite)
+├── assets/                 ← JS/CSS bundlés
+├── .htaccess               ← rewrite SPA + bypass /api
 └── api/
-    ├── _bootstrap.php
     ├── login.php
-    ├── logout.php
     ├── me.php
+    ├── logout.php
+    ├── dashboard.php
     ├── candidatures.php
     ├── candidature.php
-    └── .htaccess
-```
-
-### c) `.htaccess` racine (SPA fallback + API)
-
-À placer dans la racine de `admin.ipec.school` :
-
-```apache
-RewriteEngine On
-
-# Laisser passer les fichiers existants (assets React, /api/*.php, etc.)
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# Tout le reste → index.html (SPA fallback)
-RewriteRule ^ index.html [L]
-```
-
-### d) Identifiants admin
-
-Les comptes admin sont définis dans `public/admin/_bootstrap.php` (constante
-`ADMIN_USERS`). Ce fichier doit rester accessible à l'API PHP — il est inclus
-par `public/admin-api/_bootstrap.php`.
-
----
-
-## 3. Portail étudiant → `lms.ipec.school`
-
-### a) Build React
-
-```bash
-STATIC_BUILD=etu npm run build
-```
-
-Upload `dist/` à la racine de `lms.ipec.school`.
-
-### b) API PHP
-
-Idem : crée `/api/` et upload `public/etudiant-api/*` dedans.
-
-```
-lms.ipec.school/
-├── index.html
-├── assets/
-├── .htaccess
-└── api/
+    ├── candidature-action.php
+    ├── candidature-pdf.php
+    ├── etudiants.php
     ├── _bootstrap.php
-    ├── login.php
-    ├── logout.php
-    ├── me.php
-    ├── factures.php
-    ├── documents.php
-    ├── activer.php
-    ├── reset-password.php
-    ├── mot-de-passe-oublie.php
-    └── .htaccess
+    └── _shared/            ← Require all denied (htaccess)
+        ├── db_config.php
+        ├── mailer.php
+        ├── _pdf_classes.php
+        ├── _etudiants.php       (admin uniquement)
+        ├── admin_users.php      ← À CRÉER À LA MAIN (cf. §3)
+        ├── FPDF/
+        └── PHPMailer/
 ```
 
-### c) `.htaccess` racine
+### `www.ipec.school`
 
-Identique à celui de admin, mais on conserve aussi l'accès direct aux PDF
-téléchargés depuis l'ancien `telecharger.php` (au moins le temps de la migration) :
+Inchangé : SPA + `mailer.php`, `verify.php`, `db_config.php`, `FPDF/`, `PHPMailer/`,
+plus les anciens dossiers `/admin/` et `/etudiant/` conservés en fallback legacy.
 
-```apache
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-RewriteRule ^ index.html [L]
+## 3. Fichiers à créer à la main (jamais commit)
+
+### `admin/api/_shared/admin_users.php`
+
+```php
+<?php
+return [
+    'admin' => password_hash('TON_MOT_DE_PASSE_FORT', PASSWORD_BCRYPT),
+];
 ```
 
----
+Tu peux générer le hash en SSH :
+```bash
+php -r "echo password_hash('TON_MDP', PASSWORD_BCRYPT), PHP_EOL;"
+```
 
-## 4. Auth & cookies — important
+### `../.ipec-mailer.env` (un niveau au-dessus de `public_html`)
 
-- **Même origine** : React et API PHP servis depuis le même sous-domaine,
-  donc cookies `SameSite=Lax` (config par défaut PHP). Aucun problème CORS
-  en production.
-- **Dev Lovable** : si tu testes le React depuis `ipecbxl.lovable.app` qui
-  appelle l'API PHP de `admin.ipec.school`, c'est cross-origin :
-    - ajoute `ipecbxl.lovable.app` à `CORS_ALLOWED_ORIGINS` dans
-      `public/{admin,etudiant}-api/_bootstrap.php` (déjà fait)
-    - passe les cookies de session en `SameSite=None; Secure` :
-      modifie `etu_session_create()` dans `public/etudiant/_bootstrap.php`
-      et `session.cookie_samesite` dans `public/admin/_bootstrap.php`.
+```
+SMTP_HOST=mail.ipec.school
+SMTP_PORT=465
+SMTP_SECURE=ssl
+SMTP_USER=process@ipec.school
+SMTP_PASS=...
+```
 
----
+Ce fichier est lu par `mailer.php` partagé entre les 3 portails.
 
-## 5. État actuel (squelette)
+## 4. Sous-domaines & cookies
 
-Ce qui est **fonctionnel end-to-end** :
-- Connexion / déconnexion / `me` admin et étudiant
-- Mots de passe oubliés / reset / activation (côté React + endpoints PHP avec
-  consommation de tokens — l'envoi d'email reste à brancher sur `mailer.php`)
+- Cookie session admin : `IPEC_ADMIN`, scope `admin.ipec.school` uniquement.
+- Cookie session étudiant : `IPEC_ETU`, scope `lms.ipec.school` uniquement.
+- Pas de cookie cross-subdomain → aucune fuite, chaque portail isolé.
 
-Ce qui est **stub** (squelette React + endpoint PHP minimal qui renvoie les
-données brutes, mais l'UI ne les affiche pas encore) :
-- Liste candidatures (admin)
-- Détail candidature (admin)
-- Factures (étudiant)
-- Documents (étudiant)
-- Profil + changement de mot de passe (étudiant)
+## 5. Sécurité — checklist
 
-À faire dans les prochaines itérations :
-- Brancher les listes sur les endpoints existants
-- Téléchargement PDF (réutiliser `public/etudiant/telecharger.php`)
-- Action « marquer comme payée » côté admin
-- Création d'un étudiant + envoi du lien d'activation
+- [x] `db_config.php` non accessible HTTP (`Require all denied` dans `_shared/.htaccess`)
+- [x] `admin_users.php` jamais commité (pas dans le ZIP)
+- [x] Mots de passe bcrypt (admin) + bcrypt (étudiants, créés par lien d'activation)
+- [x] Tokens activation/reset stockés en SHA-256, usage unique, expiration
+- [x] Sessions étudiantes en BDD (`etudiant_sessions`), rotation `expires_at` à chaque requête
+- [x] CORS strict (3 origines : prod + preview Lovable)
+- [x] Rate-limit fichier sur login/reset
+- [x] Cookies `httpOnly` + `Secure` + `SameSite=Lax`
