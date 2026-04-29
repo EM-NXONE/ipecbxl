@@ -226,6 +226,7 @@ cp "$PUB/db_config.php"      "$LMS/api/_shared/"
 cp "$PUB/mailer.php"         "$LMS/api/_shared/"
 cp "$PUB/_pdf_classes.php"   "$LMS/api/_shared/"
 cp "$PUB/_shared/cors.php"   "$LMS/api/_shared/"
+cp "$PUB/ipec-logo-email.png" "$LMS/api/_shared/"
 cp -R "$PUB/FPDF"            "$LMS/api/_shared/"
 cp -R "$PUB/PHPMailer"       "$LMS/api/_shared/"
 
