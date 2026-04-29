@@ -123,23 +123,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Périmètre du build courant : "site" (par défaut), "admin" ou "etu".
-  // Injecté par vite.config.ts via define → import.meta.env.VITE_PORTAL.
-  const portal = (import.meta.env.VITE_PORTAL as "site" | "admin" | "etu" | undefined) ?? "site";
-
   // Sur les builds dédiés admin/lms : toute route hors du portail est
-  // redirigée vers le point d'entrée du portail. Évite que le site vitrine
-  // n'apparaisse sur admin.ipec.school ou lms.ipec.school.
-  if (portal === "admin" && !pathname.startsWith("/admin")) {
-    if (typeof window !== "undefined") {
-      window.location.replace("/admin/login");
-    }
+  // bloquée et redirigée vers le point d'entrée. Le site vitrine n'apparaît
+  // donc JAMAIS sur admin.ipec.school ou lms.ipec.school, même via deep-link
+  // côté client. Le rendu retourne null pour SSR ET client (pas de flash).
+  if (PORTAL === "admin" && !pathname.startsWith("/admin")) {
+    if (typeof window !== "undefined") window.location.replace("/admin/login");
     return null;
   }
-  if (portal === "etu" && !pathname.startsWith("/etudiant")) {
-    if (typeof window !== "undefined") {
-      window.location.replace("/etudiant/login");
-    }
+  if (PORTAL === "etu" && !pathname.startsWith("/etudiant")) {
+    if (typeof window !== "undefined") window.location.replace("/etudiant/login");
     return null;
   }
 
