@@ -93,13 +93,16 @@ $SITE = Join-Path $BUILD "site"
 Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant")
 
 # Backend PHP du site public
-Copy-Item (Join-Path $PUB "mailer.php")        $SITE
-Copy-Item (Join-Path $PUB "db_config.php")     $SITE
-Copy-Item (Join-Path $PUB "verify.php")        $SITE
-Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE
-Copy-Item (Join-Path $PUB "_shared\cors.php")  $SITE
-Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse
-Copy-Item (Join-Path $PUB "PHPMailer")         $SITE -Recurse
+# Backend PHP du site public (Force pour ecraser ce que le build aurait copie depuis public/)
+Copy-Item (Join-Path $PUB "mailer.php")        $SITE -Force
+Copy-Item (Join-Path $PUB "db_config.php")     $SITE -Force
+Copy-Item (Join-Path $PUB "verify.php")        $SITE -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")  $SITE -Force
+if (Test-Path (Join-Path $SITE "FPDF"))      { Remove-Item (Join-Path $SITE "FPDF")      -Recurse -Force }
+if (Test-Path (Join-Path $SITE "PHPMailer")) { Remove-Item (Join-Path $SITE "PHPMailer") -Recurse -Force }
+Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse -Force
+Copy-Item (Join-Path $PUB "PHPMailer")         $SITE -Recurse -Force
 
 $siteHt = @"
 # IPEC - www.ipec.school
@@ -138,14 +141,14 @@ $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
 New-Item -ItemType Directory -Path $adminShared -Force | Out-Null
 
-Copy-Item (Join-Path $PUB "admin-api\*.php")        $adminApi
-Copy-Item (Join-Path $PUB "db_config.php")          $adminShared
-Copy-Item (Join-Path $PUB "mailer.php")             $adminShared
-Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared
-Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared
-Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared
-Copy-Item (Join-Path $PUB "FPDF")                   $adminShared -Recurse
-Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse
+Copy-Item (Join-Path $PUB "admin-api\*.php")        $adminApi    -Force
+Copy-Item (Join-Path $PUB "db_config.php")          $adminShared -Force
+Copy-Item (Join-Path $PUB "mailer.php")             $adminShared -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared -Force
+Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared -Force
+Copy-Item (Join-Path $PUB "FPDF")                   $adminShared -Recurse -Force
+Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse -Force
 
 $adminHt = @"
 # IPEC - admin.ipec.school
@@ -179,13 +182,13 @@ $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
 New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
 
-Copy-Item (Join-Path $PUB "etudiant-api\*.php") $lmsApi
-Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared
-Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared
-Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared
-Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared
-Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse
-Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse
+Copy-Item (Join-Path $PUB "etudiant-api\*.php") $lmsApi    -Force
+Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared -Force
+Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared -Force
+Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse -Force
+Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse -Force
 
 $lmsHt = @"
 # IPEC - lms.ipec.school
