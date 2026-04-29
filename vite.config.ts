@@ -7,19 +7,23 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // =====================================================================
-// Build statique pour n0c (hébergement Apache/PHP, sans Node.js).
+// Builds statiques pour n0c (Apache/PHP, sans Node.js).
 // =====================================================================
-// Quand STATIC_BUILD=1, on désactive le preset Cloudflare et on active
-// le prerendering : chaque route listée ci-dessous est rendue en HTML
-// au build → n0c sert ces .html directement.
 //
-// Build local pour n0c :   STATIC_BUILD=1 npm run build
-// Build standard Lovable : npm run build
+// Trois cibles au total :
+//
+//   STATIC_BUILD=site  npm run build  → site public      (ipec.school)
+//   STATIC_BUILD=admin npm run build  → portail admin    (admin.ipec.school)
+//   STATIC_BUILD=etu   npm run build  → portail étudiant (lms.ipec.school)
+//
+// Les pages publiques sont prerendées en HTML par TanStack. Les pages
+// authentifiées sont des SPA (servies via fallback .htaccess → index.html).
 // =====================================================================
 
-const IS_STATIC_BUILD = process.env.STATIC_BUILD === "1";
+const TARGET = process.env.STATIC_BUILD;
 
-const PRERENDER_ROUTES = [
+// Routes publiques du site (prerender complet)
+const SITE_ROUTES = [
   "/",
   "/admissions",
   "/cgu",
@@ -35,23 +39,41 @@ const PRERENDER_ROUTES = [
   "/vie-etudiante",
 ];
 
-export default defineConfig(
-  IS_STATIC_BUILD
-    ? {
-        // Désactive Cloudflare → preset node-server par défaut → produit
-        // dist/server/server.js que le prerender sait charger.
-        cloudflare: false,
-        tanstackStart: {
-          prerender: {
-            enabled: true,
-            crawlLinks: true,
-            retryCount: 2,
-          },
-          pages: PRERENDER_ROUTES.map((path) => ({
-            path,
-            prerender: { enabled: true },
-          })),
-        },
-      }
-    : {},
-);
+// Pages publiques de l'espace admin à prerender (login uniquement,
+// le reste est rendu côté client après auth).
+const ADMIN_PUBLIC_ROUTES = ["/admin/login"];
+
+// Pages publiques de l'espace étudiant à prerender.
+const ETU_PUBLIC_ROUTES = [
+  "/etudiant/login",
+  "/etudiant/mot-de-passe-oublie",
+];
+
+function makeStaticConfig(routes: string[]) {
+  return {
+    cloudflare: false,
+    tanstackStart: {
+      prerender: {
+        enabled: true,
+        crawlLinks: false,
+        retryCount: 2,
+      },
+      pages: routes.map((path) => ({
+        path,
+        prerender: { enabled: true },
+      })),
+    },
+  };
+}
+
+let extra = {};
+if (TARGET === "site" || process.env.STATIC_BUILD === "1") {
+  // "1" conservé pour compat avec l'ancien script de build.
+  extra = makeStaticConfig(SITE_ROUTES);
+} else if (TARGET === "admin") {
+  extra = makeStaticConfig(ADMIN_PUBLIC_ROUTES);
+} else if (TARGET === "etu") {
+  extra = makeStaticConfig(ETU_PUBLIC_ROUTES);
+}
+
+export default defineConfig(extra);
