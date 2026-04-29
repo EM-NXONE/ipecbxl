@@ -141,20 +141,21 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
             'token'         => $token,
             'deja_existant' => true,
         ];
-    }
 
     $pdo->beginTransaction();
     try {
         $numero = etudiant_generate_numero($pdo);
+        $hash   = password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT);
         $stmt = $pdo->prepare(
             "INSERT INTO etudiants
                 (email, password_hash, email_verifie,
                  civilite, prenom, nom, date_naissance, nationalite, telephone,
                  numero_etudiant, statut, cree_par_admin)
-             VALUES (?, NULL, 0, ?, ?, ?, ?, ?, ?, ?, 'actif', ?)"
+             VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'actif', ?)"
         );
         $stmt->execute([
             $email,
+            $hash,
             $candidature['civilite'] ?: null,
             $candidature['prenom'],
             $candidature['nom'],
@@ -169,20 +170,15 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
         $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
             ->execute([$etuId, (int)$candidature['id']]);
 
-        $token = etudiant_create_token($pdo, $etuId, 'activation', 14 * 24 * 3600);
-
-        // Synchronise les "documents historiques" de la candidature dans les
-        // nouvelles tables `factures` + `documents` pour qu'ils apparaissent
-        // immédiatement dans l'espace étudiant. PDF jamais stockés : on n'écrit
-        // que les métadonnées + data_json (régénération à la volée).
+        // Synchronise les documents historiques de la candidature dans factures + documents.
         etudiant_sync_documents_historiques($pdo, $etuId, $candidature, $adminUser);
 
         $pdo->commit();
         return [
-            'etudiant_id'   => $etuId,
-            'numero'        => $numero,
-            'token'         => $token,
-            'deja_existant' => false,
+            'etudiant_id'      => $etuId,
+            'numero'           => $numero,
+            'default_password' => ETU_DEFAULT_PASSWORD,
+            'deja_existant'    => false,
         ];
     } catch (\Throwable $e) {
         $pdo->rollBack();
