@@ -1,15 +1,7 @@
 RewriteEngine On
-
-# CORS preflight (OPTIONS) bypass de l'auth Apache éventuelle
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=204,L]
-
-# Bloquer l'accès direct aux fichiers _* (helpers internes)
-<FilesMatch "^_">
+# Bloque l'accès direct au dossier _shared (helpers PHP réutilisables)
+RewriteRule ^_shared/ - [F]
+# Bloque admin_users.php même avec extension complète
+<Files "admin_users.php">
   Require all denied
-</FilesMatch>
-
-# Bloquer .sql / .md
-<FilesMatch "\.(sql|md)$">
-  Require all denied
-</FilesMatch>
+</Files>
