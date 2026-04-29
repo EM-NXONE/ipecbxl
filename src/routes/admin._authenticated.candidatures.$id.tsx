@@ -3,7 +3,8 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, Mail, UserPlus, RefreshCw, Download } from "lucide-react";
+import { ArrowLeft, Mail, RefreshCw, Download } from "lucide-react";
+import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
@@ -47,8 +48,8 @@ function AdminCandidatureDetailPage() {
     setMsg(null);
     setError(null);
     try {
-      const res = await adminApi.post<{ message?: string }>("/candidature-action.php", { id: Number(id), action, ...body });
-      setMsg(res.message || "Action effectuée.");
+      const res = await adminApi.post<{ message?: string; activation_url?: string | null }>("/candidature-action.php", { id: Number(id), action, ...body });
+      setMsg(adminActionMessage(res));
       reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Échec de l'action.");
@@ -119,23 +120,13 @@ function AdminCandidatureDetailPage() {
             </div>
             {c.facture_numero && <div className="text-xs text-muted-foreground font-mono mt-1">Facture {c.facture_numero}</div>}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => runAction("resend_email")} disabled={busy === "resend_email"}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-cream text-sm hover:border-blue/40 disabled:opacity-50">
-              <Mail size={14} /> {busy === "resend_email" ? "…" : "Renvoyer l'e-mail au candidat"}
-            </button>
-            {!paid ? (
-              <button onClick={() => runAction("mark_paid")} disabled={busy === "mark_paid"}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 disabled:opacity-50">
-                <CheckCircle2 size={14} /> {busy === "mark_paid" ? "…" : "Marquer comme payés"}
-              </button>
-            ) : (
-              <button onClick={() => runAction("mark_unpaid")} disabled={busy === "mark_unpaid"}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-amber-500/30 text-amber-400 text-sm hover:bg-amber-500/10 disabled:opacity-50">
-                {busy === "mark_unpaid" ? "…" : "Annuler le paiement"}
-              </button>
-            )}
-          </div>
+          <AdminCandidatureActions
+            id={id}
+            paid={paid}
+            hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
+            onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
+            onError={setError}
+          />
         </div>
       </Card>
 
@@ -157,9 +148,9 @@ function AdminCandidatureDetailPage() {
                 <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
               </button>
               {!data.etudiant.active && (
-                <button onClick={() => runAction("resend_email", { type: "activation" })} disabled={busy === "resend_email"}
+                <button onClick={() => runAction("regen_activation")} disabled={busy === "regen_activation"}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
-                  <Mail size={12} /> Renvoyer activation
+                  <Mail size={12} /> {busy === "regen_activation" ? "…" : "Régénérer activation"}
                 </button>
               )}
             </div>
@@ -180,7 +171,7 @@ function AdminCandidatureDetailPage() {
             <p className="text-sm text-muted-foreground">Aucun compte étudiant créé pour cette candidature.</p>
             <button onClick={() => runAction("create_etudiant")} disabled={busy === "create_etudiant"}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50">
-              <UserPlus size={14} /> {busy === "create_etudiant" ? "…" : "Créer le compte étudiant"}
+              {busy === "create_etudiant" ? "…" : "Créer le compte étudiant"}
             </button>
           </div>
         )}

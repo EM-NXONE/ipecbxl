@@ -23,7 +23,7 @@ $row = $pdo->query("
 $nbEtu = (int)$pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
 
 $last = $pdo->query("
-    SELECT id, reference, prenom, nom, email, statut, programme, facture_payee, created_at
+    SELECT id, reference, prenom, nom, email, statut, programme, facture_payee, etudiant_id, created_at
     FROM candidatures ORDER BY created_at DESC LIMIT 5
 ")->fetchAll();
 
