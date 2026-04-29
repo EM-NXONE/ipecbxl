@@ -18,20 +18,9 @@ declare(strict_types=1);
 // ---------- Constantes ----------
 const ADMIN_SESSION_LIFETIME = 4 * 3600; // 4 h
 
-// ---------- Chargement des dépendances partagées ----------
+// ---------- Chemins partagés ----------
 $SHARED = __DIR__ . '/_shared';
-require_once $SHARED . '/db_config.php';
-
-// Mailer + builders PDF en mode librairie (saute le pipeline HTTP du mailer)
-if (!defined('IPEC_MAILER_AS_LIB')) define('IPEC_MAILER_AS_LIB', true);
-require_once $SHARED . '/mailer.php';
-
-require_once $SHARED . '/_etudiants.php';
-
-// Comptes admin (fichier non versionné, à créer sur n0c) :
-//   <?php return ['admin' => '$2y$12$...hash_bcrypt...'];
-$adminUsersFile = $SHARED . '/admin_users.php';
-$ADMIN_USERS = is_file($adminUsersFile) ? (array)require $adminUsersFile : [];
+$ADMIN_USERS_CACHE = null;
 
 // Statuts métier (mêmes labels que l'ancien admin)
 const ADMIN_STATUTS = [
@@ -51,8 +40,16 @@ session_name('IPEC_ADMIN');
 session_start();
 
 // ---------- CORS (mutualisé entre les 3 portails) ----------
-require_once $SHARED . '/cors.php';
-ipec_cors_apply();
+$corsFile = $SHARED . '/cors.php';
+if (is_file($corsFile)) {
+    require_once $corsFile;
+}
+if (function_exists('ipec_cors_apply')) {
+    ipec_cors_apply();
+} elseif (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
 
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
@@ -83,10 +80,54 @@ function api_body(): array {
     return $data;
 }
 
+// ---------- Dépendances optionnelles ----------
+function admin_shared_path(string $file): string {
+    global $SHARED;
+    return $SHARED . '/' . ltrim($file, '/');
+}
+
+function admin_require_db(): void {
+    $path = admin_shared_path('db_config.php');
+    if (!is_file($path)) api_error('Configuration base de données introuvable.', 500);
+    require_once $path;
+    if (!function_exists('db')) api_error('Configuration base de données invalide.', 500);
+}
+
+function admin_require_mailer(): void {
+    admin_require_db();
+    if (!defined('IPEC_MAILER_AS_LIB')) define('IPEC_MAILER_AS_LIB', true);
+    $path = admin_shared_path('mailer.php');
+    if (!is_file($path)) api_error('Librairie e-mail/PDF introuvable.', 500);
+    require_once $path;
+}
+
+function admin_require_etudiants(): void {
+    admin_require_db();
+    $path = admin_shared_path('_etudiants.php');
+    if (!is_file($path)) api_error('Librairie étudiants introuvable.', 500);
+    require_once $path;
+}
+
 // ---------- Auth admin ----------
 function admin_users(): array {
-    global $ADMIN_USERS;
-    return $ADMIN_USERS ?: [];
+    global $ADMIN_USERS_CACHE;
+    if (is_array($ADMIN_USERS_CACHE)) return $ADMIN_USERS_CACHE;
+
+    // Comptes admin (fichier non versionné, à créer sur n0c) :
+    //   <?php return ['admin' => '$2y$12$...hash_bcrypt...'];
+    $path = admin_shared_path('admin_users.php');
+    if (!is_file($path)) return $ADMIN_USERS_CACHE = [];
+
+    ob_start();
+    try {
+        $users = require $path;
+        return $ADMIN_USERS_CACHE = is_array($users) ? $users : [];
+    } catch (\Throwable $e) {
+        error_log('[admin-api] admin_users.php failed: ' . $e->getMessage());
+        return $ADMIN_USERS_CACHE = [];
+    } finally {
+        if (ob_get_level() > 0) ob_end_clean();
+    }
 }
 
 function admin_is_logged_in(): bool {
@@ -109,6 +150,7 @@ function admin_current_user(): string {
 
 function admin_log_action(int $candidatureId, string $action, ?string $detail = null): void {
     try {
+        admin_require_db();
         db()->prepare(
             "INSERT INTO admin_actions (candidature_id, action, detail, admin_user, ip)
              VALUES (?, ?, ?, ?, ?)"
