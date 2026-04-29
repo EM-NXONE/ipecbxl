@@ -164,6 +164,17 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
+purge_portal_subdir "$LMS/etudiant"
+for f in $SITE_ONLY_FILES; do rm -f "$LMS/$f"; done
+cat > "$LMS/index.html" <<'HTML'
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC LMS</title>
+<meta http-equiv="refresh" content="0; url=/etudiant/login">
+<link rel="canonical" href="/etudiant/login"></head>
+<body><script>location.replace('/etudiant/login')</script>
+<a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
+HTML
+
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"
 cp "$PUB/db_config.php"      "$LMS/api/_shared/"
