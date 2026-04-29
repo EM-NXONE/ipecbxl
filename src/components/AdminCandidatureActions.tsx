@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Copy, KeyRound, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, KeyRound, Mail, Pencil, RefreshCw, UserPlus, XCircle } from "lucide-react";
 import { adminApi } from "@/lib/api";
 
 export interface AdminActionResult {
@@ -19,9 +19,13 @@ interface AdminCandidatureActionsProps {
   paid: boolean | number;
   hasEtudiant: boolean;
   compact?: boolean;
+  /** Moyen de paiement actuel (pour pré-remplir l'édition). */
+  currentMoyen?: string | null;
+  /** Date de paiement actuelle ISO (pour pré-remplir l'édition). */
+  currentDate?: string | null;
   /**
    * "all" (défaut) — toutes les actions
-   * "payment" — uniquement marquer payé / annuler paiement
+   * "payment" — uniquement marquer payé / annuler paiement / éditer
    * "general" — tout sauf le paiement (renvoi mail, création/sync étudiant, reset mdp)
    */
   scope?: "all" | "payment" | "general";
@@ -42,16 +46,32 @@ export function AdminCandidatureActions({
   paid,
   hasEtudiant,
   compact = false,
+  currentMoyen,
+  currentDate,
   scope = "all",
   onDone,
   onError,
 }: AdminCandidatureActionsProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [lastPwd, setLastPwd] = useState<string | null>(null);
   const [moyen, setMoyen] = useState<string>("virement");
   const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const isPaid = Boolean(Number(paid));
+
+  const openEdit = () => {
+    if (currentMoyen) setMoyen(currentMoyen);
+    if (currentDate) setDatePaiement(currentDate.slice(0, 10));
+    setEditMode(true);
+    setShowPayModal(true);
+  };
+  const openMarkPaid = () => {
+    setMoyen("virement");
+    setDatePaiement(new Date().toISOString().slice(0, 10));
+    setEditMode(false);
+    setShowPayModal(true);
+  };
 
   const runAction = async (action: string, body?: Record<string, unknown>) => {
     setBusy(action);
