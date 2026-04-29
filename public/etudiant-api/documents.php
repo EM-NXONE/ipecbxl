@@ -1,14 +1,12 @@
 <?php
-/** GET /api/documents.php — documents publiés de l'étudiant connecté */
+/** GET /api/documents.php → liste des documents publiés */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
-$u = api_require_etu();
+$u = api_require_etudiant();
 
 $stmt = db()->prepare(
-    "SELECT id, reference, type, titre, description,
-            date_emission, valide_jusqu_au, template
-     FROM documents
-     WHERE etudiant_id = ? AND visible_etudiant = 1 AND statut = 'publie'
+    "SELECT * FROM documents
+     WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'
      ORDER BY date_emission DESC, id DESC"
 );
 $stmt->execute([$u['id']]);
