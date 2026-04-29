@@ -6,5 +6,12 @@ Disallow: /admin/
 Disallow: /etudiant/
 Disallow: /admin-api/
 Disallow: /etudiant-api/
+Disallow: /verification
+Disallow: /verify.php
+Disallow: /mentions-legales
+Disallow: /cgu
+Disallow: /cgv
+Disallow: /confidentialite
+Disallow: /cookies
 
 Sitemap: https://ipec.school/sitemap.xml
