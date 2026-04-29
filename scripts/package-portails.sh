@@ -153,6 +153,11 @@ cp -R "$PUB/PHPMailer"          "$ADMIN/api/_shared/"
 
 cat > "$ADMIN/.htaccess" <<'HT'
 # IPEC — admin.ipec.school
+# Interdiction totale d'indexation par les moteurs de recherche
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+</IfModule>
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -160,6 +165,10 @@ RewriteRule ^ - [L]
 RewriteRule ^api/ - [L]
 RewriteRule ^ index.html [L]
 HT
+cat > "$ADMIN/robots.txt" <<'RT'
+User-agent: *
+Disallow: /
+RT
 echo "Require all denied" > "$ADMIN/api/_shared/.htaccess"
 
 (cd "$ADMIN" && zip -rq "$DIST/admin.zip" .)
@@ -200,6 +209,11 @@ cp -R "$PUB/PHPMailer"       "$LMS/api/_shared/"
 
 cat > "$LMS/.htaccess" <<'HT'
 # IPEC — lms.ipec.school
+# Interdiction totale d'indexation par les moteurs de recherche
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+</IfModule>
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -207,6 +221,10 @@ RewriteRule ^ - [L]
 RewriteRule ^api/ - [L]
 RewriteRule ^ index.html [L]
 HT
+cat > "$LMS/robots.txt" <<'RT'
+User-agent: *
+Disallow: /
+RT
 echo "Require all denied" > "$LMS/api/_shared/.htaccess"
 
 (cd "$LMS" && zip -rq "$DIST/lms.zip" .)
