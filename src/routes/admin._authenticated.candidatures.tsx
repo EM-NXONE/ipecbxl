@@ -4,7 +4,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import { AdminCandidatureActions } from "@/components/AdminCandidatureActions";
+import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
@@ -150,7 +150,7 @@ function AdminCandidaturesListPage() {
                     compact
                     onDone={(res) => {
                       setError(null);
-                      setMsg(res.message || "Action effectuée.");
+                      setMsg(adminActionMessage(res));
                       setRefreshKey((v) => v + 1);
                     }}
                     onError={(message) => { setMsg(null); setError(message); }}
