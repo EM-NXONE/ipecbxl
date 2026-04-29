@@ -34,24 +34,9 @@ if (!class_exists('IpecCandidaturePdf') && is_file($SHARED . '/_pdf_classes.php'
     require_once $SHARED . '/_pdf_classes.php';
 }
 
-// ---------- CORS ----------
-$allowedOrigins = [
-    'https://lms.ipec.school',
-    'https://ipecbxl.lovable.app',
-    'https://id-preview--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app',
-];
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins, true)) {
-    header("Access-Control-Allow-Origin: $origin");
-    header('Access-Control-Allow-Credentials: true');
-    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Accept');
-    header('Vary: Origin');
-}
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
+// ---------- CORS (mutualisé entre les 3 portails) ----------
+require_once $SHARED . '/cors.php';
+ipec_cors_apply();
 
 // JSON par défaut (telecharger.php override avec Content-Type: application/pdf)
 if (!isset($GLOBALS['ETU_RAW_OUTPUT'])) {
