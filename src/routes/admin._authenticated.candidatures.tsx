@@ -1,7 +1,7 @@
 /**
  * /admin/candidatures — liste filtrable + paginée.
  */
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
@@ -39,6 +39,9 @@ interface ListResp {
 }
 
 function AdminCandidaturesListPage() {
+  const showingDetail = useRouterState({
+    select: (s) => s.matches.some((m) => m.routeId === "/admin/_authenticated/candidatures/$id"),
+  });
   const [q, setQ] = useState("");
   const [statut, setStatut] = useState("");
   const [payee, setPayee] = useState("");
@@ -66,6 +69,8 @@ function AdminCandidaturesListPage() {
     }, q ? 250 : 0);
     return () => clearTimeout(t);
   }, [q, statut, payee, page, refreshKey]);
+
+  if (showingDetail) return <Outlet />;
 
   return (
     <div>

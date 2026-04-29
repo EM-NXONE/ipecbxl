@@ -181,17 +181,6 @@ Restrict-PortalRoot $ADMIN @("admin","assets","_build","index.html","favicon.ico
 # Purge admin/ : on jette le legacy public/admin/*.php et on garde uniquement les index.html prerendus
 Purge-PortalSubdir (Join-Path $ADMIN "admin")
 
-# Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /admin/login
-$adminIndex = @"
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
-<title>IPEC Admin</title>
-<meta http-equiv="refresh" content="0; url=/admin/login">
-<link rel="canonical" href="/admin/login"></head>
-<body><script>location.replace('/admin/login')</script>
-<a href="/admin/login">Acceder a l'espace admin</a></body></html>
-"@
-Write-Utf8NoBom (Join-Path $ADMIN "index.html") $adminIndex
-
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
 New-Item -ItemType Directory -Path $adminShared -Force | Out-Null
@@ -213,6 +202,7 @@ $adminHt = @"
 </IfModule>
 
 RewriteEngine On
+RewriteRule ^$ /admin/login [R=302,L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
@@ -245,17 +235,6 @@ Restrict-PortalRoot $LMS @("etudiant","assets","_build","index.html","favicon.ic
 # Purge etudiant/ : on jette le legacy public/etudiant/*.php et on garde uniquement les index.html prerendus
 Purge-PortalSubdir (Join-Path $LMS "etudiant")
 
-# Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /etudiant/login
-$lmsIndex = @"
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
-<title>IPEC LMS</title>
-<meta http-equiv="refresh" content="0; url=/etudiant/login">
-<link rel="canonical" href="/etudiant/login"></head>
-<body><script>location.replace('/etudiant/login')</script>
-<a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
-"@
-Write-Utf8NoBom (Join-Path $LMS "index.html") $lmsIndex
-
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
 New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
@@ -276,6 +255,7 @@ $lmsHt = @"
 </IfModule>
 
 RewriteEngine On
+RewriteRule ^$ /etudiant/login [R=302,L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]

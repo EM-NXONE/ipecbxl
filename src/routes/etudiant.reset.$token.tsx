@@ -27,7 +27,7 @@ function ResetPasswordPage() {
     }
     setSubmitting(true);
     try {
-      await etuApi.post("/reset-password.php", { token, password: pwd });
+      await etuApi.post("/reset-password.php", { token, password: pwd, password2: pwd2 });
       navigate({ to: "/etudiant/login" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Lien invalide ou expiré.");

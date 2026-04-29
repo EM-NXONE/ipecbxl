@@ -132,14 +132,6 @@ move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
 restrict_portal_root "$ADMIN" "admin assets _build index.html favicon.ico favicon.svg"
 purge_portal_subdir "$ADMIN/admin"
-cat > "$ADMIN/index.html" <<'HTML'
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
-<title>IPEC Admin</title>
-<meta http-equiv="refresh" content="0; url=/admin/login">
-<link rel="canonical" href="/admin/login"></head>
-<body><script>location.replace('/admin/login')</script>
-<a href="/admin/login">Acceder a l'espace admin</a></body></html>
-HTML
 
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
@@ -159,6 +151,7 @@ cat > "$ADMIN/.htaccess" <<'HT'
 </IfModule>
 
 RewriteEngine On
+RewriteRule ^$ /admin/login [R=302,L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
@@ -189,14 +182,6 @@ move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
 restrict_portal_root "$LMS" "etudiant assets _build index.html favicon.ico favicon.svg"
 purge_portal_subdir "$LMS/etudiant"
-cat > "$LMS/index.html" <<'HTML'
-<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
-<title>IPEC LMS</title>
-<meta http-equiv="refresh" content="0; url=/etudiant/login">
-<link rel="canonical" href="/etudiant/login"></head>
-<body><script>location.replace('/etudiant/login')</script>
-<a href="/etudiant/login">Acceder a l'espace etudiant</a></body></html>
-HTML
 
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"
@@ -215,6 +200,7 @@ cat > "$LMS/.htaccess" <<'HT'
 </IfModule>
 
 RewriteEngine On
+RewriteRule ^$ /etudiant/login [R=302,L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
