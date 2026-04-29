@@ -171,6 +171,24 @@ try {
             ]);
         }
 
+        case 'reset_password_etudiant': {
+            if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
+            $etuId = (int)$c['etudiant_id'];
+            $pdo->prepare("UPDATE etudiant_tokens SET used_at=NOW()
+                           WHERE etudiant_id=? AND type='reset_password' AND used_at IS NULL")
+                ->execute([$etuId]);
+            // Bloque la connexion jusqu'à choix d'un nouveau mot de passe via le lien.
+            $pdo->prepare("UPDATE etudiants SET password_hash=NULL WHERE id=?")
+                ->execute([$etuId]);
+            $token = etudiant_create_token($pdo, $etuId, 'reset_password', 7 * 24 * 3600);
+            admin_log_action($id, 'reset_password_etudiant', 'Étudiant #' . $etuId);
+            api_json([
+                'ok' => true,
+                'message' => "Mot de passe réinitialisé. Communique le lien à l'étudiant.",
+                'activation_url' => 'https://lms.ipec.school/etudiant/reset/' . $token,
+            ]);
+        }
+
         case 'resend_email': {
             $envFile = __DIR__ . '/../../.ipec-mailer.env';
             if (!is_file($envFile)) api_error('Fichier .ipec-mailer.env introuvable.', 500);
