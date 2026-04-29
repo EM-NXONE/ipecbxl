@@ -76,9 +76,33 @@ function etu_layout_start(string $title, ?array $user = null): void {
                     <?= $h($user['prenom']) ?>
                 </a>
             <?php endif; ?>
+            <button type="button" class="hamburger" id="etuHamburger" aria-label="Ouvrir le menu" aria-controls="etuDrawer" aria-expanded="false">
+                <svg class="icon-open"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+                <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </button>
         </nav>
     </div>
 </header>
+
+<div class="drawer-backdrop" id="etuDrawerBackdrop" aria-hidden="true"></div>
+<aside class="drawer" id="etuDrawer" aria-hidden="true">
+    <div class="drawer-head">
+        <span>Menu</span>
+        <button type="button" class="drawer-close" id="etuDrawerClose" aria-label="Fermer le menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        </button>
+    </div>
+    <nav class="drawer-nav">
+        <?php if ($user): ?>
+        <a href="<?= etu_url('/index.php') ?>"<?= $isActive('/index.php') ?>><span class="ico">▤</span> Tableau de bord</a>
+        <a href="<?= etu_url('/factures.php') ?>"<?= $isActive('/factures.php') ?>><span class="ico">€</span> Factures</a>
+        <a href="<?= etu_url('/documents.php') ?>"<?= $isActive('/documents.php') ?>><span class="ico">▣</span> Documents</a>
+        <a href="<?= etu_url('/profil.php') ?>"<?= $isActive('/profil.php') ?>><span class="ico">●</span> Mon profil</a>
+        <div class="sep-label">Compte</div>
+        <a href="<?= etu_url('/logout.php') ?>"><span class="ico">⎋</span> Déconnexion</a>
+        <?php endif; ?>
+    </nav>
+</aside>
 
 <?php if ($user): ?>
 <div class="shell">
