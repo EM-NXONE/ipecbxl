@@ -3,7 +3,7 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Mail, RefreshCw, Download } from "lucide-react";
+import { ArrowLeft, RefreshCw, Download } from "lucide-react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
