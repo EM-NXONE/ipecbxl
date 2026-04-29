@@ -149,20 +149,14 @@ function AdminCandidatureDetailPage() {
             </div>
             <div className="text-xs">
               {data.etudiant.active
-                ? <span className="text-emerald-400">Compte activé</span>
-                : <span className="text-amber-400">Compte créé, en attente d'activation</span>}
+                ? <span className="text-emerald-400">Compte actif</span>
+                : <span className="text-amber-400">Compte sans mot de passe</span>}
             </div>
             <div className="flex gap-2 pt-2">
               <button onClick={() => runAction("sync_documents")} disabled={busy === "sync_documents"}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
                 <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
               </button>
-              {!data.etudiant.active && (
-                <button onClick={() => runAction("regen_activation")} disabled={busy === "regen_activation"}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
-                  <Mail size={12} /> {busy === "regen_activation" ? "…" : "Régénérer activation"}
-                </button>
-              )}
             </div>
           </div>
         ) : data.homonyme ? (
