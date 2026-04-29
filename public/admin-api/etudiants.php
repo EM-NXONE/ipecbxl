@@ -3,6 +3,7 @@
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
 api_require_admin();
+admin_require_db();
 
 $q = trim((string)($_GET['q'] ?? ''));
 $where = '';
