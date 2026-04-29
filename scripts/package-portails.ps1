@@ -124,7 +124,15 @@ Write-Host "==> dist\site.zip OK"
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "admin"
 $ADMIN = Join-Path $BUILD "admin"
-Move-BuildOutput -BuildOutput $out -Dest $ADMIN
+# Admin : on garde uniquement assets + sous-dossier admin/. On vire tout le reste.
+$forbidAdmin = @()
+Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
+    if ($_.Name -ne "admin" -and $_.Name -ne "assets" -and $_.Name -ne "_build") {
+        $forbidAdmin += $_.Name
+    }
+}
+# Garde uniquement index.html (SPA fallback) et 404/200 a la racine.
+Move-BuildOutput -BuildOutput $out -Dest $ADMIN -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidAdmin
 
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
