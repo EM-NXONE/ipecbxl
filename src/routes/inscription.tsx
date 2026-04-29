@@ -250,7 +250,7 @@ function Inscription() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-blue mb-3">Civilité</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {["Mr", "Mme", "Mlle", "Mx — non binaire"].map((opt) => (
+                    {["Mr", "Mme", "Mlle", "Mx"].map((opt) => (
                       <label
                         key={opt}
                         className="flex items-center gap-2 px-4 py-3 rounded-sm border border-border/60 bg-card cursor-pointer hover:border-blue transition-colors text-sm text-cream has-[:checked]:border-blue has-[:checked]:bg-blue/10"
