@@ -67,6 +67,20 @@ purge_portal_subdir() {
     find "$folder" -depth -type d -empty -delete
 }
 
+# Whitelist racine : ne garde que les entrees explicitement listees.
+# Usage : restrict_portal_root <folder> "name1 name2 name3"
+restrict_portal_root() {
+    local folder="$1"; local keep=" $2 "
+    [ -d "$folder" ] || return 0
+    for entry in "$folder"/* "$folder"/.[!.]*; do
+        [ -e "$entry" ] || continue
+        local name; name="$(basename "$entry")"
+        if ! echo "$keep" | grep -q " $name "; then
+            rm -rf "$entry"
+        fi
+    done
+}
+
 # Liste des fichiers du SITE qui n'ont rien a faire dans admin/lms
 SITE_ONLY_FILES="mailer.php verify.php cors.php db_config.php schema.sql _pdf_classes.php sitemap.xml robots.txt ipec-logo-email.png android-chrome-192x192.png android-chrome-512x512.png apple-touch-icon.png favicon-16x16.png favicon-32x32.png favicon-96x96.png site.webmanifest"
 
@@ -116,8 +130,8 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
+restrict_portal_root "$ADMIN" "admin assets _build index.html favicon.ico favicon.svg"
 purge_portal_subdir "$ADMIN/admin"
-for f in $SITE_ONLY_FILES; do rm -f "$ADMIN/$f"; done
 cat > "$ADMIN/index.html" <<'HTML'
 <!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
 <title>IPEC Admin</title>
@@ -164,8 +178,8 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
+restrict_portal_root "$LMS" "etudiant assets _build index.html favicon.ico favicon.svg"
 purge_portal_subdir "$LMS/etudiant"
-for f in $SITE_ONLY_FILES; do rm -f "$LMS/$f"; done
 cat > "$LMS/index.html" <<'HTML'
 <!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
 <title>IPEC LMS</title>
