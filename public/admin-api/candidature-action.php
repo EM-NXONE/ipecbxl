@@ -15,6 +15,8 @@
 require_once __DIR__ . '/_bootstrap.php';
 api_method('POST');
 api_require_admin();
+admin_require_db();
+admin_require_etudiants();
 
 $body   = api_body();
 $id     = (int)($body['id'] ?? 0);
@@ -172,6 +174,8 @@ try {
         }
 
         case 'resend_email': {
+            admin_require_mailer();
+
             $envFile = __DIR__ . '/../../.ipec-mailer.env';
             if (!is_file($envFile)) api_error('Fichier .ipec-mailer.env introuvable.', 500);
             $env = [];

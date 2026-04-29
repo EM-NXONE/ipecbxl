@@ -5,6 +5,8 @@
  */
 require_once __DIR__ . '/_bootstrap.php';
 api_require_admin();
+admin_require_db();
+admin_require_mailer();
 
 $id   = (int)($_GET['id'] ?? 0);
 $kind = (string)($_GET['kind'] ?? 'candidature');
