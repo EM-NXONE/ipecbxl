@@ -4,7 +4,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Mail, RefreshCw, Download } from "lucide-react";
-import { AdminCandidatureActions } from "@/components/AdminCandidatureActions";
+import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
@@ -48,8 +48,8 @@ function AdminCandidatureDetailPage() {
     setMsg(null);
     setError(null);
     try {
-      const res = await adminApi.post<{ message?: string }>("/candidature-action.php", { id: Number(id), action, ...body });
-      setMsg(res.message || "Action effectuée.");
+      const res = await adminApi.post<{ message?: string; activation_url?: string | null }>("/candidature-action.php", { id: Number(id), action, ...body });
+      setMsg(adminActionMessage(res));
       reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Échec de l'action.");
@@ -124,7 +124,7 @@ function AdminCandidatureDetailPage() {
             id={id}
             paid={paid}
             hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
-            onDone={(res) => { setMsg(res.message || "Action effectuée."); reload(); }}
+            onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
             onError={setError}
           />
         </div>
