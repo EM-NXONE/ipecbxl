@@ -4,6 +4,7 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { AdminCandidatureActions } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 
@@ -30,6 +31,7 @@ interface LastCandidature {
   statut: string;
   programme: string | null;
   facture_payee: number | boolean;
+  etudiant_id: number | null;
   created_at: string;
 }
 interface DashboardData {
@@ -40,10 +42,12 @@ interface DashboardData {
 function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     adminApi.get<DashboardData>("/dashboard.php").then(setData).catch((e) => setError(e.message));
-  }, []);
+  }, [refreshKey]);
 
   return (
     <div>
@@ -53,6 +57,11 @@ function AdminDashboardPage() {
       {error && (
         <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">
           {error}
+        </div>
+      )}
+      {msg && (
+        <div className="mb-6 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">
+          {msg}
         </div>
       )}
 
@@ -88,6 +97,7 @@ function AdminDashboardPage() {
                     <th className="text-left px-4 py-2.5">Statut</th>
                     <th className="text-left px-4 py-2.5 hidden sm:table-cell">Frais</th>
                     <th className="text-left px-4 py-2.5 hidden lg:table-cell">Reçue le</th>
+                    <th className="text-left px-4 py-2.5">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -112,10 +122,24 @@ function AdminDashboardPage() {
                         )}
                       </td>
                       <td className="px-4 py-2.5 hidden lg:table-cell text-muted-foreground text-xs">{formatDateTime(c.created_at)}</td>
+                      <td className="px-4 py-2.5">
+                        <AdminCandidatureActions
+                          id={c.id}
+                          paid={c.facture_payee}
+                          hasEtudiant={Boolean(c.etudiant_id)}
+                          compact
+                          onDone={(res) => {
+                            setError(null);
+                            setMsg(res.message || "Action effectuée.");
+                            setRefreshKey((v) => v + 1);
+                          }}
+                          onError={(message) => { setMsg(null); setError(message); }}
+                        />
+                      </td>
                     </tr>
                   ))}
                   {data.last_candidatures.length === 0 && (
-                    <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground text-sm">Aucune candidature pour le moment.</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground text-sm">Aucune candidature pour le moment.</td></tr>
                   )}
                 </tbody>
               </table>
