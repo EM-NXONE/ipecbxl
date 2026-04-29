@@ -21,7 +21,14 @@ import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as CgvRouteImport } from './routes/cgv'
 import { Route as CguRouteImport } from './routes/cgu'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminAuthenticatedRouteImport } from './routes/admin._authenticated'
+import { Route as AdminAuthenticatedIndexRouteImport } from './routes/admin._authenticated.index'
+import { Route as AdminAuthenticatedEtudiantsRouteImport } from './routes/admin._authenticated.etudiants'
+import { Route as AdminAuthenticatedCandidaturesRouteImport } from './routes/admin._authenticated.candidatures'
+import { Route as AdminAuthenticatedCandidaturesIdRouteImport } from './routes/admin._authenticated.candidatures.$id'
 
 const VieEtudianteRoute = VieEtudianteRouteImport.update({
   id: '/vie-etudiante',
@@ -83,14 +90,52 @@ const AdmissionsRoute = AdmissionsRouteImport.update({
   path: '/admissions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuthenticatedRoute = AdminAuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuthenticatedIndexRoute = AdminAuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminAuthenticatedRoute,
+} as any)
+const AdminAuthenticatedEtudiantsRoute =
+  AdminAuthenticatedEtudiantsRouteImport.update({
+    id: '/etudiants',
+    path: '/etudiants',
+    getParentRoute: () => AdminAuthenticatedRoute,
+  } as any)
+const AdminAuthenticatedCandidaturesRoute =
+  AdminAuthenticatedCandidaturesRouteImport.update({
+    id: '/candidatures',
+    path: '/candidatures',
+    getParentRoute: () => AdminAuthenticatedRoute,
+  } as any)
+const AdminAuthenticatedCandidaturesIdRoute =
+  AdminAuthenticatedCandidaturesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AdminAuthenticatedCandidaturesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminAuthenticatedRouteWithChildren
   '/admissions': typeof AdmissionsRoute
   '/cgu': typeof CguRoute
   '/cgv': typeof CgvRoute
@@ -103,9 +148,15 @@ export interface FileRoutesByFullPath {
   '/programmes': typeof ProgrammesRoute
   '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/admin/': typeof AdminAuthenticatedIndexRoute
+  '/admin/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminAuthenticatedIndexRoute
   '/admissions': typeof AdmissionsRoute
   '/cgu': typeof CguRoute
   '/cgv': typeof CgvRoute
@@ -118,10 +169,15 @@ export interface FileRoutesByTo {
   '/programmes': typeof ProgrammesRoute
   '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/admin/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admissions': typeof AdmissionsRoute
   '/cgu': typeof CguRoute
   '/cgv': typeof CgvRoute
@@ -134,11 +190,18 @@ export interface FileRoutesById {
   '/programmes': typeof ProgrammesRoute
   '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
+  '/admin/_authenticated': typeof AdminAuthenticatedRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/_authenticated/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/_authenticated/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/admin/_authenticated/': typeof AdminAuthenticatedIndexRoute
+  '/admin/_authenticated/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/admissions'
     | '/cgu'
     | '/cgv'
@@ -151,9 +214,15 @@ export interface FileRouteTypes {
     | '/programmes'
     | '/verification'
     | '/vie-etudiante'
+    | '/admin/login'
+    | '/admin/candidatures'
+    | '/admin/etudiants'
+    | '/admin/'
+    | '/admin/candidatures/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/admissions'
     | '/cgu'
     | '/cgv'
@@ -166,9 +235,14 @@ export interface FileRouteTypes {
     | '/programmes'
     | '/verification'
     | '/vie-etudiante'
+    | '/admin/login'
+    | '/admin/candidatures'
+    | '/admin/etudiants'
+    | '/admin/candidatures/$id'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/admissions'
     | '/cgu'
     | '/cgv'
@@ -181,10 +255,17 @@ export interface FileRouteTypes {
     | '/programmes'
     | '/verification'
     | '/vie-etudiante'
+    | '/admin/_authenticated'
+    | '/admin/login'
+    | '/admin/_authenticated/candidatures'
+    | '/admin/_authenticated/etudiants'
+    | '/admin/_authenticated/'
+    | '/admin/_authenticated/candidatures/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AdmissionsRoute: typeof AdmissionsRoute
   CguRoute: typeof CguRoute
   CgvRoute: typeof CgvRoute
@@ -285,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdmissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -292,11 +380,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/_authenticated': {
+      id: '/admin/_authenticated'
+      path: ''
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAuthenticatedRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/_authenticated/': {
+      id: '/admin/_authenticated/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminAuthenticatedIndexRouteImport
+      parentRoute: typeof AdminAuthenticatedRoute
+    }
+    '/admin/_authenticated/etudiants': {
+      id: '/admin/_authenticated/etudiants'
+      path: '/etudiants'
+      fullPath: '/admin/etudiants'
+      preLoaderRoute: typeof AdminAuthenticatedEtudiantsRouteImport
+      parentRoute: typeof AdminAuthenticatedRoute
+    }
+    '/admin/_authenticated/candidatures': {
+      id: '/admin/_authenticated/candidatures'
+      path: '/candidatures'
+      fullPath: '/admin/candidatures'
+      preLoaderRoute: typeof AdminAuthenticatedCandidaturesRouteImport
+      parentRoute: typeof AdminAuthenticatedRoute
+    }
+    '/admin/_authenticated/candidatures/$id': {
+      id: '/admin/_authenticated/candidatures/$id'
+      path: '/$id'
+      fullPath: '/admin/candidatures/$id'
+      preLoaderRoute: typeof AdminAuthenticatedCandidaturesIdRouteImport
+      parentRoute: typeof AdminAuthenticatedCandidaturesRoute
+    }
   }
 }
 
+interface AdminAuthenticatedCandidaturesRouteChildren {
+  AdminAuthenticatedCandidaturesIdRoute: typeof AdminAuthenticatedCandidaturesIdRoute
+}
+
+const AdminAuthenticatedCandidaturesRouteChildren: AdminAuthenticatedCandidaturesRouteChildren =
+  {
+    AdminAuthenticatedCandidaturesIdRoute:
+      AdminAuthenticatedCandidaturesIdRoute,
+  }
+
+const AdminAuthenticatedCandidaturesRouteWithChildren =
+  AdminAuthenticatedCandidaturesRoute._addFileChildren(
+    AdminAuthenticatedCandidaturesRouteChildren,
+  )
+
+interface AdminAuthenticatedRouteChildren {
+  AdminAuthenticatedCandidaturesRoute: typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  AdminAuthenticatedEtudiantsRoute: typeof AdminAuthenticatedEtudiantsRoute
+  AdminAuthenticatedIndexRoute: typeof AdminAuthenticatedIndexRoute
+}
+
+const AdminAuthenticatedRouteChildren: AdminAuthenticatedRouteChildren = {
+  AdminAuthenticatedCandidaturesRoute:
+    AdminAuthenticatedCandidaturesRouteWithChildren,
+  AdminAuthenticatedEtudiantsRoute: AdminAuthenticatedEtudiantsRoute,
+  AdminAuthenticatedIndexRoute: AdminAuthenticatedIndexRoute,
+}
+
+const AdminAuthenticatedRouteWithChildren =
+  AdminAuthenticatedRoute._addFileChildren(AdminAuthenticatedRouteChildren)
+
+interface AdminRouteChildren {
+  AdminAuthenticatedRoute: typeof AdminAuthenticatedRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuthenticatedRoute: AdminAuthenticatedRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AdmissionsRoute: AdmissionsRoute,
   CguRoute: CguRoute,
   CgvRoute: CgvRoute,
