@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Copy, KeyRound, Mail, RefreshCw, UserPlus, XCircle } from "lucide-react";
+import { CheckCircle2, Copy, KeyRound, Mail, Pencil, RefreshCw, UserPlus, XCircle } from "lucide-react";
 import { adminApi } from "@/lib/api";
 
 export interface AdminActionResult {
@@ -19,9 +19,13 @@ interface AdminCandidatureActionsProps {
   paid: boolean | number;
   hasEtudiant: boolean;
   compact?: boolean;
+  /** Moyen de paiement actuel (pour pré-remplir l'édition). */
+  currentMoyen?: string | null;
+  /** Date de paiement actuelle ISO (pour pré-remplir l'édition). */
+  currentDate?: string | null;
   /**
    * "all" (défaut) — toutes les actions
-   * "payment" — uniquement marquer payé / annuler paiement
+   * "payment" — uniquement marquer payé / annuler paiement / éditer
    * "general" — tout sauf le paiement (renvoi mail, création/sync étudiant, reset mdp)
    */
   scope?: "all" | "payment" | "general";
@@ -42,16 +46,32 @@ export function AdminCandidatureActions({
   paid,
   hasEtudiant,
   compact = false,
+  currentMoyen,
+  currentDate,
   scope = "all",
   onDone,
   onError,
 }: AdminCandidatureActionsProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [lastPwd, setLastPwd] = useState<string | null>(null);
   const [moyen, setMoyen] = useState<string>("virement");
   const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const isPaid = Boolean(Number(paid));
+
+  const openEdit = () => {
+    if (currentMoyen) setMoyen(currentMoyen);
+    if (currentDate) setDatePaiement(currentDate.slice(0, 10));
+    setEditMode(true);
+    setShowPayModal(true);
+  };
+  const openMarkPaid = () => {
+    setMoyen("virement");
+    setDatePaiement(new Date().toISOString().slice(0, 10));
+    setEditMode(false);
+    setShowPayModal(true);
+  };
 
   const runAction = async (action: string, body?: Record<string, unknown>) => {
     setBusy(action);
@@ -94,21 +114,48 @@ export function AdminCandidatureActions({
           </button>
         )}
 
-        {showPayment && (
+        {showPayment && !isPaid && (
           <button
             type="button"
-            onClick={() => {
-              if (isPaid) runAction("mark_unpaid");
-              else setShowPayModal(true);
-            }}
+            onClick={openMarkPaid}
             disabled={busy !== null}
             className={buttonClass}
-            title={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
-            aria-label={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
+            title="Marquer comme payé"
+            aria-label="Marquer comme payé"
           >
-            {isPaid ? <XCircle size={compact ? 14 : 15} /> : <CheckCircle2 size={compact ? 14 : 15} />}
-            {!compact && <span>{busy === "mark_paid" || busy === "mark_unpaid" ? "…" : isPaid ? "Annuler paiement" : "Marquer payé"}</span>}
+            <CheckCircle2 size={compact ? 14 : 15} />
+            {!compact && <span>{busy === "mark_paid" ? "…" : "Marquer payé"}</span>}
           </button>
+        )}
+
+        {showPayment && isPaid && (
+          <>
+            <button
+              type="button"
+              onClick={openEdit}
+              disabled={busy !== null}
+              className={buttonClass}
+              title="Éditer le paiement (moyen / date)"
+              aria-label="Éditer le paiement"
+            >
+              <Pencil size={compact ? 14 : 15} />
+              {!compact && <span>{busy === "mark_paid" && editMode ? "…" : "Éditer"}</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirm("Annuler ce paiement ? La facture repassera en attente.")) return;
+                runAction("mark_unpaid");
+              }}
+              disabled={busy !== null}
+              className={buttonClass}
+              title="Annuler le paiement"
+              aria-label="Annuler le paiement"
+            >
+              <XCircle size={compact ? 14 : 15} />
+              {!compact && <span>{busy === "mark_unpaid" ? "…" : "Annuler paiement"}</span>}
+            </button>
+          </>
         )}
 
         {showGeneral && (
@@ -160,7 +207,7 @@ export function AdminCandidatureActions({
       {showPayModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowPayModal(false)}>
           <div className="bg-card border border-border/40 rounded-md p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-display text-lg text-cream mb-4">Marquer la facture comme payée</h3>
+            <h3 className="font-display text-lg text-cream mb-4">{editMode ? "Modifier le paiement" : "Marquer la facture comme payée"}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">Moyen de paiement</label>
@@ -198,7 +245,7 @@ export function AdminCandidatureActions({
                   }}
                   className="px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
-                  {busy === "mark_paid" ? "Enregistrement…" : "Confirmer le paiement"}
+                  {busy === "mark_paid" ? "Enregistrement…" : (editMode ? "Enregistrer les modifications" : "Confirmer le paiement")}
                 </button>
               </div>
             </div>

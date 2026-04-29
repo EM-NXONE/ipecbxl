@@ -22,7 +22,8 @@ interface Detail {
     ville: string | null; code_postal: string | null; pays_residence: string | null;
     specialisation: string | null; rentree: string | null; message: string | null;
     facture_numero: string | null; facture_payee: number | boolean;
-    facture_payee_at: string | null; facture_payee_par: string | null; etudiant_id: number | null;
+    facture_payee_at: string | null; facture_payee_par: string | null;
+    moyen_paiement: string | null; etudiant_id: number | null;
     ip: string | null; user_agent: string | null; updated_at: string | null; created_at: string;
   };
   etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number } | null;
@@ -157,6 +158,12 @@ function AdminCandidatureDetailPage() {
                 <dd className="text-cream">{formatDateTime(c.facture_payee_at)}</dd>
               </div>
             )}
+            {paid && c.moyen_paiement && (
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-32">Moyen</dt>
+                <dd className="text-cream capitalize">{moyenLabel(c.moyen_paiement)}</dd>
+              </div>
+            )}
             {paid && c.facture_payee_par && (
               <div className="flex gap-2">
                 <dt className="text-muted-foreground w-32">Validé par</dt>
@@ -173,6 +180,8 @@ function AdminCandidatureDetailPage() {
             paid={paid}
             hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
             scope="payment"
+            currentMoyen={c.moyen_paiement}
+            currentDate={c.facture_payee_at}
             onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
             onError={setError}
           />
@@ -291,4 +300,16 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
       <dd className="text-cream">{value}</dd>
     </div>
   );
+}
+
+const MOYEN_LABELS: Record<string, string> = {
+  virement: "Virement bancaire",
+  carte: "Carte bancaire",
+  especes: "Espèces",
+  cheque: "Chèque",
+  autre: "Autre",
+};
+function moyenLabel(v: string | null | undefined): string {
+  if (!v) return "—";
+  return MOYEN_LABELS[v] ?? v;
 }
