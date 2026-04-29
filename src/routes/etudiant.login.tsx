@@ -116,6 +116,7 @@ function Field({
   autoComplete,
   value,
   onChange,
+  placeholder,
 }: {
   id: string;
   label: string;
@@ -123,6 +124,7 @@ function Field({
   autoComplete?: string;
   value: string;
   onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <div>
@@ -133,6 +135,7 @@ function Field({
         id={id}
         type={type}
         autoComplete={autoComplete}
+        placeholder={placeholder}
         required
         value={value}
         onChange={(e) => onChange(e.target.value)}
