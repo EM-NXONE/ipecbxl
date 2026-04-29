@@ -15,6 +15,7 @@ import { Route as ProgrammesRouteImport } from './routes/programmes'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as InternationalRouteImport } from './routes/international'
 import { Route as InscriptionRouteImport } from './routes/inscription'
+import { Route as EtudiantRouteImport } from './routes/etudiant'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
@@ -23,9 +24,18 @@ import { Route as CguRouteImport } from './routes/cgu'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EtudiantMotDePasseOublieRouteImport } from './routes/etudiant.mot-de-passe-oublie'
+import { Route as EtudiantLoginRouteImport } from './routes/etudiant.login'
+import { Route as EtudiantAuthenticatedRouteImport } from './routes/etudiant._authenticated'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAuthenticatedRouteImport } from './routes/admin._authenticated'
+import { Route as EtudiantAuthenticatedIndexRouteImport } from './routes/etudiant._authenticated.index'
 import { Route as AdminAuthenticatedIndexRouteImport } from './routes/admin._authenticated.index'
+import { Route as EtudiantResetTokenRouteImport } from './routes/etudiant.reset.$token'
+import { Route as EtudiantActiverTokenRouteImport } from './routes/etudiant.activer.$token'
+import { Route as EtudiantAuthenticatedProfilRouteImport } from './routes/etudiant._authenticated.profil'
+import { Route as EtudiantAuthenticatedFacturesRouteImport } from './routes/etudiant._authenticated.factures'
+import { Route as EtudiantAuthenticatedDocumentsRouteImport } from './routes/etudiant._authenticated.documents'
 import { Route as AdminAuthenticatedEtudiantsRouteImport } from './routes/admin._authenticated.etudiants'
 import { Route as AdminAuthenticatedCandidaturesRouteImport } from './routes/admin._authenticated.candidatures'
 import { Route as AdminAuthenticatedCandidaturesIdRouteImport } from './routes/admin._authenticated.candidatures.$id'
@@ -58,6 +68,11 @@ const InternationalRoute = InternationalRouteImport.update({
 const InscriptionRoute = InscriptionRouteImport.update({
   id: '/inscription',
   path: '/inscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtudiantRoute = EtudiantRouteImport.update({
+  id: '/etudiant',
+  path: '/etudiant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -100,6 +115,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudiantMotDePasseOublieRoute =
+  EtudiantMotDePasseOublieRouteImport.update({
+    id: '/mot-de-passe-oublie',
+    path: '/mot-de-passe-oublie',
+    getParentRoute: () => EtudiantRoute,
+  } as any)
+const EtudiantLoginRoute = EtudiantLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => EtudiantRoute,
+} as any)
+const EtudiantAuthenticatedRoute = EtudiantAuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => EtudiantRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -109,11 +139,45 @@ const AdminAuthenticatedRoute = AdminAuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => AdminRoute,
 } as any)
+const EtudiantAuthenticatedIndexRoute =
+  EtudiantAuthenticatedIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EtudiantAuthenticatedRoute,
+  } as any)
 const AdminAuthenticatedIndexRoute = AdminAuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminAuthenticatedRoute,
 } as any)
+const EtudiantResetTokenRoute = EtudiantResetTokenRouteImport.update({
+  id: '/reset/$token',
+  path: '/reset/$token',
+  getParentRoute: () => EtudiantRoute,
+} as any)
+const EtudiantActiverTokenRoute = EtudiantActiverTokenRouteImport.update({
+  id: '/activer/$token',
+  path: '/activer/$token',
+  getParentRoute: () => EtudiantRoute,
+} as any)
+const EtudiantAuthenticatedProfilRoute =
+  EtudiantAuthenticatedProfilRouteImport.update({
+    id: '/profil',
+    path: '/profil',
+    getParentRoute: () => EtudiantAuthenticatedRoute,
+  } as any)
+const EtudiantAuthenticatedFacturesRoute =
+  EtudiantAuthenticatedFacturesRouteImport.update({
+    id: '/factures',
+    path: '/factures',
+    getParentRoute: () => EtudiantAuthenticatedRoute,
+  } as any)
+const EtudiantAuthenticatedDocumentsRoute =
+  EtudiantAuthenticatedDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => EtudiantAuthenticatedRoute,
+  } as any)
 const AdminAuthenticatedEtudiantsRoute =
   AdminAuthenticatedEtudiantsRouteImport.update({
     id: '/etudiants',
@@ -142,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/etudiant': typeof EtudiantAuthenticatedRouteWithChildren
   '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -149,9 +214,17 @@ export interface FileRoutesByFullPath {
   '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
   '/admin/login': typeof AdminLoginRoute
+  '/etudiant/login': typeof EtudiantLoginRoute
+  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
+  '/etudiant/factures': typeof EtudiantAuthenticatedFacturesRoute
+  '/etudiant/profil': typeof EtudiantAuthenticatedProfilRoute
+  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
+  '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/': typeof AdminAuthenticatedIndexRoute
+  '/etudiant/': typeof EtudiantAuthenticatedIndexRoute
   '/admin/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRoutesByTo {
@@ -163,6 +236,7 @@ export interface FileRoutesByTo {
   '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/etudiant': typeof EtudiantAuthenticatedIndexRoute
   '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -170,8 +244,15 @@ export interface FileRoutesByTo {
   '/verification': typeof VerificationRoute
   '/vie-etudiante': typeof VieEtudianteRoute
   '/admin/login': typeof AdminLoginRoute
+  '/etudiant/login': typeof EtudiantLoginRoute
+  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
+  '/etudiant/factures': typeof EtudiantAuthenticatedFacturesRoute
+  '/etudiant/profil': typeof EtudiantAuthenticatedProfilRoute
+  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
+  '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRoutesById {
@@ -184,6 +265,7 @@ export interface FileRoutesById {
   '/confidentialite': typeof ConfidentialiteRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/etudiant': typeof EtudiantRouteWithChildren
   '/inscription': typeof InscriptionRoute
   '/international': typeof InternationalRoute
   '/mentions-legales': typeof MentionsLegalesRoute
@@ -192,9 +274,18 @@ export interface FileRoutesById {
   '/vie-etudiante': typeof VieEtudianteRoute
   '/admin/_authenticated': typeof AdminAuthenticatedRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/etudiant/_authenticated': typeof EtudiantAuthenticatedRouteWithChildren
+  '/etudiant/login': typeof EtudiantLoginRoute
+  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/_authenticated/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/_authenticated/etudiants': typeof AdminAuthenticatedEtudiantsRoute
+  '/etudiant/_authenticated/documents': typeof EtudiantAuthenticatedDocumentsRoute
+  '/etudiant/_authenticated/factures': typeof EtudiantAuthenticatedFacturesRoute
+  '/etudiant/_authenticated/profil': typeof EtudiantAuthenticatedProfilRoute
+  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
+  '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/_authenticated/': typeof AdminAuthenticatedIndexRoute
+  '/etudiant/_authenticated/': typeof EtudiantAuthenticatedIndexRoute
   '/admin/_authenticated/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
 export interface FileRouteTypes {
@@ -208,6 +299,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/contact'
     | '/cookies'
+    | '/etudiant'
     | '/inscription'
     | '/international'
     | '/mentions-legales'
@@ -215,9 +307,17 @@ export interface FileRouteTypes {
     | '/verification'
     | '/vie-etudiante'
     | '/admin/login'
+    | '/etudiant/login'
+    | '/etudiant/mot-de-passe-oublie'
     | '/admin/candidatures'
     | '/admin/etudiants'
+    | '/etudiant/documents'
+    | '/etudiant/factures'
+    | '/etudiant/profil'
+    | '/etudiant/activer/$token'
+    | '/etudiant/reset/$token'
     | '/admin/'
+    | '/etudiant/'
     | '/admin/candidatures/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -229,6 +329,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/contact'
     | '/cookies'
+    | '/etudiant'
     | '/inscription'
     | '/international'
     | '/mentions-legales'
@@ -236,8 +337,15 @@ export interface FileRouteTypes {
     | '/verification'
     | '/vie-etudiante'
     | '/admin/login'
+    | '/etudiant/login'
+    | '/etudiant/mot-de-passe-oublie'
     | '/admin/candidatures'
     | '/admin/etudiants'
+    | '/etudiant/documents'
+    | '/etudiant/factures'
+    | '/etudiant/profil'
+    | '/etudiant/activer/$token'
+    | '/etudiant/reset/$token'
     | '/admin/candidatures/$id'
   id:
     | '__root__'
@@ -249,6 +357,7 @@ export interface FileRouteTypes {
     | '/confidentialite'
     | '/contact'
     | '/cookies'
+    | '/etudiant'
     | '/inscription'
     | '/international'
     | '/mentions-legales'
@@ -257,9 +366,18 @@ export interface FileRouteTypes {
     | '/vie-etudiante'
     | '/admin/_authenticated'
     | '/admin/login'
+    | '/etudiant/_authenticated'
+    | '/etudiant/login'
+    | '/etudiant/mot-de-passe-oublie'
     | '/admin/_authenticated/candidatures'
     | '/admin/_authenticated/etudiants'
+    | '/etudiant/_authenticated/documents'
+    | '/etudiant/_authenticated/factures'
+    | '/etudiant/_authenticated/profil'
+    | '/etudiant/activer/$token'
+    | '/etudiant/reset/$token'
     | '/admin/_authenticated/'
+    | '/etudiant/_authenticated/'
     | '/admin/_authenticated/candidatures/$id'
   fileRoutesById: FileRoutesById
 }
@@ -272,6 +390,7 @@ export interface RootRouteChildren {
   ConfidentialiteRoute: typeof ConfidentialiteRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
+  EtudiantRoute: typeof EtudiantRouteWithChildren
   InscriptionRoute: typeof InscriptionRoute
   InternationalRoute: typeof InternationalRoute
   MentionsLegalesRoute: typeof MentionsLegalesRoute
@@ -322,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/inscription'
       fullPath: '/inscription'
       preLoaderRoute: typeof InscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etudiant': {
+      id: '/etudiant'
+      path: '/etudiant'
+      fullPath: '/etudiant'
+      preLoaderRoute: typeof EtudiantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -380,6 +506,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etudiant/mot-de-passe-oublie': {
+      id: '/etudiant/mot-de-passe-oublie'
+      path: '/mot-de-passe-oublie'
+      fullPath: '/etudiant/mot-de-passe-oublie'
+      preLoaderRoute: typeof EtudiantMotDePasseOublieRouteImport
+      parentRoute: typeof EtudiantRoute
+    }
+    '/etudiant/login': {
+      id: '/etudiant/login'
+      path: '/login'
+      fullPath: '/etudiant/login'
+      preLoaderRoute: typeof EtudiantLoginRouteImport
+      parentRoute: typeof EtudiantRoute
+    }
+    '/etudiant/_authenticated': {
+      id: '/etudiant/_authenticated'
+      path: ''
+      fullPath: '/etudiant'
+      preLoaderRoute: typeof EtudiantAuthenticatedRouteImport
+      parentRoute: typeof EtudiantRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -394,12 +541,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthenticatedRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/etudiant/_authenticated/': {
+      id: '/etudiant/_authenticated/'
+      path: '/'
+      fullPath: '/etudiant/'
+      preLoaderRoute: typeof EtudiantAuthenticatedIndexRouteImport
+      parentRoute: typeof EtudiantAuthenticatedRoute
+    }
     '/admin/_authenticated/': {
       id: '/admin/_authenticated/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminAuthenticatedIndexRouteImport
       parentRoute: typeof AdminAuthenticatedRoute
+    }
+    '/etudiant/reset/$token': {
+      id: '/etudiant/reset/$token'
+      path: '/reset/$token'
+      fullPath: '/etudiant/reset/$token'
+      preLoaderRoute: typeof EtudiantResetTokenRouteImport
+      parentRoute: typeof EtudiantRoute
+    }
+    '/etudiant/activer/$token': {
+      id: '/etudiant/activer/$token'
+      path: '/activer/$token'
+      fullPath: '/etudiant/activer/$token'
+      preLoaderRoute: typeof EtudiantActiverTokenRouteImport
+      parentRoute: typeof EtudiantRoute
+    }
+    '/etudiant/_authenticated/profil': {
+      id: '/etudiant/_authenticated/profil'
+      path: '/profil'
+      fullPath: '/etudiant/profil'
+      preLoaderRoute: typeof EtudiantAuthenticatedProfilRouteImport
+      parentRoute: typeof EtudiantAuthenticatedRoute
+    }
+    '/etudiant/_authenticated/factures': {
+      id: '/etudiant/_authenticated/factures'
+      path: '/factures'
+      fullPath: '/etudiant/factures'
+      preLoaderRoute: typeof EtudiantAuthenticatedFacturesRouteImport
+      parentRoute: typeof EtudiantAuthenticatedRoute
+    }
+    '/etudiant/_authenticated/documents': {
+      id: '/etudiant/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/etudiant/documents'
+      preLoaderRoute: typeof EtudiantAuthenticatedDocumentsRouteImport
+      parentRoute: typeof EtudiantAuthenticatedRoute
     }
     '/admin/_authenticated/etudiants': {
       id: '/admin/_authenticated/etudiants'
@@ -468,6 +657,45 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface EtudiantAuthenticatedRouteChildren {
+  EtudiantAuthenticatedDocumentsRoute: typeof EtudiantAuthenticatedDocumentsRoute
+  EtudiantAuthenticatedFacturesRoute: typeof EtudiantAuthenticatedFacturesRoute
+  EtudiantAuthenticatedProfilRoute: typeof EtudiantAuthenticatedProfilRoute
+  EtudiantAuthenticatedIndexRoute: typeof EtudiantAuthenticatedIndexRoute
+}
+
+const EtudiantAuthenticatedRouteChildren: EtudiantAuthenticatedRouteChildren = {
+  EtudiantAuthenticatedDocumentsRoute: EtudiantAuthenticatedDocumentsRoute,
+  EtudiantAuthenticatedFacturesRoute: EtudiantAuthenticatedFacturesRoute,
+  EtudiantAuthenticatedProfilRoute: EtudiantAuthenticatedProfilRoute,
+  EtudiantAuthenticatedIndexRoute: EtudiantAuthenticatedIndexRoute,
+}
+
+const EtudiantAuthenticatedRouteWithChildren =
+  EtudiantAuthenticatedRoute._addFileChildren(
+    EtudiantAuthenticatedRouteChildren,
+  )
+
+interface EtudiantRouteChildren {
+  EtudiantAuthenticatedRoute: typeof EtudiantAuthenticatedRouteWithChildren
+  EtudiantLoginRoute: typeof EtudiantLoginRoute
+  EtudiantMotDePasseOublieRoute: typeof EtudiantMotDePasseOublieRoute
+  EtudiantActiverTokenRoute: typeof EtudiantActiverTokenRoute
+  EtudiantResetTokenRoute: typeof EtudiantResetTokenRoute
+}
+
+const EtudiantRouteChildren: EtudiantRouteChildren = {
+  EtudiantAuthenticatedRoute: EtudiantAuthenticatedRouteWithChildren,
+  EtudiantLoginRoute: EtudiantLoginRoute,
+  EtudiantMotDePasseOublieRoute: EtudiantMotDePasseOublieRoute,
+  EtudiantActiverTokenRoute: EtudiantActiverTokenRoute,
+  EtudiantResetTokenRoute: EtudiantResetTokenRoute,
+}
+
+const EtudiantRouteWithChildren = EtudiantRoute._addFileChildren(
+  EtudiantRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -477,6 +705,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfidentialiteRoute: ConfidentialiteRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
+  EtudiantRoute: EtudiantRouteWithChildren,
   InscriptionRoute: InscriptionRoute,
   InternationalRoute: InternationalRoute,
   MentionsLegalesRoute: MentionsLegalesRoute,
