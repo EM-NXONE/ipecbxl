@@ -17,7 +17,7 @@
 $ErrorActionPreference = "Stop"
 
 $ROOT  = (Resolve-Path "$PSScriptRoot\..").Path
-$DIST  = Join-Path $ROOT "dist"
+$DIST  = Join-Path $ROOT "packages"   # IMPORTANT: pas "dist" car vite build ecrit dans dist\
 $PUB   = Join-Path $ROOT "public"
 $BUILD = Join-Path $ROOT "dist-build"
 
