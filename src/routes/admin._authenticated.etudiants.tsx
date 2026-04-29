@@ -3,7 +3,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { KeyRound, Mail, Search } from "lucide-react";
+import { KeyRound, Search } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 

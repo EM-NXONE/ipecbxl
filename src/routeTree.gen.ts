@@ -32,7 +32,6 @@ import { Route as AdminAuthenticatedRouteImport } from './routes/admin._authenti
 import { Route as EtudiantAuthenticatedIndexRouteImport } from './routes/etudiant._authenticated.index'
 import { Route as AdminAuthenticatedIndexRouteImport } from './routes/admin._authenticated.index'
 import { Route as EtudiantResetTokenRouteImport } from './routes/etudiant.reset.$token'
-import { Route as EtudiantActiverTokenRouteImport } from './routes/etudiant.activer.$token'
 import { Route as EtudiantAuthenticatedProfilRouteImport } from './routes/etudiant._authenticated.profil'
 import { Route as EtudiantAuthenticatedFacturesRouteImport } from './routes/etudiant._authenticated.factures'
 import { Route as EtudiantAuthenticatedDocumentsRouteImport } from './routes/etudiant._authenticated.documents'
@@ -155,11 +154,6 @@ const EtudiantResetTokenRoute = EtudiantResetTokenRouteImport.update({
   path: '/reset/$token',
   getParentRoute: () => EtudiantRoute,
 } as any)
-const EtudiantActiverTokenRoute = EtudiantActiverTokenRouteImport.update({
-  id: '/activer/$token',
-  path: '/activer/$token',
-  getParentRoute: () => EtudiantRoute,
-} as any)
 const EtudiantAuthenticatedProfilRoute =
   EtudiantAuthenticatedProfilRouteImport.update({
     id: '/profil',
@@ -221,7 +215,6 @@ export interface FileRoutesByFullPath {
   '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
   '/etudiant/factures': typeof EtudiantAuthenticatedFacturesRoute
   '/etudiant/profil': typeof EtudiantAuthenticatedProfilRoute
-  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
   '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/': typeof AdminAuthenticatedIndexRoute
   '/etudiant/': typeof EtudiantAuthenticatedIndexRoute
@@ -251,7 +244,6 @@ export interface FileRoutesByTo {
   '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
   '/etudiant/factures': typeof EtudiantAuthenticatedFacturesRoute
   '/etudiant/profil': typeof EtudiantAuthenticatedProfilRoute
-  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
   '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/candidatures/$id': typeof AdminAuthenticatedCandidaturesIdRoute
 }
@@ -282,7 +274,6 @@ export interface FileRoutesById {
   '/etudiant/_authenticated/documents': typeof EtudiantAuthenticatedDocumentsRoute
   '/etudiant/_authenticated/factures': typeof EtudiantAuthenticatedFacturesRoute
   '/etudiant/_authenticated/profil': typeof EtudiantAuthenticatedProfilRoute
-  '/etudiant/activer/$token': typeof EtudiantActiverTokenRoute
   '/etudiant/reset/$token': typeof EtudiantResetTokenRoute
   '/admin/_authenticated/': typeof AdminAuthenticatedIndexRoute
   '/etudiant/_authenticated/': typeof EtudiantAuthenticatedIndexRoute
@@ -314,7 +305,6 @@ export interface FileRouteTypes {
     | '/etudiant/documents'
     | '/etudiant/factures'
     | '/etudiant/profil'
-    | '/etudiant/activer/$token'
     | '/etudiant/reset/$token'
     | '/admin/'
     | '/etudiant/'
@@ -344,7 +334,6 @@ export interface FileRouteTypes {
     | '/etudiant/documents'
     | '/etudiant/factures'
     | '/etudiant/profil'
-    | '/etudiant/activer/$token'
     | '/etudiant/reset/$token'
     | '/admin/candidatures/$id'
   id:
@@ -374,7 +363,6 @@ export interface FileRouteTypes {
     | '/etudiant/_authenticated/documents'
     | '/etudiant/_authenticated/factures'
     | '/etudiant/_authenticated/profil'
-    | '/etudiant/activer/$token'
     | '/etudiant/reset/$token'
     | '/admin/_authenticated/'
     | '/etudiant/_authenticated/'
@@ -562,13 +550,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtudiantResetTokenRouteImport
       parentRoute: typeof EtudiantRoute
     }
-    '/etudiant/activer/$token': {
-      id: '/etudiant/activer/$token'
-      path: '/activer/$token'
-      fullPath: '/etudiant/activer/$token'
-      preLoaderRoute: typeof EtudiantActiverTokenRouteImport
-      parentRoute: typeof EtudiantRoute
-    }
     '/etudiant/_authenticated/profil': {
       id: '/etudiant/_authenticated/profil'
       path: '/profil'
@@ -680,7 +661,6 @@ interface EtudiantRouteChildren {
   EtudiantAuthenticatedRoute: typeof EtudiantAuthenticatedRouteWithChildren
   EtudiantLoginRoute: typeof EtudiantLoginRoute
   EtudiantMotDePasseOublieRoute: typeof EtudiantMotDePasseOublieRoute
-  EtudiantActiverTokenRoute: typeof EtudiantActiverTokenRoute
   EtudiantResetTokenRoute: typeof EtudiantResetTokenRoute
 }
 
@@ -688,7 +668,6 @@ const EtudiantRouteChildren: EtudiantRouteChildren = {
   EtudiantAuthenticatedRoute: EtudiantAuthenticatedRouteWithChildren,
   EtudiantLoginRoute: EtudiantLoginRoute,
   EtudiantMotDePasseOublieRoute: EtudiantMotDePasseOublieRoute,
-  EtudiantActiverTokenRoute: EtudiantActiverTokenRoute,
   EtudiantResetTokenRoute: EtudiantResetTokenRoute,
 }
 
