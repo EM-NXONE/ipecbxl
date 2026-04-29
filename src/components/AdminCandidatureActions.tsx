@@ -19,6 +19,12 @@ interface AdminCandidatureActionsProps {
   paid: boolean | number;
   hasEtudiant: boolean;
   compact?: boolean;
+  /**
+   * "all" (défaut) — toutes les actions
+   * "payment" — uniquement marquer payé / annuler paiement
+   * "general" — tout sauf le paiement (renvoi mail, création/sync étudiant, reset mdp)
+   */
+  scope?: "all" | "payment" | "general";
   onDone?: (result: AdminActionResult, action: string) => void;
   onError?: (message: string, action: string) => void;
 }
@@ -36,6 +42,7 @@ export function AdminCandidatureActions({
   paid,
   hasEtudiant,
   compact = false,
+  scope = "all",
   onDone,
   onError,
 }: AdminCandidatureActionsProps) {
