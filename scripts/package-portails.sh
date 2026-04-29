@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # IPEC — Génère 3 ZIP distincts pour n0c (Apache/PHP, sans Node.js sur le serveur).
 #
-#   dist/site.zip   → public_html/                (www.ipec.school)
-#   dist/admin.zip  → docroot admin.ipec.school
-#   dist/lms.zip    → docroot lms.ipec.school
+#   packages/site.zip   → public_html/                (www.ipec.school)
+#   packages/admin.zip  → docroot admin.ipec.school
+#   packages/lms.zip    → docroot lms.ipec.school
 #
 # Stratégie : 3 builds Vite distincts via STATIC_BUILD (lu par vite.config.ts).
-# Chaque build prerend les routes du portail concerné en .html.
+# Sortie réelle = dist/client/ (HTML + assets) + dist/server/ (SSR, jeté).
+# Le dossier des ZIP s'appelle "packages/" pour ne PAS être écrasé par vite.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DIST="$ROOT/dist"
+DIST="$ROOT/packages"
 PUB="$ROOT/public"
 BUILD="$ROOT/dist-build"
 
@@ -20,29 +21,49 @@ mkdir -p "$DIST" "$BUILD"
 
 build_target() {
     local target="$1"
-    echo ""
-    echo "==> Build STATIC_BUILD=$target"
+    echo "" >&2
+    echo "==> Build STATIC_BUILD=$target" >&2
     rm -rf "$ROOT/dist" "$ROOT/.output"
-    (cd "$ROOT" && STATIC_BUILD="$target" npx vite build)
-    if   [ -d "$ROOT/.output/public" ]; then echo "$ROOT/.output/public"
-    elif [ -d "$ROOT/dist" ];           then echo "$ROOT/dist"
+    (cd "$ROOT" && STATIC_BUILD="$target" npx vite build >&2)
+    if   [ -d "$ROOT/dist/client" ];    then echo "$ROOT/dist/client"
+    elif [ -d "$ROOT/.output/public" ]; then echo "$ROOT/.output/public"
     else echo "ERREUR: aucune sortie de build pour $target" >&2; return 1
     fi
 }
 
+# move_output <src> <dest> "<allowed_html>" "<forbidden_dirs>"
+# allowed_html = "*" pour tout garder, sinon liste de basenames sans .html
+# forbidden_dirs = liste de noms de sous-dossiers a exclure
 move_output() {
-    local src="$1"; local dest="$2"
-    rm -rf "$dest"
-    mkdir -p "$dest"
-    cp -R "$src"/. "$dest/"
+    local src="$1"; local dest="$2"; local allowed="$3"; local forbidden="$4"
+    rm -rf "$dest"; mkdir -p "$dest"
+    for d in "$src"/*/; do
+        [ -d "$d" ] || continue
+        local name; name="$(basename "$d")"
+        if echo " $forbidden " | grep -q " $name "; then continue; fi
+        cp -R "$d" "$dest/"
+    done
+    for f in "$src"/*; do
+        [ -f "$f" ] || continue
+        local name; name="$(basename "$f")"
+        case "$name" in
+            *.html)
+                if [ "$allowed" = "*" ]; then cp "$f" "$dest/"; continue; fi
+                local base="${name%.html}"
+                if echo " $allowed " | grep -q " $base "; then cp "$f" "$dest/"; fi
+                ;;
+            *) cp "$f" "$dest/" ;;
+        esac
+    done
+    # fichiers caches a la racine (ex: .vite, etc) - skip
 }
 
 # ---------------------------------------------------------------------------
 # 1) site.zip — www.ipec.school
 # ---------------------------------------------------------------------------
-OUT="$(build_target site | tail -n1)"
+OUT="$(build_target site)"
 SITE="$BUILD/site"
-move_output "$OUT" "$SITE"
+move_output "$OUT" "$SITE" "*" "admin etudiant"
 
 cp "$PUB/mailer.php"        "$SITE/"
 cp "$PUB/db_config.php"     "$SITE/"
@@ -67,14 +88,21 @@ RewriteRule ^ index.html [L]
 HT
 
 (cd "$SITE" && zip -rq "$DIST/site.zip" .)
-echo "==> dist/site.zip OK"
+echo "==> packages/site.zip OK"
 
 # ---------------------------------------------------------------------------
 # 2) admin.zip — admin.ipec.school
 # ---------------------------------------------------------------------------
-OUT="$(build_target admin | tail -n1)"
+OUT="$(build_target admin)"
 ADMIN="$BUILD/admin"
-move_output "$OUT" "$ADMIN"
+# garde uniquement assets/, _build/ et admin/. Vire etudiant/ et tout autre.
+forbid=""
+for d in "$OUT"/*/; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    case "$name" in admin|assets|_build) ;; *) forbid="$forbid $name" ;; esac
+done
+move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
@@ -98,14 +126,20 @@ HT
 echo "Require all denied" > "$ADMIN/api/_shared/.htaccess"
 
 (cd "$ADMIN" && zip -rq "$DIST/admin.zip" .)
-echo "==> dist/admin.zip OK"
+echo "==> packages/admin.zip OK"
 
 # ---------------------------------------------------------------------------
 # 3) lms.zip — lms.ipec.school
 # ---------------------------------------------------------------------------
-OUT="$(build_target etu | tail -n1)"
+OUT="$(build_target etu)"
 LMS="$BUILD/lms"
-move_output "$OUT" "$LMS"
+forbid=""
+for d in "$OUT"/*/; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    case "$name" in etudiant|assets|_build) ;; *) forbid="$forbid $name" ;; esac
+done
+move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"
@@ -128,7 +162,7 @@ HT
 echo "Require all denied" > "$LMS/api/_shared/.htaccess"
 
 (cd "$LMS" && zip -rq "$DIST/lms.zip" .)
-echo "==> dist/lms.zip OK"
+echo "==> packages/lms.zip OK"
 
 ls -lh "$DIST"
 echo
@@ -136,6 +170,5 @@ echo "Prochaines étapes manuelles sur n0c :"
 echo "  1) site.zip  → public_html/                          (www.ipec.school)"
 echo "  2) admin.zip → docroot admin.ipec.school"
 echo "  3) lms.zip   → docroot lms.ipec.school"
-echo "  4) Créer admin/api/_shared/admin_users.php :"
-echo "       <?php return ['admin' => password_hash('MOT_DE_PASSE', PASSWORD_BCRYPT)];"
+echo "  4) Créer admin/api/_shared/admin_users.php"
 echo "  5) Créer ../.ipec-mailer.env (hors public_html) avec credentials SMTP"

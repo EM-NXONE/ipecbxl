@@ -1,8 +1,8 @@
 # IPEC - Genere 3 ZIP statiques distincts pour n0c (Windows PowerShell).
 #
-#   dist\site.zip   -> public_html\                (www.ipec.school)
-#   dist\admin.zip  -> docroot admin.ipec.school
-#   dist\lms.zip    -> docroot lms.ipec.school
+#   packages\site.zip   -> public_html\                (www.ipec.school)
+#   packages\admin.zip  -> docroot admin.ipec.school
+#   packages\lms.zip    -> docroot lms.ipec.school
 #
 # Strategie : 3 builds Vite distincts via la variable STATIC_BUILD lue par
 # vite.config.ts. Chaque build prerend uniquement les routes du portail
@@ -17,7 +17,7 @@
 $ErrorActionPreference = "Stop"
 
 $ROOT  = (Resolve-Path "$PSScriptRoot\..").Path
-$DIST  = Join-Path $ROOT "dist"
+$DIST  = Join-Path $ROOT "packages"   # IMPORTANT: pas "dist" car vite build ecrit dans dist\
 $PUB   = Join-Path $ROOT "public"
 $BUILD = Join-Path $ROOT "dist-build"
 
@@ -41,19 +41,35 @@ function Invoke-TargetBuild {
         Pop-Location
     }
 
+    # TanStack Start v1 : sortie client = dist/client/, SSR = dist/server/ (jete).
+    $distClient   = Join-Path $ROOT "dist\client"
     $outputPublic = Join-Path $ROOT ".output\public"
-    $distFolder   = Join-Path $ROOT "dist"
+    if (Test-Path $distClient)   { return $distClient }
     if (Test-Path $outputPublic) { return $outputPublic }
-    if (Test-Path $distFolder)   { return $distFolder }
-    throw "Aucune sortie de build trouvee pour $Target"
+    throw "Aucune sortie de build trouvee pour $Target (ni dist\client ni .output\public)"
 }
 
 function Move-BuildOutput {
-    param([string]$BuildOutput, [string]$Dest)
+    param([string]$BuildOutput, [string]$Dest, [string[]]$AllowedHtml, [string[]]$ForbiddenSubdirs = @())
     if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-    Get-ChildItem -Path $BuildOutput -Force | ForEach-Object {
-        Copy-Item $_.FullName $Dest -Recurse -Force
+    # Sous-dossiers : tout sauf ceux interdits
+    Get-ChildItem -Path $BuildOutput -Directory -Force | ForEach-Object {
+        if ($ForbiddenSubdirs -notcontains $_.Name) {
+            Copy-Item $_.FullName $Dest -Recurse -Force
+        }
+    }
+    # Fichiers racine : .html filtres, le reste copie tel quel
+    Get-ChildItem -Path $BuildOutput -File -Force | ForEach-Object {
+        $name = $_.Name
+        if ($name -like "*.html") {
+            $base = [System.IO.Path]::GetFileNameWithoutExtension($name)
+            if ($AllowedHtml -contains $base -or $AllowedHtml -contains "*") {
+                Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+            }
+        } else {
+            Copy-Item $_.FullName (Join-Path $Dest $name) -Force
+        }
     }
 }
 
@@ -73,7 +89,8 @@ function Zip-Folder {
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
-Move-BuildOutput -BuildOutput $out -Dest $SITE
+# Site public : exclut les sous-dossiers admin/ et etudiant/ (au cas ou le crawl en aurait genere).
+Move-BuildOutput -BuildOutput $out -Dest $SITE -AllowedHtml @("*") -ForbiddenSubdirs @("admin","etudiant")
 
 # Backend PHP du site public
 Copy-Item (Join-Path $PUB "mailer.php")        $SITE
@@ -100,14 +117,22 @@ RewriteRule ^ index.html [L]
 Write-Utf8NoBom (Join-Path $SITE ".htaccess") $siteHt
 
 Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
-Write-Host "==> dist\site.zip OK"
+Write-Host "==> packages\site.zip OK"
 
 # -------------------------------------------------------------------
 # 2) admin.zip - admin.ipec.school  (STATIC_BUILD=admin)
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "admin"
 $ADMIN = Join-Path $BUILD "admin"
-Move-BuildOutput -BuildOutput $out -Dest $ADMIN
+# Admin : on garde uniquement assets + sous-dossier admin/. On vire tout le reste.
+$forbidAdmin = @()
+Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
+    if ($_.Name -ne "admin" -and $_.Name -ne "assets" -and $_.Name -ne "_build") {
+        $forbidAdmin += $_.Name
+    }
+}
+# Garde uniquement index.html (SPA fallback) et 404/200 a la racine.
+Move-BuildOutput -BuildOutput $out -Dest $ADMIN -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidAdmin
 
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
@@ -135,14 +160,20 @@ Write-Utf8NoBom (Join-Path $ADMIN ".htaccess") $adminHt
 Write-Utf8NoBom (Join-Path $adminShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
-Write-Host "==> dist\admin.zip OK"
+Write-Host "==> packages\admin.zip OK"
 
 # -------------------------------------------------------------------
 # 3) lms.zip - lms.ipec.school  (STATIC_BUILD=etu)
 # -------------------------------------------------------------------
 $out = Invoke-TargetBuild -Target "etu"
 $LMS = Join-Path $BUILD "lms"
-Move-BuildOutput -BuildOutput $out -Dest $LMS
+$forbidLms = @()
+Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
+    if ($_.Name -ne "etudiant" -and $_.Name -ne "assets" -and $_.Name -ne "_build") {
+        $forbidLms += $_.Name
+    }
+}
+Move-BuildOutput -BuildOutput $out -Dest $LMS -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidLms
 
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
@@ -169,7 +200,7 @@ Write-Utf8NoBom (Join-Path $LMS ".htaccess") $lmsHt
 Write-Utf8NoBom (Join-Path $lmsShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $LMS -ZipPath (Join-Path $DIST "lms.zip")
-Write-Host "==> dist\lms.zip OK"
+Write-Host "==> packages\lms.zip OK"
 
 Get-ChildItem $DIST | Format-Table Name, Length
 
