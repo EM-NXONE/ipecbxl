@@ -37,6 +37,8 @@ export interface PortalNavItem {
 interface PortalLayoutProps {
   /** Titre court affiché à droite du logo (ex: "Administration", "Espace étudiant"). */
   brandSubtitle: string;
+  /** Cible du clic sur le logo (par défaut "/"). Permet de rester dans le portail. */
+  brandHref?: string;
   /** Items de navigation latérale. */
   nav: PortalNavItem[];
   /** Nom affiché dans la topbar (utilisateur connecté). */
