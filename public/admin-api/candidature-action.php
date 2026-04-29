@@ -187,10 +187,19 @@ try {
             $admUser    = $env['ADMISSION_SMTP_USER'] ?? ($env['SMTP_USER'] ?? '');
             $admPass    = $env['ADMISSION_SMTP_PASS'] ?? ($env['SMTP_PASS'] ?? '');
 
+            $imapHost     = $env['ADMISSION_IMAP_HOST'] ?? $smtpHost;
+            $imapPort     = (int)($env['ADMISSION_IMAP_PORT'] ?? 993);
+            $imapSentBox  = $env['ADMISSION_IMAP_SENT_FOLDER'] ?? 'Sent';
+
+            // PDFs : mêmes builders, mêmes données, mêmes noms de fichiers que l'envoi
+            // automatique du formulaire d'admission (mailer.php).
             $pdfCand = buildCandidaturePdf($candidatureFields);
-            $candFilename = 'candidature-' . preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($c['prenom'].'-'.$c['nom'])) . '-' . $c['reference'] . '.pdf';
+            $safeName = trim(preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($c['prenom'] . '-' . $c['nom'])), '-');
+            $candFilename = 'candidature-IPEC-' . $safeName . '.pdf';
             [$pdfFact, $factFilename] = buildFacturePdf($factureFields);
 
+            // Message-ID figé pour permettre l'attachement au fil via In-Reply-To
+            // dans le mailto: du bouton CTA (cf. buildCandidateConfirmationHtml).
             $msgId = sprintf('<%s@ipec.school>', bin2hex(random_bytes(16)));
             $html = buildCandidateConfirmationHtml([
                 'prenom' => $c['prenom'], 'nom' => $c['nom'], 'civilite' => $c['civilite'],
@@ -200,6 +209,22 @@ try {
                 'programme' => $c['programme'], 'annee' => $c['annee'],
                 'specialisation' => $c['specialisation'], 'rentree' => $c['rentree'],
             ], $msgId);
+
+            // Version texte (AltBody) — identique à mailer.php
+            $altText = "Bonjour {$c['prenom']},\n\n"
+                . "L'IPEC vous remercie pour votre candidature au programme {$c['programme']} — {$c['annee']} "
+                . "(spécialisation : {$c['specialisation']}, rentrée : {$c['rentree']}).\n\n"
+                . "Pour finaliser votre dossier :\n"
+                . "1. En réponse à cet e-mail, transmettez votre CV, lettre de motivation, "
+                . "copie de pièce d'identité, diplômes et relevés de notes, justificatifs "
+                . "de stages éventuels, et la preuve de paiement des frais de dossier (400 €).\n"
+                . "2. Réglez les frais de dossier de 400 € (non remboursables) par virement "
+                . "à l'IPEC Bruxelles. Demandez-nous l'IBAN à admission@ipec.school. "
+                . "Communication : {$c['nom']} — {$c['prenom']} — {$c['programme']} — {$c['specialisation']}.\n\n"
+                . "Dès réception du dossier complet et du paiement, votre candidature sera "
+                . "examinée par la commission pédagogique. La décision vous sera communiquée par e-mail.\n\n"
+                . "— Le service des admissions de l'IPEC Bruxelles\n"
+                . "admission@ipec.school\n";
 
             $mail = new PHPMailer\PHPMailer\PHPMailer(true);
             $mail->isSMTP();
@@ -218,17 +243,35 @@ try {
             $mail->addAddress($c['email'], $c['prenom'] . ' ' . $c['nom']);
             $mail->addReplyTo($admUser, 'IPEC — Service des admissions');
             $mail->isHTML(true);
-            $mail->Subject = "Votre demande d'admission à l'IPEC — procédure à suivre (renvoi)";
+            // Sujet identique à l'envoi automatique (sans suffixe « renvoi »)
+            $mail->Subject = "Votre demande d'admission à l'IPEC — procédure à suivre";
             $mail->Body    = $html;
+            $mail->AltBody = $altText;
 
-            $logoPath = __DIR__ . '/_shared/ipec-logo-email.png';
-            if (is_file($logoPath)) {
-                $mail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+            // Logo embarqué (CID identique au mail automatique).
+            // Le logo est copié dans api/_shared/ par le script de packaging.
+            $logoCandidates = [
+                __DIR__ . '/_shared/ipec-logo-email.png',
+                __DIR__ . '/../ipec-logo-email.png',
+            ];
+            foreach ($logoCandidates as $logoPath) {
+                if (is_file($logoPath)) {
+                    $mail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+                    break;
+                }
             }
             if ($pdfCand !== '') $mail->addStringAttachment($pdfCand, $candFilename, 'base64', 'application/pdf');
             if ($pdfFact !== '') $mail->addStringAttachment($pdfFact, $factFilename, 'base64', 'application/pdf');
 
             $mail->send();
+
+            // Archivage IMAP dans le dossier "Sent" de admission@ — comme l'envoi auto.
+            try {
+                archiveToImapSent($mail, $imapHost, $imapPort, $imapSentBox, $admUser, $admPass);
+            } catch (\Throwable $imapErr) {
+                error_log('[admin-api/resend_email] IMAP archive échec : ' . $imapErr->getMessage());
+            }
+
             admin_log_action($id, 'resend_email', 'Renvoyé à ' . $c['email']);
             api_json(['ok' => true, 'message' => 'E-mail renvoyé à ' . $c['email'] . '.']);
         }
