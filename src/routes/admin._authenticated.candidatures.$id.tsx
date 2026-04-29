@@ -101,6 +101,21 @@ function AdminCandidatureDetailPage() {
       {msg && <div className="mb-4 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">{msg}</div>}
       {error && <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
+      {/* Barre d'actions globales — placée en évidence sous le header */}
+      <div className="bg-card border border-border/40 rounded-md p-4 mb-6">
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <h2 className="text-xs uppercase tracking-wider text-muted-foreground">Actions</h2>
+        </div>
+        <AdminCandidatureActions
+          id={id}
+          paid={paid}
+          hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
+          scope="general"
+          onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
+          onError={setError}
+        />
+      </div>
+
       <div className="grid lg:grid-cols-3 gap-4 mb-6">
         <Card title="Coordonnées" className="lg:col-span-2">
           <Field label="Civilité" value={c.civilite || "—"} />
@@ -120,20 +135,44 @@ function AdminCandidatureDetailPage() {
       </div>
 
       <Card title="Frais de dossier (400 €)" className="mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-sm">
-              {paid
-                ? <span className="text-emerald-400">✓ Payés{c.facture_payee_at ? ` le ${formatDateTime(c.facture_payee_at)}` : ""}</span>
-                : <span className="text-amber-400">En attente de paiement</span>}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <dl className="space-y-1.5 text-sm">
+            <div className="flex gap-2">
+              <dt className="text-muted-foreground w-32">Statut</dt>
+              <dd>
+                {paid
+                  ? <span className="text-emerald-400">✓ Payés</span>
+                  : <span className="text-amber-400">En attente de paiement</span>}
+              </dd>
             </div>
-            {c.facture_numero && <div className="text-xs text-muted-foreground font-mono mt-1">Facture {c.facture_numero}</div>}
-            {paid && c.facture_payee_par && <div className="text-xs text-muted-foreground mt-1">Validé par {c.facture_payee_par}</div>}
-          </div>
+            {c.facture_numero && (
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-32">N° facture</dt>
+                <dd className="font-mono text-xs text-cream">{c.facture_numero}</dd>
+              </div>
+            )}
+            {paid && c.facture_payee_at && (
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-32">Payé le</dt>
+                <dd className="text-cream">{formatDateTime(c.facture_payee_at)}</dd>
+              </div>
+            )}
+            {paid && c.facture_payee_par && (
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-32">Validé par</dt>
+                <dd className="text-cream">{c.facture_payee_par}</dd>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <dt className="text-muted-foreground w-32">Montant</dt>
+              <dd className="text-cream">400,00 € · non remboursables</dd>
+            </div>
+          </dl>
           <AdminCandidatureActions
             id={id}
             paid={paid}
             hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
+            scope="payment"
             onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
             onError={setError}
           />
