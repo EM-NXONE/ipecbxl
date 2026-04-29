@@ -117,7 +117,7 @@ RewriteRule ^ - [L]
 RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
-<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^cors\.php$)">
+<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$)">
   Require all denied
 </FilesMatch>
 "@
