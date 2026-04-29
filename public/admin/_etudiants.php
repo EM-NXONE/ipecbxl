@@ -52,11 +52,11 @@ function etudiant_find_by_identity(PDO $pdo, string $prenom, string $nom, ?strin
 }
 
 /**
- * Crée un token d'activation (ou reset) à usage unique.
- * Renvoie le token EN CLAIR (à envoyer par e-mail) ; en BDD on stocke le sha256.
+ * Crée un token de réinitialisation (legacy — conservé pour compat reset_password
+ * éventuel). N'est plus utilisé pour l'activation initiale (mdp par défaut).
  */
-function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'activation', int $ttlSeconds = 7 * 24 * 3600): string {
-    if (!in_array($type, ['activation', 'reset_password'], true)) {
+function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'reset_password', int $ttlSeconds = 7 * 24 * 3600): string {
+    if (!in_array($type, ['reset_password'], true)) {
         throw new InvalidArgumentException('Type token invalide.');
     }
     $token = bin2hex(random_bytes(32));
@@ -68,6 +68,42 @@ function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'activa
     )->execute([$etudiantId, $type, $hash, $exp]);
     return $token;
 }
+
+/**
+ * Crée un compte étudiant à partir d'une candidature et le rattache.
+ *
+ * @return array{etudiant_id:int, numero:string, default_password:string, deja_existant:bool}
+ */
+function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $adminUser): array {
+    $email = trim(strtolower((string)$candidature['email']));
+    if ($email === '') {
+        throw new RuntimeException("La candidature n'a pas d'e-mail.");
+    }
+    if (trim((string)($candidature['prenom'] ?? '')) === '' || trim((string)($candidature['nom'] ?? '')) === '' || trim((string)($candidature['date_naissance'] ?? '')) === '') {
+        throw new RuntimeException("Prénom, nom et date de naissance sont requis pour créer ou rattacher un compte étudiant.");
+    }
+
+    $existing = etudiant_find_by_identity($pdo, (string)$candidature['prenom'], (string)$candidature['nom'], (string)$candidature['date_naissance']);
+    if ($existing) {
+        // Rattache la candidature s'il manque le lien
+        if (empty($candidature['etudiant_id']) || (int)$candidature['etudiant_id'] !== (int)$existing['id']) {
+            $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
+                ->execute([(int)$existing['id'], (int)$candidature['id']]);
+        }
+        // Si le compte existait sans mot de passe (cas legacy), on lui pose le mot de passe par défaut.
+        if (empty($existing['password_hash'])) {
+            $pdo->prepare("UPDATE etudiants SET password_hash=?, email_verifie=1, statut='actif' WHERE id=?")
+                ->execute([password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT), (int)$existing['id']]);
+        }
+        // (Re)synchronise les documents historiques pour cette candidature
+        etudiant_sync_documents_historiques($pdo, (int)$existing['id'], $candidature, $adminUser);
+        return [
+            'etudiant_id'      => (int)$existing['id'],
+            'numero'           => (string)$existing['numero_etudiant'],
+            'default_password' => ETU_DEFAULT_PASSWORD,
+            'deja_existant'    => true,
+        ];
+    }
 
 /**
  * Crée un compte étudiant à partir d'une candidature et le rattache.
