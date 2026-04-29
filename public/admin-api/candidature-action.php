@@ -15,6 +15,8 @@
 require_once __DIR__ . '/_bootstrap.php';
 api_method('POST');
 api_require_admin();
+admin_require_db();
+admin_require_etudiants();
 
 $body   = api_body();
 $id     = (int)($body['id'] ?? 0);
