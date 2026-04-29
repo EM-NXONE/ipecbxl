@@ -49,9 +49,14 @@ const ETU_PUBLIC_ROUTES = [
   "/etudiant/mot-de-passe-oublie",
 ];
 
-function makeStaticConfig(routes: string[]) {
+function makeStaticConfig(routes: string[], portal: "site" | "admin" | "etu") {
   return {
     cloudflare: false,
+    define: {
+      // Exposé au bundle client : permet au RootComponent de savoir quel
+      // portail il sert et de bloquer les routes hors-périmètre.
+      "import.meta.env.VITE_PORTAL": JSON.stringify(portal),
+    },
     tanstackStart: {
       prerender: {
         enabled: true,
@@ -69,11 +74,11 @@ function makeStaticConfig(routes: string[]) {
 let extra = {};
 if (TARGET === "site" || process.env.STATIC_BUILD === "1") {
   // "1" conservé pour compat avec l'ancien script de build.
-  extra = makeStaticConfig(SITE_ROUTES);
+  extra = makeStaticConfig(SITE_ROUTES, "site");
 } else if (TARGET === "admin") {
-  extra = makeStaticConfig(ADMIN_PUBLIC_ROUTES);
+  extra = makeStaticConfig(ADMIN_PUBLIC_ROUTES, "admin");
 } else if (TARGET === "etu") {
-  extra = makeStaticConfig(ETU_PUBLIC_ROUTES);
+  extra = makeStaticConfig(ETU_PUBLIC_ROUTES, "etu");
 }
 
 export default defineConfig(extra);
