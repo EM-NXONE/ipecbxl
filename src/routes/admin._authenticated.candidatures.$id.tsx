@@ -119,12 +119,23 @@ function AdminCandidatureDetailPage() {
             </div>
             {c.facture_numero && <div className="text-xs text-muted-foreground font-mono mt-1">Facture {c.facture_numero}</div>}
           </div>
-          {!paid && (
-            <button onClick={() => runAction("mark_paid")} disabled={busy === "mark_paid"}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 disabled:opacity-50">
-              <CheckCircle2 size={14} /> {busy === "mark_paid" ? "…" : "Marquer comme payés"}
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => runAction("resend_email")} disabled={busy === "resend_email"}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-cream text-sm hover:border-blue/40 disabled:opacity-50">
+              <Mail size={14} /> {busy === "resend_email" ? "…" : "Renvoyer l'e-mail au candidat"}
             </button>
-          )}
+            {!paid ? (
+              <button onClick={() => runAction("mark_paid")} disabled={busy === "mark_paid"}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 disabled:opacity-50">
+                <CheckCircle2 size={14} /> {busy === "mark_paid" ? "…" : "Marquer comme payés"}
+              </button>
+            ) : (
+              <button onClick={() => runAction("mark_unpaid")} disabled={busy === "mark_unpaid"}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-amber-500/30 text-amber-400 text-sm hover:bg-amber-500/10 disabled:opacity-50">
+                {busy === "mark_unpaid" ? "…" : "Annuler le paiement"}
+              </button>
+            )}
+          </div>
         </div>
       </Card>
 
