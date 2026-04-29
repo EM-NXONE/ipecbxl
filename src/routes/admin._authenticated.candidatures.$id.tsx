@@ -18,11 +18,12 @@ interface Detail {
     id: number; reference: string; statut: string; prenom: string; nom: string;
     email: string; date_naissance: string | null; programme: string | null;
     annee: string | null; annee_academique: string | null; nationalite: string | null;
-    telephone: string | null; adresse: string | null; ville: string | null;
-    code_postal: string | null; pays: string | null; message: string | null;
+    telephone: string | null; civilite: string | null; rue: string | null; numero: string | null;
+    ville: string | null; code_postal: string | null; pays_residence: string | null;
+    specialisation: string | null; rentree: string | null; message: string | null;
     facture_numero: string | null; facture_payee: number | boolean;
-    facture_payee_at: string | null; etudiant_id: number | null;
-    documents_count: number | null; created_at: string;
+    facture_payee_at: string | null; facture_payee_par: string | null; etudiant_id: number | null;
+    ip: string | null; user_agent: string | null; updated_at: string | null; created_at: string;
   };
   etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number } | null;
   homonyme: { id: number; numero_etudiant: string; prenom: string; nom: string; date_naissance: string } | null;
@@ -70,6 +71,11 @@ function AdminCandidatureDetailPage() {
 
   const c = data.candidature;
   const paid = Boolean(Number(c.facture_payee));
+  const address = [
+    [c.rue, c.numero].filter(Boolean).join(" "),
+    [c.code_postal, c.ville].filter(Boolean).join(" "),
+    c.pays_residence,
+  ].filter(Boolean).join(", ");
 
   return (
     <div>
@@ -97,15 +103,18 @@ function AdminCandidatureDetailPage() {
 
       <div className="grid lg:grid-cols-3 gap-4 mb-6">
         <Card title="Coordonnées" className="lg:col-span-2">
+          <Field label="Civilité" value={c.civilite || "—"} />
           <Field label="Email" value={<a href={`mailto:${c.email}`} className="text-blue hover:underline">{c.email}</a>} />
           <Field label="Téléphone" value={c.telephone || "—"} />
           <Field label="Date de naissance" value={formatDate(c.date_naissance)} />
           <Field label="Nationalité" value={c.nationalite || "—"} />
-          <Field label="Adresse" value={[c.adresse, [c.code_postal, c.ville].filter(Boolean).join(" "), c.pays].filter(Boolean).join(", ") || "—"} />
+          <Field label="Adresse" value={address || "—"} />
         </Card>
         <Card title="Programme">
           <Field label="Cursus" value={c.programme || "—"} />
           <Field label="Année" value={c.annee || "—"} />
+          <Field label="Spécialisation" value={c.specialisation || "—"} />
+          <Field label="Rentrée" value={c.rentree || "—"} />
           <Field label="Année académique" value={c.annee_academique || "—"} />
         </Card>
       </div>
@@ -119,6 +128,7 @@ function AdminCandidatureDetailPage() {
                 : <span className="text-amber-400">En attente de paiement</span>}
             </div>
             {c.facture_numero && <div className="text-xs text-muted-foreground font-mono mt-1">Facture {c.facture_numero}</div>}
+            {paid && c.facture_payee_par && <div className="text-xs text-muted-foreground mt-1">Validé par {c.facture_payee_par}</div>}
           </div>
           <AdminCandidatureActions
             id={id}
