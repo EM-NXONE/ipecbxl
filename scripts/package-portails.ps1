@@ -73,6 +73,27 @@ function Move-BuildOutput {
     }
 }
 
+# Purge un sous-dossier de portail (etudiant/ ou admin/) en gardant UNIQUEMENT
+# les index.html (=pages prerendues TanStack) et en supprimant tout le legacy PHP
+# venu de public/ (mailer.php, FPDF/, PHPMailer/, *.php, *.css, *.md...).
+function Purge-PortalSubdir {
+    param([string]$Folder)
+    if (-not (Test-Path $Folder)) { return }
+    Get-ChildItem -Path $Folder -Recurse -File -Force | ForEach-Object {
+        if ($_.Name -ne "index.html") {
+            Remove-Item $_.FullName -Force
+        }
+    }
+    # Supprime les sous-dossiers vides apres coup (FPDF/font, PHPMailer/src, etc.)
+    Get-ChildItem -Path $Folder -Recurse -Directory -Force |
+        Sort-Object FullName -Descending |
+        ForEach-Object {
+            if (-not (Get-ChildItem -Path $_.FullName -Force)) {
+                Remove-Item $_.FullName -Force
+            }
+        }
+}
+
 function Write-Utf8NoBom {
     param([string]$Path, [string]$Content)
     [System.IO.File]::WriteAllText($Path, $Content, (New-Object System.Text.UTF8Encoding $false))
