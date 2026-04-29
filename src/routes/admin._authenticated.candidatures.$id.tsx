@@ -301,3 +301,15 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
+
+const MOYEN_LABELS: Record<string, string> = {
+  virement: "Virement bancaire",
+  carte: "Carte bancaire",
+  especes: "Espèces",
+  cheque: "Chèque",
+  autre: "Autre",
+};
+function moyenLabel(v: string | null | undefined): string {
+  if (!v) return "—";
+  return MOYEN_LABELS[v] ?? v;
+}
