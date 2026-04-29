@@ -36,10 +36,18 @@ function EtudiantProfilPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError(null); setSuccess(null);
-    if (pwd !== pwd2) { setFormError("Les deux mots de passe ne correspondent pas."); return; }
+    // On compare les valeurs brutes (pas de trim : un mdp peut contenir des espaces)
+    if (pwd.length === 0) { setFormError("Le nouveau mot de passe est requis."); return; }
+    if (pwd !== pwd2) {
+      setFormError(
+        `Les deux mots de passe ne correspondent pas (saisi : ${pwd.length} caractères, confirmation : ${pwd2.length} caractères). Astuce : si votre navigateur a auto-rempli un champ, effacez-le et retapez les deux.`
+      );
+      return;
+    }
     setSubmitting(true);
     try {
-      await etuApi.post("/change-password.php", { current, password: pwd });
+      // On envoie aussi password2 pour que la validation serveur soit la source de vérité.
+      await etuApi.post("/change-password.php", { current, password: pwd, password2: pwd2 });
       setSuccess("Mot de passe mis à jour. Les autres sessions ont été déconnectées.");
       setCurrent(""); setPwd(""); setPwd2("");
     } catch (err) {
@@ -105,9 +113,25 @@ function Field({ id, label, type, autoComplete, value, onChange, hint }: {
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">{label}</label>
-      <input id={id} type={type} autoComplete={autoComplete} required value={value} onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2.5 bg-input/40 border border-border rounded-sm text-cream focus:outline-none focus:ring-2 focus:ring-ring" />
+      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center justify-between gap-2">
+        <span>{label}</span>
+        {type === "password" && value.length > 0 && (
+          <span className="text-[10px] normal-case tracking-normal text-muted-foreground/70">{value.length} car.</span>
+        )}
+      </label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-2.5 bg-input/40 border border-border rounded-sm text-cream focus:outline-none focus:ring-2 focus:ring-ring"
+      />
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
