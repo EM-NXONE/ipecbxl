@@ -250,6 +250,7 @@ $hasSpec = $specialisationRaw !== ''
 $docTypeLabels = [
     'candidature' => 'Confirmation de candidature',
     'facture'     => 'Facture — frais de dossier',
+    'recu'        => 'Reçu de paiement',
 ];
 
 echo json_encode([
