@@ -105,43 +105,6 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
         ];
     }
 
-/**
- * Crée un compte étudiant à partir d'une candidature et le rattache.
- *
- * @return array{etudiant_id:int, numero:string, token:string, deja_existant:bool}
- */
-function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $adminUser): array {
-    $email = trim(strtolower((string)$candidature['email']));
-    if ($email === '') {
-        throw new RuntimeException("La candidature n'a pas d'e-mail.");
-    }
-    if (trim((string)($candidature['prenom'] ?? '')) === '' || trim((string)($candidature['nom'] ?? '')) === '' || trim((string)($candidature['date_naissance'] ?? '')) === '') {
-        throw new RuntimeException("Prénom, nom et date de naissance sont requis pour créer ou rattacher un compte étudiant.");
-    }
-
-    $existing = etudiant_find_by_identity($pdo, (string)$candidature['prenom'], (string)$candidature['nom'], (string)$candidature['date_naissance']);
-    if ($existing) {
-        // Rattache la candidature s'il manque le lien
-        if (empty($candidature['etudiant_id']) || (int)$candidature['etudiant_id'] !== (int)$existing['id']) {
-            $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
-                ->execute([(int)$existing['id'], (int)$candidature['id']]);
-        }
-        $token = '';
-        if (empty($existing['password_hash'])) {
-            $pdo->prepare("UPDATE etudiant_tokens SET used_at = NOW()
-                           WHERE etudiant_id = ? AND type = 'activation' AND used_at IS NULL")
-                ->execute([(int)$existing['id']]);
-            $token = etudiant_create_token($pdo, (int)$existing['id'], 'activation', 14 * 24 * 3600);
-        }
-        // (Re)synchronise les documents historiques pour cette candidature
-        etudiant_sync_documents_historiques($pdo, (int)$existing['id'], $candidature, $adminUser);
-        return [
-            'etudiant_id'   => (int)$existing['id'],
-            'numero'        => (string)$existing['numero_etudiant'],
-            'token'         => $token,
-            'deja_existant' => true,
-        ];
-
     $pdo->beginTransaction();
     try {
         $numero = etudiant_generate_numero($pdo);
