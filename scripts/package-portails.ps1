@@ -233,14 +233,11 @@ Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
 }
 Move-BuildOutput -BuildOutput $out -Dest $LMS -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidLms
 
+# Whitelist racine : seules ces entrees survivent (api/ sera ajoute juste apres)
+Restrict-PortalRoot $LMS @("etudiant","assets","_build","index.html","favicon.ico","favicon.svg")
+
 # Purge etudiant/ : on jette le legacy public/etudiant/*.php et on garde uniquement les index.html prerendus
 Purge-PortalSubdir (Join-Path $LMS "etudiant")
-
-# Vire les fichiers du SITE qui n'ont rien a faire ici
-foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt","ipec-logo-email.png","android-chrome-192x192.png","android-chrome-512x512.png","apple-touch-icon.png","favicon-16x16.png","favicon-32x32.png","favicon-96x96.png","site.webmanifest")) {
-    $p = Join-Path $LMS $f
-    if (Test-Path $p) { Remove-Item $p -Force }
-}
 
 # Remplace l'index.html racine (= home du site, 88KB) par une redirection vers /etudiant/login
 $lmsIndex = @"
