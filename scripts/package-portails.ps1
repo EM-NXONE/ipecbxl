@@ -207,6 +207,11 @@ Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse -Force
 
 $adminHt = @"
 # IPEC - admin.ipec.school
+# Interdiction totale d'indexation par les moteurs de recherche
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+</IfModule>
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -215,6 +220,7 @@ RewriteRule ^api/ - [L]
 RewriteRule ^ index.html [L]
 "@
 Write-Utf8NoBom (Join-Path $ADMIN ".htaccess") $adminHt
+Write-Utf8NoBom (Join-Path $ADMIN "robots.txt") "User-agent: *`r`nDisallow: /`r`n"
 Write-Utf8NoBom (Join-Path $adminShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
@@ -264,6 +270,11 @@ Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse -Force
 
 $lmsHt = @"
 # IPEC - lms.ipec.school
+# Interdiction totale d'indexation par les moteurs de recherche
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+</IfModule>
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -272,6 +283,7 @@ RewriteRule ^api/ - [L]
 RewriteRule ^ index.html [L]
 "@
 Write-Utf8NoBom (Join-Path $LMS ".htaccess") $lmsHt
+Write-Utf8NoBom (Join-Path $LMS "robots.txt") "User-agent: *`r`nDisallow: /`r`n"
 Write-Utf8NoBom (Join-Path $lmsShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $LMS -ZipPath (Join-Path $DIST "lms.zip")
