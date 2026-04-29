@@ -12,7 +12,7 @@ export const Route = createFileRoute("/verification")({
         content:
           "Vérifiez l'authenticité d'un document officiel émis par l'IPEC (candidature, confirmation, facture) à l'aide de son numéro de référence.",
       },
-      { name: "robots", content: "index, follow" },
+      { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Vérification d'authenticité — IPEC" },
       {
         property: "og:description",
