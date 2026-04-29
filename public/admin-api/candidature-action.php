@@ -10,7 +10,7 @@
  *   - resend_email       (renvoi e-mail candidat avec 2 PDF)
  *   - create_etudiant    (crée ou rattache + génère token activation)
  *   - sync_documents     (resync facture 400€ + récap dans espace étudiant)
- *   - regen_activation   (nouveau token d'activation)
+ *   - reset_password_etudiant (réinitialise au mdp par défaut "Student1")
  */
 require_once __DIR__ . '/_bootstrap.php';
 api_method('POST');
