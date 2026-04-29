@@ -188,6 +188,12 @@ Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
 }
 Move-BuildOutput -BuildOutput $out -Dest $LMS -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidLms
 
+# Nettoie les fichiers PHP/SQL deposes par Vite depuis public/ (reserves au site public)
+foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt")) {
+    $p = Join-Path $LMS $f
+    if (Test-Path $p) { Remove-Item $p -Force }
+}
+
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
 New-Item -ItemType Directory -Path $lmsShared -Force | Out-Null
