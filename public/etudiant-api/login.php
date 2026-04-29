@@ -1,7 +1,7 @@
 <?php
 /**
  * POST /api/login.php
- * Body: { email, prenom, nom, date_naissance, password }
+ * Body: { numero_etudiant, password }
  *  → { user: {id, email, prenom, nom, numero_etudiant} }
  */
 require_once __DIR__ . '/_bootstrap.php';
@@ -10,26 +10,16 @@ api_method('POST');
 if (!etu_rate_limit('login', 8, 600)) api_error('Trop de tentatives. Réessaie dans quelques minutes.', 429);
 
 $body = api_body();
-$email         = trim(strtolower((string)($body['email'] ?? '')));
-$prenom        = trim((string)($body['prenom'] ?? ''));
-$nom           = trim((string)($body['nom'] ?? ''));
-$dateNaissance = trim((string)($body['date_naissance'] ?? ''));
-$password      = (string)($body['password'] ?? '');
+$numero   = trim((string)($body['numero_etudiant'] ?? ''));
+$password = (string)($body['password'] ?? '');
 
-if ($email === '' || $prenom === '' || $nom === '' || $dateNaissance === '' || $password === '') {
-    api_error('E-mail, identité complète et mot de passe requis.', 400);
+if ($numero === '' || $password === '') {
+    api_error('Numéro étudiant et mot de passe requis.', 400);
 }
 
 $pdo = db();
-$stmt = $pdo->prepare(
-    "SELECT * FROM etudiants
-     WHERE email = ?
-       AND LOWER(TRIM(prenom)) = LOWER(TRIM(?))
-       AND LOWER(TRIM(nom))    = LOWER(TRIM(?))
-       AND date_naissance      = ?
-     LIMIT 1"
-);
-$stmt->execute([$email, $prenom, $nom, $dateNaissance]);
+$stmt = $pdo->prepare("SELECT * FROM etudiants WHERE numero_etudiant = ? LIMIT 1");
+$stmt->execute([$numero]);
 $etu = $stmt->fetch();
 
 $generic = 'Identifiants invalides ou compte non activé.';
