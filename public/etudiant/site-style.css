@@ -467,18 +467,108 @@ footer.site-footer .footer-brand {
 footer.site-footer .footer-brand svg { color: var(--blue); }
 
 /* ============================================================
+   Hamburger + Drawer mobile
+   ============================================================ */
+.hamburger {
+    display: none;
+    width: 40px; height: 40px; padding: 0;
+    align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--hairline-strong);
+    border-radius: 6px; color: var(--ink); cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.hamburger:hover { color: var(--blue); border-color: var(--blue); }
+.hamburger svg { width: 20px; height: 20px; display: block; }
+.hamburger .icon-close { display: none; }
+body.drawer-open .hamburger .icon-open  { display: none; }
+body.drawer-open .hamburger .icon-close { display: block; }
+
+.drawer-backdrop {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(15,19,32,0.45);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+body.drawer-open .drawer-backdrop { opacity: 1; pointer-events: auto; }
+
+.drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(320px, 86vw); z-index: 70;
+    background: var(--card);
+    border-left: 1px solid var(--hairline);
+    box-shadow: -12px 0 32px -12px rgba(15,19,32,0.18);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+}
+body.drawer-open .drawer { transform: translateX(0); }
+
+.drawer-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px; border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-display); font-size: 16px; color: var(--ink);
+}
+.drawer-head .drawer-close {
+    width: 36px; height: 36px; padding: 0;
+    background: transparent; border: none; color: var(--muted);
+    cursor: pointer; border-radius: 4px;
+}
+.drawer-head .drawer-close:hover { color: var(--blue); }
+
+.drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; }
+.drawer-nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 6px;
+    color: var(--ink); font-family: var(--font-body); font-size: 15px;
+    text-decoration: none; border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s;
+}
+.drawer-nav a:hover { background: var(--primary-soft); color: var(--blue); text-decoration: none; }
+.drawer-nav a[aria-current="page"] {
+    background: var(--primary-soft); color: var(--blue);
+    border-color: rgba(31,61,138,0.18);
+}
+.drawer-nav .ico { width: 18px; opacity: 0.8; display: inline-flex; }
+.drawer-nav .sep-label {
+    padding: 14px 14px 6px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--muted);
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
+/* Tables : scroll horizontal pour ne jamais déborder sur mobile */
+.card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 960px) {
+    .hamburger { display: inline-flex; }
+    /* Cache la nav desktop dans le header, on bascule sur le drawer */
+    header.topbar nav > a,
+    header.topbar nav .user-pill,
+    header.topbar nav .cta-primary { display: none; }
+    header.topbar nav { gap: 6px; }
+    /* Sidebar étudiant cachée sur mobile (remplacée par drawer) */
+    .shell { grid-template-columns: 1fr; gap: 16px; padding: 24px 16px 48px; }
+    aside.sidebar { display: none; }
+}
+
 @media (max-width: 720px) {
     body { padding-top: 64px; }
     main { padding: 24px 16px 48px; }
-    .shell { padding: 24px 16px 48px; }
     header.topbar .topbar-inner { padding: 0 16px; height: 64px; }
     header.topbar .brand .brand-sub { display: none; }
-    header.topbar nav { gap: 0; }
-    header.topbar nav a { padding: 8px 8px; font-size: 13px; }
-    header.topbar .user-pill { display: none; }
+    header.topbar .brand .brand-name { font-size: 18px; }
     table { font-size: 12px; }
     th, td { padding: 10px 8px; }
     .auth-shell { min-height: calc(100vh - 64px); }
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kpi-value { font-size: 22px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 18px; }
+    .card { padding: 18px; }
+    .detail-grid { grid-template-columns: 1fr; gap: 16px; }
+}
+@media (max-width: 420px) {
+    .kpi-grid { grid-template-columns: 1fr; }
 }

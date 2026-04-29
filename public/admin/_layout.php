@@ -66,11 +66,51 @@ function admin_layout_start(string $title): void {
                     <?= $h($u) ?>
                 </span>
             <?php endif; ?>
+            <button type="button" class="hamburger" id="ipecHamburger" aria-label="Ouvrir le menu" aria-controls="ipecDrawer" aria-expanded="false">
+                <svg class="icon-open"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+                <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </button>
         </nav>
     </div>
 </header>
+<div class="drawer-backdrop" id="ipecDrawerBackdrop" aria-hidden="true"></div>
+<aside class="drawer" id="ipecDrawer" aria-hidden="true">
+    <div class="drawer-head">
+        <span>Menu</span>
+        <button type="button" class="drawer-close" id="ipecDrawerClose" aria-label="Fermer le menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        </button>
+    </div>
+    <nav class="drawer-nav">
+        <?php
+        foreach ($navItems as $href => $label) {
+            $isActive = ($cur === $href) || ($href === 'index.php' && $cur === 'detail.php');
+            echo '<a href="' . $h($href) . '"' . ($isActive ? ' aria-current="page"' : '') . '>' . $h($label) . '</a>';
+        }
+        if ($u !== ''):
+        ?>
+        <div class="sep-label">Connecté</div>
+        <a href="#" onclick="return false;" style="cursor:default;">
+            <span class="ico">●</span> <?= $h($u) ?>
+        </a>
+        <?php endif; ?>
+    </nav>
+</aside>
 <script>
-(function(){var b=document.getElementById('ipecThemeToggle');if(!b)return;b.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',c);try{localStorage.setItem('ipec-admin-theme',c);}catch(e){}});})();
+(function(){
+    var b=document.getElementById('ipecThemeToggle');
+    if(b)b.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',c);try{localStorage.setItem('ipec-admin-theme',c);}catch(e){}});
+    var h=document.getElementById('ipecHamburger'),
+        bd=document.getElementById('ipecDrawerBackdrop'),
+        dr=document.getElementById('ipecDrawer'),
+        cl=document.getElementById('ipecDrawerClose');
+    function open(){document.body.classList.add('drawer-open');h&&h.setAttribute('aria-expanded','true');dr&&dr.setAttribute('aria-hidden','false');}
+    function close(){document.body.classList.remove('drawer-open');h&&h.setAttribute('aria-expanded','false');dr&&dr.setAttribute('aria-hidden','true');}
+    if(h)h.addEventListener('click',function(){document.body.classList.contains('drawer-open')?close():open();});
+    if(bd)bd.addEventListener('click',close);
+    if(cl)cl.addEventListener('click',close);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
 </script>
 <main>
 <?php
