@@ -5,10 +5,8 @@
 #   dist/admin.zip  → docroot admin.ipec.school
 #   dist/lms.zip    → docroot lms.ipec.school
 #
-# Stratégie : 1 seul build Vite, puis chaque ZIP filtre les .html à la racine
-# pour ne garder que les pages du portail concerné. Le bundle JS est partagé
-# côté client mais code-splitté par route (un admin ne charge pas les chunks
-# /etudiant/* et inversement).
+# Stratégie : 3 builds Vite distincts via STATIC_BUILD (lu par vite.config.ts).
+# Chaque build prerend les routes du portail concerné en .html.
 
 set -euo pipefail
 
@@ -20,64 +18,31 @@ BUILD="$ROOT/dist-build"
 rm -rf "$DIST" "$BUILD"
 mkdir -p "$DIST" "$BUILD"
 
-echo "==> Build statique unique (TanStack)"
-rm -rf "$ROOT/dist" "$ROOT/.output"
-(cd "$ROOT" && npx vite build)
-
-if   [ -d "$ROOT/.output/public" ]; then BUILT="$ROOT/.output/public"
-elif [ -d "$ROOT/dist" ];           then BUILT="$ROOT/dist"
-else echo "ERREUR: aucune sortie de build" >&2; exit 1
-fi
-echo "==> Build OK -> $BUILT"
-
-# Copie filtrée : ne garde à la RACINE que les .html dont le nom (sans .html)
-# est dans $2 (liste séparée par espaces). Sous-dossiers : ceux dans $3, ou
-# tous si $3 = "ALL".
-copy_filtered() {
-    local dest="$1"; local allowed_html="$2"; local allowed_dirs="$3"
-    mkdir -p "$dest"
-    # sous-dossiers
-    for d in "$BUILT"/*/; do
-        [ -d "$d" ] || continue
-        local name; name="$(basename "$d")"
-        if [ "$allowed_dirs" = "ALL" ] || echo " $allowed_dirs " | grep -q " $name "; then
-            cp -R "$d" "$dest/"
-        fi
-    done
-    # fichiers racine
-    for f in "$BUILT"/*; do
-        [ -f "$f" ] || continue
-        local name; name="$(basename "$f")"
-        case "$name" in
-            *.html)
-                local base="${name%.html}"
-                if echo " $allowed_html " | grep -q " $base "; then
-                    cp "$f" "$dest/"
-                fi
-                ;;
-            *)
-                cp "$f" "$dest/"
-                ;;
-        esac
-    done
+build_target() {
+    local target="$1"
+    echo ""
+    echo "==> Build STATIC_BUILD=$target"
+    rm -rf "$ROOT/dist" "$ROOT/.output"
+    (cd "$ROOT" && STATIC_BUILD="$target" npx vite build)
+    if   [ -d "$ROOT/.output/public" ]; then echo "$ROOT/.output/public"
+    elif [ -d "$ROOT/dist" ];           then echo "$ROOT/dist"
+    else echo "ERREUR: aucune sortie de build pour $target" >&2; return 1
+    fi
 }
 
-SITE_HTML="index admissions cgu cgv confidentialite contact cookies inscription international mentions-legales programmes verification vie-etudiante 404 200"
+move_output() {
+    local src="$1"; local dest="$2"
+    rm -rf "$dest"
+    mkdir -p "$dest"
+    cp -R "$src"/. "$dest/"
+}
 
 # ---------------------------------------------------------------------------
 # 1) site.zip — www.ipec.school
 # ---------------------------------------------------------------------------
+OUT="$(build_target site | tail -n1)"
 SITE="$BUILD/site"
-# Tous les sous-dossiers SAUF admin/ et etudiant/
-SITE_DIRS=""
-for d in "$BUILT"/*/; do
-    [ -d "$d" ] || continue
-    name="$(basename "$d")"
-    [ "$name" = "admin" ] && continue
-    [ "$name" = "etudiant" ] && continue
-    SITE_DIRS="$SITE_DIRS $name"
-done
-copy_filtered "$SITE" "$SITE_HTML" "$SITE_DIRS"
+move_output "$OUT" "$SITE"
 
 cp "$PUB/mailer.php"        "$SITE/"
 cp "$PUB/db_config.php"     "$SITE/"
@@ -107,8 +72,9 @@ echo "==> dist/site.zip OK"
 # ---------------------------------------------------------------------------
 # 2) admin.zip — admin.ipec.school
 # ---------------------------------------------------------------------------
+OUT="$(build_target admin | tail -n1)"
 ADMIN="$BUILD/admin"
-copy_filtered "$ADMIN" "index admin 404 200" "admin assets _build"
+move_output "$OUT" "$ADMIN"
 
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
@@ -137,8 +103,9 @@ echo "==> dist/admin.zip OK"
 # ---------------------------------------------------------------------------
 # 3) lms.zip — lms.ipec.school
 # ---------------------------------------------------------------------------
+OUT="$(build_target etu | tail -n1)"
 LMS="$BUILD/lms"
-copy_filtered "$LMS" "index etudiant 404 200" "etudiant assets _build"
+move_output "$OUT" "$LMS"
 
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"

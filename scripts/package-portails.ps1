@@ -4,10 +4,13 @@
 #   dist\admin.zip  -> docroot admin.ipec.school
 #   dist\lms.zip    -> docroot lms.ipec.school
 #
-# Strategie : 1 seul build Vite (TanStack Router code-split par route),
-# puis chaque ZIP filtre les .html a la racine pour ne garder que les pages
-# du portail concerne. Le bundle JS est partage cote client (chunks
-# lazy-loades : un admin ne charge pas les chunks /etudiant/* et vice-versa).
+# Strategie : 3 builds Vite distincts via la variable STATIC_BUILD lue par
+# vite.config.ts. Chaque build prerend uniquement les routes du portail
+# concerne (cf. SITE_ROUTES / ADMIN_PUBLIC_ROUTES / ETU_PUBLIC_ROUTES dans
+# vite.config.ts). Ainsi :
+#   - site  -> /, /admissions, /cgu, ... prerendus en .html a la racine
+#   - admin -> /admin/login prerendu, le reste en SPA fallback
+#   - etu   -> /etudiant/login + /etudiant/mot-de-passe-oublie prerendus
 #
 # Usage :  powershell -ExecutionPolicy Bypass -File scripts\package-portails.ps1
 
@@ -22,61 +25,35 @@ if (Test-Path $DIST)  { Remove-Item $DIST  -Recurse -Force }
 if (Test-Path $BUILD) { Remove-Item $BUILD -Recurse -Force }
 New-Item -ItemType Directory -Path $DIST, $BUILD | Out-Null
 
-# -------------------------------------------------------------------
-# 0) Build unique
-# -------------------------------------------------------------------
-function Invoke-Build {
-    Write-Host "==> Build statique unique (TanStack)"
+function Invoke-TargetBuild {
+    param([string]$Target)
+    Write-Host ""
+    Write-Host "==> Build STATIC_BUILD=$Target"
     if (Test-Path (Join-Path $ROOT "dist"))    { Remove-Item (Join-Path $ROOT "dist")    -Recurse -Force }
     if (Test-Path (Join-Path $ROOT ".output")) { Remove-Item (Join-Path $ROOT ".output") -Recurse -Force }
     Push-Location $ROOT
     try {
-        # Utilise npx vite build directement pour eviter les soucis de PATH npm
+        $env:STATIC_BUILD = $Target
         & npx vite build | Out-Host
-        if ($LASTEXITCODE -ne 0) { throw "vite build a echoue" }
+        if ($LASTEXITCODE -ne 0) { throw "vite build ($Target) a echoue" }
     } finally {
+        Remove-Item Env:STATIC_BUILD -ErrorAction SilentlyContinue
         Pop-Location
     }
-}
 
-function Get-BuildOutputDir {
     $outputPublic = Join-Path $ROOT ".output\public"
     $distFolder   = Join-Path $ROOT "dist"
     if (Test-Path $outputPublic) { return $outputPublic }
     if (Test-Path $distFolder)   { return $distFolder }
-    throw "Aucune sortie de build trouvee"
+    throw "Aucune sortie de build trouvee pour $Target"
 }
 
-# Copie un build complet vers $Dest, mais ne garde a la RACINE que les
-# .html dont le nom (sans extension) figure dans $AllowedHtml.
-# Les sous-dossiers (assets, _build, etudiant/, admin/, etc.) sont copies
-# integralement -- TanStack peut emettre des sous-pages prerendues.
-function Copy-BundleFiltered {
-    param(
-        [string]$Source,
-        [string]$Dest,
-        [string[]]$AllowedHtml,        # ex: @("index", "admissions", "contact")
-        [string[]]$AllowedSubdirs = @() # ex: @() ou @("etudiant","admin"). Vide = tous gardes.
-    )
+function Move-BuildOutput {
+    param([string]$BuildOutput, [string]$Dest)
+    if (Test-Path $Dest) { Remove-Item $Dest -Recurse -Force }
     New-Item -ItemType Directory -Path $Dest -Force | Out-Null
-
-    # 1) sous-dossiers : tous copies sauf si filtre
-    Get-ChildItem -Path $Source -Directory | ForEach-Object {
-        if ($AllowedSubdirs.Count -eq 0 -or $AllowedSubdirs -contains $_.Name) {
-            Copy-Item $_.FullName $Dest -Recurse -Force
-        }
-    }
-    # 2) fichiers a la racine : on filtre les .html
-    Get-ChildItem -Path $Source -File | ForEach-Object {
-        $name = $_.Name
-        if ($name -like "*.html") {
-            $base = [System.IO.Path]::GetFileNameWithoutExtension($name)
-            if ($AllowedHtml -contains $base) {
-                Copy-Item $_.FullName (Join-Path $Dest $name) -Force
-            }
-        } else {
-            Copy-Item $_.FullName (Join-Path $Dest $name) -Force
-        }
+    Get-ChildItem -Path $BuildOutput -Force | ForEach-Object {
+        Copy-Item $_.FullName $Dest -Recurse -Force
     }
 }
 
@@ -91,29 +68,12 @@ function Zip-Folder {
     Compress-Archive -Path (Join-Path $Source "*") -DestinationPath $ZipPath -Force
 }
 
-Invoke-Build
-$BUILT = Get-BuildOutputDir
-Write-Host "==> Build OK -> $BUILT"
-
-# Pages publiques (= toutes les routes /src/routes/*.tsx hors admin/etudiant)
-$SITE_HTML = @(
-    "index","admissions","cgu","cgv","confidentialite","contact","cookies",
-    "inscription","international","mentions-legales","programmes",
-    "verification","vie-etudiante","404","200"
-)
-
 # -------------------------------------------------------------------
-# 1) site.zip - www.ipec.school
+# 1) site.zip - www.ipec.school  (STATIC_BUILD=site)
 # -------------------------------------------------------------------
+$out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
-# On exclut les sous-dossiers admin/ et etudiant/ du site public.
-$SITE_SUBDIRS = @()
-Get-ChildItem -Path $BUILT -Directory | ForEach-Object {
-    if ($_.Name -ne "admin" -and $_.Name -ne "etudiant") {
-        $SITE_SUBDIRS += $_.Name
-    }
-}
-Copy-BundleFiltered -Source $BUILT -Dest $SITE -AllowedHtml $SITE_HTML -AllowedSubdirs $SITE_SUBDIRS
+Move-BuildOutput -BuildOutput $out -Dest $SITE
 
 # Backend PHP du site public
 Copy-Item (Join-Path $PUB "mailer.php")        $SITE
@@ -143,13 +103,11 @@ Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
 Write-Host "==> dist\site.zip OK"
 
 # -------------------------------------------------------------------
-# 2) admin.zip - admin.ipec.school
+# 2) admin.zip - admin.ipec.school  (STATIC_BUILD=admin)
 # -------------------------------------------------------------------
+$out = Invoke-TargetBuild -Target "admin"
 $ADMIN = Join-Path $BUILD "admin"
-# On garde uniquement assets + le sous-dossier admin/ + login.html eventuel.
-$ADMIN_SUBDIRS = @("admin", "assets", "_build")
-$ADMIN_HTML    = @("index","admin","404","200")
-Copy-BundleFiltered -Source $BUILT -Dest $ADMIN -AllowedHtml $ADMIN_HTML -AllowedSubdirs $ADMIN_SUBDIRS
+Move-BuildOutput -BuildOutput $out -Dest $ADMIN
 
 $adminApi    = Join-Path $ADMIN "api"
 $adminShared = Join-Path $adminApi "_shared"
@@ -180,12 +138,11 @@ Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
 Write-Host "==> dist\admin.zip OK"
 
 # -------------------------------------------------------------------
-# 3) lms.zip - lms.ipec.school
+# 3) lms.zip - lms.ipec.school  (STATIC_BUILD=etu)
 # -------------------------------------------------------------------
+$out = Invoke-TargetBuild -Target "etu"
 $LMS = Join-Path $BUILD "lms"
-$LMS_SUBDIRS = @("etudiant", "assets", "_build")
-$LMS_HTML    = @("index","etudiant","404","200")
-Copy-BundleFiltered -Source $BUILT -Dest $LMS -AllowedHtml $LMS_HTML -AllowedSubdirs $LMS_SUBDIRS
+Move-BuildOutput -BuildOutput $out -Dest $LMS
 
 $lmsApi    = Join-Path $LMS "api"
 $lmsShared = Join-Path $lmsApi "_shared"
