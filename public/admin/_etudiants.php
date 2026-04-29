@@ -87,12 +87,19 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
             $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
                 ->execute([(int)$existing['id'], (int)$candidature['id']]);
         }
+        $token = '';
+        if (empty($existing['password_hash'])) {
+            $pdo->prepare("UPDATE etudiant_tokens SET used_at = NOW()
+                           WHERE etudiant_id = ? AND type = 'activation' AND used_at IS NULL")
+                ->execute([(int)$existing['id']]);
+            $token = etudiant_create_token($pdo, (int)$existing['id'], 'activation', 14 * 24 * 3600);
+        }
         // (Re)synchronise les documents historiques pour cette candidature
         etudiant_sync_documents_historiques($pdo, (int)$existing['id'], $candidature, $adminUser);
         return [
             'etudiant_id'   => (int)$existing['id'],
             'numero'        => (string)$existing['numero_etudiant'],
-            'token'         => '',
+            'token'         => $token,
             'deja_existant' => true,
         ];
     }
