@@ -287,6 +287,7 @@ Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared -Force
 Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared -Force
 Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "ipec-logo-email.png") $lmsShared -Force
 Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse -Force
 Copy-Item (Join-Path $PUB "PHPMailer")          $lmsShared -Recurse -Force
 
