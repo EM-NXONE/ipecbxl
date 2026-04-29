@@ -5,7 +5,12 @@ api_method('GET');
 $u = api_require_etudiant();
 
 $stmt = db()->prepare(
-    "SELECT * FROM factures
+    "SELECT id, numero, type, libelle, description,
+            montant_ht_cents, tva_taux, montant_ttc_cents, devise,
+            date_emission, date_echeance,
+            statut_paiement, paye_at, moyen_paiement, reference_paiement,
+            created_at, updated_at
+     FROM factures
      WHERE etudiant_id=? AND visible_etudiant=1
      ORDER BY date_emission DESC, id DESC"
 );
@@ -23,6 +28,13 @@ foreach ($factures as $f) {
 
 api_json([
     'factures' => $factures,
+    // Forme attendue par le React (KPIs)
+    'kpis' => [
+        'total_du_cents'   => $totalDu,
+        'total_paye_cents' => $totalPaye,
+        'count'            => count($factures),
+    ],
+    // Rétro-compat (anciens consommateurs)
     'totaux' => [
         'du_cents'   => $totalDu,
         'paye_cents' => $totalPaye,
