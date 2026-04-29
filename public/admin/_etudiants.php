@@ -5,10 +5,13 @@
  * Régles :
  *  - Création MANUELLE par l'admin depuis une fiche candidature.
  *  - Auth = PHP natif bcrypt (pas de Supabase).
- *  - Le compte est créé sans mot de passe (password_hash NULL) et un token
- *    d'activation est généré ; l'étudiant définira son mdp via le lien reçu.
+ *  - Le compte est créé ACTIF avec le mot de passe par défaut "Student1".
+ *    L'étudiant peut le changer ensuite depuis son espace (/etudiant/profil).
  *  - Numéro étudiant format IPEC-ETU-AAAA-XXXX (4 hex majuscules).
  */
+
+/** Mot de passe par défaut pour tout compte étudiant créé/réinitialisé par l'admin. */
+const ETU_DEFAULT_PASSWORD = 'Student1';
 
 declare(strict_types=1);
 
