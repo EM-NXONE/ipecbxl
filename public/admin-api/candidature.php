@@ -6,6 +6,8 @@
 require_once __DIR__ . '/_bootstrap.php';
 api_method('GET');
 api_require_admin();
+admin_require_db();
+admin_require_etudiants();
 
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) api_error('id invalide', 400);
