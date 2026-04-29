@@ -22,7 +22,7 @@ function EtudiantLoginPage() {
 
   if (loading) {
     return (
-      <PortalAuthShell brandSubtitle="Espace étudiant">
+      <PortalAuthShell brandSubtitle="Espace étudiant" brandHref="/etudiant">
         <p className="text-center text-sm text-muted-foreground">Chargement…</p>
       </PortalAuthShell>
     );
@@ -49,7 +49,7 @@ function EtudiantLoginPage() {
   };
 
   return (
-    <PortalAuthShell brandSubtitle="Espace étudiant">
+    <PortalAuthShell brandSubtitle="Espace étudiant" brandHref="/etudiant">
       <div className="bg-card border border-border/40 rounded-md p-8 shadow-elegant">
         <h1 className="font-display text-2xl text-cream text-center mb-2">Connexion</h1>
         <p className="text-center text-sm text-muted-foreground mb-6">

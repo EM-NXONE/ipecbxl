@@ -37,7 +37,7 @@ function ResetPasswordPage() {
   };
 
   return (
-    <PortalAuthShell brandSubtitle="Espace étudiant">
+    <PortalAuthShell brandSubtitle="Espace étudiant" brandHref="/etudiant">
       <div className="bg-card border border-border/40 rounded-md p-8 shadow-elegant">
         <h1 className="font-display text-2xl text-cream text-center mb-2">Nouveau mot de passe</h1>
         <p className="text-center text-sm text-muted-foreground mb-6">

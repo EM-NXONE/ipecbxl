@@ -37,6 +37,8 @@ export interface PortalNavItem {
 interface PortalLayoutProps {
   /** Titre court affiché à droite du logo (ex: "Administration", "Espace étudiant"). */
   brandSubtitle: string;
+  /** Cible du clic sur le logo (par défaut "/"). Permet de rester dans le portail. */
+  brandHref?: string;
   /** Items de navigation latérale. */
   nav: PortalNavItem[];
   /** Nom affiché dans la topbar (utilisateur connecté). */
@@ -49,6 +51,7 @@ interface PortalLayoutProps {
 
 export function PortalLayout({
   brandSubtitle,
+  brandHref = "/",
   nav,
   userLabel,
   onLogout,
@@ -91,7 +94,7 @@ export function PortalLayout({
             >
               {drawerOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
-            <Link to="/" className="flex items-center gap-3 min-w-0">
+            <Link to={brandHref} className="flex items-center gap-3 min-w-0">
               <LogoIpec size={36} className="text-blue shrink-0" />
               <div className="leading-tight min-w-0">
                 <div className="font-display text-lg text-cream tracking-tight">IPEC</div>
@@ -177,16 +180,18 @@ export function PortalLayout({
  */
 export function PortalAuthShell({
   brandSubtitle,
+  brandHref = "/",
   children,
 }: {
   brandSubtitle: string;
+  brandHref?: string;
   children: ReactNode;
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-body">
       <header className="h-16 backdrop-blur-xl bg-background/80 border-b border-border/40">
         <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to={brandHref} className="flex items-center gap-3">
             <LogoIpec size={36} className="text-blue shrink-0" />
             <div className="leading-tight">
               <div className="font-display text-lg text-cream tracking-tight">IPEC</div>

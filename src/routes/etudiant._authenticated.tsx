@@ -36,7 +36,7 @@ function EtudiantAuthenticatedLayout() {
 
   return (
     <PortalLayout
-      brandSubtitle="Espace étudiant"
+      brandSubtitle="Espace étudiant" brandHref="/etudiant"
       nav={NAV}
       userLabel={userLabel}
       onLogout={async () => {
