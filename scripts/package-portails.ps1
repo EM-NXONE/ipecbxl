@@ -162,12 +162,6 @@ Get-ChildItem -Path $out -Directory -Force | ForEach-Object {
 # Garde uniquement index.html (SPA fallback) et 404/200 a la racine.
 Move-BuildOutput -BuildOutput $out -Dest $ADMIN -AllowedHtml @("index","404","200") -ForbiddenSubdirs $forbidAdmin
 
-# Nettoie les fichiers PHP/SQL deposes par Vite depuis public/ (reserves au site public)
-foreach ($f in @("mailer.php","verify.php","cors.php","db_config.php","schema.sql","_pdf_classes.php","sitemap.xml","robots.txt")) {
-    $p = Join-Path $ADMIN $f
-    if (Test-Path $p) { Remove-Item $p -Force }
-}
-
 # Purge admin/ : on jette le legacy public/admin/*.php et on garde uniquement les index.html prerendus
 Purge-PortalSubdir (Join-Path $ADMIN "admin")
 
