@@ -7,6 +7,13 @@ export interface AdminActionResult {
   activation_url?: string | null;
 }
 
+export function adminActionMessage(result: AdminActionResult): string {
+  return [
+    result.message || "Action effectuée.",
+    result.activation_url ? `Lien d'activation : ${result.activation_url}` : "",
+  ].filter(Boolean).join(" ");
+}
+
 interface AdminCandidatureActionsProps {
   id: number | string;
   paid: boolean | number;
