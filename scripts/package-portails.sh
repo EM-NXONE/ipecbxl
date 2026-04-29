@@ -116,6 +116,17 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
+purge_portal_subdir "$ADMIN/admin"
+for f in $SITE_ONLY_FILES; do rm -f "$ADMIN/$f"; done
+cat > "$ADMIN/index.html" <<'HTML'
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<title>IPEC Admin</title>
+<meta http-equiv="refresh" content="0; url=/admin/login">
+<link rel="canonical" href="/admin/login"></head>
+<body><script>location.replace('/admin/login')</script>
+<a href="/admin/login">Acceder a l'espace admin</a></body></html>
+HTML
+
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
 cp "$PUB/db_config.php"         "$ADMIN/api/_shared/"
