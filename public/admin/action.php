@@ -98,6 +98,11 @@ try {
             admin_csrf_check();
             $pdo->prepare("UPDATE candidatures SET facture_payee=1, facture_payee_at=NOW(), facture_payee_par=? WHERE id=?")
                 ->execute([admin_current_user(), $id]);
+            // Propage à la table factures (espace étudiant)
+            $pdo->prepare("UPDATE factures
+                           SET statut_paiement='payee', date_paiement=CURDATE()
+                           WHERE candidature_id=? AND type='frais_dossier'")
+                ->execute([$id]);
             admin_log_action($id, 'mark_paid', 'Facture ' . $c['facture_numero']);
             admin_set_flash('Facture marquée comme payée.');
             header('Location: detail.php?id=' . $id); exit;
@@ -106,6 +111,11 @@ try {
         case 'mark_unpaid': {
             admin_csrf_check();
             $pdo->prepare("UPDATE candidatures SET facture_payee=0, facture_payee_at=NULL, facture_payee_par=NULL WHERE id=?")
+                ->execute([$id]);
+            // Propage à la table factures (espace étudiant)
+            $pdo->prepare("UPDATE factures
+                           SET statut_paiement='en_attente', date_paiement=NULL
+                           WHERE candidature_id=? AND type='frais_dossier'")
                 ->execute([$id]);
             admin_log_action($id, 'mark_unpaid', 'Facture ' . $c['facture_numero']);
             admin_set_flash('Paiement annulé.');
