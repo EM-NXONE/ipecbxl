@@ -231,6 +231,7 @@ Copy-Item (Join-Path $PUB "mailer.php")             $adminShared -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared -Force
 Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared -Force
 Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared -Force
+Copy-Item (Join-Path $PUB "ipec-logo-email.png")    $adminShared -Force
 Copy-Item (Join-Path $PUB "FPDF")                   $adminShared -Recurse -Force
 Copy-Item (Join-Path $PUB "PHPMailer")              $adminShared -Recurse -Force
 
