@@ -158,6 +158,7 @@ function Zip-Folder {
 # -------------------------------------------------------------------
 # 1) site.zip - www.ipec.school  (STATIC_BUILD=site)
 # -------------------------------------------------------------------
+if (Should-Build "site") {
 $out = Invoke-TargetBuild -Target "site"
 $SITE = Join-Path $BUILD "site"
 # Site public : exclut les portails ET les dossiers backend reserves aux autres ZIPs.
@@ -196,10 +197,12 @@ Write-Utf8NoBom (Join-Path $SITE ".htaccess") $siteHt
 
 Zip-Folder -Source $SITE -ZipPath (Join-Path $DIST "site.zip")
 Write-Host "==> packages\site.zip OK"
+}
 
 # -------------------------------------------------------------------
 # 2) admin.zip - admin.ipec.school  (STATIC_BUILD=admin)
 # -------------------------------------------------------------------
+if (Should-Build "admin") {
 $out = Invoke-TargetBuild -Target "admin"
 $ADMIN = Join-Path $BUILD "admin"
 # Admin : on garde uniquement assets + sous-dossier admin/. On vire tout le reste.
@@ -252,10 +255,12 @@ Write-Utf8NoBom (Join-Path $adminShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $ADMIN -ZipPath (Join-Path $DIST "admin.zip")
 Write-Host "==> packages\admin.zip OK"
+}
 
 # -------------------------------------------------------------------
 # 3) lms.zip - lms.ipec.school  (STATIC_BUILD=etu)
 # -------------------------------------------------------------------
+if (Should-Build "lms") {
 $out = Invoke-TargetBuild -Target "etu"
 $LMS = Join-Path $BUILD "lms"
 $forbidLms = @()
@@ -305,6 +310,7 @@ Write-Utf8NoBom (Join-Path $lmsShared ".htaccess") "Require all denied`r`n"
 
 Zip-Folder -Source $LMS -ZipPath (Join-Path $DIST "lms.zip")
 Write-Host "==> packages\lms.zip OK"
+}
 
 Get-ChildItem $DIST | Format-Table Name, Length
 
