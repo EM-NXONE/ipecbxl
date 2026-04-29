@@ -114,21 +114,48 @@ export function AdminCandidatureActions({
           </button>
         )}
 
-        {showPayment && (
+        {showPayment && !isPaid && (
           <button
             type="button"
-            onClick={() => {
-              if (isPaid) runAction("mark_unpaid");
-              else setShowPayModal(true);
-            }}
+            onClick={openMarkPaid}
             disabled={busy !== null}
             className={buttonClass}
-            title={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
-            aria-label={isPaid ? "Annuler le paiement" : "Marquer comme payé"}
+            title="Marquer comme payé"
+            aria-label="Marquer comme payé"
           >
-            {isPaid ? <XCircle size={compact ? 14 : 15} /> : <CheckCircle2 size={compact ? 14 : 15} />}
-            {!compact && <span>{busy === "mark_paid" || busy === "mark_unpaid" ? "…" : isPaid ? "Annuler paiement" : "Marquer payé"}</span>}
+            <CheckCircle2 size={compact ? 14 : 15} />
+            {!compact && <span>{busy === "mark_paid" ? "…" : "Marquer payé"}</span>}
           </button>
+        )}
+
+        {showPayment && isPaid && (
+          <>
+            <button
+              type="button"
+              onClick={openEdit}
+              disabled={busy !== null}
+              className={buttonClass}
+              title="Éditer le paiement (moyen / date)"
+              aria-label="Éditer le paiement"
+            >
+              <Pencil size={compact ? 14 : 15} />
+              {!compact && <span>{busy === "mark_paid" && editMode ? "…" : "Éditer"}</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!confirm("Annuler ce paiement ? La facture repassera en attente.")) return;
+                runAction("mark_unpaid");
+              }}
+              disabled={busy !== null}
+              className={buttonClass}
+              title="Annuler le paiement"
+              aria-label="Annuler le paiement"
+            >
+              <XCircle size={compact ? 14 : 15} />
+              {!compact && <span>{busy === "mark_unpaid" ? "…" : "Annuler paiement"}</span>}
+            </button>
+          </>
         )}
 
         {showGeneral && (
