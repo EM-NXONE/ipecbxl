@@ -247,18 +247,32 @@ cp -R "$PUB/PHPMailer"       "$LMS/api/_shared/"
 
 cat > "$LMS/.htaccess" <<'HT'
 # IPEC — lms.ipec.school
-# Interdiction totale d'indexation par les moteurs de recherche
+# Interdiction TOTALE et permanente d'indexation (toutes réponses)
 <IfModule mod_headers.c>
-  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+  Header always set Referrer-Policy "no-referrer"
 </IfModule>
 
 RewriteEngine On
+
+# Racine → login étudiant
 RewriteRule ^$ /etudiant/login [R=302,L]
+
+# Fichiers et dossiers existants : servir tel quel
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
+
+# API PHP : passer
 RewriteRule ^api/ - [L]
-RewriteRule ^ index.html [L]
+
+# Toute URL hors /etudiant/* et /api/* → 301 vers /etudiant/login
+RewriteCond %{REQUEST_URI} !^/etudiant(/|$)
+RewriteCond %{REQUEST_URI} !^/api(/|$)
+RewriteRule ^ /etudiant/login [R=301,L]
+
+# Fallback SPA : tout /etudiant/* → index.html
+RewriteRule ^etudiant(/.*)?$ index.html [L]
 HT
 cat > "$LMS/robots.txt" <<'RT'
 User-agent: *
