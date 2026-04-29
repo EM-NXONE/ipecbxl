@@ -33,7 +33,7 @@ function AdminAuthenticatedLayout() {
 
   return (
     <PortalLayout
-      brandSubtitle="Administration"
+      brandSubtitle="Administration" brandHref="/admin"
       nav={NAV}
       userLabel={user.username}
       onLogout={async () => {

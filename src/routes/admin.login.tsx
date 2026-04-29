@@ -20,7 +20,7 @@ function AdminLoginPage() {
 
   if (loading) {
     return (
-      <PortalAuthShell brandSubtitle="Administration">
+      <PortalAuthShell brandSubtitle="Administration" brandHref="/admin">
         <p className="text-center text-sm text-muted-foreground">Chargement…</p>
       </PortalAuthShell>
     );
@@ -44,7 +44,7 @@ function AdminLoginPage() {
   };
 
   return (
-    <PortalAuthShell brandSubtitle="Administration">
+    <PortalAuthShell brandSubtitle="Administration" brandHref="/admin">
       <div className="bg-card border border-border/40 rounded-md p-8 shadow-elegant">
         <h1 className="font-display text-2xl text-cream text-center mb-2">Espace administration</h1>
         <p className="text-center text-sm text-muted-foreground mb-6">

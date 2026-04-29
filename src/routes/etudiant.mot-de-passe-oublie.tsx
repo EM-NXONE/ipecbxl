@@ -31,7 +31,7 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <PortalAuthShell brandSubtitle="Espace étudiant">
+    <PortalAuthShell brandSubtitle="Espace étudiant" brandHref="/etudiant">
       <div className="bg-card border border-border/40 rounded-md p-8 shadow-elegant">
         <h1 className="font-display text-2xl text-cream text-center mb-2">Mot de passe oublié</h1>
 
