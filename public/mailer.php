@@ -1427,20 +1427,7 @@ function buildRecuPaiementPdf(array $f): array {
         . 'Il tient lieu de pièce justificative et peut être présenté à toute autorité ou organisme tiers.'
     ), 0, 'L');
 
-    // Bloc CODE DE VÉRIFICATION
-    $pdf->Ln(4);
-    $verifY = $pdf->GetY();
-    $pdf->SetDrawColor(44, 93, 219); $pdf->SetFillColor(247, 249, 252);
-    $pdf->SetLineWidth(0.3); $pdf->Rect(20, $verifY, 170, 18, 'DF');
-    $pdf->SetXY(24, $verifY + 3);
-    $pdf->SetFont('Helvetica', 'B', 8); $pdf->SetTextColor(44, 93, 219);
-    $pdf->Cell(0, 4, $tr('CODE DE VÉRIFICATION'), 0, 1);
-    $pdf->SetX(24);
-    $pdf->SetFont('Courier', 'B', 13); $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr($verifCode), 0, 1);
-    $pdf->SetX(24);
-    $pdf->SetFont('Helvetica', '', 8); $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $recuNumero), 0, 1);
+    // (Bloc "CODE DE VÉRIFICATION" supprimé : la mention d'authenticité figure dans le pied de page.)
 
     $filename = 'recu-paiement-IPEC-' . preg_replace('/[^A-Za-z0-9_-]+/', '-', $recuNumero) . '.pdf';
     return [$pdf->Output('S'), $filename, $recuNumero];
