@@ -76,14 +76,10 @@ $dStmt = $pdo->prepare("SELECT * FROM documents
 $dStmt->execute([$u['id']]);
 $lastDocs = $dStmt->fetchAll();
 
-// Pour les documents recap_candidature, on expose la référence candidature
-// (cf. /api/documents.php) plutôt que la référence interne IPEC-DOC-...
+// Nettoyage d'affichage des récapitulatifs de candidature (cf. /api/documents.php)
 foreach ($lastDocs as &$d) {
-    if (($d['template'] ?? '') === 'recap_candidature' && !empty($d['data_json'])) {
-        $tmp = json_decode($d['data_json'], true);
-        if (is_array($tmp) && !empty($tmp['reference'])) {
-            $d['reference'] = (string)$tmp['reference'];
-        }
+    if (($d['template'] ?? '') === 'recap_candidature') {
+        $d['titre'] = 'Récapitulatif de candidature';
     }
     unset($d['data_json']);
 }
