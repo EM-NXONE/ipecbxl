@@ -887,13 +887,22 @@ function buildFacturePdf(array $f): array {
     $now        = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr    = $now->format('d/m/Y');
     // Numéro de facture officiel (IPEC-FACT-AAAA-XXXXXX) fourni par l'appelant.
-    // Fallback historique (timestamp) uniquement si non fourni.
+    // Aucun fallback inventé : si vide, on laisse vide (le footer ne montrera rien).
     $referenceFacture = trim((string)($f['reference_facture'] ?? ''));
-    $numFacture = $referenceFacture !== '' ? $referenceFacture : ('IPEC-FACT-' . $now->format('Ymd-His'));
+    $numFacture = $referenceFacture;
 
-    // Communication structurée belge : 12 chiffres → +++XXX/XXXX/XXXYY+++
-    // YY = (10 premiers chiffres) mod 97 (97 → 00). Standard belge.
-    $base10 = substr($now->format('YmdHis'), 0, 10); // 10 chiffres
+    // Communication structurée belge dérivée DÉTERMINISTIQUEMENT de la référence
+    // facture (qui est elle-même unique en base). Garantit qu'à 1 facture = 1 comm
+    // structurée unique, et que la même facture a toujours la même comm.
+    // Format : 12 chiffres → +++XXX/XXXX/XXXYY+++  (YY = 10 chiffres mod 97).
+    $seedSrc  = $numFacture !== '' ? $numFacture : $now->format('YmdHis');
+    $seedHash = hash('sha256', 'ipec-comm|' . $seedSrc);
+    // Convertit le hash hex en une chaîne purement numérique de 10+ chiffres.
+    $base10 = '';
+    for ($i = 0; $i < strlen($seedHash) && strlen($base10) < 10; $i++) {
+        $base10 .= (string)hexdec($seedHash[$i]);
+    }
+    $base10 = substr($base10, 0, 10);
     $check  = (int)$base10 % 97;
     if ($check === 0) { $check = 97; }
     $digits12 = $base10 . str_pad((string)$check, 2, '0', STR_PAD_LEFT);
