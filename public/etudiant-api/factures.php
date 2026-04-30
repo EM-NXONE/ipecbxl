@@ -17,6 +17,23 @@ $stmt = db()->prepare(
 $stmt->execute([$u['id']]);
 $factures = $stmt->fetchAll();
 
+// Normalisation d'affichage pour les frais de dossier (anciennes factures
+// pouvant porter l'ancien libellé verbeux).
+foreach ($factures as &$f) {
+    if (($f['type'] ?? '') === 'frais_dossier') {
+        $f['libelle'] = 'Frais de dossier IPEC';
+        // Tente d'extraire la référence candidature de l'ancienne description
+        $ref = '';
+        if (!empty($f['description']) && preg_match('/IPEC-CAND-\d{4}-[A-F0-9]+/i', (string)$f['description'], $m)) {
+            $ref = strtoupper($m[0]);
+        }
+        $f['description'] = $ref
+            ? 'Traitement de la candidature ' . $ref
+            : 'Traitement de votre candidature';
+    }
+}
+unset($f);
+
 $totalDu = 0; $totalPaye = 0;
 foreach ($factures as $f) {
     if (in_array($f['statut_paiement'], ['en_attente','partiellement_payee'], true)) {

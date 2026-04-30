@@ -200,8 +200,8 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
                      1, ?)"
         )->execute([
             $numero, $etudiantId, $candId,
-            'Frais de dossier de candidature IPEC',
-            'Frais de dossier non remboursables — traitement de la candidature ' . ($candidature['reference'] ?? ''),
+            'Frais de dossier IPEC',
+            'Traitement de la candidature ' . ($candidature['reference'] ?? ''),
             $emis, $emis,
             $payee ? 'payee' : 'en_attente',
             $payee ? ($candidature['created_at'] ?? date('Y-m-d H:i:s')) : null,
