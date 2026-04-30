@@ -99,6 +99,13 @@ function AdminCandidatureDetailPage() {
       <div className="bg-card border border-border/40 rounded-md p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-3">
           <h2 className="text-xs uppercase tracking-wider text-muted-foreground">Actions</h2>
+          <a
+            href={adminUrl(`/candidature-pdf.php?id=${id}`)}
+            target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+          >
+            <Download size={14} /> Pdf candidature
+          </a>
         </div>
         <AdminCandidatureActions
           id={id}
