@@ -186,6 +186,24 @@ function AdminCandidatureDetailPage() {
             onError={setError}
           />
         </div>
+        <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap gap-2">
+          <a
+            href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
+            target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+          >
+            <Download size={14} /> Facture PDF
+          </a>
+          {paid && (
+            <a
+              href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
+            >
+              <Download size={14} /> Reçu de paiement
+            </a>
+          )}
+        </div>
       </Card>
 
       <Card title="Compte étudiant" className="mb-6">
