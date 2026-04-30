@@ -90,31 +90,6 @@ function AdminCandidatureDetailPage() {
           </div>
           <p className="text-sm text-muted-foreground font-mono">{c.reference} · reçue le {formatDateTime(c.created_at)}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href={adminUrl(`/candidature-pdf.php?id=${id}`)}
-            target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-          >
-            <Download size={14} /> Récap PDF
-          </a>
-          <a
-            href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
-            target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-          >
-            <Download size={14} /> Facture PDF
-          </a>
-          {paid && (
-            <a
-              href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
-              target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
-            >
-              <Download size={14} /> Reçu de paiement
-            </a>
-          )}
-        </div>
       </div>
 
       {msg && <div className="mb-4 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">{msg}</div>}
@@ -124,6 +99,13 @@ function AdminCandidatureDetailPage() {
       <div className="bg-card border border-border/40 rounded-md p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-3">
           <h2 className="text-xs uppercase tracking-wider text-muted-foreground">Actions</h2>
+          <a
+            href={adminUrl(`/candidature-pdf.php?id=${id}`)}
+            target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+          >
+            <Download size={14} /> Pdf candidature
+          </a>
         </div>
         <AdminCandidatureActions
           id={id}
@@ -203,6 +185,24 @@ function AdminCandidatureDetailPage() {
             onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
             onError={setError}
           />
+        </div>
+        <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap gap-2">
+          <a
+            href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
+            target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+          >
+            <Download size={14} /> Facture PDF
+          </a>
+          {paid && (
+            <a
+              href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
+            >
+              <Download size={14} /> Reçu de paiement
+            </a>
+          )}
         </div>
       </Card>
 
