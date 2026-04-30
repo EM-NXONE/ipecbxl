@@ -54,12 +54,40 @@ $fStmt = $pdo->prepare("SELECT * FROM factures
 $fStmt->execute([$u['id']]);
 $lastFact = $fStmt->fetchAll();
 
+// Normalisation d'affichage pour les frais de dossier (cf. /api/factures.php)
+foreach ($lastFact as &$f) {
+    if (($f['type'] ?? '') === 'frais_dossier') {
+        $f['libelle'] = 'Frais de dossier IPEC';
+        $ref = '';
+        if (!empty($f['description']) && preg_match('/IPEC-CAND-\d{4}-[A-F0-9]+/i', (string)$f['description'], $m)) {
+            $ref = strtoupper($m[0]);
+        }
+        $f['description'] = $ref
+            ? 'Traitement de la candidature ' . $ref
+            : 'Traitement de votre candidature';
+    }
+}
+unset($f);
+
 // Derniers documents
 $dStmt = $pdo->prepare("SELECT * FROM documents
                         WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'
                         ORDER BY date_emission DESC, id DESC LIMIT 5");
 $dStmt->execute([$u['id']]);
 $lastDocs = $dStmt->fetchAll();
+
+// Pour les documents recap_candidature, on expose la référence candidature
+// (cf. /api/documents.php) plutôt que la référence interne IPEC-DOC-...
+foreach ($lastDocs as &$d) {
+    if (($d['template'] ?? '') === 'recap_candidature' && !empty($d['data_json'])) {
+        $tmp = json_decode($d['data_json'], true);
+        if (is_array($tmp) && !empty($tmp['reference'])) {
+            $d['reference'] = (string)$tmp['reference'];
+        }
+    }
+    unset($d['data_json']);
+}
+unset($d);
 
 api_json([
     // Profil light pour l'en-tête (le React utilise déjà /me.php, c'est en bonus)
