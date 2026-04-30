@@ -48,26 +48,35 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
             } else {
                 $refToShow = $this->reference;
             }
-            if ($refToShow !== '') {
-                $this->SetFont('Helvetica', '', 7);
-                $this->SetTextColor(44, 93, 219);
-                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
-            }
-            $this->Ln(1);
-            $this->SetFont('Helvetica', 'I', 8);
-            $this->SetTextColor(124, 138, 168);
-            if ($this->docKind === 'recu') {
-                $label = $this->recuNumero !== ''
-                    ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
-                    : 'Reçu de paiement — Pièce justificative';
-            } elseif ($this->docKind === 'facture') {
-                $label = $this->factureNumero !== ''
-                    ? 'Facture n° ' . $this->factureNumero
-                    : 'Facture';
+            if ($this->docKind === 'candidature') {
+                // Candidature : pas de mention "Document généré automatiquement…",
+                // la ligne d'authenticité prend sa place avec un espace.
+                if ($refToShow !== '') {
+                    $this->Ln(3);
+                    $this->SetFont('Helvetica', '', 7);
+                    $this->SetTextColor(44, 93, 219);
+                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
+                }
             } else {
-                $label = "Document généré automatiquement — preuve de candidature.";
+                if ($refToShow !== '') {
+                    $this->SetFont('Helvetica', '', 7);
+                    $this->SetTextColor(44, 93, 219);
+                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
+                }
+                $this->Ln(1);
+                $this->SetFont('Helvetica', 'I', 8);
+                $this->SetTextColor(124, 138, 168);
+                if ($this->docKind === 'recu') {
+                    $label = $this->recuNumero !== ''
+                        ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
+                        : 'Reçu de paiement — Pièce justificative';
+                } else {
+                    $label = $this->factureNumero !== ''
+                        ? 'Facture n° ' . $this->factureNumero
+                        : 'Facture';
+                }
+                $this->Cell(0, 4, $tr($label), 0, 1, 'C');
             }
-            $this->Cell(0, 4, $tr($label), 0, 1, 'C');
         }
     }
 }
