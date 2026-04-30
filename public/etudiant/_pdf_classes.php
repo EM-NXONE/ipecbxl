@@ -48,8 +48,8 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
             } else {
                 $refToShow = $this->reference;
             }
-            if ($this->docKind === 'candidature') {
-                // Candidature : pas de mention "Document généré automatiquement…",
+            if ($this->docKind === 'candidature' || $this->docKind === 'facture') {
+                // Candidature & facture : pas de libellé "Document généré…" ni "Facture n°…",
                 // la ligne d'authenticité prend sa place avec un espace.
                 if ($refToShow !== '') {
                     $this->Ln(3);
@@ -66,15 +66,9 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
                 $this->Ln(1);
                 $this->SetFont('Helvetica', 'I', 8);
                 $this->SetTextColor(124, 138, 168);
-                if ($this->docKind === 'recu') {
-                    $label = $this->recuNumero !== ''
-                        ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
-                        : 'Reçu de paiement — Pièce justificative';
-                } else {
-                    $label = $this->factureNumero !== ''
-                        ? 'Facture n° ' . $this->factureNumero
-                        : 'Facture';
-                }
+                $label = $this->recuNumero !== ''
+                    ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
+                    : 'Reçu de paiement — Pièce justificative';
                 $this->Cell(0, 4, $tr($label), 0, 1, 'C');
             }
         }
