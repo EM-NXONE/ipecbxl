@@ -1221,8 +1221,9 @@ function buildRecuPaiementPdf(array $f): array {
     $now     = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr = $now->format('d/m/Y');
 
+    // Pas de fallback inventé : si la référence facture officielle n'est pas
+    // fournie, on laisse vide (le PDF n'affichera pas de N° plutôt qu'un faux).
     $numFacture = trim((string)($f['reference_facture'] ?? ''));
-    if ($numFacture === '') $numFacture = 'IPEC-FACT-' . $now->format('Ymd-His');
 
     $recuNumero = trim((string)($f['recu_numero'] ?? ''));
     if ($recuNumero === '') {
