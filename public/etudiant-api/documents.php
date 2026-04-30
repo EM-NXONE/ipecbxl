@@ -12,16 +12,13 @@ $stmt = db()->prepare(
 $stmt->execute([$u['id']]);
 $docs = $stmt->fetchAll();
 
-// Pour les documents de type "recap_candidature", on affiche la référence de
-// la candidature elle-même (IPEC-CAND-AAAA-XXXXXX) plutôt que la référence
-// interne du document (IPEC-DOC-...), pour rester cohérent avec le PDF généré
-// et le numéro vérifiable sur ipec.school/verification.
+// Nettoyage d'affichage pour les récapitulatifs de candidature : on retire
+// la référence candidature qui était accolée au titre (« Récapitulatif de
+// candidature IPEC-CAND-AAAA-XXXXXX »). La référence du document
+// (IPEC-DOC-...) reste celle exposée pour l'affichage.
 foreach ($docs as &$d) {
-    if (($d['template'] ?? '') === 'recap_candidature' && !empty($d['data_json'])) {
-        $tmp = json_decode($d['data_json'], true);
-        if (is_array($tmp) && !empty($tmp['reference'])) {
-            $d['reference'] = (string)$tmp['reference'];
-        }
+    if (($d['template'] ?? '') === 'recap_candidature') {
+        $d['titre'] = 'Récapitulatif de candidature';
     }
     unset($d['data_json']); // pas utile au front, et potentiellement volumineux
 }
