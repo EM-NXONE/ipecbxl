@@ -565,29 +565,14 @@ if (!class_exists('IpecCandidaturePdf') && is_file(__DIR__ . '/FPDF/fpdf.php')) 
             $contactEmail = $this->docKind === 'facture' ? 'finance@ipec.school' : 'admission@ipec.school';
             $this->Cell(0, 4, $tr($contactEmail . "  ·  www.ipec.school"), 0, 1, 'C');
             // Mention de vérification d'authenticité (référence propre au document)
+            // Candidature & facture : pas de libellé sous le pied de page,
+            // la ligne d'authenticité descend avec un espace de séparation.
             $refToShow = $this->docKind === 'facture' ? $this->referenceFacture : $this->reference;
-            if ($this->docKind === 'facture') {
-                if ($refToShow !== '') {
-                    $this->SetFont('Helvetica', '', 7);
-                    $this->SetTextColor(44, 93, 219);
-                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
-                }
-                $this->Ln(1);
-                $this->SetFont('Helvetica', 'I', 8);
-                $this->SetTextColor(124, 138, 168);
-                $label = $this->factureNumero !== ''
-                    ? 'Facture n° ' . $this->factureNumero
-                    : 'Facture';
-                $this->Cell(0, 4, $tr($label), 0, 1, 'C');
-            } else {
-                // Candidature : on supprime la mention "Document généré automatiquement…"
-                // et on fait descendre la ligne d'authenticité à sa place, avec un espace.
-                if ($refToShow !== '') {
-                    $this->Ln(3);
-                    $this->SetFont('Helvetica', '', 7);
-                    $this->SetTextColor(44, 93, 219);
-                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
-                }
+            if ($refToShow !== '') {
+                $this->Ln(3);
+                $this->SetFont('Helvetica', '', 7);
+                $this->SetTextColor(44, 93, 219);
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
             }
         }
     }
