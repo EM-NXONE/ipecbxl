@@ -592,10 +592,11 @@ function buildCandidaturePdf(array $f): string {
 
     $now           = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
     $dateStr       = $now->format('d/m/Y');
-    // Référence officielle stockée en base (IPEC-AAAA-XXXXXX). Fallback ancien
-    // format si non fournie (rétro-compat tests).
+    // Référence officielle stockée en base (IPEC-CAND-AAAA-XXXXXX), unique.
+    // Aucune référence inventée : si l'appelant n'en fournit pas (cas BDD down),
+    // on laisse vide → footer/PDF n'affiche aucune réf plutôt qu'une fausse.
     $reference     = trim((string)($f['reference'] ?? ''));
-    $numCandidature = $reference !== '' ? $reference : ('IPEC-CAND-' . $now->format('Ymd-His'));
+    $numCandidature = $reference;
     $submittedAt   = $now->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
