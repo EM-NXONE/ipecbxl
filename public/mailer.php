@@ -1190,7 +1190,8 @@ function buildFacturePdf(array $f): array {
         . 'avant l\'échéance indiquée, en indiquant la communication structurée ci-dessus.'
     ), 0, 'L');
 
-    return [$pdf->Output('S'), 'facture-frais-dossier-IPEC-' . $now->format('Ymd-His') . '.pdf', $numFacture];
+    $factureFilename = 'facture-' . preg_replace('/[^A-Za-z0-9_-]+/', '-', (string)$numFacture) . '.pdf';
+    return [$pdf->Output('S'), $factureFilename, $numFacture];
 }
 
 /**
