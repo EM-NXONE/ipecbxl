@@ -17,4 +17,5 @@ $stmt->execute([$u['id']]);
 $etu = $stmt->fetch();
 if (!$etu) api_error('Compte introuvable', 404);
 
-api_json(['etudiant' => $etu]);
+// On expose les deux clés (`profil` attendu par le React, `etudiant` historique).
+api_json(['profil' => $etu, 'etudiant' => $etu]);
