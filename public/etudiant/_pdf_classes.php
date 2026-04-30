@@ -48,28 +48,13 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
             } else {
                 $refToShow = $this->reference;
             }
-            if ($this->docKind === 'candidature' || $this->docKind === 'facture') {
-                // Candidature & facture : pas de libellé "Document généré…" ni "Facture n°…",
-                // la ligne d'authenticité prend sa place avec un espace.
-                if ($refToShow !== '') {
-                    $this->Ln(3);
-                    $this->SetFont('Helvetica', '', 7);
-                    $this->SetTextColor(44, 93, 219);
-                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
-                }
-            } else {
-                if ($refToShow !== '') {
-                    $this->SetFont('Helvetica', '', 7);
-                    $this->SetTextColor(44, 93, 219);
-                    $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
-                }
-                $this->Ln(1);
-                $this->SetFont('Helvetica', 'I', 8);
-                $this->SetTextColor(124, 138, 168);
-                $label = $this->recuNumero !== ''
-                    ? 'Reçu de paiement n° ' . $this->recuNumero . ' — Pièce justificative'
-                    : 'Reçu de paiement — Pièce justificative';
-                $this->Cell(0, 4, $tr($label), 0, 1, 'C');
+            // Candidature, facture & reçu : pas de libellé italique en bas,
+            // la ligne d'authenticité descend avec un espace de séparation.
+            if ($refToShow !== '') {
+                $this->Ln(3);
+                $this->SetFont('Helvetica', '', 7);
+                $this->SetTextColor(44, 93, 219);
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
             }
         }
     }
