@@ -172,7 +172,7 @@ function AdminCandidatureDetailPage() {
             )}
             <div className="flex gap-2">
               <dt className="text-muted-foreground w-32">Montant</dt>
-              <dd className="text-cream">400,00 € · non remboursables</dd>
+              <dd className="text-cream">400,00 €</dd>
             </div>
           </dl>
           <AdminCandidatureActions
