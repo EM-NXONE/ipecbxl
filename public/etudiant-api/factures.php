@@ -33,6 +33,9 @@ foreach ($factures as &$f) {
     }
 }
 unset($f);
+
+$totalDu = 0; $totalPaye = 0;
+foreach ($factures as $f) {
     if (in_array($f['statut_paiement'], ['en_attente','partiellement_payee'], true)) {
         $totalDu += (int)$f['montant_ttc_cents'];
     } elseif ($f['statut_paiement'] === 'payee') {
