@@ -112,6 +112,12 @@ function Row({ label, value, mono }: { label: string; value: string | null | und
     </div>
   );
 }
+function formatAdresse(p: Profil): string | null {
+  const ligne1 = [p.rue, p.numero].filter(Boolean).join(" ").trim();
+  const ligne2 = [p.code_postal, p.ville].filter(Boolean).join(" ").trim();
+  const full = [ligne1, ligne2].filter(Boolean).join(", ");
+  return full || null;
+}
 function Field({ id, label, type, autoComplete, value, onChange, hint }: {
   id: string; label: string; type: string; autoComplete?: string;
   value: string; onChange: (v: string) => void; hint?: string;
