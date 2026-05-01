@@ -11,6 +11,7 @@ import { StatusBadge } from "./admin._authenticated.index";
 
 export const Route = createFileRoute("/admin/_authenticated/candidatures")({
   component: AdminCandidaturesListPage,
+  head: () => ({ meta: [{ title: "IPEC | Candidatures" }] }),
 });
 
 interface Cand {
