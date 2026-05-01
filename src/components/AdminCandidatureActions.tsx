@@ -109,11 +109,11 @@ export function AdminCandidatureActions({
             onClick={() => runAction("resend_email")}
             disabled={busy !== null}
             className={buttonClass}
-            title="Renvoyer l'e-mail au candidat"
-            aria-label="Renvoyer l'e-mail au candidat"
+            title="Renvoyer l'email de confirmation au candidat"
+            aria-label="Renvoyer l'email de confirmation au candidat"
           >
             <Mail size={compact ? 14 : 15} />
-            {!compact && <span>{busy === "resend_email" ? "…" : "Renvoyer e-mail"}</span>}
+            {!compact && <span>{busy === "resend_email" ? "…" : "Renvoyer email de confirmation"}</span>}
           </button>
         )}
 
