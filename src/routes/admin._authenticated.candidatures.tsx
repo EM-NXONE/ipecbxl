@@ -4,7 +4,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
+
 import { adminApi } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
