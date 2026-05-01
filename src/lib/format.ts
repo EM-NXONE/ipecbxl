@@ -1,20 +1,31 @@
-/** Formatage centralisé pour les portails. */
+/** Formatage centralisé pour les portails (timezone Europe/Brussels). */
+const TZ = "Europe/Brussels";
+const LOCALE = "fr-BE";
+
 export function formatMoneyCents(cents: number, devise = "EUR"): string {
-  return new Intl.NumberFormat("fr-BE", { style: "currency", currency: devise }).format((cents || 0) / 100);
+  return new Intl.NumberFormat(LOCALE, { style: "currency", currency: devise }).format((cents || 0) / 100);
 }
 
+/** Format jj/mm/aaaa, fuseau Europe/Brussels. Accepte ISO ou "YYYY-MM-DD". */
 export function formatDate(iso?: string | null): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  // Pour une date pure YYYY-MM-DD on construit en UTC pour éviter tout décalage de jour.
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso + "T12:00:00Z") : new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("fr-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return new Intl.DateTimeFormat(LOCALE, {
+    timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric",
+  }).format(d);
 }
 
+/** Format jj/mm/aaaa HH:mm, fuseau Europe/Brussels. */
 export function formatDateTime(iso?: string | null): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  return d.toLocaleString("fr-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Intl.DateTimeFormat(LOCALE, {
+    timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).format(d);
 }
 
 export const FACTURE_STATUTS: Record<string, { label: string; tone: "warn" | "ok" | "muted" }> = {
