@@ -192,7 +192,7 @@ function AdminCandidatureDetailPage() {
             </div>
           </Card>
 
-          <Card title="Frais de dossier · 400 €">
+          <Card title="Frais de dossier">
             <dl className="space-y-1.5 text-sm mb-4">
               <div className="flex gap-2">
                 <dt className="text-muted-foreground w-28 shrink-0">Statut</dt>
