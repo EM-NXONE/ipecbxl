@@ -10,6 +10,7 @@ import { formatMoneyCents, formatDate, FACTURE_STATUTS, CANDIDATURE_STATUTS, CAN
 
 export const Route = createFileRoute("/etudiant/_authenticated/")({
   component: EtudiantDashboardPage,
+  head: () => ({ meta: [{ title: "IPEC | Tableau de bord" }] }),
 });
 
 interface Dashboard {
