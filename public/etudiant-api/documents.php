@@ -5,22 +5,27 @@ api_method('GET');
 $u = api_require_etudiant();
 
 $stmt = db()->prepare(
-    "SELECT * FROM documents
-     WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'
-     ORDER BY date_emission DESC, id DESC"
+    "SELECT d.*, c.reference AS candidature_reference
+     FROM documents d
+     LEFT JOIN candidatures c ON c.id = d.candidature_id
+     WHERE d.etudiant_id = ? AND d.visible_etudiant = 1 AND d.statut = 'publie'
+     ORDER BY d.date_emission DESC, d.id DESC"
 );
 $stmt->execute([$u['id']]);
 $docs = $stmt->fetchAll();
 
-// Nettoyage d'affichage pour les récapitulatifs de candidature : on retire
-// la référence candidature qui était accolée au titre (« Récapitulatif de
-// candidature IPEC-CAND-AAAA-XXXXXX »). La référence du document
-// (IPEC-DOC-...) reste celle exposée pour l'affichage.
+// Pour le récapitulatif de candidature : on affiche la référence réelle de la
+// candidature (IPEC-CAND-...) plutôt que la référence interne du document,
+// et on retire la phrase descriptive.
 foreach ($docs as &$d) {
     if (($d['template'] ?? '') === 'recap_candidature') {
         $d['titre'] = 'Récapitulatif de candidature';
+        $d['description'] = null;
+        if (!empty($d['candidature_reference'])) {
+            $d['reference'] = $d['candidature_reference'];
+        }
     }
-    unset($d['data_json']); // pas utile au front, et potentiellement volumineux
+    unset($d['data_json'], $d['candidature_reference']);
 }
 unset($d);
 
