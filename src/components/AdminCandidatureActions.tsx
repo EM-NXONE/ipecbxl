@@ -27,8 +27,9 @@ interface AdminCandidatureActionsProps {
    * "all" (défaut) — toutes les actions
    * "payment" — uniquement marquer payé / annuler paiement / éditer
    * "general" — tout sauf le paiement (renvoi mail, création/sync étudiant, reset mdp)
+   * "email"   — uniquement le renvoi e-mail
    */
-  scope?: "all" | "payment" | "general";
+  scope?: "all" | "payment" | "general" | "email";
   onDone?: (result: AdminActionResult, action: string) => void;
   onError?: (message: string, action: string) => void;
 }
