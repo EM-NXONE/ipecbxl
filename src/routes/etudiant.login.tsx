@@ -94,11 +94,11 @@ function EtudiantLoginPage() {
         <div className="mt-6 space-y-2 text-center text-xs">
           <p className="text-muted-foreground">
             Mot de passe oublié ? Contacte{" "}
-            <a href="mailto:admission@ipec.school" className="text-blue hover:underline">
-              admission@ipec.school
+            <a href="mailto:forgot@ipec.school" className="text-blue hover:underline">
+              forgot@ipec.school
             </a>
             <br />
-            pour recevoir un nouveau lien d'activation.
+            pour obtenir un nouveau mot de passe.
           </p>
           <p className="text-muted-foreground">
             Pas encore de compte ? Il est créé par l'administration de l'IPEC<br />
