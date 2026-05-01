@@ -104,7 +104,6 @@ function AdminCandidaturesListPage() {
         </select>
       </div>
 
-      {msg && <div className="mb-4 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">{msg}</div>}
       {error && <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
       <div className="bg-card border border-border/40 rounded-md overflow-x-auto">
