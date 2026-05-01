@@ -133,6 +133,10 @@ function AdminCandidaturesListPage() {
                 </td>
                 <td className="px-4 py-2.5 text-muted-foreground text-xs">
                   {c.programme || "—"}
+                  {c.annee && <div>Année : {c.annee}</div>}
+                  <div>
+                    Spécialité : {c.specialisation && !/je ne sais pas/i.test(c.specialisation) ? c.specialisation : "Non choisie"}
+                  </div>
                   {c.annee_academique && <div>{c.annee_academique}</div>}
                 </td>
                 <td className="px-4 py-2.5"><StatusBadge value={c.statut} /></td>
