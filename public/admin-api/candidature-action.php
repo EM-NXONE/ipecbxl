@@ -173,6 +173,24 @@ try {
             ]);
         }
 
+        case 'set_statut_etudiant': {
+            if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
+            $newStatut = (string)($body['statut'] ?? '');
+            $allowed = ['actif', 'suspendu', 'archive'];
+            if (!in_array($newStatut, $allowed, true)) {
+                api_error('Statut étudiant invalide (actif, suspendu, archive).', 400);
+            }
+            $etuId = (int)$c['etudiant_id'];
+            $pdo->prepare("UPDATE etudiants SET statut=? WHERE id=?")->execute([$newStatut, $etuId]);
+            // Suspendu / archivé → on coupe toutes les sessions actives.
+            if ($newStatut !== 'actif') {
+                $pdo->prepare("DELETE FROM etudiant_sessions WHERE etudiant_id=?")->execute([$etuId]);
+            }
+            $labels = ['actif' => 'actif', 'suspendu' => 'suspendu', 'archive' => 'archivé'];
+            admin_log_action($id, 'set_statut_etudiant', 'Étudiant #' . $etuId . ' → ' . $newStatut);
+            api_json(['ok' => true, 'message' => 'Compte étudiant ' . $labels[$newStatut] . '.']);
+        }
+
         case 'resend_email': {
             admin_require_mailer();
 

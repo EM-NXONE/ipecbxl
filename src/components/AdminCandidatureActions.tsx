@@ -27,8 +27,9 @@ interface AdminCandidatureActionsProps {
    * "all" (défaut) — toutes les actions
    * "payment" — uniquement marquer payé / annuler paiement / éditer
    * "general" — tout sauf le paiement (renvoi mail, création/sync étudiant, reset mdp)
+   * "email"   — uniquement le renvoi e-mail
    */
-  scope?: "all" | "payment" | "general";
+  scope?: "all" | "payment" | "general" | "email";
   onDone?: (result: AdminActionResult, action: string) => void;
   onError?: (message: string, action: string) => void;
 }
@@ -96,11 +97,13 @@ export function AdminCandidatureActions({
 
   const showGeneral = scope === "all" || scope === "general";
   const showPayment = scope === "all" || scope === "payment";
+  const showEmail   = scope === "all" || scope === "general" || scope === "email";
+  const showStudentMgmt = scope === "all" || scope === "general"; // create / sync / reset mdp
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        {showGeneral && (
+        {showEmail && (
           <button
             type="button"
             onClick={() => runAction("resend_email")}
@@ -158,7 +161,7 @@ export function AdminCandidatureActions({
           </>
         )}
 
-        {showGeneral && (
+        {showStudentMgmt && (
           <button
             type="button"
             onClick={() => runAction(hasEtudiant ? "sync_documents" : "create_etudiant")}
@@ -172,7 +175,7 @@ export function AdminCandidatureActions({
           </button>
         )}
 
-        {showGeneral && hasEtudiant && (
+        {showStudentMgmt && hasEtudiant && (
           <button
             type="button"
             onClick={() => {
