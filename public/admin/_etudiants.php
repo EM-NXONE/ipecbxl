@@ -236,7 +236,7 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
         )->execute([
             $ref, $etudiantId, $candId,
             'Récapitulatif de candidature',
-            'Confirmation officielle de réception de votre dossier de candidature à l\'IPEC.',
+            'Confirmation officielle de réception de votre candidature à l\'IPEC.',
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             $emis, $adminUser,
         ]);
