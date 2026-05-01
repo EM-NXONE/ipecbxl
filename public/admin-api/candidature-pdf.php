@@ -43,22 +43,30 @@ try {
         $pdf = buildCandidaturePdf($base);
         $filename = 'candidature-' . preg_replace('/[^A-Za-z0-9_-]+/', '-', strtolower($c['prenom'].'-'.$c['nom'])) . '-' . $c['reference'] . '.pdf';
     } elseif ($kind === 'recu') {
-        // Récupère les infos de paiement depuis la table factures
+        // Récupère les infos de paiement depuis la table factures, avec
+        // repli sur les colonnes legacy de `candidatures` si besoin.
         $stmtF = $pdo->prepare(
             "SELECT numero, montant_ttc_cents, paye_at, moyen_paiement, reference_paiement, statut_paiement
              FROM factures WHERE candidature_id = ? AND type = 'frais_dossier' LIMIT 1"
         );
         $stmtF->execute([$id]);
-        $fact = $stmtF->fetch();
-        if (!$fact) api_error('Facture introuvable pour cette candidature.', 404);
-        if (($fact['statut_paiement'] ?? '') !== 'payee') {
+        $fact = $stmtF->fetch() ?: [];
+
+        $isPaid = (($fact['statut_paiement'] ?? '') === 'payee')
+            || ((int)($c['facture_payee'] ?? 0) === 1);
+        if (!$isPaid) {
             api_error('La facture n\'est pas encore marquée comme payée.', 409);
         }
-        $base['reference_facture']   = $fact['numero'];
-        $base['paye_at']             = $fact['paye_at'];
-        $base['moyen_paiement']      = $fact['moyen_paiement'];
-        $base['reference_paiement']  = $fact['reference_paiement'];
-        $base['montant_ttc_cents']   = (int)$fact['montant_ttc_cents'];
+
+        $base['reference_facture']   = $fact['numero']            ?? $c['facture_numero'];
+        $base['paye_at']             = $fact['paye_at']           ?? $c['facture_payee_at'];
+        $base['moyen_paiement']      = $fact['moyen_paiement']    ?? ($c['moyen_paiement'] ?? '');
+        $base['reference_paiement']  = $fact['reference_paiement'] ?? '';
+        $base['montant_ttc_cents']   = (int)($fact['montant_ttc_cents'] ?? 40000);
+
+        if (empty($base['reference_facture'])) {
+            api_error('Référence facture introuvable pour cette candidature.', 404);
+        }
         [$pdf, $filename, $recuNumero] = buildRecuPaiementPdf($base);
     } else {
         [$pdf, $filename] = buildFacturePdf($base);
