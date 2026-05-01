@@ -36,7 +36,7 @@ $countStmt->execute($params);
 $total = (int)$countStmt->fetchColumn();
 $pages = max(1, (int)ceil($total / $perPage));
 
-$sql = "SELECT id, reference, statut, prenom, nom, email, programme, annee,
+$sql = "SELECT id, reference, statut, prenom, nom, email, programme, annee, specialisation,
                annee_academique, facture_numero, facture_payee, facture_payee_at,
                etudiant_id, created_at
         FROM candidatures
