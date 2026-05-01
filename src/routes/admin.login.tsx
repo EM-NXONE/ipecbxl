@@ -8,6 +8,7 @@ import { useAdminAuth } from "@/lib/auth-admin";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,
+  head: () => ({ meta: [{ title: "IPEC | Connexion administration" }] }),
 });
 
 function AdminLoginPage() {

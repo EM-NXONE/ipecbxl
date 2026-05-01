@@ -10,6 +10,7 @@ import { useEtudiantAuth } from "@/lib/auth-etudiant";
 
 export const Route = createFileRoute("/etudiant/login")({
   component: EtudiantLoginPage,
+  head: () => ({ meta: [{ title: "IPEC | Connexion étudiant" }] }),
 });
 
 function EtudiantLoginPage() {

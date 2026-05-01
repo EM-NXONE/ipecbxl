@@ -8,6 +8,7 @@ import { etuApi } from "@/lib/api";
 
 export const Route = createFileRoute("/etudiant/mot-de-passe-oublie")({
   component: ForgotPasswordPage,
+  head: () => ({ meta: [{ title: "IPEC | Mot de passe oublié" }] }),
 });
 
 function ForgotPasswordPage() {
