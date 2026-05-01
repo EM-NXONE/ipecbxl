@@ -82,216 +82,238 @@ function AdminCandidatureDetailPage() {
     <div>
       <BackLink />
 
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="font-display text-3xl text-cream">{c.prenom} {c.nom}</h1>
-            <StatusBadge value={c.statut} />
+      {/* Header : identité + statut + repères temporels */}
+      <header className="mb-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-3 mb-1">
+              <h1 className="font-display text-3xl text-cream truncate">{c.prenom} {c.nom}</h1>
+              <StatusBadge value={c.statut} />
+              {paid
+                ? <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">Frais payés</span>
+                : <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-amber-500/10 text-amber-300 border-amber-500/30">Frais en attente</span>}
+            </div>
+            <p className="text-sm text-muted-foreground font-mono">
+              {c.reference} · reçue le {formatDateTime(c.created_at)}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground font-mono">{c.reference} · reçue le {formatDateTime(c.created_at)}</p>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <a
+              href={`mailto:${c.email}`}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+            >
+              Écrire au candidat
+            </a>
+            <a
+              href={adminUrl(`/candidature-pdf.php?id=${id}`)}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+            >
+              <Download size={14} /> PDF candidature
+            </a>
+          </div>
         </div>
-      </div>
+      </header>
 
       {msg && <div className="mb-4 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">{msg}</div>}
       {error && <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
-      {/* Barre d'actions globales — placée en évidence sous le header */}
-      <div className="bg-card border border-border/40 rounded-md p-4 mb-6">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <h2 className="text-xs uppercase tracking-wider text-muted-foreground">Actions</h2>
-          <a
-            href={adminUrl(`/candidature-pdf.php?id=${id}`)}
-            target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-          >
-            <Download size={14} /> Pdf candidature
-          </a>
-        </div>
-        <AdminCandidatureActions
-          id={id}
-          paid={paid}
-          hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
-          scope="general"
-          onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
-          onError={setError}
-        />
-      </div>
+      {/* Layout 2 colonnes : contenu détaillé à gauche, panneau opérationnel à droite */}
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
 
-      <div className="grid lg:grid-cols-3 gap-4 mb-6">
-        <Card title="Coordonnées" className="lg:col-span-2">
-          <Field label="Civilité" value={c.civilite || "—"} />
-          <Field label="Email" value={<a href={`mailto:${c.email}`} className="text-blue hover:underline">{c.email}</a>} />
-          <Field label="Téléphone" value={c.telephone || "—"} />
-          <Field label="Date de naissance" value={formatDate(c.date_naissance)} />
-          <Field label="Nationalité" value={c.nationalite || "—"} />
-          <Field label="Adresse" value={address || "—"} />
-        </Card>
-        <Card title="Programme">
-          <Field label="Cursus" value={c.programme || "—"} />
-          <Field label="Année" value={c.annee || "—"} />
-          <Field label="Spécialisation" value={c.specialisation || "—"} />
-          <Field label="Rentrée" value={c.rentree || "—"} />
-          <Field label="Année académique" value={c.annee_academique || "—"} />
-        </Card>
-      </div>
+        {/* ====================== COLONNE PRINCIPALE ====================== */}
+        <div className="space-y-6 min-w-0">
 
-      <Card title="Frais de dossier (400 €)" className="mb-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <dl className="space-y-1.5 text-sm">
-            <div className="flex gap-2">
-              <dt className="text-muted-foreground w-32">Statut</dt>
-              <dd>
-                {paid
-                  ? <span className="text-emerald-400">✓ Payés</span>
-                  : <span className="text-amber-400">En attente de paiement</span>}
-              </dd>
-            </div>
-            {c.facture_numero && (
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-32">N° facture</dt>
-                <dd className="font-mono text-xs text-cream">{c.facture_numero}</dd>
-              </div>
-            )}
-            {paid && c.facture_payee_at && (
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-32">Payé le</dt>
-                <dd className="text-cream">{formatDateTime(c.facture_payee_at)}</dd>
-              </div>
-            )}
-            {paid && c.moyen_paiement && (
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-32">Moyen</dt>
-                <dd className="text-cream capitalize">{moyenLabel(c.moyen_paiement)}</dd>
-              </div>
-            )}
-            {paid && c.facture_payee_par && (
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-32">Validé par</dt>
-                <dd className="text-cream">{c.facture_payee_par}</dd>
-              </div>
-            )}
-            <div className="flex gap-2">
-              <dt className="text-muted-foreground w-32">Montant</dt>
-              <dd className="text-cream">400,00 €</dd>
-            </div>
-          </dl>
-          <AdminCandidatureActions
-            id={id}
-            paid={paid}
-            hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
-            scope="payment"
-            currentMoyen={c.moyen_paiement}
-            currentDate={c.facture_payee_at}
-            onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
-            onError={setError}
-          />
-        </div>
-        <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap gap-2">
-          <a
-            href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
-            target="_blank" rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-          >
-            <Download size={14} /> Facture PDF
-          </a>
-          {paid && (
-            <a
-              href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
-              target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
-            >
-              <Download size={14} /> Reçu de paiement
-            </a>
+          <Card title="Coordonnées du candidat">
+            <Field label="Civilité" value={c.civilite || "—"} />
+            <Field label="Email" value={<a href={`mailto:${c.email}`} className="text-blue hover:underline break-all">{c.email}</a>} />
+            <Field label="Téléphone" value={c.telephone || "—"} />
+            <Field label="Date de naissance" value={formatDate(c.date_naissance)} />
+            <Field label="Nationalité" value={c.nationalite || "—"} />
+            <Field label="Adresse" value={address || "—"} />
+          </Card>
+
+          <Card title="Dossier académique">
+            <Field label="Cursus" value={c.programme || "—"} />
+            <Field label="Année" value={c.annee || "—"} />
+            <Field label="Spécialisation" value={c.specialisation || "—"} />
+            <Field label="Rentrée" value={c.rentree || "—"} />
+            <Field label="Année académique" value={c.annee_academique || "—"} />
+          </Card>
+
+          {c.message && (
+            <Card title="Message du candidat">
+              <p className="text-sm whitespace-pre-wrap text-muted-foreground">{c.message as string}</p>
+            </Card>
           )}
+
+          <Card title="Historique">
+            {data.historique.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Aucune action enregistrée.</p>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                {data.historique.map((h) => (
+                  <li key={h.id} className="flex flex-wrap gap-2 border-b border-border/20 pb-2 last:border-b-0 last:pb-0">
+                    <span className="font-mono text-xs text-blue">{h.action}</span>
+                    {h.detail && <span className="text-muted-foreground">{h.detail}</span>}
+                    <span className="text-muted-foreground text-xs ml-auto">
+                      {h.admin_user || "—"} · {formatDateTime(h.created_at)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          <Card title="Traçabilité">
+            <Field label="ID interne" value={c.id} />
+            <Field label="Référence" value={<span className="font-mono text-blue">{c.reference}</span>} />
+            <Field label="Créée le" value={formatDateTime(c.created_at)} />
+            <Field label="Modifiée le" value={c.updated_at ? formatDateTime(c.updated_at) : "—"} />
+            <Field label="IP" value={c.ip || "—"} />
+            <Field label="Navigateur" value={<span className="break-all text-xs">{c.user_agent || "—"}</span>} />
+          </Card>
         </div>
-      </Card>
 
-      <Card title="Compte étudiant" className="mb-6">
-        {data.etudiant ? (
-          <div className="space-y-2">
-            <div className="text-sm">
-              <span className="text-cream">{data.etudiant.prenom} {data.etudiant.nom}</span>
-              <span className="text-muted-foreground"> · n° {data.etudiant.numero_etudiant}</span>
+        {/* ====================== PANNEAU OPÉRATIONNEL ====================== */}
+        <aside className="space-y-6 lg:sticky lg:top-4">
+
+          <Card title="Statut de la candidature">
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(data.statuts).map(([k, label]) => (
+                <button key={k}
+                  disabled={c.statut === k || busy === `statut:${k}`}
+                  onClick={() => runAction("change_statut", { statut: k })}
+                  className={`px-3 py-1.5 rounded-sm border text-xs ${c.statut === k ? "border-blue bg-blue/10 text-blue" : "border-border/40 text-cream hover:border-blue/40"} disabled:opacity-50`}>
+                  {label}
+                </button>
+              ))}
             </div>
-            <div className="text-xs">
-              {data.etudiant.active
-                ? <span className="text-emerald-400">Compte actif</span>
-                : <span className="text-amber-400">Compte sans mot de passe</span>}
+          </Card>
+
+          <Card title="Frais de dossier · 400 €">
+            <dl className="space-y-1.5 text-sm mb-4">
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-28 shrink-0">Statut</dt>
+                <dd>
+                  {paid
+                    ? <span className="text-emerald-400">✓ Payés</span>
+                    : <span className="text-amber-400">En attente</span>}
+                </dd>
+              </div>
+              {c.facture_numero && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground w-28 shrink-0">N° facture</dt>
+                  <dd className="font-mono text-xs text-cream break-all">{c.facture_numero}</dd>
+                </div>
+              )}
+              {paid && c.facture_payee_at && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground w-28 shrink-0">Payé le</dt>
+                  <dd className="text-cream">{formatDateTime(c.facture_payee_at)}</dd>
+                </div>
+              )}
+              {paid && c.moyen_paiement && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground w-28 shrink-0">Moyen</dt>
+                  <dd className="text-cream">{moyenLabel(c.moyen_paiement)}</dd>
+                </div>
+              )}
+              {paid && c.facture_payee_par && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground w-28 shrink-0">Validé par</dt>
+                  <dd className="text-cream">{c.facture_payee_par}</dd>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground w-28 shrink-0">Montant</dt>
+                <dd className="text-cream">400,00 €</dd>
+              </div>
+            </dl>
+
+            <AdminCandidatureActions
+              id={id}
+              paid={paid}
+              hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
+              scope="payment"
+              currentMoyen={c.moyen_paiement}
+              currentDate={c.facture_payee_at}
+              onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
+              onError={setError}
+            />
+
+            <div className="mt-4 pt-4 border-t border-border/40 flex flex-col gap-2">
+              <a
+                href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
+                target="_blank" rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+              >
+                <Download size={14} /> Facture PDF
+              </a>
+              {paid && (
+                <a
+                  href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
+                  target="_blank" rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
+                >
+                  <Download size={14} /> Reçu de paiement
+                </a>
+              )}
             </div>
-            <div className="flex gap-2 pt-2">
-              <button onClick={() => runAction("sync_documents")} disabled={busy === "sync_documents"}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
-                <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
-              </button>
-            </div>
-          </div>
-        ) : data.homonyme ? (
-          <div className="space-y-2">
-            <p className="text-sm text-amber-400">⚠ Un étudiant avec la même identité existe déjà :</p>
-            <div className="text-sm text-cream">
-              {data.homonyme.prenom} {data.homonyme.nom} (n° {data.homonyme.numero_etudiant}, né le {formatDate(data.homonyme.date_naissance)})
-            </div>
-            <button onClick={() => runAction("create_etudiant", { link_to: data.homonyme!.id })} disabled={busy === "create_etudiant"}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm border border-blue/40 text-xs text-blue hover:bg-blue/10 disabled:opacity-50">
-              Lier à ce compte existant
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Aucun compte étudiant créé pour cette candidature.</p>
-            <button onClick={() => runAction("create_etudiant")} disabled={busy === "create_etudiant"}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50">
-              {busy === "create_etudiant" ? "…" : "Créer le compte étudiant"}
-            </button>
-          </div>
-        )}
-      </Card>
+          </Card>
 
-      {c.message && (
-        <Card title="Message du candidat" className="mb-6">
-          <p className="text-sm whitespace-pre-wrap text-muted-foreground">{c.message as string}</p>
-        </Card>
-      )}
+          <Card title="Compte étudiant">
+            {data.etudiant ? (
+              <div className="space-y-2">
+                <div className="text-sm">
+                  <div className="text-cream">{data.etudiant.prenom} {data.etudiant.nom}</div>
+                  <div className="text-xs text-muted-foreground font-mono">n° {data.etudiant.numero_etudiant}</div>
+                </div>
+                <div className="text-xs">
+                  {data.etudiant.active
+                    ? <span className="text-emerald-400">● Compte actif</span>
+                    : <span className="text-amber-400">● Compte sans mot de passe</span>}
+                </div>
+                <button onClick={() => runAction("sync_documents")} disabled={busy === "sync_documents"}
+                  className="w-full mt-2 inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
+                  <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
+                </button>
+              </div>
+            ) : data.homonyme ? (
+              <div className="space-y-2">
+                <p className="text-sm text-amber-400">⚠ Identité déjà connue :</p>
+                <div className="text-sm text-cream">
+                  {data.homonyme.prenom} {data.homonyme.nom}
+                  <div className="text-xs text-muted-foreground">n° {data.homonyme.numero_etudiant} · né le {formatDate(data.homonyme.date_naissance)}</div>
+                </div>
+                <button onClick={() => runAction("create_etudiant", { link_to: data.homonyme!.id })} disabled={busy === "create_etudiant"}
+                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-sm border border-blue/40 text-xs text-blue hover:bg-blue/10 disabled:opacity-50">
+                  Lier au compte existant
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Aucun compte étudiant.</p>
+                <button onClick={() => runAction("create_etudiant")} disabled={busy === "create_etudiant"}
+                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50">
+                  {busy === "create_etudiant" ? "…" : "Créer le compte étudiant"}
+                </button>
+              </div>
+            )}
+          </Card>
 
-      <Card title="Traçabilité" className="mb-6">
-        <Field label="ID interne" value={c.id} />
-        <Field label="Référence" value={<span className="font-mono text-blue">{c.reference}</span>} />
-        <Field label="Créée le" value={formatDateTime(c.created_at)} />
-        <Field label="Modifiée le" value={c.updated_at ? formatDateTime(c.updated_at) : "—"} />
-        <Field label="IP" value={c.ip || "—"} />
-        <Field label="Navigateur" value={<span className="break-all">{c.user_agent || "—"}</span>} />
-      </Card>
-
-      <Card title="Statut de la candidature" className="mb-6">
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(data.statuts).map(([k, label]) => (
-            <button key={k}
-              disabled={c.statut === k || busy === `statut:${k}`}
-              onClick={() => runAction("change_statut", { statut: k })}
-              className={`px-3 py-1.5 rounded-sm border text-xs ${c.statut === k ? "border-blue bg-blue/10 text-blue" : "border-border/40 text-cream hover:border-blue/40"} disabled:opacity-50`}>
-              {label}
-            </button>
-          ))}
-        </div>
-      </Card>
-
-      <Card title="Historique">
-        {data.historique.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucune action enregistrée.</p>
-        ) : (
-          <ul className="space-y-2 text-sm">
-            {data.historique.map((h) => (
-              <li key={h.id} className="flex flex-wrap gap-2 border-b border-border/20 pb-2 last:border-b-0 last:pb-0">
-                <span className="font-mono text-xs text-blue">{h.action}</span>
-                {h.detail && <span className="text-muted-foreground">{h.detail}</span>}
-                <span className="text-muted-foreground text-xs ml-auto">
-                  {h.admin_user || "—"} · {formatDateTime(h.created_at)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+          <Card title="Autres actions">
+            <AdminCandidatureActions
+              id={id}
+              paid={paid}
+              hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
+              scope="general"
+              onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
+              onError={setError}
+            />
+          </Card>
+        </aside>
+      </div>
     </div>
   );
 }
