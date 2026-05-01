@@ -103,7 +103,7 @@ export function AdminCandidatureActions({
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        {showGeneral && (
+        {showEmail && (
           <button
             type="button"
             onClick={() => runAction("resend_email")}
@@ -161,7 +161,7 @@ export function AdminCandidatureActions({
           </>
         )}
 
-        {showGeneral && (
+        {showStudentMgmt && (
           <button
             type="button"
             onClick={() => runAction(hasEtudiant ? "sync_documents" : "create_etudiant")}
@@ -175,7 +175,7 @@ export function AdminCandidatureActions({
           </button>
         )}
 
-        {showGeneral && hasEtudiant && (
+        {showStudentMgmt && hasEtudiant && (
           <button
             type="button"
             onClick={() => {
