@@ -131,8 +131,17 @@ function admin_log_action(int $candidatureId, string $action, ?string $detail = 
 
 function admin_format_date(?string $iso): string {
     if (!$iso) return '—';
-    $ts = strtotime($iso);
-    return $ts ? date('d/m/Y H:i', $ts) : admin_h($iso);
+    try {
+        $dt = new DateTime($iso, new DateTimeZone('UTC'));
+        $dt->setTimezone(new DateTimeZone('Europe/Brussels'));
+        // Date pure (YYYY-MM-DD) → pas d'heure
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $iso)) {
+            return $dt->format('d/m/Y');
+        }
+        return $dt->format('d/m/Y H:i');
+    } catch (\Throwable $e) {
+        return admin_h($iso);
+    }
 }
 
 /**
