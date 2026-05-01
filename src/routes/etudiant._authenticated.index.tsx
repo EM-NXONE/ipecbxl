@@ -170,9 +170,41 @@ function Card({ title, children, linkTo, linkLabel }: { title: string; children:
   );
 }
 
-function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "ok" | "muted" }) {
-  const cls = tone === "ok" ? "bg-green-500/10 text-green-400 border-green-500/30"
+function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "ok" | "muted" | "info" | "danger" }) {
+  const cls =
+    tone === "ok"     ? "bg-green-500/10 text-green-400 border-green-500/30"
     : tone === "warn" ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
+    : tone === "info" ? "bg-blue-500/10 text-blue-300 border-blue-500/30"
+    : tone === "danger" ? "bg-destructive/10 text-destructive border-destructive/30"
     : "bg-muted/30 text-muted-foreground border-border/40";
   return <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border ${cls}`}>{children}</span>;
+}
+
+function Stepper({ currentStep }: { currentStep: number }) {
+  return (
+    <ol className="flex items-center gap-2">
+      {CANDIDATURE_STEPS.map((s, idx) => {
+        const stepNum = idx + 1;
+        const done = stepNum < currentStep;
+        const active = stepNum === currentStep;
+        const dot = done
+          ? "bg-green-500/80 border-green-500/60 text-background"
+          : active
+            ? "bg-amber-500/80 border-amber-500/60 text-background"
+            : "bg-transparent border-border/40 text-muted-foreground";
+        const label = done || active ? "text-cream" : "text-muted-foreground";
+        return (
+          <li key={s.key} className="flex items-center gap-2 flex-1 min-w-0">
+            <span className={`shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-[11px] font-medium ${dot}`}>
+              {done ? "✓" : stepNum}
+            </span>
+            <span className={`text-xs truncate ${label}`}>{s.label}</span>
+            {idx < CANDIDATURE_STEPS.length - 1 && (
+              <span className={`flex-1 h-px ${done ? "bg-green-500/40" : "bg-border/40"}`} />
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
