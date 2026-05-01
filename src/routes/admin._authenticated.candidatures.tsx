@@ -4,7 +4,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
-import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
+
 import { adminApi } from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
@@ -50,8 +50,6 @@ function AdminCandidaturesListPage() {
   const [data, setData] = useState<ListResp | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -69,7 +67,7 @@ function AdminCandidaturesListPage() {
         .finally(() => setLoading(false));
     }, q ? 250 : 0);
     return () => clearTimeout(t);
-  }, [q, statut, payee, page, refreshKey]);
+  }, [q, statut, payee, page]);
 
   if (showingDetail) return <Outlet />;
 
@@ -106,7 +104,6 @@ function AdminCandidaturesListPage() {
         </select>
       </div>
 
-      {msg && <div className="mb-4 px-4 py-3 rounded-sm bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-400">{msg}</div>}
       {error && <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
       <div className="bg-card border border-border/40 rounded-md overflow-x-auto">
@@ -119,7 +116,6 @@ function AdminCandidaturesListPage() {
               <th className="text-left px-4 py-2.5">Statut</th>
               <th className="text-left px-4 py-2.5">Frais</th>
               <th className="text-left px-4 py-2.5">Reçue le</th>
-              <th className="text-left px-4 py-2.5">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -148,27 +144,13 @@ function AdminCandidaturesListPage() {
                   {c.facture_numero && <div className="text-muted-foreground font-mono">{c.facture_numero}</div>}
                 </td>
                 <td className="px-4 py-2.5 text-muted-foreground text-xs">{formatDateTime(c.created_at)}</td>
-                <td className="px-4 py-2.5">
-                  <AdminCandidatureActions
-                    id={c.id}
-                    paid={c.facture_payee}
-                    hasEtudiant={Boolean(c.etudiant_id)}
-                    compact
-                    onDone={(res) => {
-                      setError(null);
-                      setMsg(adminActionMessage(res));
-                      setRefreshKey((v) => v + 1);
-                    }}
-                    onError={(message) => { setMsg(null); setError(message); }}
-                  />
-                </td>
               </tr>
             ))}
             {data && data.candidatures.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun résultat.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun résultat.</td></tr>
             )}
             {loading && !data && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Chargement…</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">Chargement…</td></tr>
             )}
           </tbody>
         </table>
