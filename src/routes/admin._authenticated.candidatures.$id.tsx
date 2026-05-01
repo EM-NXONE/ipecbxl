@@ -183,6 +183,15 @@ function AdminCandidatureDetailPage() {
                 </button>
               ))}
             </div>
+            <div className="mt-4 pt-4 border-t border-border/40">
+              <a
+                href={adminUrl(`/candidature-pdf.php?id=${id}`)}
+                target="_blank" rel="noreferrer"
+                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
+              >
+                <Download size={14} /> Télécharger PDF candidature
+              </a>
+            </div>
           </Card>
 
           <Card title="Frais de dossier">
