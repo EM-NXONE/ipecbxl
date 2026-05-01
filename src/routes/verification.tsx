@@ -6,7 +6,7 @@ import { getRecaptchaToken } from "@/lib/recaptcha";
 export const Route = createFileRoute("/verification")({
   head: () => ({
     meta: [
-      { title: "IPEC | Vérification de document" },
+      { title: "IPEC | Vérification" },
       {
         name: "description",
         content:
