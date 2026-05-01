@@ -328,8 +328,8 @@ function BackLink() {
 }
 function Card({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`bg-card border border-border/40 rounded-md p-5 ${className}`}>
-      <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">{title}</h2>
+    <section className={`bg-card border border-border/40 rounded-md p-6 ${className}`}>
+      <h2 className="font-display text-lg text-cream mb-4">{title}</h2>
       {children}
     </section>
   );
