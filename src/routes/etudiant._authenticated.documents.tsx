@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/documents")({
   component: EtudiantDocumentsPage,
+  head: () => ({ meta: [{ title: "IPEC | Documents" }] }),
 });
 
 interface Doc {
