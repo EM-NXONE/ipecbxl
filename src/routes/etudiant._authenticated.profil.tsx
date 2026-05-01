@@ -8,6 +8,7 @@ import { formatDate, formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/profil")({
   component: EtudiantProfilPage,
+  head: () => ({ meta: [{ title: "IPEC | Profil" }] }),
 });
 
 interface Profil {
