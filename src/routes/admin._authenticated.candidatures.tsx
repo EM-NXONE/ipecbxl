@@ -23,6 +23,7 @@ interface Cand {
   email: string;
   programme: string | null;
   annee: string | null;
+  specialisation: string | null;
   annee_academique: string | null;
   facture_numero: string | null;
   facture_payee: number | boolean;
