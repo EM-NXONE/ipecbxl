@@ -66,6 +66,42 @@ function EtudiantDashboardPage() {
 
       {error && <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
+      {data?.candidatures && data.candidatures.length > 0 && (
+        <section className="mb-8 space-y-4">
+          <h2 className="font-display text-lg text-cream">Suivi de candidature</h2>
+          {data.candidatures.map((c) => {
+            const meta = CANDIDATURE_STATUTS[c.statut] ?? { label: c.statut, tone: "muted" as const, description: "", step: 0 };
+            const programmeLabel = [c.programme, c.annee, c.specialisation].filter(Boolean).join(" · ");
+            return (
+              <div key={c.id} className="bg-card border border-border/40 rounded-md p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                  <div className="min-w-0">
+                    <div className="text-cream font-medium truncate">{programmeLabel || "Candidature"}</div>
+                    <div className="text-xs text-muted-foreground font-mono mt-0.5">
+                      {c.reference}
+                      {c.rentree ? <> · Rentrée {c.rentree}</> : null}
+                      {c.created_at ? <> · Déposée le {formatDate(c.created_at)}</> : null}
+                    </div>
+                  </div>
+                  <Badge tone={meta.tone}>{meta.label}</Badge>
+                </div>
+
+                {meta.description && (
+                  <p className="text-sm text-muted-foreground mb-4">{meta.description}</p>
+                )}
+
+                {c.statut !== "annulee" && c.statut !== "refusee" && (
+                  <Stepper currentStep={meta.step} />
+                )}
+                {c.statut === "refusee" && (
+                  <div className="text-xs uppercase tracking-wider text-destructive">Décision : non retenue</div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Kpi icon={<Wallet size={18} />}        label="Total dû"    value={loading ? "…" : totalDu    !== undefined ? formatMoneyCents(totalDu)    : "—"} />
         <Kpi icon={<CheckCircle2 size={18} />}  label="Total payé"  value={loading ? "…" : totalPaye  !== undefined ? formatMoneyCents(totalPaye)  : "—"} />
