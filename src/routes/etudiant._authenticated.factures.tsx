@@ -11,6 +11,7 @@ import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/factures")({
   component: EtudiantFacturesPage,
+  head: () => ({ meta: [{ title: "IPEC | Factures" }] }),
 });
 
 interface Facture {
