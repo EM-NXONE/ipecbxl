@@ -350,7 +350,7 @@ function AdminCandidatureDetailPage() {
               id={id}
               paid={paid}
               hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
-              scope="general"
+              scope="email"
               onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
               onError={setError}
             />
