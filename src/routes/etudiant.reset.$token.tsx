@@ -8,6 +8,7 @@ import { etuApi } from "@/lib/api";
 
 export const Route = createFileRoute("/etudiant/reset/$token")({
   component: ResetPasswordPage,
+  head: () => ({ meta: [{ title: "IPEC | Réinitialisation du mot de passe" }] }),
 });
 
 function ResetPasswordPage() {
