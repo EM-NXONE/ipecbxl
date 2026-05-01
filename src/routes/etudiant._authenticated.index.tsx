@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Receipt, FolderOpen, Wallet, CheckCircle2 } from "lucide-react";
 import { useEtudiantAuth } from "@/lib/auth-etudiant";
 import { etuApi } from "@/lib/api";
-import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
+import { formatMoneyCents, formatDate, FACTURE_STATUTS, CANDIDATURE_STATUTS, CANDIDATURE_STEPS } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/")({
   component: EtudiantDashboardPage,
