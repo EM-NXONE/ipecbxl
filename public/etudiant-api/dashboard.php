@@ -17,14 +17,14 @@ $cStmt->execute([$u['id']]);
 $candidatures = $cStmt->fetchAll();
 
 // --- Agrégats factures ----------------------------------------------------
-// Total dû    = somme des factures visibles, hors annulées/remboursées
-// Total payé  = somme des factures visibles dont statut_paiement='payee'
-// Nb factures = toutes les factures visibles (sert au KPI "Factures")
+// Total dû    = solde restant à payer (en_attente + partiellement_payee)
+// Total payé  = somme des factures dont statut_paiement='payee'
+// Nb factures = toutes les factures visibles (KPI "Factures")
 // Nb ouvertes = factures en attente / partiellement payées (compat)
 $aStmt = $pdo->prepare("
     SELECT
         COUNT(*)                                                        AS nb_total,
-        COALESCE(SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee','payee')
+        COALESCE(SUM(CASE WHEN statut_paiement IN ('en_attente','partiellement_payee')
                           THEN montant_ttc_cents ELSE 0 END), 0)        AS total_du,
         COALESCE(SUM(CASE WHEN statut_paiement = 'payee'
                           THEN montant_ttc_cents ELSE 0 END), 0)        AS total_paye,
