@@ -78,8 +78,8 @@ function Home() {
           {/* Key numbers */}
           <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl border-t border-border/40 pt-12">
             {[
-              { v: "5", l: "années d'études", to: "/programmes" as const },
-              { v: "4", l: "spécialisations" },
+              { v: "5", l: "années d'études", to: "/programmes" as const, hash: undefined as string | undefined },
+              { v: "4", l: "spécialisations", to: "/programmes" as const, hash: "quatre-voies" },
               { v: "1", l: "campus à Bruxelles" },
               { v: "∞", l: "perspectives" },
             ].map((s) =>
@@ -87,6 +87,7 @@ function Home() {
                 <Link
                   key={s.l}
                   to={s.to}
+                  hash={s.hash}
                   className="group block transition-opacity hover:opacity-80"
                   aria-label={`${s.v} ${s.l} — découvrir les programmes`}
                 >
