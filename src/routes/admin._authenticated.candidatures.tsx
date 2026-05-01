@@ -147,27 +147,13 @@ function AdminCandidaturesListPage() {
                   {c.facture_numero && <div className="text-muted-foreground font-mono">{c.facture_numero}</div>}
                 </td>
                 <td className="px-4 py-2.5 text-muted-foreground text-xs">{formatDateTime(c.created_at)}</td>
-                <td className="px-4 py-2.5">
-                  <AdminCandidatureActions
-                    id={c.id}
-                    paid={c.facture_payee}
-                    hasEtudiant={Boolean(c.etudiant_id)}
-                    compact
-                    onDone={(res) => {
-                      setError(null);
-                      setMsg(adminActionMessage(res));
-                      setRefreshKey((v) => v + 1);
-                    }}
-                    onError={(message) => { setMsg(null); setError(message); }}
-                  />
-                </td>
               </tr>
             ))}
             {data && data.candidatures.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun résultat.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun résultat.</td></tr>
             )}
             {loading && !data && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-sm">Chargement…</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">Chargement…</td></tr>
             )}
           </tbody>
         </table>
