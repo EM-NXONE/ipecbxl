@@ -97,6 +97,8 @@ export function AdminCandidatureActions({
 
   const showGeneral = scope === "all" || scope === "general";
   const showPayment = scope === "all" || scope === "payment";
+  const showEmail   = scope === "all" || scope === "general" || scope === "email";
+  const showStudentMgmt = scope === "all" || scope === "general"; // create / sync / reset mdp
 
   return (
     <>
