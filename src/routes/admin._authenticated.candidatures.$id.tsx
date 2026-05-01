@@ -105,13 +105,6 @@ function AdminCandidatureDetailPage() {
             >
               Écrire au candidat
             </a>
-            <a
-              href={adminUrl(`/candidature-pdf.php?id=${id}`)}
-              target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-            >
-              <Download size={14} /> PDF candidature
-            </a>
           </div>
         </div>
       </header>
