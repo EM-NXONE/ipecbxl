@@ -15,6 +15,8 @@ interface Profil {
   id: number; numero_etudiant: string | null;
   civilite: string | null; prenom: string; nom: string; email: string;
   date_naissance: string | null; nationalite: string | null; telephone: string | null;
+  rue: string | null; numero: string | null; code_postal: string | null;
+  ville: string | null; pays_residence: string | null;
   statut: string; derniere_connexion: string | null; created_at: string;
 }
 
@@ -74,6 +76,8 @@ function EtudiantProfilPage() {
             <Row label="Nationalité" value={profil.nationalite} />
             <Row label="E-mail" value={profil.email} />
             <Row label="Téléphone" value={profil.telephone} />
+            <Row label="Adresse" value={formatAdresse(profil)} />
+            <Row label="Pays de résidence" value={profil.pays_residence} />
             <Row label="Dernière connexion" value={formatDateTime(profil.derniere_connexion)} />
           </dl>
         ) : <p className="text-sm text-muted-foreground">Chargement…</p>}
@@ -107,6 +111,12 @@ function Row({ label, value, mono }: { label: string; value: string | null | und
       <dd className={`text-cream ${mono ? "font-mono text-xs" : ""}`}>{value || "—"}</dd>
     </div>
   );
+}
+function formatAdresse(p: Profil): string | null {
+  const ligne1 = [p.rue, p.numero].filter(Boolean).join(" ").trim();
+  const ligne2 = [p.code_postal, p.ville].filter(Boolean).join(" ").trim();
+  const full = [ligne1, ligne2].filter(Boolean).join(", ");
+  return full || null;
 }
 function Field({ id, label, type, autoComplete, value, onChange, hint }: {
   id: string; label: string; type: string; autoComplete?: string;
