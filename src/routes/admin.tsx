@@ -9,7 +9,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminRoot,
   head: () => ({
     meta: [
-      { title: "Administration — IPEC" },
+      { title: "IPEC | Administration" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
