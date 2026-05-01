@@ -9,6 +9,7 @@ import { formatDate, formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/_authenticated/etudiants")({
   component: AdminEtudiantsPage,
+  head: () => ({ meta: [{ title: "IPEC | Étudiants" }] }),
 });
 
 interface Etu {
