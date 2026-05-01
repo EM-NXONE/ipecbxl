@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Receipt, FolderOpen, Wallet, CheckCircle2 } from "lucide-react";
 import { useEtudiantAuth } from "@/lib/auth-etudiant";
 import { etuApi } from "@/lib/api";
-import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
+import { formatMoneyCents, formatDate, FACTURE_STATUTS, CANDIDATURE_STATUTS, CANDIDATURE_STEPS } from "@/lib/format";
 
 export const Route = createFileRoute("/etudiant/_authenticated/")({
   component: EtudiantDashboardPage,
@@ -24,6 +24,12 @@ interface Dashboard {
     numero_etudiant?: string | null;
   };
   etudiant?: { numero_etudiant?: string | null; prenom?: string | null; nom?: string | null };
+  candidatures?: Array<{
+    id: number; reference: string; statut: string; programme?: string | null;
+    annee?: string | null; specialisation?: string | null; rentree?: string | null;
+    annee_academique?: string | null; created_at?: string | null;
+    facture_payee?: number | string | null;
+  }>;
   last_factures: Array<{ id: number; numero: string; libelle: string; montant_ttc_cents: number; statut_paiement: string; date_emission: string }>;
   last_documents: Array<{ id: number; reference: string; type: string; titre: string; date_emission: string }>;
 }
@@ -59,6 +65,42 @@ function EtudiantDashboardPage() {
       </p>
 
       {error && <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
+
+      {data?.candidatures && data.candidatures.length > 0 && (
+        <section className="mb-8 space-y-4">
+          <h2 className="font-display text-lg text-cream">Suivi de candidature</h2>
+          {data.candidatures.map((c) => {
+            const meta = CANDIDATURE_STATUTS[c.statut] ?? { label: c.statut, tone: "muted" as const, description: "", step: 0 };
+            const programmeLabel = [c.programme, c.annee, c.specialisation].filter(Boolean).join(" · ");
+            return (
+              <div key={c.id} className="bg-card border border-border/40 rounded-md p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                  <div className="min-w-0">
+                    <div className="text-cream font-medium truncate">{programmeLabel || "Candidature"}</div>
+                    <div className="text-xs text-muted-foreground font-mono mt-0.5">
+                      {c.reference}
+                      {c.rentree ? <> · Rentrée {c.rentree}</> : null}
+                      {c.created_at ? <> · Déposée le {formatDate(c.created_at)}</> : null}
+                    </div>
+                  </div>
+                  <Badge tone={meta.tone}>{meta.label}</Badge>
+                </div>
+
+                {meta.description && (
+                  <p className="text-sm text-muted-foreground mb-4">{meta.description}</p>
+                )}
+
+                {c.statut !== "annulee" && c.statut !== "refusee" && (
+                  <Stepper currentStep={meta.step} />
+                )}
+                {c.statut === "refusee" && (
+                  <div className="text-xs uppercase tracking-wider text-destructive">Décision : non retenue</div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Kpi icon={<Wallet size={18} />}        label="Total dû"    value={loading ? "…" : totalDu    !== undefined ? formatMoneyCents(totalDu)    : "—"} />
@@ -128,9 +170,41 @@ function Card({ title, children, linkTo, linkLabel }: { title: string; children:
   );
 }
 
-function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "ok" | "muted" }) {
-  const cls = tone === "ok" ? "bg-green-500/10 text-green-400 border-green-500/30"
+function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "ok" | "muted" | "info" | "danger" }) {
+  const cls =
+    tone === "ok"     ? "bg-green-500/10 text-green-400 border-green-500/30"
     : tone === "warn" ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
+    : tone === "info" ? "bg-blue-500/10 text-blue-300 border-blue-500/30"
+    : tone === "danger" ? "bg-destructive/10 text-destructive border-destructive/30"
     : "bg-muted/30 text-muted-foreground border-border/40";
   return <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border ${cls}`}>{children}</span>;
+}
+
+function Stepper({ currentStep }: { currentStep: number }) {
+  return (
+    <ol className="flex items-center gap-2">
+      {CANDIDATURE_STEPS.map((s, idx) => {
+        const stepNum = idx + 1;
+        const done = stepNum < currentStep;
+        const active = stepNum === currentStep;
+        const dot = done
+          ? "bg-green-500/80 border-green-500/60 text-background"
+          : active
+            ? "bg-amber-500/80 border-amber-500/60 text-background"
+            : "bg-transparent border-border/40 text-muted-foreground";
+        const label = done || active ? "text-cream" : "text-muted-foreground";
+        return (
+          <li key={s.key} className="flex items-center gap-2 flex-1 min-w-0">
+            <span className={`shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-[11px] font-medium ${dot}`}>
+              {done ? "✓" : stepNum}
+            </span>
+            <span className={`text-xs truncate ${label}`}>{s.label}</span>
+            {idx < CANDIDATURE_STEPS.length - 1 && (
+              <span className={`flex-1 h-px ${done ? "bg-green-500/40" : "bg-border/40"}`} />
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
