@@ -119,7 +119,6 @@ function AdminCandidaturesListPage() {
               <th className="text-left px-4 py-2.5">Statut</th>
               <th className="text-left px-4 py-2.5">Frais</th>
               <th className="text-left px-4 py-2.5">Reçue le</th>
-              <th className="text-left px-4 py-2.5">Actions</th>
             </tr>
           </thead>
           <tbody>
