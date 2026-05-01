@@ -266,23 +266,63 @@ function AdminCandidatureDetailPage() {
           </Card>
 
           <Card title="Compte étudiant">
-            {data.etudiant ? (
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <div className="text-cream">{data.etudiant.prenom} {data.etudiant.nom}</div>
-                  <div className="text-xs text-muted-foreground font-mono">n° {data.etudiant.numero_etudiant}</div>
+            {data.etudiant ? (() => {
+              const etu = data.etudiant!;
+              const statut = etu.statut || "actif";
+              const statutLabel: Record<string, { label: string; tone: string }> = {
+                actif:    { label: "● Compte actif",     tone: "text-emerald-400" },
+                suspendu: { label: "● Compte suspendu",  tone: "text-amber-400" },
+                archive:  { label: "● Compte archivé",   tone: "text-muted-foreground" },
+              };
+              const s = statutLabel[statut] ?? statutLabel.actif;
+              return (
+                <div className="space-y-3">
+                  <div className="text-sm">
+                    <div className="text-cream">{etu.prenom} {etu.nom}</div>
+                    <div className="text-xs text-muted-foreground font-mono">n° {etu.numero_etudiant}</div>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <div className={s.tone}>{s.label}</div>
+                    {!etu.active && <div className="text-amber-400">● Sans mot de passe</div>}
+                  </div>
+
+                  <div className="pt-3 border-t border-border/40 flex flex-col gap-2">
+                    <button onClick={() => runAction("sync_documents")} disabled={busy !== null}
+                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
+                      <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!confirm('Réinitialiser le mot de passe de cet étudiant à "Student1" ?')) return;
+                        runAction("reset_password_etudiant");
+                      }}
+                      disabled={busy !== null}
+                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
+                      <KeyRound size={12} /> {busy === "reset_password_etudiant" ? "…" : "Réinitialiser le mot de passe"}
+                    </button>
+
+                    {statut === "actif" ? (
+                      <button
+                        onClick={() => {
+                          if (!confirm("Suspendre ce compte étudiant ? L'étudiant ne pourra plus se connecter et toutes ses sessions seront fermées.")) return;
+                          runAction("set_statut_etudiant", { statut: "suspendu" });
+                        }}
+                        disabled={busy !== null}
+                        className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-amber-500/40 text-xs text-amber-300 hover:bg-amber-500/10 disabled:opacity-50">
+                        <Ban size={12} /> {busy === "set_statut_etudiant" ? "…" : "Suspendre le compte"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => runAction("set_statut_etudiant", { statut: "actif" })}
+                        disabled={busy !== null}
+                        className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-xs text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-50">
+                        <CheckCircle2 size={12} /> {busy === "set_statut_etudiant" ? "…" : "Réactiver le compte"}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="text-xs">
-                  {data.etudiant.active
-                    ? <span className="text-emerald-400">● Compte actif</span>
-                    : <span className="text-amber-400">● Compte sans mot de passe</span>}
-                </div>
-                <button onClick={() => runAction("sync_documents")} disabled={busy === "sync_documents"}
-                  className="w-full mt-2 inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50">
-                  <RefreshCw size={12} /> {busy === "sync_documents" ? "…" : "Synchroniser documents"}
-                </button>
-              </div>
-            ) : data.homonyme ? (
+              );
+            })() : data.homonyme ? (
               <div className="space-y-2">
                 <p className="text-sm text-amber-400">⚠ Identité déjà connue :</p>
                 <div className="text-sm text-cream">
