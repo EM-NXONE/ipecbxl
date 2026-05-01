@@ -13,7 +13,7 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "IPEC - INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES" },
+      { title: "IPEC | Institut Privé des Études Commerciales" },
       { name: "description", content: "IPEC, institut privé en Belgique à Bruxelles : école supérieure de commerce privée. Programmes BAC+1 à BAC+5 en management, marketing, relations internationales, économie & finance. Université privée à dimension internationale." },
       { name: "keywords", content: "institut privé Bruxelles, institut privé Belgique, université privée Bruxelles, université privée Belgique, école privée Bruxelles, école privée Belgique, école de commerce Bruxelles, école de commerce Belgique, école supérieure Bruxelles, école supérieure Belgique, business school Bruxelles, business school Belgique, IPEC Bruxelles, étudier à Bruxelles, étudier en Belgique, BAC+3 Bruxelles, BAC+3 Belgique, BAC+5 Bruxelles, BAC+5 Belgique, management Bruxelles, marketing Bruxelles, finance Bruxelles" },
       { property: "og:title", content: "IPEC — Institut privé en Belgique · École de commerce à Bruxelles" },
