@@ -15,6 +15,8 @@ interface Profil {
   id: number; numero_etudiant: string | null;
   civilite: string | null; prenom: string; nom: string; email: string;
   date_naissance: string | null; nationalite: string | null; telephone: string | null;
+  rue: string | null; numero: string | null; code_postal: string | null;
+  ville: string | null; pays_residence: string | null;
   statut: string; derniere_connexion: string | null; created_at: string;
 }
 
