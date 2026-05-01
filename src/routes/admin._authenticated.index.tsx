@@ -10,6 +10,7 @@ import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/_authenticated/")({
   component: AdminDashboardPage,
+  head: () => ({ meta: [{ title: "IPEC | Tableau de bord" }] }),
 });
 
 interface Kpis {
