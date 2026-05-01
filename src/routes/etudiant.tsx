@@ -8,7 +8,7 @@ export const Route = createFileRoute("/etudiant")({
   component: EtudiantRoot,
   head: () => ({
     meta: [
-      { title: "Espace étudiant — IPEC" },
+      { title: "IPEC | Espace étudiant" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
