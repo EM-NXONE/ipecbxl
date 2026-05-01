@@ -76,6 +76,8 @@ function EtudiantProfilPage() {
             <Row label="Nationalité" value={profil.nationalite} />
             <Row label="E-mail" value={profil.email} />
             <Row label="Téléphone" value={profil.telephone} />
+            <Row label="Adresse" value={formatAdresse(profil)} />
+            <Row label="Pays de résidence" value={profil.pays_residence} />
             <Row label="Dernière connexion" value={formatDateTime(profil.derniere_connexion)} />
           </dl>
         ) : <p className="text-sm text-muted-foreground">Chargement…</p>}
