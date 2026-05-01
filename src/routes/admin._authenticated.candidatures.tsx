@@ -67,7 +67,7 @@ function AdminCandidaturesListPage() {
         .finally(() => setLoading(false));
     }, q ? 250 : 0);
     return () => clearTimeout(t);
-  }, [q, statut, payee, page, refreshKey]);
+  }, [q, statut, payee, page]);
 
   if (showingDetail) return <Outlet />;
 
