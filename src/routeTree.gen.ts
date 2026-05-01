@@ -24,7 +24,6 @@ import { Route as CguRouteImport } from './routes/cgu'
 import { Route as AdmissionsRouteImport } from './routes/admissions'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EtudiantMotDePasseOublieRouteImport } from './routes/etudiant.mot-de-passe-oublie'
 import { Route as EtudiantLoginRouteImport } from './routes/etudiant.login'
 import { Route as EtudiantAuthenticatedRouteImport } from './routes/etudiant._authenticated'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -114,12 +113,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EtudiantMotDePasseOublieRoute =
-  EtudiantMotDePasseOublieRouteImport.update({
-    id: '/mot-de-passe-oublie',
-    path: '/mot-de-passe-oublie',
-    getParentRoute: () => EtudiantRoute,
-  } as any)
 const EtudiantLoginRoute = EtudiantLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -209,7 +202,6 @@ export interface FileRoutesByFullPath {
   '/vie-etudiante': typeof VieEtudianteRoute
   '/admin/login': typeof AdminLoginRoute
   '/etudiant/login': typeof EtudiantLoginRoute
-  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
@@ -238,7 +230,6 @@ export interface FileRoutesByTo {
   '/vie-etudiante': typeof VieEtudianteRoute
   '/admin/login': typeof AdminLoginRoute
   '/etudiant/login': typeof EtudiantLoginRoute
-  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/etudiant/documents': typeof EtudiantAuthenticatedDocumentsRoute
@@ -268,7 +259,6 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/etudiant/_authenticated': typeof EtudiantAuthenticatedRouteWithChildren
   '/etudiant/login': typeof EtudiantLoginRoute
-  '/etudiant/mot-de-passe-oublie': typeof EtudiantMotDePasseOublieRoute
   '/admin/_authenticated/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
   '/admin/_authenticated/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/etudiant/_authenticated/documents': typeof EtudiantAuthenticatedDocumentsRoute
@@ -299,7 +289,6 @@ export interface FileRouteTypes {
     | '/vie-etudiante'
     | '/admin/login'
     | '/etudiant/login'
-    | '/etudiant/mot-de-passe-oublie'
     | '/admin/candidatures'
     | '/admin/etudiants'
     | '/etudiant/documents'
@@ -328,7 +317,6 @@ export interface FileRouteTypes {
     | '/vie-etudiante'
     | '/admin/login'
     | '/etudiant/login'
-    | '/etudiant/mot-de-passe-oublie'
     | '/admin/candidatures'
     | '/admin/etudiants'
     | '/etudiant/documents'
@@ -357,7 +345,6 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/etudiant/_authenticated'
     | '/etudiant/login'
-    | '/etudiant/mot-de-passe-oublie'
     | '/admin/_authenticated/candidatures'
     | '/admin/_authenticated/etudiants'
     | '/etudiant/_authenticated/documents'
@@ -493,13 +480,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/etudiant/mot-de-passe-oublie': {
-      id: '/etudiant/mot-de-passe-oublie'
-      path: '/mot-de-passe-oublie'
-      fullPath: '/etudiant/mot-de-passe-oublie'
-      preLoaderRoute: typeof EtudiantMotDePasseOublieRouteImport
-      parentRoute: typeof EtudiantRoute
     }
     '/etudiant/login': {
       id: '/etudiant/login'
@@ -660,14 +640,12 @@ const EtudiantAuthenticatedRouteWithChildren =
 interface EtudiantRouteChildren {
   EtudiantAuthenticatedRoute: typeof EtudiantAuthenticatedRouteWithChildren
   EtudiantLoginRoute: typeof EtudiantLoginRoute
-  EtudiantMotDePasseOublieRoute: typeof EtudiantMotDePasseOublieRoute
   EtudiantResetTokenRoute: typeof EtudiantResetTokenRoute
 }
 
 const EtudiantRouteChildren: EtudiantRouteChildren = {
   EtudiantAuthenticatedRoute: EtudiantAuthenticatedRouteWithChildren,
   EtudiantLoginRoute: EtudiantLoginRoute,
-  EtudiantMotDePasseOublieRoute: EtudiantMotDePasseOublieRoute,
   EtudiantResetTokenRoute: EtudiantResetTokenRoute,
 }
 
