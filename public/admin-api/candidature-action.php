@@ -155,7 +155,7 @@ try {
             if (empty($c['etudiant_id'])) api_error('Aucun compte étudiant rattaché.', 400);
             etudiant_sync_documents_historiques($pdo, (int)$c['etudiant_id'], $c, admin_current_user());
             admin_log_action($id, 'sync_documents', 'Étudiant #' . $c['etudiant_id']);
-            api_json(['ok' => true, 'message' => 'Documents synchronisés (facture 400€ + récap candidature).']);
+            api_json(['ok' => true, 'message' => 'Documents synchronisés.']);
         }
 
         case 'reset_password_etudiant': {
