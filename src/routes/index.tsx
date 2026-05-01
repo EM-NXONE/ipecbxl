@@ -78,16 +78,30 @@ function Home() {
           {/* Key numbers */}
           <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl border-t border-border/40 pt-12">
             {[
-              { v: "5", l: "années d'études" },
+              { v: "5", l: "années d'études", to: "/programmes" as const },
               { v: "4", l: "spécialisations" },
               { v: "1", l: "campus à Bruxelles" },
               { v: "∞", l: "perspectives" },
-            ].map((s) => (
-              <div key={s.l}>
-                <div className="font-display text-4xl md:text-5xl text-gradient-blue">{s.v}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2">{s.l}</div>
-              </div>
-            ))}
+            ].map((s) =>
+              s.to ? (
+                <Link
+                  key={s.l}
+                  to={s.to}
+                  className="group block transition-opacity hover:opacity-80"
+                  aria-label={`${s.v} ${s.l} — découvrir les programmes`}
+                >
+                  <div className="font-display text-4xl md:text-5xl text-gradient-blue">{s.v}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2 group-hover:text-cream transition-colors">
+                    {s.l} →
+                  </div>
+                </Link>
+              ) : (
+                <div key={s.l}>
+                  <div className="font-display text-4xl md:text-5xl text-gradient-blue">{s.v}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2">{s.l}</div>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </section>
