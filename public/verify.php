@@ -89,13 +89,17 @@ if ($recaptchaSecret !== '') {
         exit;
     }
 }
-// Nouveau format : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX, IPEC-RECU-AAAA-XXXXXX
-// Ancien format toléré : IPEC-AAAA-XXXXXX (assimilé à une candidature)
-if (!preg_match('/^IPEC-(CAND|FACT|RECU)-\d{4}-[A-F0-9]{6,16}$/', $reference)
+// Formats acceptés :
+//   IPEC-CAND-AAAA-XXXXXX  (candidature)
+//   IPEC-FACT-AAAA-XXXXXX  (facture — frais de dossier ou scolarité)
+//   IPEC-RECU-AAAA-XXXXXX  (reçu de paiement)
+//   IPEC-DOC-AAAA-XXXXXX   (document : préadmission, attestation, etc.)
+//   IPEC-AAAA-XXXXXX       (ancien format, assimilé à une candidature)
+if (!preg_match('/^IPEC-(CAND|FACT|RECU|DOC)-\d{4}-[A-F0-9]{6,16}$/', $reference)
     && !preg_match('/^IPEC-\d{4}-[A-F0-9]{6,16}$/', $reference)) {
     echo json_encode([
         'valid' => false,
-        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX ou IPEC-RECU-AAAA-XXXXXX.',
+        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX, IPEC-RECU-AAAA-XXXXXX ou IPEC-DOC-AAAA-XXXXXX.',
     ]);
     exit;
 }
@@ -108,6 +112,8 @@ if (strpos($reference, 'IPEC-FACT-') === 0) {
     $docType = 'recu';
 } elseif (strpos($reference, 'IPEC-CAND-') === 0) {
     $docType = 'candidature';
+} elseif (strpos($reference, 'IPEC-DOC-') === 0) {
+    $docType = 'document';
 }
 
 // ----- Lecture en base -----
