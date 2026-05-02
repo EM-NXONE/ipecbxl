@@ -44,48 +44,6 @@ type VerifyResult = {
   date_creation?: string;
 };
 
-/**
- * Format attendu : IPEC-{4 lettres}-{4 chiffres}-{6 hex}
- * Le préfixe "IPEC-" est figé, on n'ajoute que les tirets pendant la frappe.
- */
-const REF_PREFIX = "IPEC-";
-
-function formatReference(raw: string): string {
-  // Ne garde que les caractères alphanumériques, peu importe l'état du préfixe
-  let body = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  // Retire toutes les occurrences de "IPEC" en tête (gère "IPEC", "IPECIPEC", "IPE", etc.)
-  while (body.startsWith("IPEC")) body = body.slice(4);
-
-  // Segment 1 : 4 lettres (type de document)
-  const kindMatch = body.match(/^[A-Z]{0,4}/);
-  const kind = kindMatch ? kindMatch[0] : "";
-  let after = body.slice(kind.length);
-
-  // Si l'utilisateur a tapé un chiffre alors que le segment lettres n'est pas plein,
-  // on ignore ce qui reste (sécurité), on prend juste 4 chiffres pour l'année
-  const yearRaw = after.replace(/[^0-9]/g, "").slice(0, 4);
-  // recompose après-année à partir des chiffres restants + lettres restantes (hex)
-  const consumedYear = (() => {
-    let n = 0, idx = 0;
-    while (idx < after.length && n < yearRaw.length) {
-      if (/[0-9]/.test(after[idx])) n++;
-      idx++;
-    }
-    return idx;
-  })();
-  const afterYear = after.slice(consumedYear).replace(/[^0-9A-F]/g, "");
-  const suffix = afterYear.slice(0, 6);
-
-  // Reconstruction avec tirets (segment vide → on n'ajoute pas le tiret suivant)
-  let out = REF_PREFIX + kind;
-  if (kind.length === 4 && (yearRaw.length > 0 || suffix.length > 0)) {
-    out += "-" + yearRaw;
-  }
-  if (yearRaw.length === 4 && suffix.length > 0) {
-    out += "-" + suffix;
-  }
-  return out;
-}
 
 function VerificationPage() {
   const [reference, setReference] = useState("");
