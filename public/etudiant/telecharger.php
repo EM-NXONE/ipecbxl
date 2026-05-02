@@ -177,6 +177,35 @@ try {
         echo $out; exit;
     }
 
+    // ---- Template "preadmission" → builder dédié (lettre formelle IPEC) ----
+    if ($d['template'] === 'preadmission' && function_exists('buildPreadmissionPdf')) {
+        // Enrichit data avec les champs identité du destinataire (issus de la jointure)
+        $data['reference_doc']    = $data['reference_doc']    ?? $d['reference'];
+        $data['date_emission']    = $data['date_emission']    ?? $d['date_emission'];
+        $data['civilite']         = $data['civilite']         ?? $d['civilite'];
+        $data['prenom']           = $data['prenom']           ?? $d['prenom'];
+        $data['nom']              = $data['nom']              ?? $d['nom'];
+        $data['email']            = $data['email']            ?? $d['email'];
+        $data['numero_etudiant']  = $data['numero_etudiant']  ?? $d['numero_etudiant'];
+
+        $out = buildPreadmissionPdf($data);
+        if ($out === '') { http_response_code(500); exit('PDF vide.'); }
+
+        $pdo->prepare("UPDATE documents
+                       SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                           nb_telechargements = nb_telechargements + 1
+                       WHERE id = ?")->execute([$id]);
+        $pdo->prepare("INSERT INTO etudiant_actions (etudiant_id, action, detail, ip)
+                       VALUES (?, 'download_doc', ?, ?)")
+            ->execute([$user['id'], 'Document ' . $d['reference'], $_SERVER['REMOTE_ADDR'] ?? null]);
+
+        $filename = safe_filename('preadmission', $d['reference']);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
+
 
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);

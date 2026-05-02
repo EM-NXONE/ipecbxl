@@ -365,6 +365,7 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     ];
 
     $pdo->beginTransaction();
+    $factureT1Numero = '';
     try {
         $insert = $pdo->prepare(
             "INSERT INTO factures
@@ -377,8 +378,9 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
                      ?, ?,
                      'en_attente', 1, ?)"
         );
-        foreach ($tranches as $t) {
+        foreach ($tranches as $idx => $t) {
             $numero = etudiant_generate_ref($pdo, 'FACT');
+            if ($idx === 0) $factureT1Numero = $numero;
             $insert->execute([
                 $numero, $etuId, $candId,
                 $t['libelle'], $t['description'],
@@ -393,6 +395,74 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
         throw $e;
     }
 
+    // Document "Lettre de préadmission" — généré en même temps que les factures
+    // (idempotent : ne crée rien si déjà présent pour cette candidature)
+    try {
+        etudiant_create_document_preadmission($pdo, $candidature, $adminUser, [
+            'facture_t1_numero'   => $factureT1Numero,
+            'facture_t1_echeance' => $tranches[0]['echeance'],
+        ]);
+    } catch (\Throwable $e) {
+        // Ne pas faire échouer la génération des factures si le document échoue ;
+        // l'admin pourra le rejouer via sync_documents.
+        error_log('[etudiant_create_factures_scolarite] preadmission doc failed: ' . $e->getMessage());
+    }
+
     return ['created' => true, 'count' => count($tranches)];
+}
+
+/**
+ * Crée (idempotent) le document "Lettre de préadmission" dans l'espace
+ * étudiant. Le PDF est régénéré à la volée par buildPreadmissionPdf()
+ * depuis data_json (cf. public/etudiant/telecharger.php).
+ *
+ * Ne fait rien si :
+ *   - aucun etudiant_id rattaché
+ *   - un document de template 'preadmission' existe déjà pour cette candidature
+ */
+function etudiant_create_document_preadmission(PDO $pdo, array $candidature, string $adminUser, array $extra = []): void {
+    if (empty($candidature['etudiant_id'])) return;
+    $etuId  = (int)$candidature['etudiant_id'];
+    $candId = (int)$candidature['id'];
+
+    $stmt = $pdo->prepare("SELECT id FROM documents
+                            WHERE candidature_id = ? AND template = 'preadmission' LIMIT 1");
+    $stmt->execute([$candId]);
+    if ($stmt->fetchColumn()) return;
+
+    $ref = etudiant_generate_ref($pdo, 'DOC');
+    $emis = date('Y-m-d');
+
+    $data = [
+        'reference_doc'         => $ref,
+        'date_emission'         => $emis,
+        'civilite'              => $candidature['civilite']        ?? null,
+        'prenom'                => $candidature['prenom']          ?? null,
+        'nom'                   => $candidature['nom']             ?? null,
+        'email'                 => $candidature['email']           ?? null,
+        'programme'             => $candidature['programme']       ?? null,
+        'annee'                 => $candidature['annee']           ?? null,
+        'specialisation'        => $candidature['specialisation']  ?? null,
+        'rentree'               => $candidature['rentree']         ?? null,
+        'candidature_reference' => $candidature['reference']       ?? null,
+        'facture_t1_numero'     => (string)($extra['facture_t1_numero'] ?? ''),
+        'facture_t1_echeance'   => (string)($extra['facture_t1_echeance'] ?? ''),
+    ];
+
+    $pdo->prepare(
+        "INSERT INTO documents
+            (reference, etudiant_id, candidature_id, type, template,
+             titre, description, data_json, statut, visible_etudiant,
+             date_emission, cree_par_admin)
+         VALUES (?, ?, ?, 'autre', 'preadmission',
+                 ?, ?, ?, 'publie', 1,
+                 ?, ?)"
+    )->execute([
+        $ref, $etuId, $candId,
+        'Lettre de préadmission IPEC',
+        "Avis favorable de la Commission pédagogique. Inscription définitive sous réserve du paiement de la 1ʳᵉ tranche des frais de scolarité.",
+        json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
+        $emis, $adminUser,
+    ]);
 }
 
