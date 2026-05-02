@@ -315,7 +315,7 @@ echo json_encode([
     'valid'             => true,
     'reference'         => $reference,
     'document_type'     => $docType,
-    'document_label'    => $docTypeLabels[$docType] ?? $docType,
+    'document_label'    => $documentLabel,
     'candidat'          => $nomAffiche,
     'programme_code'    => $row['programme'],
     'programme'         => $programmeFull,
