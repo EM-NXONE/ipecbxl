@@ -152,13 +152,13 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf->SetTextColor(91, 100, 120);
         if ($numEtu !== '') $pdf->Cell(0, 5, $tr('N° étudiant : ' . $numEtu), 0, 1);
         if ($email !== '')  $pdf->Cell(0, 5, $tr($email), 0, 1);
-        $pdf->Ln(8);
+        $pdf->Ln(6);
 
         // ---- Objet ----
         $pdf->SetFont('Helvetica', 'B', 12);
         $pdf->SetTextColor(27, 31, 42);
         $pdf->Cell(0, 7, $tr("Objet : Lettre de préadmission à l'IPEC"), 0, 1);
-        $pdf->Ln(4);
+        $pdf->Ln(2);
 
         // ---- Corps de la lettre ----
         $pdf->SetFont('Helvetica', '', 11);
