@@ -1139,10 +1139,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
 
-    // TVA 21%
+    // TVA (taux dynamique)
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(110, 6, '', 0, 0);
-    $pdf->Cell(30, 6, $tr('TVA 21%'), 0, 0, 'R');
+    $pdf->Cell(30, 6, $tr($tvaLabel), 0, 0, 'R');
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
 
