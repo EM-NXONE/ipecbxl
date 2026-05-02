@@ -1281,9 +1281,11 @@ function buildRecuPaiementPdf(array $f): array {
 
     $montant = isset($f['montant_ttc_cents']) && (int)$f['montant_ttc_cents'] > 0
         ? ((int)$f['montant_ttc_cents']) / 100 : 400.00;
-    $tauxTva    = 0.21;
-    $montantHT  = round($montant / (1 + $tauxTva), 2);
+    // Taux TVA : passé par l'appelant (source = table `factures`), sinon 0 % par défaut (frais de dossier).
+    $tauxTva    = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.00;
+    $montantHT  = $tauxTva > 0 ? round($montant / (1 + $tauxTva), 2) : $montant;
     $montantTVA = round($montant - $montantHT, 2);
+    $tvaLabel   = 'TVA ' . rtrim(rtrim(number_format($tauxTva * 100, 2, ',', ''), '0'), ',') . '%';
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'recu';
