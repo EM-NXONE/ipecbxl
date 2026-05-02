@@ -93,6 +93,8 @@ try {
             'programme' => $f['programme'], 'annee' => $f['annee'],
             'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'],
             'montant_ttc_cents' => (int)$f['montant_ttc_cents'],
+            'tva_taux' => (float)$f['tva_taux'],
+            'libelle' => $f['libelle'], 'description' => $f['description'],
             'paye_at' => $f['paye_at'],
             'moyen_paiement' => $f['moyen_paiement'],
             'reference_paiement' => $f['reference_paiement'],
