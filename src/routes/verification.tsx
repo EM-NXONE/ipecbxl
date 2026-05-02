@@ -88,40 +88,21 @@ function formatReference(raw: string): string {
 }
 
 function VerificationPage() {
-  const [reference, setReference] = useState(REF_PREFIX);
+  const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
 
   const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setReference(formatReference(e.target.value));
-  };
-
-  // Empêche l'utilisateur de placer son curseur dans le préfixe figé
-  const protectPrefix = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    if ((input.selectionStart ?? 0) < REF_PREFIX.length) {
-      input.setSelectionRange(REF_PREFIX.length, Math.max(input.selectionEnd ?? 0, REF_PREFIX.length));
-    }
-  };
-
-  // Bloque Backspace/Delete quand le curseur est dans/au bord du préfixe
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    const start = input.selectionStart ?? 0;
-    const end = input.selectionEnd ?? 0;
-    if (e.key === "Backspace" && start === end && start <= REF_PREFIX.length) {
-      e.preventDefault();
-    }
-    if (e.key === "Delete" && start === end && start < REF_PREFIX.length) {
-      e.preventDefault();
-    }
+    // Normalisation légère : majuscules, on supprime les espaces, on garde
+    // tout le reste tel quel pour ne bloquer aucun format de référence.
+    setReference(e.target.value.toUpperCase().replace(/\s+/g, ""));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
     const ref = reference.trim().toUpperCase();
-    if (!ref || ref === REF_PREFIX) return;
+    if (!ref) return;
 
     setLoading(true);
     setResult(null);
