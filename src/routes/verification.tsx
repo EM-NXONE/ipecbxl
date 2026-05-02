@@ -134,13 +134,8 @@ function VerificationPage() {
                   required
                   value={reference}
                   onChange={handleReferenceChange}
-                  onClick={protectPrefix}
-                  onKeyUp={protectPrefix}
-                  onKeyDown={handleKeyDown}
-                  onFocus={protectPrefix}
-                  onSelect={protectPrefix}
                   placeholder="IPEC-CAND-2026-A1B2C3"
-                  maxLength={REF_PREFIX.length + 4 + 1 + 4 + 1 + 6}
+                  maxLength={64}
                   autoComplete="off"
                   inputMode="text"
                   spellCheck={false}
@@ -148,7 +143,7 @@ function VerificationPage() {
                 />
                 <button
                   type="submit"
-                  disabled={loading || reference.trim() === REF_PREFIX || reference.trim() === ""}
+                  disabled={loading || reference.trim() === ""}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {loading ? (
@@ -165,8 +160,11 @@ function VerificationPage() {
                 </button>
               </div>
               <p className="mt-3 text-xs text-muted-foreground/80">
-                Les tirets sont insérés automatiquement. Tapez simplement le type de document
-                (4 lettres), l'année (4 chiffres) puis le code à 6 caractères figurant sur le document.
+                Saisissez la référence exacte figurant sur le document
+                (ex. <code className="text-cream">IPEC-DOC-2026-B1BF2C</code>,{" "}
+                <code className="text-cream">IPEC-FACT-2026-…</code>,{" "}
+                <code className="text-cream">IPEC-CAND-2026-…</code>,{" "}
+                <code className="text-cream">IPEC-RECU-2026-…</code>).
               </p>
             </div>
           </form>
