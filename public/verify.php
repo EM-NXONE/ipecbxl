@@ -120,6 +120,8 @@ if (strpos($reference, 'IPEC-FACT-') === 0) {
 try {
     $pdo = db();
     $row = null;
+    $factureType = null; $factureLibelle = null;
+    $documentTemplate = null; $documentTitre = null;
 
     if ($docType === 'recu') {
         // Le numéro de reçu est déterministe : sha1('ipec-recu|' + numero_facture).
