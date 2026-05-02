@@ -77,6 +77,34 @@ $factureFields = [
     'rentree'       => $c['rentree'],
 ];
 
+/**
+ * Tente la génération des 3 factures de scolarité après une action
+ * (mark_paid / change_statut / create_etudiant). Idempotent et silencieux :
+ *   - relit la candidature pour avoir le statut & le rattachement à jour
+ *   - n'agit que si statut=validee + facture_payee=1 + etudiant_id présent
+ *   - en cas d'exception, log mais n'interrompt pas la requête en cours
+ *
+ * @return string suffixe à concaténer au message de l'action principale
+ *                ("" si rien généré, " — 3 factures de scolarité créées." sinon)
+ */
+function try_generate_factures_scolarite(PDO $pdo, int $candidatureId, string $adminUser): string {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
+        $stmt->execute([$candidatureId]);
+        $cand = $stmt->fetch();
+        if (!$cand) return '';
+        $res = etudiant_create_factures_scolarite($pdo, $cand, $adminUser);
+        if (!empty($res['created'])) {
+            admin_log_action($candidatureId, 'create_factures_scolarite',
+                $res['count'] . ' factures (3 tranches) générées');
+            return ' Les ' . $res['count'] . ' factures de scolarité ont été générées dans l\'espace étudiant.';
+        }
+    } catch (\Throwable $e) {
+        error_log('[candidature-action] try_generate_factures_scolarite #' . $candidatureId . ' : ' . $e->getMessage());
+    }
+    return '';
+}
+
 try {
     switch ($action) {
 
