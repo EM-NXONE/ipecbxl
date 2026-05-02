@@ -114,8 +114,8 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
         $pdf->docKind = 'document';
         $pdf->reference = $refDoc;
-        $pdf->SetMargins(20, 22, 20);
-        $pdf->SetAutoPageBreak(true, 32);
+        $pdf->SetMargins(20, 20, 20);
+        $pdf->SetAutoPageBreak(true, 28);
         $pdf->AddPage();
 
         // ---- En-tête : bandeau IPEC ----
@@ -152,21 +152,21 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf->SetTextColor(91, 100, 120);
         if ($numEtu !== '') $pdf->Cell(0, 5, $tr('N° étudiant : ' . $numEtu), 0, 1);
         if ($email !== '')  $pdf->Cell(0, 5, $tr($email), 0, 1);
-        $pdf->Ln(8);
+        $pdf->Ln(6);
 
         // ---- Objet ----
         $pdf->SetFont('Helvetica', 'B', 12);
         $pdf->SetTextColor(27, 31, 42);
         $pdf->Cell(0, 7, $tr("Objet : Lettre de préadmission à l'IPEC"), 0, 1);
-        $pdf->Ln(4);
+        $pdf->Ln(2);
 
         // ---- Corps de la lettre ----
         $pdf->SetFont('Helvetica', '', 11);
         $pdf->SetTextColor(27, 31, 42);
 
         $p = function (string $text) use ($pdf, $tr) {
-            $pdf->MultiCell(0, 6, $tr($text));
-            $pdf->Ln(2);
+            $pdf->MultiCell(0, 5.5, $tr($text));
+            $pdf->Ln(1.5);
         };
 
         $p($civAccord . ',');
@@ -180,12 +180,12 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $p("Nous avons le plaisir de vous informer que votre dossier de candidature a été examiné avec attention par la Commission pédagogique de l'IPEC. À l'issue de ses délibérations, la Commission a émis un avis favorable et a déclaré votre candidature recevable pour intégrer le programme suivant :");
 
         $pdf->SetFont('Helvetica', 'B', 11);
-        $pdf->MultiCell(0, 6, $tr($detailsProg !== '' ? $detailsProg : 'Programme demandé'));
+        $pdf->MultiCell(0, 5.5, $tr($detailsProg !== '' ? $detailsProg : 'Programme demandé'));
         if ($rentree !== '') {
             $pdf->SetFont('Helvetica', '', 11);
-            $pdf->MultiCell(0, 6, $tr('Rentrée envisagée : ' . $rentree));
+            $pdf->MultiCell(0, 5.5, $tr('Rentrée envisagée : ' . $rentree));
         }
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
         $pdf->SetFont('Helvetica', '', 11);
 
         $p("Cette préadmission constitue une étape déterminante de votre parcours d'inscription, mais elle ne vaut pas encore admission définitive. Conformément aux conditions générales de l'IPEC, votre inscription ne deviendra effective qu'après réception du paiement de la première tranche des droits de scolarité, d'un montant de 3 000 € (trois mille euros).");
@@ -205,7 +205,7 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
 
         $p("Nous vous prions de croire, " . $civAccord . ", en l'expression de nos salutations distinguées.");
 
-        $pdf->Ln(6);
+        $pdf->Ln(4);
         $pdf->SetFont('Helvetica', 'B', 11);
         $pdf->Cell(0, 6, $tr("Le Service des admissions"), 0, 1);
         $pdf->SetFont('Helvetica', 'I', 10);
