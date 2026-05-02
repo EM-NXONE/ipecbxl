@@ -180,12 +180,12 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $p("Nous avons le plaisir de vous informer que votre dossier de candidature a été examiné avec attention par la Commission pédagogique de l'IPEC. À l'issue de ses délibérations, la Commission a émis un avis favorable et a déclaré votre candidature recevable pour intégrer le programme suivant :");
 
         $pdf->SetFont('Helvetica', 'B', 11);
-        $pdf->MultiCell(0, 6, $tr($detailsProg !== '' ? $detailsProg : 'Programme demandé'));
+        $pdf->MultiCell(0, 5.5, $tr($detailsProg !== '' ? $detailsProg : 'Programme demandé'));
         if ($rentree !== '') {
             $pdf->SetFont('Helvetica', '', 11);
-            $pdf->MultiCell(0, 6, $tr('Rentrée envisagée : ' . $rentree));
+            $pdf->MultiCell(0, 5.5, $tr('Rentrée envisagée : ' . $rentree));
         }
-        $pdf->Ln(2);
+        $pdf->Ln(1.5);
         $pdf->SetFont('Helvetica', '', 11);
 
         $p("Cette préadmission constitue une étape déterminante de votre parcours d'inscription, mais elle ne vaut pas encore admission définitive. Conformément aux conditions générales de l'IPEC, votre inscription ne deviendra effective qu'après réception du paiement de la première tranche des droits de scolarité, d'un montant de 3 000 € (trois mille euros).");
