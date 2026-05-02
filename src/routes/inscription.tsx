@@ -399,8 +399,8 @@ function Inscription() {
                     Rentrée envisagée — Année {academicYearLabel}
                   </label>
                   <select required name="rentree" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>Rentrée principale — {septembreRentree}</option>
-                    <option>Rentrée décalée — {fevrierRentree}</option>
+                    <option>Septembre — {septembreRentree}</option>
+                    <option>Février — {fevrierRentree}</option>
                   </select>
                 </div>
 
