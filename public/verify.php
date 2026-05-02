@@ -89,13 +89,17 @@ if ($recaptchaSecret !== '') {
         exit;
     }
 }
-// Nouveau format : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX, IPEC-RECU-AAAA-XXXXXX
-// Ancien format toléré : IPEC-AAAA-XXXXXX (assimilé à une candidature)
-if (!preg_match('/^IPEC-(CAND|FACT|RECU)-\d{4}-[A-F0-9]{6,16}$/', $reference)
+// Formats acceptés :
+//   IPEC-CAND-AAAA-XXXXXX  (candidature)
+//   IPEC-FACT-AAAA-XXXXXX  (facture — frais de dossier ou scolarité)
+//   IPEC-RECU-AAAA-XXXXXX  (reçu de paiement)
+//   IPEC-DOC-AAAA-XXXXXX   (document : préadmission, attestation, etc.)
+//   IPEC-AAAA-XXXXXX       (ancien format, assimilé à une candidature)
+if (!preg_match('/^IPEC-(CAND|FACT|RECU|DOC)-\d{4}-[A-F0-9]{6,16}$/', $reference)
     && !preg_match('/^IPEC-\d{4}-[A-F0-9]{6,16}$/', $reference)) {
     echo json_encode([
         'valid' => false,
-        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX ou IPEC-RECU-AAAA-XXXXXX.',
+        'error' => 'Format de référence invalide. Format attendu : IPEC-CAND-AAAA-XXXXXX, IPEC-FACT-AAAA-XXXXXX, IPEC-RECU-AAAA-XXXXXX ou IPEC-DOC-AAAA-XXXXXX.',
     ]);
     exit;
 }
@@ -108,12 +112,16 @@ if (strpos($reference, 'IPEC-FACT-') === 0) {
     $docType = 'recu';
 } elseif (strpos($reference, 'IPEC-CAND-') === 0) {
     $docType = 'candidature';
+} elseif (strpos($reference, 'IPEC-DOC-') === 0) {
+    $docType = 'document';
 }
 
 // ----- Lecture en base -----
 try {
     $pdo = db();
     $row = null;
+    $factureType = null; $factureLibelle = null;
+    $documentTemplate = null; $documentTitre = null;
 
     if ($docType === 'recu') {
         // Le numéro de reçu est déterministe : sha1('ipec-recu|' + numero_facture).
@@ -173,6 +181,27 @@ try {
                 }
             }
         }
+    } elseif ($docType === 'document') {
+        // Documents (préadmission, attestations, …) — table `documents`.
+        try {
+            $stmtD = $pdo->prepare(
+                "SELECT d.reference, d.template, d.titre, d.date_emission AS created_at,
+                        e.prenom, e.nom,
+                        c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
+                   FROM documents d
+                   INNER JOIN etudiants e ON e.id = d.etudiant_id
+                   LEFT JOIN candidatures c ON c.id = d.candidature_id
+                  WHERE d.reference = ? AND d.statut = 'publie' LIMIT 1"
+            );
+            $stmtD->execute([$reference]);
+            $row = $stmtD->fetch();
+            if ($row) {
+                $documentTemplate = (string)$row['template'];
+                $documentTitre    = (string)$row['titre'];
+            }
+        } catch (\Throwable $eD) {
+            error_log('[verify.php] documents lookup skipped: ' . $eD->getMessage());
+        }
     } else {
         $column = $docType === 'facture' ? 'facture_numero' : 'reference';
         $stmt = $pdo->prepare(
@@ -189,7 +218,8 @@ try {
         if (!$row && $docType === 'facture') {
             try {
                 $stmt2 = $pdo->prepare(
-                    "SELECT f.numero AS facture_numero, f.numero AS reference, f.paye_at, f.created_at,
+                    "SELECT f.numero AS facture_numero, f.numero AS reference, f.type AS facture_type,
+                            f.libelle AS facture_libelle, f.paye_at, f.created_at,
                             e.prenom, e.nom,
                             c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
                        FROM factures f
@@ -199,6 +229,10 @@ try {
                 );
                 $stmt2->execute([$reference]);
                 $row = $stmt2->fetch();
+                if ($row) {
+                    $factureType    = (string)($row['facture_type'] ?? '');
+                    $factureLibelle = (string)($row['facture_libelle'] ?? '');
+                }
             } catch (\Throwable $e2) { /* table absente : ignorer */ }
         }
     }
@@ -249,15 +283,41 @@ $hasSpec = $specialisationRaw !== ''
 
 $docTypeLabels = [
     'candidature' => 'Confirmation de candidature',
-    'facture'     => 'Facture — frais de dossier',
+    'facture'     => 'Facture',
     'recu'        => 'Reçu de paiement',
+    'document'    => 'Document officiel IPEC',
 ];
+
+// Affiner le libellé selon le sous-type
+$documentLabel = $docTypeLabels[$docType] ?? $docType;
+if ($docType === 'facture') {
+    $ftype = $factureType ?? '';
+    if ($ftype === 'frais_dossier') {
+        $documentLabel = 'Facture — frais de dossier';
+    } elseif ($ftype === 'scolarite') {
+        $documentLabel = 'Facture — frais de scolarité';
+    } elseif (!empty($factureLibelle)) {
+        $documentLabel = 'Facture — ' . $factureLibelle;
+    } else {
+        // Frais de dossier historiques (table candidatures.facture_numero)
+        $documentLabel = 'Facture — frais de dossier';
+    }
+} elseif ($docType === 'document') {
+    $tpl = $documentTemplate ?? '';
+    if ($tpl === 'preadmission') {
+        $documentLabel = 'Lettre de préadmission';
+    } elseif ($tpl === 'recap_candidature') {
+        $documentLabel = 'Récapitulatif de candidature';
+    } elseif (!empty($documentTitre)) {
+        $documentLabel = $documentTitre;
+    }
+}
 
 echo json_encode([
     'valid'             => true,
     'reference'         => $reference,
     'document_type'     => $docType,
-    'document_label'    => $docTypeLabels[$docType] ?? $docType,
+    'document_label'    => $documentLabel,
     'candidat'          => $nomAffiche,
     'programme_code'    => $row['programme'],
     'programme'         => $programmeFull,

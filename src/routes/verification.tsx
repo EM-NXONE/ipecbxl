@@ -32,7 +32,7 @@ type VerifyResult = {
   valid: boolean;
   error?: string;
   reference?: string;
-  document_type?: "candidature" | "facture" | "recu";
+  document_type?: "candidature" | "facture" | "recu" | "document";
   document_label?: string;
   candidat?: string;
   programme?: string;
@@ -44,84 +44,23 @@ type VerifyResult = {
   date_creation?: string;
 };
 
-/**
- * Format attendu : IPEC-{4 lettres}-{4 chiffres}-{6 hex}
- * Le préfixe "IPEC-" est figé, on n'ajoute que les tirets pendant la frappe.
- */
-const REF_PREFIX = "IPEC-";
-
-function formatReference(raw: string): string {
-  // Ne garde que les caractères alphanumériques, peu importe l'état du préfixe
-  let body = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  // Retire toutes les occurrences de "IPEC" en tête (gère "IPEC", "IPECIPEC", "IPE", etc.)
-  while (body.startsWith("IPEC")) body = body.slice(4);
-
-  // Segment 1 : 4 lettres (type de document)
-  const kindMatch = body.match(/^[A-Z]{0,4}/);
-  const kind = kindMatch ? kindMatch[0] : "";
-  let after = body.slice(kind.length);
-
-  // Si l'utilisateur a tapé un chiffre alors que le segment lettres n'est pas plein,
-  // on ignore ce qui reste (sécurité), on prend juste 4 chiffres pour l'année
-  const yearRaw = after.replace(/[^0-9]/g, "").slice(0, 4);
-  // recompose après-année à partir des chiffres restants + lettres restantes (hex)
-  const consumedYear = (() => {
-    let n = 0, idx = 0;
-    while (idx < after.length && n < yearRaw.length) {
-      if (/[0-9]/.test(after[idx])) n++;
-      idx++;
-    }
-    return idx;
-  })();
-  const afterYear = after.slice(consumedYear).replace(/[^0-9A-F]/g, "");
-  const suffix = afterYear.slice(0, 6);
-
-  // Reconstruction avec tirets (segment vide → on n'ajoute pas le tiret suivant)
-  let out = REF_PREFIX + kind;
-  if (kind.length === 4 && (yearRaw.length > 0 || suffix.length > 0)) {
-    out += "-" + yearRaw;
-  }
-  if (yearRaw.length === 4 && suffix.length > 0) {
-    out += "-" + suffix;
-  }
-  return out;
-}
 
 function VerificationPage() {
-  const [reference, setReference] = useState(REF_PREFIX);
+  const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
 
   const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setReference(formatReference(e.target.value));
-  };
-
-  // Empêche l'utilisateur de placer son curseur dans le préfixe figé
-  const protectPrefix = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    if ((input.selectionStart ?? 0) < REF_PREFIX.length) {
-      input.setSelectionRange(REF_PREFIX.length, Math.max(input.selectionEnd ?? 0, REF_PREFIX.length));
-    }
-  };
-
-  // Bloque Backspace/Delete quand le curseur est dans/au bord du préfixe
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    const start = input.selectionStart ?? 0;
-    const end = input.selectionEnd ?? 0;
-    if (e.key === "Backspace" && start === end && start <= REF_PREFIX.length) {
-      e.preventDefault();
-    }
-    if (e.key === "Delete" && start === end && start < REF_PREFIX.length) {
-      e.preventDefault();
-    }
+    // Normalisation légère : majuscules, on supprime les espaces, on garde
+    // tout le reste tel quel pour ne bloquer aucun format de référence.
+    setReference(e.target.value.toUpperCase().replace(/\s+/g, ""));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
     const ref = reference.trim().toUpperCase();
-    if (!ref || ref === REF_PREFIX) return;
+    if (!ref) return;
 
     setLoading(true);
     setResult(null);
@@ -195,13 +134,8 @@ function VerificationPage() {
                   required
                   value={reference}
                   onChange={handleReferenceChange}
-                  onClick={protectPrefix}
-                  onKeyUp={protectPrefix}
-                  onKeyDown={handleKeyDown}
-                  onFocus={protectPrefix}
-                  onSelect={protectPrefix}
                   placeholder="IPEC-CAND-2026-A1B2C3"
-                  maxLength={REF_PREFIX.length + 4 + 1 + 4 + 1 + 6}
+                  maxLength={64}
                   autoComplete="off"
                   inputMode="text"
                   spellCheck={false}
@@ -209,7 +143,7 @@ function VerificationPage() {
                 />
                 <button
                   type="submit"
-                  disabled={loading || reference.trim() === REF_PREFIX || reference.trim() === ""}
+                  disabled={loading || reference.trim() === ""}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-sm bg-gradient-blue text-ink font-medium shadow-blue hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {loading ? (
@@ -226,8 +160,11 @@ function VerificationPage() {
                 </button>
               </div>
               <p className="mt-3 text-xs text-muted-foreground/80">
-                Les tirets sont insérés automatiquement. Tapez simplement le type de document
-                (4 lettres), l'année (4 chiffres) puis le code à 6 caractères figurant sur le document.
+                Saisissez la référence exacte figurant sur le document
+                (ex. <code className="text-cream">IPEC-DOC-2026-B1BF2C</code>,{" "}
+                <code className="text-cream">IPEC-FACT-2026-…</code>,{" "}
+                <code className="text-cream">IPEC-CAND-2026-…</code>,{" "}
+                <code className="text-cream">IPEC-RECU-2026-…</code>).
               </p>
             </div>
           </form>
