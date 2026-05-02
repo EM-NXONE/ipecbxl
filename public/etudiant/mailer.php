@@ -913,7 +913,18 @@ function buildFacturePdf(array $f): array {
     $iban = 'BE53 3770 8630 2553';
     $bic  = 'BBRUBEBB';
 
-    $montant = 400.00;
+    // Montant : priorité au champ explicite (centimes), sinon fallback 400 € (frais de dossier).
+    $montant = isset($f['montant_ttc_cents']) && (int)$f['montant_ttc_cents'] > 0
+        ? ((int)$f['montant_ttc_cents']) / 100
+        : 400.00;
+    // Libellé / description : priorité aux valeurs passées (factures de scolarité),
+    // sinon fallback historique "Frais de dossier IPEC".
+    $libelleFacture     = trim((string)($f['libelle'] ?? ''));
+    $descriptionFacture = trim((string)($f['description'] ?? ''));
+    // Taux TVA explicite si fourni (sinon 21 % par défaut).
+    $tauxTvaFacture     = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.21;
+    // Échéance : si fournie en YYYY-MM-DD, on l'utilise telle quelle, sinon +14j.
+    $dateEcheanceRaw    = trim((string)($f['date_echeance'] ?? ''));
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
@@ -922,7 +933,7 @@ function buildFacturePdf(array $f): array {
     $pdf->referenceFacture = $numFacture;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
-    $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
+    $pdf->SetTitle($tr($libelleFacture !== '' ? $libelleFacture : 'Facture frais de dossier IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut Privé des Études Commerciales'));
     $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
@@ -1087,14 +1098,16 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
     $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
 
-    // Description simplifiée : uniquement "Frais de dossier IPEC — aaaa/aaaa"
-    // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
-    $firstLine = 'Frais de dossier IPEC — ' . $academicYear;
+    // Description du tableau : si un libellé est fourni (factures de scolarité par ex.),
+    // on l'utilise tel quel. Sinon fallback historique "Frais de dossier IPEC — aaaa/aaaa".
+    $firstLine     = $libelleFacture !== '' ? $libelleFacture : ('Frais de dossier IPEC — ' . $academicYear);
+    $secondLine    = $descriptionFacture !== '' ? $descriptionFacture : 'Frais unique';
 
-    // Décomposition TVA : le montant indiqué est TTC, TVA belge 21%
-    $tauxTva = 0.21;
-    $montantHT  = round($montant / (1 + $tauxTva), 2);
+    // Décomposition TVA : le montant indiqué est TTC, taux explicite ou 21 % par défaut
+    $tauxTva   = $tauxTvaFacture;
+    $montantHT  = $tauxTva > 0 ? round($montant / (1 + $tauxTva), 2) : $montant;
     $montantTVA = round($montant - $montantHT, 2);
+    $tvaLabel  = 'TVA ' . rtrim(rtrim(number_format($tauxTva * 100, 2, ',', ''), '0'), ',') . '%';
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
@@ -1105,7 +1118,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(138, 5, $tr('Frais unique'), 0, 1, 'L');
+    $pdf->MultiCell(138, 5, $tr($secondLine), 0, 'L');
     $endY = $pdf->GetY();
     $pdf->SetXY(160, $startYRow);
     $pdf->SetFont('Helvetica', '', 10);
@@ -1126,10 +1139,10 @@ function buildFacturePdf(array $f): array {
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
 
-    // TVA 21%
+    // TVA (taux dynamique)
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(110, 6, '', 0, 0);
-    $pdf->Cell(30, 6, $tr('TVA 21%'), 0, 0, 'R');
+    $pdf->Cell(30, 6, $tr($tvaLabel), 0, 0, 'R');
     $pdf->SetTextColor(15, 21, 37);
     $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
 
@@ -1182,15 +1195,22 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
-    // Échéance : date de facture + 14 jours
-    $echeance = $now->modify('+14 days');
+    // Échéance : utilise date_echeance si fournie, sinon +14 jours par défaut
+    if ($dateEcheanceRaw !== '' && ($tsEch = strtotime($dateEcheanceRaw)) !== false) {
+        $echeanceStr = date('d/m/Y', $tsEch);
+        $echeanceSuffix = '';
+    } else {
+        $echeance = $now->modify('+14 days');
+        $echeanceStr = $echeance->format('d/m/Y');
+        $echeanceSuffix = ' (sous 14 jours)';
+    }
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Échéance'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr($echeance->format('d/m/Y') . ' (sous 14 jours)'), 0, 1);
+    $pdf->Cell(0, 6, $tr($echeanceStr . $echeanceSuffix), 0, 1);
 
     $pdf->SetY($startY + 51);
     $pdf->SetFont('Helvetica', '', 9);
