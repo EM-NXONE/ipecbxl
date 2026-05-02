@@ -913,17 +913,28 @@ function buildFacturePdf(array $f): array {
     $iban = 'BE53 3770 8630 2553';
     $bic  = 'BBRUBEBB';
 
-    // Montant : priorité au champ explicite (centimes), sinon fallback 400 € (frais de dossier).
+    // ---------------------------------------------------------------
+    // Source de vérité : table `factures` (BDD). Tous les champs sont
+    // passés par l'appelant (telecharger.php, admin/action.php, etc.).
+    //
+    // Fallback : pour le PREMIER envoi de mail candidat (mailer.php en
+    // mode HTTP), la facture frais de dossier n'est pas encore persistée
+    // en BDD. On utilise alors les valeurs par défaut "frais de dossier
+    // IPEC" qui DOIVENT rester strictement alignées avec ce qui sera
+    // ensuite inséré dans `factures` par etudiant_sync_documents_historiques()
+    // (cf. public/admin/_etudiants.php) :
+    //   - libelle      = 'Frais de dossier IPEC'
+    //   - montant      = 400 €
+    //   - tva_taux     = 0 %
+    //   - description  = 'Traitement de la candidature ...'
+    //   - date_echeance = date d'émission (paiement immédiat, non remboursable)
+    // ---------------------------------------------------------------
     $montant = isset($f['montant_ttc_cents']) && (int)$f['montant_ttc_cents'] > 0
         ? ((int)$f['montant_ttc_cents']) / 100
         : 400.00;
-    // Libellé / description : priorité aux valeurs passées (factures de scolarité),
-    // sinon fallback historique "Frais de dossier IPEC".
-    $libelleFacture     = trim((string)($f['libelle'] ?? ''));
+    $libelleFacture     = trim((string)($f['libelle'] ?? '')) ?: 'Frais de dossier IPEC';
     $descriptionFacture = trim((string)($f['description'] ?? ''));
-    // Taux TVA explicite si fourni (sinon 21 % par défaut).
-    $tauxTvaFacture     = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.21;
-    // Échéance : si fournie en YYYY-MM-DD, on l'utilise telle quelle, sinon +14j.
+    $tauxTvaFacture     = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.00;
     $dateEcheanceRaw    = trim((string)($f['date_echeance'] ?? ''));
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
