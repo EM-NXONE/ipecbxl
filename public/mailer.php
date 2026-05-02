@@ -934,7 +934,17 @@ function buildFacturePdf(array $f): array {
         : 400.00;
     $libelleFacture     = trim((string)($f['libelle'] ?? '')) ?: 'Frais de dossier IPEC';
     $descriptionFacture = trim((string)($f['description'] ?? ''));
-    $tauxTvaFacture     = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.00;
+    // Normalisation : les anciennes factures "frais de dossier" stockent une
+    // description verbeuse "Traitement de la candidature IPEC-CAND-...". On
+    // affiche toujours "Frais unique" pour rester cohérent avec l'email candidat
+    // et la vue admin.
+    if ($descriptionFacture === '' || preg_match('/^Traitement de (la |votre )?candidature/i', $descriptionFacture)) {
+        $descriptionFacture = 'Frais unique';
+    }
+    // TVA : toutes les factures IPEC sont émises à 21% TVA comprise.
+    // Les montants stockés en BDD sont TTC. On force 21% même si l'ancienne
+    // valeur en BDD est 0 (legacy frais de dossier).
+    $tauxTvaFacture     = 0.21;
     $dateEcheanceRaw    = trim((string)($f['date_echeance'] ?? ''));
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
