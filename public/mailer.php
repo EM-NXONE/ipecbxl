@@ -1428,15 +1428,17 @@ function buildRecuPaiementPdf(array $f): array {
     $pdf->Line(20, $pdf->GetY() + 3, 190, $pdf->GetY() + 3);
     $pdf->Ln(4);
 
-    $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr('Sous-total HT'), 0, 0, 'R');
-    $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+    if ($tauxTva > 0) {
+        $pdf->SetFont('Helvetica', '', 10); $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr('Sous-total HT'), 0, 0, 'R');
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(30, 6, number_format($montantHT, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
 
-    $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr('TVA 21%'), 0, 0, 'R');
-    $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(110, 6, '', 0, 0); $pdf->Cell(30, 6, $tr($tvaLabel), 0, 0, 'R');
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(30, 6, number_format($montantTVA, 2, ',', ' ') . ' EUR  ', 0, 1, 'R');
+    }
 
     $pdf->Ln(2);
 
