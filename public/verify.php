@@ -179,6 +179,27 @@ try {
                 }
             }
         }
+    } elseif ($docType === 'document') {
+        // Documents (préadmission, attestations, …) — table `documents`.
+        try {
+            $stmtD = $pdo->prepare(
+                "SELECT d.reference, d.template, d.titre, d.date_emission AS created_at,
+                        e.prenom, e.nom,
+                        c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
+                   FROM documents d
+                   INNER JOIN etudiants e ON e.id = d.etudiant_id
+                   LEFT JOIN candidatures c ON c.id = d.candidature_id
+                  WHERE d.reference = ? AND d.statut = 'publie' LIMIT 1"
+            );
+            $stmtD->execute([$reference]);
+            $row = $stmtD->fetch();
+            if ($row) {
+                $documentTemplate = (string)$row['template'];
+                $documentTitre    = (string)$row['titre'];
+            }
+        } catch (\Throwable $eD) {
+            error_log('[verify.php] documents lookup skipped: ' . $eD->getMessage());
+        }
     } else {
         $column = $docType === 'facture' ? 'facture_numero' : 'reference';
         $stmt = $pdo->prepare(
@@ -195,7 +216,8 @@ try {
         if (!$row && $docType === 'facture') {
             try {
                 $stmt2 = $pdo->prepare(
-                    "SELECT f.numero AS facture_numero, f.numero AS reference, f.paye_at, f.created_at,
+                    "SELECT f.numero AS facture_numero, f.numero AS reference, f.type AS facture_type,
+                            f.libelle AS facture_libelle, f.paye_at, f.created_at,
                             e.prenom, e.nom,
                             c.programme, c.annee, c.annee_academique, c.specialisation, c.rentree
                        FROM factures f
@@ -205,6 +227,10 @@ try {
                 );
                 $stmt2->execute([$reference]);
                 $row = $stmt2->fetch();
+                if ($row) {
+                    $factureType    = (string)($row['facture_type'] ?? '');
+                    $factureLibelle = (string)($row['facture_libelle'] ?? '');
+                }
             } catch (\Throwable $e2) { /* table absente : ignorer */ }
         }
     }
