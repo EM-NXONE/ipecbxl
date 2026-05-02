@@ -348,7 +348,7 @@ function Inscription() {
                       onChange={(e) => handleProgrammeChange(e.target.value as Programme)}
                       className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors"
                     >
-                      <option value="PAA">PAA — Administration des Affaires</option>
+                      <option value="PAA">PAA — Programme en Administration des Affaires</option>
                       <option value="PEA">PEA — Programme Exécutif Avancé</option>
                     </select>
                   </div>
