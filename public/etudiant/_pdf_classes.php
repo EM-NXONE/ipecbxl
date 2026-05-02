@@ -114,8 +114,8 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
         $pdf->docKind = 'document';
         $pdf->reference = $refDoc;
-        $pdf->SetMargins(20, 22, 20);
-        $pdf->SetAutoPageBreak(true, 32);
+        $pdf->SetMargins(20, 20, 20);
+        $pdf->SetAutoPageBreak(true, 28);
         $pdf->AddPage();
 
         // ---- En-tête : bandeau IPEC ----
