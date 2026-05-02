@@ -1098,14 +1098,16 @@ function buildFacturePdf(array $f): array {
     $pdf->Cell(140, 9, '  ' . $tr('DESCRIPTION'), 0, 0, 'L', true);
     $pdf->Cell(30, 9, $tr('MONTANT') . '  ', 0, 1, 'R', true);
 
-    // Description simplifiée : uniquement "Frais de dossier IPEC — aaaa/aaaa"
-    // (les détails programme / spécialité / année sont dans l'encadré "Inscription" ci-dessus)
-    $firstLine = 'Frais de dossier IPEC — ' . $academicYear;
+    // Description du tableau : si un libellé est fourni (factures de scolarité par ex.),
+    // on l'utilise tel quel. Sinon fallback historique "Frais de dossier IPEC — aaaa/aaaa".
+    $firstLine     = $libelleFacture !== '' ? $libelleFacture : ('Frais de dossier IPEC — ' . $academicYear);
+    $secondLine    = $descriptionFacture !== '' ? $descriptionFacture : 'Frais unique';
 
-    // Décomposition TVA : le montant indiqué est TTC, TVA belge 21%
-    $tauxTva = 0.21;
-    $montantHT  = round($montant / (1 + $tauxTva), 2);
+    // Décomposition TVA : le montant indiqué est TTC, taux explicite ou 21 % par défaut
+    $tauxTva   = $tauxTvaFacture;
+    $montantHT  = $tauxTva > 0 ? round($montant / (1 + $tauxTva), 2) : $montant;
     $montantTVA = round($montant - $montantHT, 2);
+    $tvaLabel  = 'TVA ' . rtrim(rtrim(number_format($tauxTva * 100, 2, ',', ''), '0'), ',') . '%';
 
     $pdf->Ln(2);
     $startYRow = $pdf->GetY();
@@ -1116,7 +1118,7 @@ function buildFacturePdf(array $f): array {
     $pdf->SetX(22);
     $pdf->SetFont('Helvetica', '', 9);
     $pdf->SetTextColor(91, 100, 120);
-    $pdf->Cell(138, 5, $tr('Frais unique'), 0, 1, 'L');
+    $pdf->MultiCell(138, 5, $tr($secondLine), 0, 'L');
     $endY = $pdf->GetY();
     $pdf->SetXY(160, $startYRow);
     $pdf->SetFont('Helvetica', '', 10);
