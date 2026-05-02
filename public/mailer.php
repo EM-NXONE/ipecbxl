@@ -933,7 +933,7 @@ function buildFacturePdf(array $f): array {
     $pdf->referenceFacture = $numFacture;
     $pdf->SetMargins(20, 20, 20);
     $pdf->SetAutoPageBreak(true, 30);
-    $pdf->SetTitle($tr('Facture frais de dossier IPEC'));
+    $pdf->SetTitle($tr($libelleFacture !== '' ? $libelleFacture : 'Facture frais de dossier IPEC'));
     $pdf->SetAuthor($tr('IPEC — Institut Privé des Études Commerciales'));
     $pdf->SetCreator('www.ipec.school');
     $pdf->AddPage();
