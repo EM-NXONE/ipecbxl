@@ -242,3 +242,157 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
         ]);
     }
 }
+
+/* =====================================================================
+ * FACTURES DE SCOLARITÉ — génération automatique en 3 tranches
+ *
+ * Conditions de déclenchement (toutes requises) :
+ *   - candidature.statut       = 'validee'   (= "Acceptée" côté admin)
+ *   - candidature.facture_payee = 1          (frais de dossier 400 € encaissés)
+ *   - candidature rattachée à un compte etudiants.id
+ *
+ * Plan (cf. CGV /cgv et /admissions) :
+ *   - PAA : 3000 € + 1475 € + 1475 €  (total 5950 €)
+ *   - PEA : 3000 € + 2075 € + 2075 €  (total 7150 €)
+ *
+ * Échéances (calendaires, basées sur la rentrée choisie) :
+ *   - T1 (3 000 €) : à la confirmation d'inscription → +30 jours
+ *   - T2 (solde/2) : ~15 jours avant la date de rentrée
+ *   - T3 (solde/2) : 31 janvier de l'année académique
+ *                    (ou +6 mois après T2 pour rentrée février)
+ *
+ * Idempotent : si une facture de type 'scolarite' existe déjà pour
+ * (etudiant_id, candidature_id), on ne fait rien.
+ *
+ * @return array{created:bool, count:int, reason?:string}
+ * ===================================================================== */
+function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string $adminUser): array {
+    // --- Garde-fous ---
+    if (($candidature['statut'] ?? '') !== 'validee') {
+        return ['created' => false, 'count' => 0, 'reason' => 'statut non validé'];
+    }
+    if (empty($candidature['facture_payee'])) {
+        return ['created' => false, 'count' => 0, 'reason' => 'frais de dossier non payés'];
+    }
+    if (empty($candidature['etudiant_id'])) {
+        return ['created' => false, 'count' => 0, 'reason' => 'aucun compte étudiant rattaché'];
+    }
+    $etuId  = (int)$candidature['etudiant_id'];
+    $candId = (int)$candidature['id'];
+
+    // Idempotence : si déjà une facture scolarité, on s'arrête.
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM factures
+                            WHERE candidature_id = ? AND type = 'scolarite'");
+    $stmt->execute([$candId]);
+    if ((int)$stmt->fetchColumn() > 0) {
+        return ['created' => false, 'count' => 0, 'reason' => 'déjà générées'];
+    }
+
+    // --- Programme : PAA vs PEA (prend le préfixe du libellé) ---
+    $progRaw = strtoupper(trim((string)($candidature['programme'] ?? '')));
+    $isPEA = (strpos($progRaw, 'PEA') === 0);
+    $isPAA = (strpos($progRaw, 'PAA') === 0);
+    if (!$isPAA && !$isPEA) {
+        return ['created' => false, 'count' => 0, 'reason' => 'programme inconnu (ni PAA ni PEA)'];
+    }
+    $progLabel = $isPEA ? 'PEA' : 'PAA';
+
+    // Montants en centimes (TTC, exonérés TVA enseignement)
+    $t1Cents = 300000; // 3 000 €
+    $soldeCents = $isPEA ? 415000 : 295000;     // 4 150 € (PEA) / 2 950 € (PAA)
+    $trancheSolde = (int)round($soldeCents / 2); // 2 075 € (PEA) / 1 475 € (PAA)
+
+    // --- Échéances ---
+    $today = new DateTimeImmutable('today');
+    $emission = $today->format('Y-m-d');
+
+    // T1 : à la confirmation d'inscription → 30 jours
+    $t1Echeance = $today->modify('+30 days')->format('Y-m-d');
+
+    // Tente d'extraire la date de rentrée depuis candidature.rentree.
+    // Format attendu (cf. inscription.tsx) : "Septembre — JJ/MM/AAAA" ou "Février — JJ/MM/AAAA".
+    $rentreeStr = (string)($candidature['rentree'] ?? '');
+    $rentreeDate = null;
+    if (preg_match('#(\d{2})/(\d{2})/(\d{4})#', $rentreeStr, $m)) {
+        $rentreeDate = DateTimeImmutable::createFromFormat('!d/m/Y', "{$m[1]}/{$m[2]}/{$m[3]}");
+    }
+    $isFebruary = (stripos($rentreeStr, 'février') !== false || stripos($rentreeStr, 'fevrier') !== false);
+
+    if ($rentreeDate) {
+        // T2 : 15 jours avant la rentrée
+        $t2Echeance = $rentreeDate->modify('-15 days')->format('Y-m-d');
+        if ($isFebruary) {
+            // T3 : +6 mois après T2 pour les rentrées de février
+            $t3Echeance = $rentreeDate->modify('-15 days')->modify('+6 months')->format('Y-m-d');
+        } else {
+            // T3 : 31 janvier de l'année académique (l'année civile suivant la rentrée septembre)
+            $t3Year = (int)$rentreeDate->format('Y') + 1;
+            $t3Echeance = $t3Year . '-01-31';
+        }
+    } else {
+        // Fallback si la rentrée n'est pas parsable : étalement +60j / +180j
+        $t2Echeance = $today->modify('+60 days')->format('Y-m-d');
+        $t3Echeance = $today->modify('+180 days')->format('Y-m-d');
+    }
+
+    // S'assurer qu'aucune échéance n'est antérieure à T1
+    if ($t2Echeance < $t1Echeance) $t2Echeance = $t1Echeance;
+    if ($t3Echeance < $t2Echeance) $t3Echeance = $t2Echeance;
+
+    $rentreeLabel = $rentreeStr !== '' ? $rentreeStr : 'rentrée à venir';
+
+    $tranches = [
+        [
+            'libelle'     => "Frais de scolarité {$progLabel} — 1ʳᵉ tranche",
+            'description' => "Première tranche due à la confirmation d'inscription ({$rentreeLabel}).",
+            'montant'     => $t1Cents,
+            'echeance'    => $t1Echeance,
+        ],
+        [
+            'libelle'     => "Frais de scolarité {$progLabel} — 2ᵉ tranche",
+            'description' => "Deuxième tranche exigible avant le début du programme ({$rentreeLabel}).",
+            'montant'     => $trancheSolde,
+            'echeance'    => $t2Echeance,
+        ],
+        [
+            'libelle'     => "Frais de scolarité {$progLabel} — 3ᵉ tranche (solde)",
+            'description' => $isFebruary
+                ? "Solde des droits de scolarité — exigible 6 mois après le début du programme."
+                : "Solde des droits de scolarité — exigible avant le 31 janvier de l'année académique.",
+            'montant'     => $trancheSolde,
+            'echeance'    => $t3Echeance,
+        ],
+    ];
+
+    $pdo->beginTransaction();
+    try {
+        $insert = $pdo->prepare(
+            "INSERT INTO factures
+                (numero, etudiant_id, candidature_id, type, libelle, description,
+                 montant_ht_cents, tva_taux, montant_ttc_cents, devise,
+                 date_emission, date_echeance,
+                 statut_paiement, visible_etudiant, cree_par_admin)
+             VALUES (?, ?, ?, 'scolarite', ?, ?,
+                     ?, 0.00, ?, 'EUR',
+                     ?, ?,
+                     'en_attente', 1, ?)"
+        );
+        foreach ($tranches as $t) {
+            $numero = etudiant_generate_ref($pdo, 'FACT');
+            $insert->execute([
+                $numero, $etuId, $candId,
+                $t['libelle'], $t['description'],
+                $t['montant'], $t['montant'],
+                $emission, $t['echeance'],
+                $adminUser,
+            ]);
+        }
+        $pdo->commit();
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+
+    return ['created' => true, 'count' => count($tranches)];
+}
+
