@@ -199,13 +199,13 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
             $p("La facture correspondant à cette première tranche est dès à présent disponible dans votre espace étudiant, à la rubrique « Mes factures ».");
         }
 
-        $p("Dès réception de ce paiement, votre admission sera confirmée et nous vous transmettrons l'ensemble des documents nécessaires à la finalisation de votre inscription, ainsi que, le cas échéant, les pièces requises pour vos démarches administratives (attestation d'inscription, demande de visa étudiant, etc.).");
+        $p("Dès réception de ce paiement, votre admission sera confirmée et nous vous transmettrons les documents nécessaires à la finalisation de votre inscription (attestation d'inscription, pièces requises pour la demande de visa étudiant le cas échéant, etc.).");
 
-        $p("L'équipe pédagogique et administrative de l'IPEC se réjouit de la perspective de vous compter prochainement parmi ses étudiants. Nous restons à votre disposition pour toute question relative à cette préadmission ou à votre future rentrée à l'adresse admission@ipec.school.");
+        $p("L'équipe de l'IPEC se réjouit de vous compter prochainement parmi ses étudiants et reste à votre disposition à l'adresse admission@ipec.school.");
 
         $p("Nous vous prions de croire, " . $civAccord . ", en l'expression de nos salutations distinguées.");
 
-        $pdf->Ln(4);
+        $pdf->Ln(3);
         $pdf->SetFont('Helvetica', 'B', 11);
         $pdf->Cell(0, 6, $tr("Le Service des admissions"), 0, 1);
         $pdf->SetFont('Helvetica', 'I', 10);
