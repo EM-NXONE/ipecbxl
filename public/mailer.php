@@ -1195,15 +1195,22 @@ function buildFacturePdf(array $f): array {
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(44, 93, 219);
     $pdf->Cell(0, 6, $tr($commStruct), 0, 1);
-    // Échéance : date de facture + 14 jours
-    $echeance = $now->modify('+14 days');
+    // Échéance : utilise date_echeance si fournie, sinon +14 jours par défaut
+    if ($dateEcheanceRaw !== '' && ($tsEch = strtotime($dateEcheanceRaw)) !== false) {
+        $echeanceStr = date('d/m/Y', $tsEch);
+        $echeanceSuffix = '';
+    } else {
+        $echeance = $now->modify('+14 days');
+        $echeanceStr = $echeance->format('d/m/Y');
+        $echeanceSuffix = ' (sous 14 jours)';
+    }
     $pdf->SetX(24);
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(91, 100, 120);
     $pdf->Cell(50, 6, $tr('Échéance'), 0, 0);
     $pdf->SetFont('Helvetica', 'B', 10);
     $pdf->SetTextColor(15, 21, 37);
-    $pdf->Cell(0, 6, $tr($echeance->format('d/m/Y') . ' (sous 14 jours)'), 0, 1);
+    $pdf->Cell(0, 6, $tr($echeanceStr . $echeanceSuffix), 0, 1);
 
     $pdf->SetY($startY + 51);
     $pdf->SetFont('Helvetica', '', 9);
