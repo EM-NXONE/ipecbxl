@@ -32,13 +32,13 @@ type Programme = "PAA" | "PEA";
 
 const yearsByProgramme: Record<Programme, { value: string; label: string }[]> = {
   PAA: [
-    { value: "1", label: "1ʳᵉ année" },
-    { value: "2", label: "2ᵉ année (Bac+1)" },
-    { value: "3", label: "3ᵉ année (Bac+2)" },
+    { value: "1", label: "1ʳᵉ année (BAC+1)" },
+    { value: "2", label: "2ᵉ année (BAC+2)" },
+    { value: "3", label: "3ᵉ année (BAC+3)" },
   ],
   PEA: [
-    { value: "4", label: "1ʳᵉ année — PEA1 (Bac+3)" },
-    { value: "5", label: "2ᵉ année — PEA2 (Bac+4)" },
+    { value: "4", label: "1ʳᵉ année (BAC+4)" },
+    { value: "5", label: "2ᵉ année (BAC+5)" },
   ],
 };
 
