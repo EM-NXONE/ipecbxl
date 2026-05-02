@@ -77,6 +77,34 @@ $factureFields = [
     'rentree'       => $c['rentree'],
 ];
 
+/**
+ * Tente la génération des 3 factures de scolarité après une action
+ * (mark_paid / change_statut / create_etudiant). Idempotent et silencieux :
+ *   - relit la candidature pour avoir le statut & le rattachement à jour
+ *   - n'agit que si statut=validee + facture_payee=1 + etudiant_id présent
+ *   - en cas d'exception, log mais n'interrompt pas la requête en cours
+ *
+ * @return string suffixe à concaténer au message de l'action principale
+ *                ("" si rien généré, " — 3 factures de scolarité créées." sinon)
+ */
+function try_generate_factures_scolarite(PDO $pdo, int $candidatureId, string $adminUser): string {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
+        $stmt->execute([$candidatureId]);
+        $cand = $stmt->fetch();
+        if (!$cand) return '';
+        $res = etudiant_create_factures_scolarite($pdo, $cand, $adminUser);
+        if (!empty($res['created'])) {
+            admin_log_action($candidatureId, 'create_factures_scolarite',
+                $res['count'] . ' factures (3 tranches) générées');
+            return ' Les ' . $res['count'] . ' factures de scolarité ont été générées dans l\'espace étudiant.';
+        }
+    } catch (\Throwable $e) {
+        error_log('[candidature-action] try_generate_factures_scolarite #' . $candidatureId . ' : ' . $e->getMessage());
+    }
+    return '';
+}
+
 try {
     switch ($action) {
 
@@ -105,7 +133,8 @@ try {
                            WHERE candidature_id=? AND type='frais_dossier'")
                 ->execute([$payeAt, admin_current_user(), $moyen, $id]);
             admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? '') . ' — ' . $moyen . ' le ' . substr($payeAt, 0, 10));
-            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').']);
+            $extra = try_generate_factures_scolarite($pdo, $id, admin_current_user());
+            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').' . $extra]);
         }
 
         case 'mark_unpaid': {
@@ -125,17 +154,21 @@ try {
             $pdo->prepare("UPDATE candidatures SET statut=? WHERE id=?")
                 ->execute([$newStatut, $id]);
             admin_log_action($id, 'update_statut', $c['statut'] . ' → ' . $newStatut);
-            api_json(['ok' => true, 'message' => 'Statut mis à jour : ' . ADMIN_STATUTS[$newStatut]]);
+            $extra = ($newStatut === 'validee') ? try_generate_factures_scolarite($pdo, $id, admin_current_user()) : '';
+            api_json(['ok' => true, 'message' => 'Statut mis à jour : ' . ADMIN_STATUTS[$newStatut] . $extra]);
         }
 
         case 'create_etudiant': {
             $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
             $pwd = $res['default_password'];
+            // À ce stade la candidature est rattachée à $res['etudiant_id'].
+            // Si elle est déjà acceptée ET frais payés, on génère les factures de scolarité.
+            $extra = try_generate_factures_scolarite($pdo, $id, admin_current_user());
             if ($res['deja_existant']) {
                 admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
                 api_json([
                     'ok' => true,
-                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
+                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']})." . $extra,
                     'etudiant_id' => $res['etudiant_id'],
                     'numero' => $res['numero'],
                     'default_password' => $pwd,
@@ -144,7 +177,7 @@ try {
             admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
             api_json([
                 'ok' => true,
-                'message' => "Compte étudiant créé : {$res['numero']}. Mot de passe par défaut : {$pwd}.",
+                'message' => "Compte étudiant créé : {$res['numero']}. Mot de passe par défaut : {$pwd}." . $extra,
                 'etudiant_id' => $res['etudiant_id'],
                 'numero' => $res['numero'],
                 'default_password' => $pwd,
