@@ -126,7 +126,8 @@ try {
             $pdo->prepare("UPDATE candidatures SET statut=? WHERE id=?")
                 ->execute([$newStatut, $id]);
             admin_log_action($id, 'update_statut', $c['statut'] . ' → ' . $newStatut);
-            api_json(['ok' => true, 'message' => 'Statut mis à jour : ' . ADMIN_STATUTS[$newStatut]]);
+            $extra = ($newStatut === 'validee') ? try_generate_factures_scolarite($pdo, $id, admin_current_user()) : '';
+            api_json(['ok' => true, 'message' => 'Statut mis à jour : ' . ADMIN_STATUTS[$newStatut] . $extra]);
         }
 
         case 'create_etudiant': {
