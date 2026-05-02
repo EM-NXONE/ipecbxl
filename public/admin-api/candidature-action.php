@@ -133,11 +133,14 @@ try {
         case 'create_etudiant': {
             $res = etudiant_create_from_candidature($pdo, $c, admin_current_user());
             $pwd = $res['default_password'];
+            // À ce stade la candidature est rattachée à $res['etudiant_id'].
+            // Si elle est déjà acceptée ET frais payés, on génère les factures de scolarité.
+            $extra = try_generate_factures_scolarite($pdo, $id, admin_current_user());
             if ($res['deja_existant']) {
                 admin_log_action($id, 'link_etudiant', 'Étudiant #' . $res['etudiant_id'] . ' (' . $res['numero'] . ')');
                 api_json([
                     'ok' => true,
-                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']}).",
+                    'message' => "Compte existant pour {$c['prenom']} {$c['nom']} — candidature rattachée ({$res['numero']})." . $extra,
                     'etudiant_id' => $res['etudiant_id'],
                     'numero' => $res['numero'],
                     'default_password' => $pwd,
@@ -146,7 +149,7 @@ try {
             admin_log_action($id, 'create_etudiant', '#' . $res['etudiant_id'] . ' ' . $res['numero']);
             api_json([
                 'ok' => true,
-                'message' => "Compte étudiant créé : {$res['numero']}. Mot de passe par défaut : {$pwd}.",
+                'message' => "Compte étudiant créé : {$res['numero']}. Mot de passe par défaut : {$pwd}." . $extra,
                 'etudiant_id' => $res['etudiant_id'],
                 'numero' => $res['numero'],
                 'default_password' => $pwd,
