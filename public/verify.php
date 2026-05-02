@@ -281,9 +281,35 @@ $hasSpec = $specialisationRaw !== ''
 
 $docTypeLabels = [
     'candidature' => 'Confirmation de candidature',
-    'facture'     => 'Facture — frais de dossier',
+    'facture'     => 'Facture',
     'recu'        => 'Reçu de paiement',
+    'document'    => 'Document officiel IPEC',
 ];
+
+// Affiner le libellé selon le sous-type
+$documentLabel = $docTypeLabels[$docType] ?? $docType;
+if ($docType === 'facture') {
+    $ftype = $factureType ?? '';
+    if ($ftype === 'frais_dossier') {
+        $documentLabel = 'Facture — frais de dossier';
+    } elseif ($ftype === 'scolarite') {
+        $documentLabel = 'Facture — frais de scolarité';
+    } elseif (!empty($factureLibelle)) {
+        $documentLabel = 'Facture — ' . $factureLibelle;
+    } else {
+        // Frais de dossier historiques (table candidatures.facture_numero)
+        $documentLabel = 'Facture — frais de dossier';
+    }
+} elseif ($docType === 'document') {
+    $tpl = $documentTemplate ?? '';
+    if ($tpl === 'preadmission') {
+        $documentLabel = 'Lettre de préadmission';
+    } elseif ($tpl === 'recap_candidature') {
+        $documentLabel = 'Récapitulatif de candidature';
+    } elseif (!empty($documentTitre)) {
+        $documentLabel = $documentTitre;
+    }
+}
 
 echo json_encode([
     'valid'             => true,
