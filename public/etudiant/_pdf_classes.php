@@ -205,7 +205,7 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
 
         $p("Nous vous prions de croire, " . $civAccord . ", en l'expression de nos salutations distinguées.");
 
-        $pdf->Ln(6);
+        $pdf->Ln(4);
         $pdf->SetFont('Helvetica', 'B', 11);
         $pdf->Cell(0, 6, $tr("Le Service des admissions"), 0, 1);
         $pdf->SetFont('Helvetica', 'I', 10);
