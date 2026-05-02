@@ -105,7 +105,8 @@ try {
                            WHERE candidature_id=? AND type='frais_dossier'")
                 ->execute([$payeAt, admin_current_user(), $moyen, $id]);
             admin_log_action($id, 'mark_paid', 'Facture ' . ($c['facture_numero'] ?? '') . ' — ' . $moyen . ' le ' . substr($payeAt, 0, 10));
-            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').']);
+            $extra = try_generate_factures_scolarite($pdo, $id, admin_current_user());
+            api_json(['ok' => true, 'message' => 'Facture marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').' . $extra]);
         }
 
         case 'mark_unpaid': {
