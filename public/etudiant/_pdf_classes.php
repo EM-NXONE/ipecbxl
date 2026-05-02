@@ -165,8 +165,8 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf->SetTextColor(27, 31, 42);
 
         $p = function (string $text) use ($pdf, $tr) {
-            $pdf->MultiCell(0, 6, $tr($text));
-            $pdf->Ln(2);
+            $pdf->MultiCell(0, 5.5, $tr($text));
+            $pdf->Ln(1.5);
         };
 
         $p($civAccord . ',');
