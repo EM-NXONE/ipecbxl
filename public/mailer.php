@@ -913,7 +913,18 @@ function buildFacturePdf(array $f): array {
     $iban = 'BE53 3770 8630 2553';
     $bic  = 'BBRUBEBB';
 
-    $montant = 400.00;
+    // Montant : priorité au champ explicite (centimes), sinon fallback 400 € (frais de dossier).
+    $montant = isset($f['montant_ttc_cents']) && (int)$f['montant_ttc_cents'] > 0
+        ? ((int)$f['montant_ttc_cents']) / 100
+        : 400.00;
+    // Libellé / description : priorité aux valeurs passées (factures de scolarité),
+    // sinon fallback historique "Frais de dossier IPEC".
+    $libelleFacture     = trim((string)($f['libelle'] ?? ''));
+    $descriptionFacture = trim((string)($f['description'] ?? ''));
+    // Taux TVA explicite si fourni (sinon 21 % par défaut).
+    $tauxTvaFacture     = isset($f['tva_taux']) ? (float)$f['tva_taux'] : 0.21;
+    // Échéance : si fournie en YYYY-MM-DD, on l'utilise telle quelle, sinon +14j.
+    $dateEcheanceRaw    = trim((string)($f['date_echeance'] ?? ''));
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'facture';
