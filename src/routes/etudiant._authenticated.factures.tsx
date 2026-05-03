@@ -1,11 +1,9 @@
 /**
  * /etudiant/factures — liste complète des factures + KPIs + téléchargement PDF.
- * Affiche le statut de paiement avec, le cas échéant, la date de paiement,
- * le moyen et la référence encodés par l'admin.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { etuApi, etuUrl } from "@/lib/api";
 import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
 
@@ -19,9 +17,6 @@ interface Facture {
   numero: string;
   type: string;
   libelle: string;
-  description?: string | null;
-  montant_ht_cents?: number;
-  tva_taux?: string | number | null;
   montant_ttc_cents: number;
   devise: string;
   date_emission: string;
@@ -35,39 +30,21 @@ interface Facture {
 interface Resp {
   factures: Facture[];
   kpis?: { total_du_cents: number; total_paye_cents: number; count: number };
-  // Rétro-compat ancien shape
   totaux?: { du_cents: number; paye_cents: number; count: number };
 }
 
 const MOYEN_LABELS: Record<string, string> = {
-  virement: "Virement bancaire",
-  cb: "Carte bancaire",
-  carte: "Carte bancaire",
+  virement: "Virement",
+  cb: "Carte",
+  carte: "Carte",
   especes: "Espèces",
   cheque: "Chèque",
   autre: "Autre",
 };
 
 function moyenLabel(m?: string | null): string {
-  if (!m) return "";
-  const key = m.toLowerCase();
-  return MOYEN_LABELS[key] ?? m;
-}
-
-/** Texte secondaire "Payée le X par virement (réf …)" si applicable. */
-function paiementInfo(f: Facture): string | null {
-  if (f.statut_paiement === "payee" || f.statut_paiement === "partiellement_payee") {
-    const parts: string[] = [];
-    if (f.paye_at) parts.push(`Payée le ${formatDate(f.paye_at)}`);
-    const m = moyenLabel(f.moyen_paiement);
-    if (m) parts.push(`par ${m}`);
-    if (f.reference_paiement) parts.push(`réf. ${f.reference_paiement}`);
-    return parts.length ? parts.join(" · ") : null;
-  }
-  if (f.statut_paiement === "en_attente" && f.date_echeance) {
-    return `Échéance ${formatDate(f.date_echeance)}`;
-  }
-  return null;
+  if (!m) return "—";
+  return MOYEN_LABELS[m.toLowerCase()] ?? m;
 }
 
 function EtudiantFacturesPage() {
@@ -78,7 +55,6 @@ function EtudiantFacturesPage() {
     etuApi.get<Resp>("/factures.php").then(setData).catch((e) => setError(e.message));
   }, []);
 
-  // Tolérance : accepte le nouveau shape `kpis` ou l'ancien `totaux`.
   const totalDu = data?.kpis?.total_du_cents ?? data?.totaux?.du_cents;
   const totalPaye = data?.kpis?.total_paye_cents ?? data?.totaux?.paye_cents;
   const count = data?.kpis?.count ?? data?.totaux?.count ?? data?.factures.length;
@@ -86,9 +62,15 @@ function EtudiantFacturesPage() {
   return (
     <div>
       <h1 className="font-display text-3xl text-cream mb-2">Mes factures</h1>
-      <p className="text-sm text-muted-foreground mb-8">Toutes les factures émises par l'IPEC à ton nom.</p>
+      <p className="text-sm text-muted-foreground mb-8">
+        Toutes les factures émises par l'IPEC à ton nom.
+      </p>
 
-      {error && <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-4 mb-8">
         <Kpi label="Total dû" value={totalDu !== undefined ? formatMoneyCents(totalDu) : "—"} />
@@ -106,49 +88,49 @@ function EtudiantFacturesPage() {
             {/* Tableau (desktop) */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
+                <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                   <tr>
-                    <th className="text-left px-4 py-3">Numéro</th>
-                    <th className="text-left px-4 py-3">Libellé</th>
-                    <th className="text-left px-4 py-3">Émise le</th>
-                    <th className="text-right px-4 py-3">Montant</th>
-                    <th className="text-left px-4 py-3">Statut</th>
-                    <th className="px-4 py-3"></th>
+                    <th className="text-left font-medium px-4 py-3">Numéro</th>
+                    <th className="text-left font-medium px-4 py-3">Libellé</th>
+                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
+                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
+                    <th className="text-right font-medium px-4 py-3">Montant</th>
+                    <th className="text-left font-medium px-4 py-3">Statut</th>
+                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Payée le</th>
+                    <th className="text-left font-medium px-4 py-3">Moyen</th>
+                    <th className="text-right font-medium px-4 py-3">Documents</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
                   {data.factures.map((f) => {
                     const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
-                    const info = paiementInfo(f);
+                    const paid = f.statut_paiement === "payee";
                     return (
-                      <tr key={f.id} className="hover:bg-secondary/20 align-top">
+                      <tr key={f.id} className="hover:bg-secondary/20">
                         <td className="px-4 py-3 font-mono text-xs text-cream whitespace-nowrap">{f.numero}</td>
-                        <td className="px-4 py-3 text-cream">
-                          <div>{f.libelle}</div>
-                          {f.description && (
-                            <div className="text-xs text-muted-foreground mt-0.5">{f.description}</div>
-                          )}
-                        </td>
+                        <td className="px-4 py-3 text-cream">{f.libelle}</td>
                         <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
-                        <td className="px-4 py-3 text-right font-medium text-cream whitespace-nowrap">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
-                        <td className="px-4 py-3">
-                          <Badge tone={s.tone}>{s.label}</Badge>
-                          {info && (
-                            <div className="text-xs text-muted-foreground mt-1">{info}</div>
-                          )}
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
+                        <td className="px-4 py-3 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
+                        <td className="px-4 py-3"><Badge tone={s.tone}>{s.label}</Badge></td>
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                          {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
                         </td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex flex-col items-end gap-1">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-3">
                             <a
                               href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-                              className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
+                              className="inline-flex items-center gap-1 text-xs text-blue hover:underline"
+                              title="Télécharger la facture"
                             >
-                              <Download size={12} /> Facture
+                              <FileText size={12} /> Facture
                             </a>
-                            {f.statut_paiement === "payee" && (
+                            {paid && (
                               <a
                                 href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
-                                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline"
+                                className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline"
+                                title="Télécharger le reçu"
                               >
                                 <Download size={12} /> Reçu
                               </a>
@@ -166,7 +148,7 @@ function EtudiantFacturesPage() {
             <ul className="md:hidden divide-y divide-border/30">
               {data.factures.map((f) => {
                 const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
-                const info = paiementInfo(f);
+                const paid = f.statut_paiement === "payee";
                 return (
                   <li key={f.id} className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
@@ -175,23 +157,28 @@ function EtudiantFacturesPage() {
                         <div className="font-mono text-[11px] text-muted-foreground">{f.numero}</div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="text-cream font-medium">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</div>
+                        <div className="text-cream font-medium tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</div>
                         <div className="text-[11px] text-muted-foreground">{formatDate(f.date_emission)}</div>
                       </div>
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <Badge tone={s.tone}>{s.label}</Badge>
-                        {info && <div className="text-[11px] text-muted-foreground mt-1">{info}</div>}
+                        {f.date_echeance && !paid && (
+                          <div className="text-[11px] text-muted-foreground mt-1">Échéance {formatDate(f.date_echeance)}</div>
+                        )}
+                        {paid && f.paye_at && (
+                          <div className="text-[11px] text-muted-foreground mt-1">Payée le {formatDate(f.paye_at)} · {moyenLabel(f.moyen_paiement)}</div>
+                        )}
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
                         <a
                           href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
                           className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
                         >
-                          <Download size={12} /> Facture
+                          <FileText size={12} /> Facture
                         </a>
-                        {f.statut_paiement === "payee" && (
+                        {paid && (
                           <a
                             href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
                             className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline"
@@ -216,12 +203,13 @@ function Kpi({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-card border border-border/40 rounded-md p-4">
       <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{label}</div>
-      <div className="font-display text-2xl text-cream">{value}</div>
+      <div className="font-display text-2xl text-cream tabular-nums">{value}</div>
     </div>
   );
 }
+
 function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "ok" | "muted" }) {
-  const cls = tone === "ok" ? "bg-green-500/10 text-green-400 border-green-500/30"
+  const cls = tone === "ok" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
     : tone === "warn" ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
     : "bg-muted/30 text-muted-foreground border-border/40";
   return <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border ${cls}`}>{children}</span>;
