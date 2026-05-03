@@ -6,7 +6,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatMoneyCents } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/_authenticated/")({
   component: AdminDashboardPage,
@@ -18,10 +18,27 @@ interface Kpis {
   recue: number;
   en_cours: number;
   validee: number;
+  refusee: number;
   payees: number;
   non_payees: number;
   recent_7j: number;
   etudiants: number;
+  cat_candidats: number;
+  cat_preadmis: number;
+  cat_etudiants: number;
+}
+interface Paiements {
+  total_factures: number;
+  nb_payees: number;
+  nb_attente: number;
+  nb_partielles: number;
+  nb_retard: number;
+  encaisse_cents: number;
+  attendu_cents: number;
+  retard_cents: number;
+  encaisse_30j_cents: number;
+  frais_dossier_cents: number;
+  scolarite_cents: number;
 }
 interface LastCandidature {
   id: number;
@@ -37,6 +54,7 @@ interface LastCandidature {
 }
 interface DashboardData {
   kpis: Kpis;
+  paiements: Paiements;
   last_candidatures: LastCandidature[];
 }
 
@@ -70,16 +88,35 @@ function AdminDashboardPage() {
 
       {data && (
         <>
+          <h2 className="font-display text-lg text-cream mb-3">Candidatures & comptes</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             <Kpi label="Candidatures" value={data.kpis.total} />
             <Kpi label="7 derniers jours" value={data.kpis.recent_7j} accent />
             <Kpi label="Reçues" value={data.kpis.recue} />
             <Kpi label="En cours" value={data.kpis.en_cours} />
             <Kpi label="Validées" value={data.kpis.validee} />
-            <Kpi label="Frais payés" value={data.kpis.payees} />
-            <Kpi label="Frais en attente" value={data.kpis.non_payees} />
-            <Kpi label="Étudiants" value={data.kpis.etudiants} />
+            <Kpi label="Candidats" value={data.kpis.cat_candidats} />
+            <Kpi label="Préadmis" value={data.kpis.cat_preadmis} />
+            <Kpi label="Étudiants" value={data.kpis.cat_etudiants} />
           </div>
+
+          <h2 className="font-display text-lg text-cream mb-3">Paiements</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <KpiMoney label="Encaissé (total)" value={data.paiements.encaisse_cents} accent />
+            <KpiMoney label="Encaissé (30 j)" value={data.paiements.encaisse_30j_cents} />
+            <KpiMoney label="En attente" value={data.paiements.attendu_cents} tone="warn" />
+            <KpiMoney label="En retard" value={data.paiements.retard_cents} tone="danger" />
+            <Kpi label="Factures payées" value={data.paiements.nb_payees} />
+            <Kpi label="Factures en attente" value={data.paiements.nb_attente} />
+            <Kpi label="Factures en retard" value={data.paiements.nb_retard} />
+            <Kpi label="Total factures" value={data.paiements.total_factures} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+            <KpiMoney label="Frais de dossier encaissés" value={data.paiements.frais_dossier_cents} />
+            <KpiMoney label="Scolarité encaissée" value={data.paiements.scolarite_cents} />
+          </div>
+
 
           <section>
             <div className="flex items-center justify-between mb-3">
@@ -148,6 +185,25 @@ function AdminDashboardPage() {
           </section>
         </>
       )}
+    </div>
+  );
+}
+
+function KpiMoney({ label, value, accent, tone }: { label: string; value: number; accent?: boolean; tone?: "warn" | "danger" }) {
+  const valueClass =
+    tone === "danger" ? "text-destructive"
+    : tone === "warn" ? "text-amber-400"
+    : accent ? "text-blue"
+    : "text-cream";
+  const borderClass =
+    tone === "danger" ? "border-destructive/40"
+    : tone === "warn" ? "border-amber-500/40"
+    : accent ? "border-blue/40"
+    : "border-border/40";
+  return (
+    <div className={`bg-card border rounded-md p-4 ${borderClass}`}>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
+      <div className={`font-display text-2xl ${valueClass}`}>{formatMoneyCents(value)}</div>
     </div>
   );
 }
