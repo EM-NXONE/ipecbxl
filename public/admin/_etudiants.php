@@ -74,6 +74,102 @@ function etudiant_create_token(PDO $pdo, int $etudiantId, string $type = 'reset_
  *
  * @return array{etudiant_id:int, numero:string, default_password:string, deja_existant:bool}
  */
+/**
+ * Crée (idempotent) un compte étudiant minimal au moment de la SOUMISSION
+ * d'une candidature. Le compte démarre en categorie='candidat' avec le mot
+ * de passe par défaut "Student1" (l'étudiant pourra le changer ensuite).
+ *
+ * Si un compte existe déjà pour cette identité civile, on le rattache à la
+ * candidature SANS écraser sa catégorie ni son mot de passe.
+ *
+ * Pensé pour être appelé depuis mailer.php juste après l'INSERT INTO
+ * candidatures. NE doit PAS faire échouer la soumission en cas d'erreur :
+ * l'appelant capture les exceptions.
+ *
+ * @return array{etudiant_id:int, numero:string, deja_existant:bool}
+ */
+function etudiant_create_minimal_for_candidature(PDO $pdo, int $candidatureId, array $candidature): array {
+    if (trim((string)($candidature['prenom'] ?? '')) === ''
+        || trim((string)($candidature['nom'] ?? '')) === ''
+        || trim((string)($candidature['date_naissance'] ?? '')) === '') {
+        throw new RuntimeException("Identité incomplète (prénom/nom/date_naissance) pour créer le compte candidat.");
+    }
+    $email = trim(strtolower((string)($candidature['email'] ?? '')));
+    if ($email === '') throw new RuntimeException("E-mail manquant pour créer le compte candidat.");
+
+    $existing = etudiant_find_by_identity($pdo, (string)$candidature['prenom'], (string)$candidature['nom'], (string)$candidature['date_naissance']);
+    if ($existing) {
+        $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
+            ->execute([(int)$existing['id'], $candidatureId]);
+        return [
+            'etudiant_id'   => (int)$existing['id'],
+            'numero'        => (string)$existing['numero_etudiant'],
+            'deja_existant' => true,
+        ];
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $numero = etudiant_generate_numero($pdo);
+        $hash   = password_hash(ETU_DEFAULT_PASSWORD, PASSWORD_BCRYPT);
+        $stmt = $pdo->prepare(
+            "INSERT INTO etudiants
+                (email, password_hash, email_verifie,
+                 civilite, prenom, nom, date_naissance, nationalite, telephone,
+                 numero_etudiant, statut, categorie, cree_par_admin)
+             VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?, 'actif', 'candidat', ?)"
+        );
+        $stmt->execute([
+            $email, $hash,
+            $candidature['civilite']       ?: null,
+            $candidature['prenom'],
+            $candidature['nom'],
+            $candidature['date_naissance'] ?: null,
+            $candidature['nationalite']    ?: null,
+            $candidature['telephone']      ?: null,
+            $numero,
+            'auto:soumission',
+        ]);
+        $etuId = (int)$pdo->lastInsertId();
+        $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
+            ->execute([$etuId, $candidatureId]);
+        $pdo->commit();
+        return ['etudiant_id' => $etuId, 'numero' => $numero, 'deja_existant' => false];
+    } catch (\Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+}
+
+/**
+ * Met à jour la catégorie d'un étudiant (candidat → preadmis → etudiant),
+ * uniquement vers une catégorie "supérieure" (jamais de retour arrière auto).
+ */
+function etudiant_set_categorie(PDO $pdo, int $etudiantId, string $newCategorie): void {
+    $order = ['candidat' => 1, 'preadmis' => 2, 'etudiant' => 3];
+    if (!isset($order[$newCategorie])) return;
+    $stmt = $pdo->prepare("SELECT categorie FROM etudiants WHERE id = ?");
+    $stmt->execute([$etudiantId]);
+    $cur = (string)($stmt->fetchColumn() ?: 'candidat');
+    if (($order[$cur] ?? 0) >= $order[$newCategorie]) return;
+    $pdo->prepare("UPDATE etudiants SET categorie = ? WHERE id = ?")
+        ->execute([$newCategorie, $etudiantId]);
+}
+
+/**
+ * Promeut un étudiant en categorie='etudiant' si au moins une facture de
+ * scolarité (n'importe quelle tranche, généralement la T1) est marquée payée.
+ * Idempotent.
+ */
+function etudiant_promote_if_scolarite_paid(PDO $pdo, int $etudiantId): bool {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM factures
+                            WHERE etudiant_id = ? AND type = 'scolarite' AND statut_paiement = 'payee'");
+    $stmt->execute([$etudiantId]);
+    if ((int)$stmt->fetchColumn() <= 0) return false;
+    etudiant_set_categorie($pdo, $etudiantId, 'etudiant');
+    return true;
+}
+
 function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $adminUser): array {
     $email = trim(strtolower((string)$candidature['email']));
     if ($email === '') {
