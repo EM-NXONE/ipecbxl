@@ -52,9 +52,21 @@ $countStmt->execute($params);
 $total = (int)$countStmt->fetchColumn();
 $pages = max(1, (int)ceil($total / $perPage));
 
-$sql = "SELECT candidatures.id, reference, statut, prenom, nom, email, programme, annee, specialisation,
-               annee_academique, facture_numero, facture_payee, facture_payee_at,
-               etudiant_id, candidatures.created_at
+$sql = "SELECT candidatures.id,
+               candidatures.reference,
+               candidatures.statut,
+               candidatures.prenom,
+               candidatures.nom,
+               candidatures.email,
+               candidatures.programme,
+               candidatures.annee,
+               candidatures.specialisation,
+               candidatures.annee_academique,
+               candidatures.facture_numero,
+               candidatures.facture_payee,
+               candidatures.facture_payee_at,
+               candidatures.etudiant_id,
+               candidatures.created_at
         FROM candidatures
         $joinSql
         $whereSql
