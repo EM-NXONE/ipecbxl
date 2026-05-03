@@ -47,7 +47,6 @@ function EtudiantDocumentsPage() {
                   <th className="text-left px-4 py-3">Référence</th>
                   <th className="text-left px-4 py-3">Titre</th>
                   <th className="text-left px-4 py-3">Émis le</th>
-                  <th className="text-left px-4 py-3">Valide jusqu'au</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -60,7 +59,6 @@ function EtudiantDocumentsPage() {
                       {d.description && <div className="text-xs text-muted-foreground">{d.description}</div>}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{formatDate(d.date_emission)}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{formatDate(d.valide_jusqu_au)}</td>
                     <td className="px-4 py-3 text-right">
                       <a
                         href={etuUrl(`/telecharger.php?type=document&id=${d.id}`)}

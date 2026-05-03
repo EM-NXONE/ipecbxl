@@ -560,7 +560,7 @@ function etudiant_create_document_preadmission(PDO $pdo, array $candidature, str
     )->execute([
         $ref, $etuId, $candId,
         'Lettre de préadmission IPEC',
-        "Avis favorable de la Commission pédagogique. Inscription définitive sous réserve du paiement de la 1ʳᵉ tranche des frais de scolarité.",
+        "Avis favorable — sous réserve du paiement de la 1ʳᵉ tranche.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
     ]);
