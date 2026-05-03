@@ -90,7 +90,7 @@ function EtudiantFacturesPage() {
               <table className="w-full text-sm">
                 <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                   <tr>
-                    <th className="text-left font-medium px-4 py-3">Numéro</th>
+                    <th className="text-left font-medium px-4 py-3">Facture</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
                     <th className="text-right font-medium px-4 py-3">Montant</th>
