@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { KeyRound, Search } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { adminApi } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 
