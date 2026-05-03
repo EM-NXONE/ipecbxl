@@ -14,6 +14,24 @@ export const Route = createFileRoute("/admin/_authenticated/candidatures/$id")({
   head: () => ({ meta: [{ title: "IPEC | Détail candidature" }] }),
 });
 
+interface FactureRow {
+  id: number;
+  numero: string;
+  type: "frais_dossier" | "scolarite" | string;
+  libelle: string | null;
+  description: string | null;
+  montant_ttc_cents: number;
+  tva_taux: number | string | null;
+  devise: string | null;
+  date_emission: string | null;
+  date_echeance: string | null;
+  statut_paiement: "en_attente" | "payee" | string;
+  paye_at: string | null;
+  moyen_paiement: string | null;
+  paye_par_admin: string | null;
+  reference_paiement: string | null;
+}
+
 interface Detail {
   candidature: Record<string, unknown> & {
     id: number; reference: string; statut: string; prenom: string; nom: string;
@@ -29,6 +47,7 @@ interface Detail {
   };
   etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number; statut: string } | null;
   homonyme: { id: number; numero_etudiant: string; prenom: string; nom: string; date_naissance: string } | null;
+  factures: FactureRow[];
   historique: { id: number; action: string; detail: string | null; admin_user: string | null; created_at: string }[];
   statuts: Record<string, string>;
 }
