@@ -504,6 +504,10 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
         error_log('[etudiant_create_factures_scolarite] preadmission doc failed: ' . $e->getMessage());
     }
 
+    // Promotion catégorie : candidat → preadmis (factures scolarité émises)
+    try { etudiant_set_categorie($pdo, $etuId, 'preadmis'); }
+    catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] set_categorie failed: ' . $e->getMessage()); }
+
     return ['created' => true, 'count' => count($tranches)];
 }
 
