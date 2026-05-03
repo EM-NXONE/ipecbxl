@@ -52,11 +52,29 @@ try {
 
             // Si c'est la facture des frais de dossier, on synchronise aussi
             // la candidature (pour l'historique + déclencheur factures scolarité).
+            $preadmisCreated = '';
             if (($f['type'] ?? '') === 'frais_dossier' && $candidatureId > 0) {
                 $pdo->prepare("UPDATE candidatures
                                SET facture_payee=1, facture_payee_at=?, facture_payee_par=?
                                WHERE id=?")
                     ->execute([$payeAt, admin_current_user(), $candidatureId]);
+                // Tente de générer les 3 factures de scolarité (et promotion en 'preadmis')
+                // si la candidature est aussi en statut 'validee' et rattachée à un étudiant.
+                try {
+                    $cs = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
+                    $cs->execute([$candidatureId]);
+                    $cand = $cs->fetch();
+                    if ($cand) {
+                        $res = etudiant_create_factures_scolarite($pdo, $cand, admin_current_user());
+                        if (!empty($res['created'])) {
+                            $preadmisCreated = ' Compte promu en « préadmis » — ' . $res['count'] . ' factures de scolarité créées.';
+                            admin_log_action($candidatureId, 'create_factures_scolarite',
+                                $res['count'] . ' factures (3 tranches) générées');
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    error_log('[facture-action] generate scolarite #' . $candidatureId . ' : ' . $e->getMessage());
+                }
             }
 
             // Si c'est une facture de scolarité → promotion en 'etudiant'
@@ -66,6 +84,7 @@ try {
             }
 
             $msg = 'Facture ' . ($f['numero'] ?? '') . ' marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').';
+            if ($preadmisCreated) $msg .= $preadmisCreated;
             if ($promoted) $msg .= ' Compte promu en « étudiant ».';
 
             if ($candidatureId > 0) {
