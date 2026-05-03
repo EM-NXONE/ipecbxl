@@ -141,6 +141,28 @@ try {
         echo $out; exit;
     }
 
+    // Template "preadmission" → lettre formelle IPEC (en-tête + pied identiques aux autres docs)
+    if ($d['template'] === 'preadmission' && function_exists('buildPreadmissionPdf')) {
+        $data['reference_doc']    = $data['reference_doc']    ?? $d['reference'];
+        $data['date_emission']    = $data['date_emission']    ?? $d['date_emission'];
+        $data['civilite']         = $data['civilite']         ?? $d['civilite'];
+        $data['prenom']           = $data['prenom']           ?? $d['prenom'];
+        $data['nom']              = $data['nom']              ?? $d['nom'];
+        $data['email']            = $data['email']            ?? $d['email'];
+        $data['numero_etudiant']  = $data['numero_etudiant']  ?? $d['numero_etudiant'];
+
+        $out = buildPreadmissionPdf($data);
+        if ($out === '') throw new RuntimeException('PDF vide.');
+        $pdo->prepare("UPDATE documents SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                       nb_telechargements = nb_telechargements + 1 WHERE id = ?")->execute([$id]);
+        etu_log_action((int)$user['id'], 'download_doc', 'Document ' . $d['reference']);
+        $filename = etu_safe_filename('preadmission', $d['reference']);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
+
     // Fallback générique (autres documents) — repris à l'identique de l'ancien telecharger.php
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
