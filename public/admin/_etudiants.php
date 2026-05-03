@@ -209,11 +209,8 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
             "INSERT INTO etudiants
                 (email, password_hash, email_verifie,
                  civilite, prenom, nom, date_naissance, nationalite, telephone,
-                 numero_etudiant, statut, cree_par_admin)
+                 numero_etudiant, statut, categorie, cree_par_admin)
              VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'actif', 'etudiant', ?)"
-            // categorie='etudiant' : création manuelle admin = compte plein.
-            // (la colonne categorie est insérée après statut — cf. migration v4)
-            // Note : pour conserver l'ordre des paramètres, on injecte la valeur en dur dans la requête.
         );
         $stmt->execute([
             $email,
