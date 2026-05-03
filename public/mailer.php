@@ -1675,8 +1675,29 @@ HTML;
                         'telephone'      => $telephone,
                         'nationalite'    => $nationalite,
                     ];
-                    etudiant_create_minimal_for_candidature($pdo, $candidatureDbId, $candForEtu);
-                }
+                    $res = etudiant_create_minimal_for_candidature($pdo, $candidatureDbId, $candForEtu);
+                    // Synchronise facture frais de dossier 400 € + récap candidature
+                    if (!empty($res['etudiant_id']) && function_exists('etudiant_sync_documents_historiques')) {
+                        $candFull = $candForEtu + [
+                            'id'             => $candidatureDbId,
+                            'reference'      => $candidatureReference,
+                            'facture_numero' => $factureReference,
+                            'facture_payee'  => 0,
+                            'created_at'     => date('Y-m-d H:i:s'),
+                            'rue'            => $rue,
+                            'numero'         => $numero,
+                            'code_postal'    => $codePostal,
+                            'ville'          => $ville,
+                            'pays_residence' => $paysResidence,
+                            'programme'      => $programme,
+                            'annee'          => $annee,
+                            'specialisation' => $specialisation,
+                            'rentree'        => $rentree,
+                            'message'        => $message,
+                            'ip'             => $ip,
+                        ];
+                        etudiant_sync_documents_historiques($pdo, (int)$res['etudiant_id'], $candFull, 'auto:soumission');
+                    }
             }
         } catch (\Throwable $autoErr) {
             error_log('[mailer.php] Auto-création compte étudiant échouée : ' . $autoErr->getMessage());
