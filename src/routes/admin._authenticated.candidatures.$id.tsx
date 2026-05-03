@@ -160,29 +160,39 @@ function AdminCandidatureDetailPage() {
             </Card>
           )}
 
-          <Card title="Historique">
-            {data.historique.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucune action enregistrée.</p>
-            ) : (
-              <ul className="space-y-2 text-sm">
-                {data.historique.map((h) => (
-                  <li key={h.id} className="flex flex-wrap gap-2 border-b border-border/20 pb-2 last:border-b-0 last:pb-0">
-                    <span className="font-mono text-xs text-blue">{h.action}</span>
-                    {h.detail && <span className="text-muted-foreground">{h.detail}</span>}
-                    <span className="text-muted-foreground text-xs ml-auto">
-                      {h.admin_user || "—"} · {formatDateTime(h.created_at)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
           <FacturesCard
             factures={data.factures || []}
             onDone={(m) => { setMsg(m); reload(); }}
             onError={setError}
           />
+
+          <details className="bg-card border border-border/40 rounded-md group">
+            <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between hover:bg-secondary/20 select-none">
+              <span className="font-display text-base text-cream">Historique</span>
+              <span className="text-xs text-muted-foreground">
+                {data.historique.length} entrée{data.historique.length > 1 ? "s" : ""}
+                <span className="ml-2 text-blue group-open:hidden">Afficher ▾</span>
+                <span className="ml-2 text-blue hidden group-open:inline">Masquer ▴</span>
+              </span>
+            </summary>
+            <div className="px-5 pb-5 pt-0 border-t border-border/30">
+              {data.historique.length === 0 ? (
+                <p className="text-sm text-muted-foreground pt-4">Aucune action enregistrée.</p>
+              ) : (
+                <ul className="space-y-2 text-sm pt-4">
+                  {data.historique.map((h) => (
+                    <li key={h.id} className="flex flex-wrap gap-2 border-b border-border/20 pb-2 last:border-b-0 last:pb-0">
+                      <span className="font-mono text-xs text-blue">{h.action}</span>
+                      {h.detail && <span className="text-muted-foreground">{h.detail}</span>}
+                      <span className="text-muted-foreground text-xs ml-auto">
+                        {h.admin_user || "—"} · {formatDateTime(h.created_at)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </details>
         </div>
 
         {/* ====================== PANNEAU OPÉRATIONNEL ====================== */}
