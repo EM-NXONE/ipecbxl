@@ -210,7 +210,7 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
                 (email, password_hash, email_verifie,
                  civilite, prenom, nom, date_naissance, nationalite, telephone,
                  numero_etudiant, statut, categorie, cree_par_admin)
-             VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'actif', 'etudiant', ?)"
+             VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 'actif', 'candidat', ?)"
         );
         $stmt->execute([
             $email,
