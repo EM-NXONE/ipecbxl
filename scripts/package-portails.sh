@@ -285,6 +285,25 @@ echo "==> packages/lms.zip OK"
 fi
 
 ls -lh "$DIST"
+
+# ---------------------------------------------------------------------------
+# Extraction automatique des ZIP dans packages/<nom>/ pour inspection / upload
+# ---------------------------------------------------------------------------
+extract_zip() {
+    local name="$1"
+    local zip="$DIST/$name.zip"
+    local out="$DIST/$name"
+    [ -f "$zip" ] || return 0
+    echo "==> Extraction de $name.zip dans packages/$name/"
+    rm -rf "$out"
+    mkdir -p "$out"
+    (cd "$out" && unzip -oq "$zip")
+}
+
+should_build site  && extract_zip site  || true
+should_build admin && extract_zip admin || true
+should_build lms   && extract_zip lms   || true
+
 echo
 echo "Prochaines étapes manuelles sur n0c :"
 echo "  1) site.zip  → public_html/                          (www.ipec.school)"
