@@ -4,7 +4,6 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
 import { formatDateTime, formatMoneyCents } from "@/lib/format";
 
@@ -135,7 +134,7 @@ function AdminDashboardPage() {
                     <th className="text-left px-4 py-2.5">Statut</th>
                     <th className="text-left px-4 py-2.5 hidden sm:table-cell">Frais</th>
                     <th className="text-left px-4 py-2.5 hidden lg:table-cell">Reçue le</th>
-                    <th className="text-left px-4 py-2.5">Actions</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -160,24 +159,10 @@ function AdminDashboardPage() {
                         )}
                       </td>
                       <td className="px-4 py-2.5 hidden lg:table-cell text-muted-foreground text-xs">{formatDateTime(c.created_at)}</td>
-                      <td className="px-4 py-2.5">
-                        <AdminCandidatureActions
-                          id={c.id}
-                          paid={c.facture_payee}
-                          hasEtudiant={Boolean(c.etudiant_id)}
-                          compact
-                          onDone={(res) => {
-                            setError(null);
-                            setMsg(adminActionMessage(res));
-                            setRefreshKey((v) => v + 1);
-                          }}
-                          onError={(message) => { setMsg(null); setError(message); }}
-                        />
-                      </td>
                     </tr>
                   ))}
                   {data.last_candidatures.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground text-sm">Aucune candidature pour le moment.</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground text-sm">Aucune candidature pour le moment.</td></tr>
                   )}
                 </tbody>
               </table>
