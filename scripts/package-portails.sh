@@ -278,8 +278,8 @@ RewriteCond %{REQUEST_URI} !^/etudiant(/|$)
 RewriteCond %{REQUEST_URI} !^/api(/|$)
 RewriteRule ^ /etudiant/login [R=301,L]
 
-# Fallback SPA : tout /etudiant/* → index.html
-RewriteRule ^etudiant(/.*)?$ index.html [L]
+# Fallback SPA : tout /etudiant/* → shell prerendé du login étudiant
+RewriteRule ^etudiant(/.*)?$ /etudiant/login/index.html [L]
 HT
 cat > "$LMS/robots.txt" <<'RT'
 User-agent: *
