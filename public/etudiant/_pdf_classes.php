@@ -115,38 +115,56 @@ if (!function_exists('buildPreadmissionPdf') && class_exists('IpecCandidaturePdf
         $pdf->docKind = 'document';
         $pdf->reference = $refDoc;
         $pdf->SetMargins(20, 20, 20);
-        $pdf->SetAutoPageBreak(true, 28);
+        $pdf->SetAutoPageBreak(true, 30);
+        $pdf->SetTitle($tr("Lettre de préadmission IPEC"));
+        $pdf->SetAuthor($tr("IPEC — Institut Privé des Études Commerciales"));
+        $pdf->SetCreator('www.ipec.school');
         $pdf->AddPage();
 
-        // ---- En-tête : bandeau IPEC ----
-        $pdf->SetFont('Helvetica', 'B', 22);
-        $pdf->SetTextColor(27, 31, 42);
-        $pdf->Cell(0, 10, $tr('IPEC'), 0, 1);
-        $pdf->SetFont('Helvetica', '', 9);
-        $pdf->SetTextColor(91, 100, 120);
-        $pdf->Cell(0, 4, $tr("Institut Privé des Études Commerciales"), 0, 1);
-        $pdf->Cell(0, 4, $tr("Service des admissions"), 0, 1);
-        $pdf->Ln(6);
-        $pdf->SetDrawColor(220, 226, 240);
-        $pdf->SetLineWidth(0.3);
-        $pdf->Line(20, $pdf->GetY(), 190, $pdf->GetY());
-        $pdf->Ln(8);
+        // ===== EN-TÊTE (identique candidature/facture) =====
+        $logoPath = __DIR__ . '/ipec-logo-email.png';
+        if (is_file($logoPath)) {
+            try { $pdf->Image($logoPath, 20, 15, 18, 18); }
+            catch (\Throwable $e) { /* ignore */ }
+        }
+        $pdf->SetXY(41, 19);
+        $pdf->SetFont('Times', '', 18);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 7, $tr('IPEC'), 0, 2);
+        $pdf->SetX(41);
+        $pdf->SetFont('Helvetica', '', 6);
+        $pdf->SetTextColor(120, 130, 150);
+        $subtitle = 'INSTITUT PRIVÉ DES ÉTUDES COMMERCIALES';
+        $spaced   = implode(' ', preg_split('//u', $subtitle, -1, PREG_SPLIT_NO_EMPTY));
+        $pdf->Cell(0, 4, $tr($spaced), 0, 2);
 
-        // ---- Bloc référence + date ----
+        // Bloc identification document (à droite)
+        $pdf->SetXY(120, 20);
+        $pdf->SetFont('Helvetica', 'B', 13);
+        $pdf->SetTextColor(44, 93, 219);
+        $pdf->Cell(70, 7, $tr('PRÉADMISSION'), 0, 2, 'R');
+        $pdf->SetX(120);
         $pdf->SetFont('Helvetica', '', 9);
         $pdf->SetTextColor(91, 100, 120);
-        $pdf->Cell(0, 5, $tr('Bruxelles, le ' . $emis), 0, 1, 'R');
         if ($refDoc !== '') {
-            $pdf->Cell(0, 5, $tr('Référence document : ' . $refDoc), 0, 1, 'R');
+            $pdf->Cell(70, 5, $tr('N° ' . $refDoc), 0, 2, 'R');
+            $pdf->SetX(120);
         }
+        $pdf->Cell(70, 5, $tr('Date : ' . $emis), 0, 2, 'R');
         if ($refCand !== '') {
-            $pdf->Cell(0, 5, $tr('Référence candidature : ' . $refCand), 0, 1, 'R');
+            $pdf->SetX(120);
+            $pdf->Cell(70, 5, $tr('Réf. cand. : ' . $refCand), 0, 2, 'R');
         }
-        $pdf->Ln(6);
+
+        $pdf->SetY(40);
+        $pdf->SetDrawColor(44, 93, 219);
+        $pdf->SetLineWidth(0.6);
+        $pdf->Line(20, 40, 190, 40);
+        $pdf->Ln(10);
 
         // ---- Destinataire ----
         $pdf->SetFont('Helvetica', 'B', 11);
-        $pdf->SetTextColor(27, 31, 42);
+        $pdf->SetTextColor(15, 21, 37);
         $pdf->Cell(0, 6, $tr($fullName), 0, 1);
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->SetTextColor(91, 100, 120);
