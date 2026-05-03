@@ -137,7 +137,7 @@ function etu_current(): ?array {
     $stmt = $pdo->prepare(
         "SELECT s.id AS session_token,
                 e.id, e.email, e.prenom, e.nom, e.civilite, e.numero_etudiant,
-                e.statut, e.password_hash
+                e.statut, e.categorie, e.password_hash
          FROM etudiant_sessions s
          INNER JOIN etudiants e ON e.id = s.etudiant_id
          WHERE s.id = ? AND s.expires_at > NOW() LIMIT 1"
@@ -161,6 +161,7 @@ function etu_current(): ?array {
         'nom'             => (string)$row['nom'],
         'civilite'        => (string)($row['civilite'] ?? ''),
         'numero_etudiant' => (string)($row['numero_etudiant'] ?? ''),
+        'categorie'       => (string)($row['categorie'] ?? 'candidat'),
         'session_token'   => (string)$token,
     ];
 }
