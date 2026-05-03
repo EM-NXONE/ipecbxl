@@ -165,8 +165,11 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
-restrict_portal_root "$ADMIN" "admin assets _build index.html favicon.ico favicon.svg"
+restrict_portal_root "$ADMIN" "admin assets _build favicon.ico favicon.svg"
 purge_portal_subdir "$ADMIN/admin"
+# IMPORTANT : pas d'index.html racine (sinon le fallback SPA servirait
+# la home prerendée du site vitrine — flash visible au refresh).
+rm -f "$ADMIN/index.html"
 
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
@@ -206,8 +209,9 @@ RewriteCond %{REQUEST_URI} !^/admin(/|$)
 RewriteCond %{REQUEST_URI} !^/api(/|$)
 RewriteRule ^ /admin/login [R=301,L]
 
-# Fallback SPA : tout /admin/* → index.html
-RewriteRule ^admin(/.*)?$ index.html [L]
+# Fallback SPA : tout /admin/* → shell prerendé du login admin
+# (jamais l'index.html racine du site vitrine, qui n'existe plus ici)
+RewriteRule ^admin(/.*)?$ /admin/login/index.html [L]
 HT
 cat > "$ADMIN/robots.txt" <<'RT'
 User-agent: *
@@ -233,8 +237,10 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$LMS" "index 404 200" "$forbid"
 
-restrict_portal_root "$LMS" "etudiant assets _build index.html favicon.ico favicon.svg"
+restrict_portal_root "$LMS" "etudiant assets _build favicon.ico favicon.svg"
 purge_portal_subdir "$LMS/etudiant"
+# IMPORTANT : pas d'index.html racine (anti-flash site vitrine).
+rm -f "$LMS/index.html"
 
 mkdir -p "$LMS/api/_shared"
 cp "$PUB/etudiant-api/"*.php "$LMS/api/"
@@ -272,8 +278,8 @@ RewriteCond %{REQUEST_URI} !^/etudiant(/|$)
 RewriteCond %{REQUEST_URI} !^/api(/|$)
 RewriteRule ^ /etudiant/login [R=301,L]
 
-# Fallback SPA : tout /etudiant/* → index.html
-RewriteRule ^etudiant(/.*)?$ index.html [L]
+# Fallback SPA : tout /etudiant/* → shell prerendé du login étudiant
+RewriteRule ^etudiant(/.*)?$ /etudiant/login/index.html [L]
 HT
 cat > "$LMS/robots.txt" <<'RT'
 User-agent: *
