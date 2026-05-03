@@ -1698,6 +1698,7 @@ HTML;
                         ];
                         etudiant_sync_documents_historiques($pdo, (int)$res['etudiant_id'], $candFull, 'auto:soumission');
                     }
+                }
             }
         } catch (\Throwable $autoErr) {
             error_log('[mailer.php] Auto-création compte étudiant échouée : ' . $autoErr->getMessage());
