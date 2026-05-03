@@ -6,7 +6,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatMoneyCents } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/_authenticated/")({
   component: AdminDashboardPage,
@@ -18,10 +18,27 @@ interface Kpis {
   recue: number;
   en_cours: number;
   validee: number;
+  refusee: number;
   payees: number;
   non_payees: number;
   recent_7j: number;
   etudiants: number;
+  cat_candidats: number;
+  cat_preadmis: number;
+  cat_etudiants: number;
+}
+interface Paiements {
+  total_factures: number;
+  nb_payees: number;
+  nb_attente: number;
+  nb_partielles: number;
+  nb_retard: number;
+  encaisse_cents: number;
+  attendu_cents: number;
+  retard_cents: number;
+  encaisse_30j_cents: number;
+  frais_dossier_cents: number;
+  scolarite_cents: number;
 }
 interface LastCandidature {
   id: number;
@@ -37,6 +54,7 @@ interface LastCandidature {
 }
 interface DashboardData {
   kpis: Kpis;
+  paiements: Paiements;
   last_candidatures: LastCandidature[];
 }
 
