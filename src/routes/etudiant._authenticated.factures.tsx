@@ -90,7 +90,7 @@ function EtudiantFacturesPage() {
               <table className="w-full text-sm">
                 <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                   <tr>
-                    <th className="text-left font-medium px-4 py-3">Numéro</th>
+                    <th className="text-left font-medium px-4 py-3">Facture</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
                     <th className="text-right font-medium px-4 py-3">Montant</th>
@@ -185,42 +185,40 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "
 
 function FactureRows({ f, paid, statut }: { f: Facture; paid: boolean; statut: { label: string; tone: "warn" | "ok" | "muted" } }) {
   return (
-    <>
-      <tr className="hover:bg-secondary/20 border-t border-border/30">
-        <td className="px-4 pt-3 pb-1 font-mono text-xs text-cream whitespace-nowrap">{f.numero}</td>
-        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
-        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
-        <td className="px-4 pt-3 pb-1 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
-        <td className="px-4 pt-3 pb-1"><Badge tone={statut.tone}>{statut.label}</Badge></td>
-        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
-        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">
-          {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
-        </td>
-        <td className="px-4 pt-3 pb-1">
-          <div className="flex items-center justify-end gap-3">
+    <tr className="hover:bg-secondary/20 border-t border-border/30 align-middle">
+      <td className="px-4 py-4 min-w-[260px]">
+        <div className="text-cream text-[13px] leading-snug font-medium">{f.libelle}</div>
+        <div className="font-mono text-[11px] text-muted-foreground mt-0.5 tracking-tight">{f.numero}</div>
+      </td>
+      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
+      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
+      <td className="px-4 py-4 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
+      <td className="px-4 py-4"><Badge tone={statut.tone}>{statut.label}</Badge></td>
+      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
+      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">
+        {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
+      </td>
+      <td className="px-4 py-4">
+        <div className="flex items-center justify-end gap-3">
+          <a
+            href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
+            className="inline-flex items-center gap-1 text-xs text-blue hover:underline"
+            title="Télécharger la facture"
+          >
+            <FileText size={12} /> Facture
+          </a>
+          {paid && (
             <a
-              href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-              className="inline-flex items-center gap-1 text-xs text-blue hover:underline"
-              title="Télécharger la facture"
+              href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
+              className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline"
+              title="Télécharger le reçu"
             >
-              <FileText size={12} /> Facture
+              <Download size={12} /> Reçu
             </a>
-            {paid && (
-              <a
-                href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
-                className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline"
-                title="Télécharger le reçu"
-              >
-                <Download size={12} /> Reçu
-              </a>
-            )}
-          </div>
-        </td>
-      </tr>
-      <tr className="hover:bg-secondary/20 border-b border-border/30">
-        <td className="px-4 pt-0 pb-3" />
-        <td colSpan={7} className="px-4 pt-0 pb-3 text-cream text-[13px]">{f.libelle}</td>
-      </tr>
-    </>
+          )}
+        </div>
+      </td>
+    </tr>
   );
 }
+
