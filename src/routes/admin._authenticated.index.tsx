@@ -4,7 +4,6 @@
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
 import { adminApi } from "@/lib/api";
 import { formatDateTime, formatMoneyCents } from "@/lib/format";
 
