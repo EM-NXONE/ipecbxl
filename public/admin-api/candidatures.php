@@ -12,6 +12,8 @@ admin_require_db();
 $q       = trim((string)($_GET['q'] ?? ''));
 $statut  = (string)($_GET['statut'] ?? '');
 $payee   = (string)($_GET['payee'] ?? '');
+// vue : 'actives' (défaut, exclut refusee/annulee) | 'refuses' (uniquement refusee+annulee) | 'all'
+$vue     = (string)($_GET['vue'] ?? 'actives');
 $page    = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(100, (int)($_GET['perPage'] ?? 30)));
 $offset  = ($page - 1) * $perPage;
@@ -26,9 +28,15 @@ if ($statut !== '' && isset(ADMIN_STATUTS[$statut])) {
     $where[] = 'statut = :statut';
     $params[':statut'] = $statut;
 }
+if ($vue === 'refuses') {
+    $where[] = "statut IN ('refusee','annulee')";
+} elseif ($vue === 'actives') {
+    $where[] = "statut NOT IN ('refusee','annulee')";
+}
 if ($payee === '1') $where[] = 'facture_payee = 1';
 elseif ($payee === '0') $where[] = 'facture_payee = 0';
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
 
 $pdo = db();
 $countStmt = $pdo->prepare("SELECT COUNT(*) FROM candidatures $whereSql");
