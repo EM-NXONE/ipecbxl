@@ -88,16 +88,35 @@ function AdminDashboardPage() {
 
       {data && (
         <>
+          <h2 className="font-display text-lg text-cream mb-3">Candidatures & comptes</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             <Kpi label="Candidatures" value={data.kpis.total} />
             <Kpi label="7 derniers jours" value={data.kpis.recent_7j} accent />
             <Kpi label="Reçues" value={data.kpis.recue} />
             <Kpi label="En cours" value={data.kpis.en_cours} />
             <Kpi label="Validées" value={data.kpis.validee} />
-            <Kpi label="Frais payés" value={data.kpis.payees} />
-            <Kpi label="Frais en attente" value={data.kpis.non_payees} />
-            <Kpi label="Étudiants" value={data.kpis.etudiants} />
+            <Kpi label="Candidats" value={data.kpis.cat_candidats} />
+            <Kpi label="Préadmis" value={data.kpis.cat_preadmis} />
+            <Kpi label="Étudiants" value={data.kpis.cat_etudiants} />
           </div>
+
+          <h2 className="font-display text-lg text-cream mb-3">Paiements</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <KpiMoney label="Encaissé (total)" value={data.paiements.encaisse_cents} accent />
+            <KpiMoney label="Encaissé (30 j)" value={data.paiements.encaisse_30j_cents} />
+            <KpiMoney label="En attente" value={data.paiements.attendu_cents} tone="warn" />
+            <KpiMoney label="En retard" value={data.paiements.retard_cents} tone="danger" />
+            <Kpi label="Factures payées" value={data.paiements.nb_payees} />
+            <Kpi label="Factures en attente" value={data.paiements.nb_attente} />
+            <Kpi label="Factures en retard" value={data.paiements.nb_retard} />
+            <Kpi label="Total factures" value={data.paiements.total_factures} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+            <KpiMoney label="Frais de dossier encaissés" value={data.paiements.frais_dossier_cents} />
+            <KpiMoney label="Scolarité encaissée" value={data.paiements.scolarite_cents} />
+          </div>
+
 
           <section>
             <div className="flex items-center justify-between mb-3">
