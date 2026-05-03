@@ -189,6 +189,25 @@ function AdminDashboardPage() {
   );
 }
 
+function KpiMoney({ label, value, accent, tone }: { label: string; value: number; accent?: boolean; tone?: "warn" | "danger" }) {
+  const valueClass =
+    tone === "danger" ? "text-destructive"
+    : tone === "warn" ? "text-amber-400"
+    : accent ? "text-blue"
+    : "text-cream";
+  const borderClass =
+    tone === "danger" ? "border-destructive/40"
+    : tone === "warn" ? "border-amber-500/40"
+    : accent ? "border-blue/40"
+    : "border-border/40";
+  return (
+    <div className={`bg-card border rounded-md p-4 ${borderClass}`}>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
+      <div className={`font-display text-2xl ${valueClass}`}>{formatMoneyCents(value)}</div>
+    </div>
+  );
+}
+
 function Kpi({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div className={`bg-card border rounded-md p-4 ${accent ? "border-blue/40" : "border-border/40"}`}>
