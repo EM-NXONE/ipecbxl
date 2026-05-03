@@ -85,13 +85,12 @@ function EtudiantFacturesPage() {
           <div className="p-8 text-sm text-muted-foreground">Aucune facture pour l'instant.</div>
         ) : (
           <>
-            {/* Tableau (desktop) */}
+            {/* Tableau (desktop) — chaque facture = 2 lignes : infos puis libellé */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
                   <tr>
                     <th className="text-left font-medium px-4 py-3">Numéro</th>
-                    <th className="text-left font-medium px-4 py-3">Libellé</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
                     <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
                     <th className="text-right font-medium px-4 py-3">Montant</th>
@@ -101,43 +100,12 @@ function EtudiantFacturesPage() {
                     <th className="text-right font-medium px-4 py-3">Documents</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30">
+                <tbody>
                   {data.factures.map((f) => {
                     const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
                     const paid = f.statut_paiement === "payee";
                     return (
-                      <tr key={f.id} className="hover:bg-secondary/20">
-                        <td className="px-4 py-3 font-mono text-xs text-cream whitespace-nowrap">{f.numero}</td>
-                        <td className="px-4 py-3 text-cream">{f.libelle}</td>
-                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
-                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
-                        <td className="px-4 py-3 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
-                        <td className="px-4 py-3"><Badge tone={s.tone}>{s.label}</Badge></td>
-                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
-                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                          {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-end gap-3">
-                            <a
-                              href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-                              className="inline-flex items-center gap-1 text-xs text-blue hover:underline"
-                              title="Télécharger la facture"
-                            >
-                              <FileText size={12} /> Facture
-                            </a>
-                            {paid && (
-                              <a
-                                href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
-                                className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline"
-                                title="Télécharger le reçu"
-                              >
-                                <Download size={12} /> Reçu
-                              </a>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
+                      <FactureRows key={f.id} f={f} paid={paid} statut={s} />
                     );
                   })}
                 </tbody>
@@ -213,4 +181,46 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "
     : tone === "warn" ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
     : "bg-muted/30 text-muted-foreground border-border/40";
   return <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border ${cls}`}>{children}</span>;
+}
+
+function FactureRows({ f, paid, statut }: { f: Facture; paid: boolean; statut: { label: string; tone: "warn" | "ok" | "muted" } }) {
+  return (
+    <>
+      <tr className="hover:bg-secondary/20 border-t border-border/30">
+        <td className="px-4 pt-3 pb-1 font-mono text-xs text-cream whitespace-nowrap">{f.numero}</td>
+        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
+        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
+        <td className="px-4 pt-3 pb-1 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
+        <td className="px-4 pt-3 pb-1"><Badge tone={statut.tone}>{statut.label}</Badge></td>
+        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
+        <td className="px-4 pt-3 pb-1 text-muted-foreground whitespace-nowrap">
+          {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
+        </td>
+        <td className="px-4 pt-3 pb-1">
+          <div className="flex items-center justify-end gap-3">
+            <a
+              href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
+              className="inline-flex items-center gap-1 text-xs text-blue hover:underline"
+              title="Télécharger la facture"
+            >
+              <FileText size={12} /> Facture
+            </a>
+            {paid && (
+              <a
+                href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
+                className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline"
+                title="Télécharger le reçu"
+              >
+                <Download size={12} /> Reçu
+              </a>
+            )}
+          </div>
+        </td>
+      </tr>
+      <tr className="hover:bg-secondary/20 border-b border-border/30">
+        <td className="px-4 pt-0 pb-3" />
+        <td colSpan={7} className="px-4 pt-0 pb-3 text-cream text-[13px]">{f.libelle}</td>
+      </tr>
+    </>
+  );
 }
