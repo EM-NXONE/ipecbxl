@@ -138,9 +138,15 @@ export function ComptesTable({
               const active = Boolean(Number(e.active));
               return (
                 <tr key={e.id} className="border-b border-border/20 hover:bg-secondary/30">
-                  <td className="px-4 py-2.5 font-mono text-xs text-blue">{e.numero_etudiant}</td>
+                  <td className="px-4 py-2.5 font-mono text-xs">
+                    <Link to="/admin/etudiants/$numero" params={{ numero: e.numero_etudiant }} className="text-blue hover:underline">
+                      {e.numero_etudiant}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2.5 text-cream">
-                    {e.prenom} {e.nom}
+                    <Link to="/admin/etudiants/$numero" params={{ numero: e.numero_etudiant }} className="hover:text-blue">
+                      {e.prenom} {e.nom}
+                    </Link>
                     <div className="text-xs text-muted-foreground">{e.email}</div>
                   </td>
                   {showCategorie && (
