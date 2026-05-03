@@ -37,6 +37,14 @@ if ($payee === '1') $where[] = 'facture_payee = 1';
 elseif ($payee === '0') $where[] = 'facture_payee = 0';
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
+// Pour la vue 'actives' : exclure aussi les candidats déjà passés en preadmis/etudiant
+$joinSql = '';
+if ($vue === 'actives') {
+    $joinSql = "LEFT JOIN etudiants e ON e.id = candidatures.etudiant_id";
+    $extra = "(e.categorie IS NULL OR e.categorie = 'candidat')";
+    $whereSql .= ($whereSql ? ' AND ' : 'WHERE ') . $extra;
+}
+
 
 $pdo = db();
 $countStmt = $pdo->prepare("SELECT COUNT(*) FROM candidatures $whereSql");
