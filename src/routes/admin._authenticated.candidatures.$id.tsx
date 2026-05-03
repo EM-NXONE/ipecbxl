@@ -178,14 +178,11 @@ function AdminCandidatureDetailPage() {
             )}
           </Card>
 
-          <Card title="Traçabilité">
-            <Field label="ID interne" value={c.id} />
-            <Field label="Référence" value={<span className="font-mono text-blue">{c.reference}</span>} />
-            <Field label="Créée le" value={formatDateTime(c.created_at)} />
-            <Field label="Modifiée le" value={c.updated_at ? formatDateTime(c.updated_at) : "—"} />
-            <Field label="IP" value={c.ip || "—"} />
-            <Field label="Navigateur" value={<span className="break-all text-xs">{c.user_agent || "—"}</span>} />
-          </Card>
+          <FacturesCard
+            factures={data.factures || []}
+            onDone={(m) => { setMsg(m); reload(); }}
+            onError={setError}
+          />
         </div>
 
         {/* ====================== PANNEAU OPÉRATIONNEL ====================== */}
@@ -213,76 +210,8 @@ function AdminCandidatureDetailPage() {
             </div>
           </Card>
 
-          <Card title="Frais de dossier">
-            <dl className="space-y-1.5 text-sm mb-4">
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-28 shrink-0">Statut</dt>
-                <dd>
-                  {paid
-                    ? <span className="text-emerald-400">✓ Payés</span>
-                    : <span className="text-amber-400">En attente</span>}
-                </dd>
-              </div>
-              {c.facture_numero && (
-                <div className="flex gap-2">
-                  <dt className="text-muted-foreground w-28 shrink-0">N° facture</dt>
-                  <dd className="font-mono text-xs text-cream break-all">{c.facture_numero}</dd>
-                </div>
-              )}
-              {paid && c.facture_payee_at && (
-                <div className="flex gap-2">
-                  <dt className="text-muted-foreground w-28 shrink-0">Payé le</dt>
-                  <dd className="text-cream">{formatDateTime(c.facture_payee_at)}</dd>
-                </div>
-              )}
-              {paid && c.moyen_paiement && (
-                <div className="flex gap-2">
-                  <dt className="text-muted-foreground w-28 shrink-0">Moyen</dt>
-                  <dd className="text-cream">{moyenLabel(c.moyen_paiement)}</dd>
-                </div>
-              )}
-              {paid && c.facture_payee_par && (
-                <div className="flex gap-2">
-                  <dt className="text-muted-foreground w-28 shrink-0">Validé par</dt>
-                  <dd className="text-cream">{c.facture_payee_par}</dd>
-                </div>
-              )}
-              <div className="flex gap-2">
-                <dt className="text-muted-foreground w-28 shrink-0">Montant</dt>
-                <dd className="text-cream">400,00 €</dd>
-              </div>
-            </dl>
-
-            <AdminCandidatureActions
-              id={id}
-              paid={paid}
-              hasEtudiant={Boolean(data.etudiant || c.etudiant_id)}
-              scope="payment"
-              currentMoyen={c.moyen_paiement}
-              currentDate={c.facture_payee_at}
-              onDone={(res) => { setMsg(adminActionMessage(res)); reload(); }}
-              onError={setError}
-            />
-
-            <div className="mt-4 pt-4 border-t border-border/40 flex flex-col gap-2">
-              <a
-                href={adminUrl(`/candidature-pdf.php?id=${id}&kind=facture`)}
-                target="_blank" rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-border/40 text-sm text-cream hover:border-blue/40"
-              >
-                <Download size={14} /> Facture PDF
-              </a>
-              {paid && (
-                <a
-                  href={adminUrl(`/candidature-pdf.php?id=${id}&kind=recu`)}
-                  target="_blank" rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-sm border border-emerald-500/40 text-sm text-emerald-300 hover:border-emerald-500/70"
-                >
-                  <Download size={14} /> Reçu de paiement
-                </a>
-              )}
-            </div>
-          </Card>
+          {/* Le détail / actions des factures (frais + scolarité) sont gérés
+              dans le carton « Factures » de la colonne principale. */}
 
           <Card title="Compte étudiant">
             {data.etudiant ? (() => {
