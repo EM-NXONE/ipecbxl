@@ -344,3 +344,223 @@ function moyenLabel(v: string | null | undefined): string {
   if (!v) return "—";
   return MOYEN_LABELS[v] ?? v;
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  frais_dossier: "Frais de dossier",
+  scolarite: "Scolarité",
+};
+
+function formatMontantCents(cents: number, devise: string | null = "EUR"): string {
+  const v = (cents || 0) / 100;
+  return v.toLocaleString("fr-BE", { style: "currency", currency: devise || "EUR" });
+}
+
+function FacturesCard({
+  factures,
+  onDone,
+  onError,
+}: {
+  factures: FactureRow[];
+  onDone: (msg: string) => void;
+  onError: (msg: string) => void;
+}) {
+  const [busy, setBusy] = useState<number | null>(null);
+  const [showPay, setShowPay] = useState<{ id: number; edit: boolean } | null>(null);
+  const [moyen, setMoyen] = useState("virement");
+  const [datePaiement, setDatePaiement] = useState<string>(() => new Date().toISOString().slice(0, 10));
+
+  const openPay = (f: FactureRow, edit: boolean) => {
+    setMoyen(edit && f.moyen_paiement ? f.moyen_paiement : "virement");
+    setDatePaiement(
+      edit && f.paye_at ? f.paye_at.slice(0, 10) : new Date().toISOString().slice(0, 10),
+    );
+    setShowPay({ id: f.id, edit });
+  };
+
+  const runAction = async (id: number, action: string, body?: Record<string, unknown>) => {
+    setBusy(id);
+    try {
+      const res = await adminApi.post<{ message?: string }>("/facture-action.php", {
+        id, action, ...body,
+      });
+      onDone(res.message || "Action effectuée.");
+      setShowPay(null);
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "Échec de l'action.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (!factures.length) {
+    return (
+      <Card title="Factures">
+        <p className="text-sm text-muted-foreground">
+          Aucune facture pour ce candidat. Les factures de scolarité sont générées
+          automatiquement lorsque la candidature est validée et que les frais de
+          dossier sont marqués payés.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <Card title={`Factures (${factures.length})`}>
+      <ul className="divide-y divide-border/20 -my-2">
+        {factures.map((f) => {
+          const paid = f.statut_paiement === "payee";
+          return (
+            <li key={f.id} className="py-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border border-border/40 text-muted-foreground">
+                      {TYPE_LABELS[f.type] ?? f.type}
+                    </span>
+                    {paid ? (
+                      <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+                        ✓ Payée
+                      </span>
+                    ) : (
+                      <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-amber-500/10 text-amber-300 border-amber-500/30">
+                        En attente
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-cream font-medium truncate">
+                    {f.libelle || "—"}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono break-all">
+                    {f.numero}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 space-x-3">
+                    {f.date_echeance && <span>Échéance : {formatDate(f.date_echeance)}</span>}
+                    {paid && f.paye_at && <span>Payée le {formatDate(f.paye_at)}</span>}
+                    {paid && f.moyen_paiement && <span>· {moyenLabel(f.moyen_paiement)}</span>}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-cream font-medium">
+                    {formatMontantCents(f.montant_ttc_cents, f.devise)}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">TTC</div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=facture`)}
+                  target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40"
+                >
+                  <Download size={12} /> Facture PDF
+                </a>
+                {paid && (
+                  <a
+                    href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=recu`)}
+                    target="_blank" rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-emerald-500/40 text-xs text-emerald-300 hover:border-emerald-500/70"
+                  >
+                    <Download size={12} /> Reçu
+                  </a>
+                )}
+                {!paid ? (
+                  <button
+                    onClick={() => openPay(f, false)}
+                    disabled={busy === f.id}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-blue/40 text-xs text-blue hover:bg-blue/10 disabled:opacity-50"
+                  >
+                    <CheckCircle2 size={12} /> Marquer payée
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => openPay(f, true)}
+                      disabled={busy === f.id}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50"
+                    >
+                      Éditer
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!confirm("Annuler ce paiement ? La facture repassera en attente.")) return;
+                        runAction(f.id, "mark_unpaid");
+                      }}
+                      disabled={busy === f.id}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-amber-500/40 text-xs text-amber-300 hover:bg-amber-500/10 disabled:opacity-50"
+                    >
+                      Annuler paiement
+                    </button>
+                  </>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {showPay && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setShowPay(null)}
+        >
+          <div
+            className="bg-card border border-border/40 rounded-md p-6 w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-lg text-cream mb-4">
+              {showPay.edit ? "Modifier le paiement" : "Marquer la facture comme payée"}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Moyen de paiement
+                </label>
+                <select
+                  value={moyen}
+                  onChange={(e) => setMoyen(e.target.value)}
+                  className="w-full px-3 py-2 bg-input/40 border border-border rounded-sm text-cream text-sm"
+                >
+                  <option value="virement">Virement bancaire</option>
+                  <option value="carte">Carte bancaire</option>
+                  <option value="especes">Espèces</option>
+                  <option value="cheque">Chèque</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Date du paiement
+                </label>
+                <input
+                  type="date"
+                  value={datePaiement}
+                  onChange={(e) => setDatePaiement(e.target.value)}
+                  className="w-full px-3 py-2 bg-input/40 border border-border rounded-sm text-cream text-sm"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setShowPay(null)}
+                  className="px-3 py-2 rounded-sm border border-border/40 text-sm text-muted-foreground hover:text-cream"
+                >
+                  Annuler
+                </button>
+                <button
+                  disabled={busy === showPay.id}
+                  onClick={() => runAction(showPay.id, "mark_paid", {
+                    moyen_paiement: moyen,
+                    date_paiement: datePaiement,
+                  })}
+                  className="px-3 py-2 rounded-sm bg-gradient-blue text-ink text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                >
+                  {busy === showPay.id ? "…" : "Confirmer"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
