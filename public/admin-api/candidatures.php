@@ -21,20 +21,20 @@ $offset  = ($page - 1) * $perPage;
 $where  = [];
 $params = [];
 if ($q !== '') {
-    $where[] = '(prenom LIKE :q OR nom LIKE :q OR email LIKE :q OR reference LIKE :q OR facture_numero LIKE :q)';
+    $where[] = '(candidatures.prenom LIKE :q OR candidatures.nom LIKE :q OR candidatures.email LIKE :q OR candidatures.reference LIKE :q OR candidatures.facture_numero LIKE :q)';
     $params[':q'] = '%' . $q . '%';
 }
 if ($statut !== '' && isset(ADMIN_STATUTS[$statut])) {
-    $where[] = 'statut = :statut';
+    $where[] = 'candidatures.statut = :statut';
     $params[':statut'] = $statut;
 }
 if ($vue === 'refuses') {
-    $where[] = "statut IN ('refusee','annulee')";
+    $where[] = "candidatures.statut IN ('refusee','annulee')";
 } elseif ($vue === 'actives') {
-    $where[] = "statut NOT IN ('refusee','annulee')";
+    $where[] = "candidatures.statut NOT IN ('refusee','annulee')";
 }
-if ($payee === '1') $where[] = 'facture_payee = 1';
-elseif ($payee === '0') $where[] = 'facture_payee = 0';
+if ($payee === '1') $where[] = 'candidatures.facture_payee = 1';
+elseif ($payee === '0') $where[] = 'candidatures.facture_payee = 0';
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // Pour la vue 'actives' : exclure aussi les candidats déjà passés en preadmis/etudiant
