@@ -1656,6 +1656,31 @@ HTML;
             ':user_agent'       => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
         ]);
         $candidatureDbId = (int)$pdo->lastInsertId();
+
+        // ---- Auto-création du compte étudiant (catégorie='candidat') ---------
+        // Le candidat reçoit un mot de passe par défaut "Student1" et peut
+        // se connecter immédiatement à son espace pour suivre son dossier.
+        // Non bloquant : toute exception est loggée mais n'empêche pas l'envoi.
+        try {
+            $etuLib = __DIR__ . '/_etudiants.php';
+            if (is_file($etuLib)) {
+                require_once $etuLib;
+                if (function_exists('etudiant_create_minimal_for_candidature')) {
+                    $candForEtu = [
+                        'prenom'         => $prenom,
+                        'nom'            => $nom,
+                        'date_naissance' => $dateNaissance,
+                        'civilite'       => $civilite,
+                        'email'          => $email,
+                        'telephone'      => $telephone,
+                        'nationalite'    => $nationalite,
+                    ];
+                    etudiant_create_minimal_for_candidature($pdo, $candidatureDbId, $candForEtu);
+                }
+            }
+        } catch (\Throwable $autoErr) {
+            error_log('[mailer.php] Auto-création compte étudiant échouée : ' . $autoErr->getMessage());
+        }
     } catch (\Throwable $dbErr) {
         $candidatureDbError = $dbErr->getMessage();
         error_log('[mailer.php] INSERT candidature échoué : ' . $candidatureDbError);
