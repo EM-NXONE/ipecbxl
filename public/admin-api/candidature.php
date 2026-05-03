@@ -63,6 +63,15 @@ if (!$etudiant) {
     }
 }
 
+// Factures de scolarité (si générées)
+$sStmt = $pdo->prepare("SELECT id, numero, libelle, montant_ttc_cents, date_emission,
+                               date_echeance, statut_paiement, paye_at, moyen_paiement
+                        FROM factures
+                        WHERE candidature_id = ? AND type = 'scolarite'
+                        ORDER BY date_echeance ASC, id ASC");
+$sStmt->execute([$id]);
+$facturesScolarite = $sStmt->fetchAll();
+
 // Historique
 $histStmt = $pdo->prepare(
     "SELECT id, action, detail, admin_user, ip, created_at
@@ -72,9 +81,10 @@ $histStmt = $pdo->prepare(
 $histStmt->execute([$id]);
 
 api_json([
-    'candidature' => $cand,
-    'etudiant'    => $etudiant,
-    'homonyme'    => $homonyme,
-    'historique'  => $histStmt->fetchAll(),
-    'statuts'     => ADMIN_STATUTS,
+    'candidature'         => $cand,
+    'etudiant'            => $etudiant,
+    'homonyme'            => $homonyme,
+    'factures_scolarite'  => $facturesScolarite,
+    'historique'          => $histStmt->fetchAll(),
+    'statuts'             => ADMIN_STATUTS,
 ]);

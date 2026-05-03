@@ -1656,6 +1656,53 @@ HTML;
             ':user_agent'       => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
         ]);
         $candidatureDbId = (int)$pdo->lastInsertId();
+
+        // ---- Auto-création du compte étudiant (catégorie='candidat') ---------
+        // Le candidat reçoit un mot de passe par défaut "Student1" et peut
+        // se connecter immédiatement à son espace pour suivre son dossier.
+        // Non bloquant : toute exception est loggée mais n'empêche pas l'envoi.
+        try {
+            $etuLib = __DIR__ . '/_etudiants.php';
+            if (is_file($etuLib)) {
+                require_once $etuLib;
+                if (function_exists('etudiant_create_minimal_for_candidature')) {
+                    $candForEtu = [
+                        'prenom'         => $prenom,
+                        'nom'            => $nom,
+                        'date_naissance' => $dateNaissance,
+                        'civilite'       => $civilite,
+                        'email'          => $email,
+                        'telephone'      => $telephone,
+                        'nationalite'    => $nationalite,
+                    ];
+                    $res = etudiant_create_minimal_for_candidature($pdo, $candidatureDbId, $candForEtu);
+                    // Synchronise facture frais de dossier 400 € + récap candidature
+                    if (!empty($res['etudiant_id']) && function_exists('etudiant_sync_documents_historiques')) {
+                        $candFull = $candForEtu + [
+                            'id'             => $candidatureDbId,
+                            'reference'      => $candidatureReference,
+                            'facture_numero' => $factureReference,
+                            'facture_payee'  => 0,
+                            'created_at'     => date('Y-m-d H:i:s'),
+                            'rue'            => $rue,
+                            'numero'         => $numero,
+                            'code_postal'    => $codePostal,
+                            'ville'          => $ville,
+                            'pays_residence' => $paysResidence,
+                            'programme'      => $programme,
+                            'annee'          => $annee,
+                            'specialisation' => $specialisation,
+                            'rentree'        => $rentree,
+                            'message'        => $message,
+                            'ip'             => $ip,
+                        ];
+                        etudiant_sync_documents_historiques($pdo, (int)$res['etudiant_id'], $candFull, 'auto:soumission');
+                    }
+                }
+            }
+        } catch (\Throwable $autoErr) {
+            error_log('[mailer.php] Auto-création compte étudiant échouée : ' . $autoErr->getMessage());
+        }
     } catch (\Throwable $dbErr) {
         $candidatureDbError = $dbErr->getMessage();
         error_log('[mailer.php] INSERT candidature échoué : ' . $candidatureDbError);

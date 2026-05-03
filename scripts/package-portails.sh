@@ -128,6 +128,7 @@ cp "$PUB/db_config.php"     "$SITE/"
 cp "$PUB/verify.php"        "$SITE/"
 cp "$PUB/_pdf_classes.php"  "$SITE/"
 cp "$PUB/_shared/cors.php"  "$SITE/"
+cp "$PUB/admin/_etudiants.php" "$SITE/"
 cp -R "$PUB/FPDF"           "$SITE/"
 cp -R "$PUB/PHPMailer"      "$SITE/"
 
@@ -140,7 +141,7 @@ RewriteRule ^ - [L]
 RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
-<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^cors\.php$)">
+<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^cors\.php$|^_etudiants\.php$)">
   Require all denied
 </FilesMatch>
 HT

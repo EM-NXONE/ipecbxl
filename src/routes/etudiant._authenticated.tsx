@@ -32,13 +32,16 @@ function EtudiantAuthenticatedLayout() {
     return <Navigate to="/etudiant/login" />;
   }
 
+  const cat = user.categorie ?? "candidat";
+  const catLabel = cat === "etudiant" ? "Étudiant" : cat === "preadmis" ? "Préadmis" : "Candidat";
   const userLabel = `${user.prenom} ${user.nom}`.trim() || user.email;
+  const userLabelWithBadge = `${userLabel} · ${catLabel}`;
 
   return (
     <PortalLayout
       brandSubtitle="Espace étudiant" brandHref="/etudiant"
       nav={NAV}
-      userLabel={userLabel}
+      userLabel={userLabelWithBadge}
       onLogout={async () => {
         await logout();
         navigate({ to: "/etudiant/login" });
