@@ -47,17 +47,18 @@ if ($vue === 'actives') {
 
 
 $pdo = db();
-$countStmt = $pdo->prepare("SELECT COUNT(*) FROM candidatures $whereSql");
+$countStmt = $pdo->prepare("SELECT COUNT(*) FROM candidatures $joinSql $whereSql");
 $countStmt->execute($params);
 $total = (int)$countStmt->fetchColumn();
 $pages = max(1, (int)ceil($total / $perPage));
 
-$sql = "SELECT id, reference, statut, prenom, nom, email, programme, annee, specialisation,
+$sql = "SELECT candidatures.id, reference, statut, prenom, nom, email, programme, annee, specialisation,
                annee_academique, facture_numero, facture_payee, facture_payee_at,
-               etudiant_id, created_at
+               etudiant_id, candidatures.created_at
         FROM candidatures
+        $joinSql
         $whereSql
-        ORDER BY created_at DESC
+        ORDER BY candidatures.created_at DESC
         LIMIT $perPage OFFSET $offset";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
