@@ -2,7 +2,7 @@
  * Layout authentifié de l'admin : garde sur user + PortalLayout avec sidebar.
  */
 import { createFileRoute, Outlet, Navigate, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, FileText, Users } from "lucide-react";
+import { LayoutDashboard, FileText, UserCheck, GraduationCap, XCircle, Users } from "lucide-react";
 import { PortalLayout, type PortalNavItem } from "@/components/PortalLayout";
 import { useAdminAuth } from "@/lib/auth-admin";
 
@@ -13,7 +13,10 @@ export const Route = createFileRoute("/admin/_authenticated")({
 const NAV: PortalNavItem[] = [
   { to: "/admin", label: "Tableau de bord", icon: <LayoutDashboard size={16} />, exact: true },
   { to: "/admin/candidatures", label: "Candidatures", icon: <FileText size={16} /> },
-  { to: "/admin/etudiants", label: "Étudiants", icon: <Users size={16} /> },
+  { to: "/admin/preadmis", label: "Préadmis", icon: <UserCheck size={16} /> },
+  { to: "/admin/etudiants", label: "Étudiants", icon: <GraduationCap size={16} /> },
+  { to: "/admin/refuses", label: "Refusés", icon: <XCircle size={16} /> },
+  { to: "/admin/comptes", label: "Tous les comptes", icon: <Users size={16} /> },
 ];
 
 function AdminAuthenticatedLayout() {
