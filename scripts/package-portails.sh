@@ -209,8 +209,9 @@ RewriteCond %{REQUEST_URI} !^/admin(/|$)
 RewriteCond %{REQUEST_URI} !^/api(/|$)
 RewriteRule ^ /admin/login [R=301,L]
 
-# Fallback SPA : tout /admin/* → index.html
-RewriteRule ^admin(/.*)?$ index.html [L]
+# Fallback SPA : tout /admin/* → shell prerendé du login admin
+# (jamais l'index.html racine du site vitrine, qui n'existe plus ici)
+RewriteRule ^admin(/.*)?$ /admin/login/index.html [L]
 HT
 cat > "$ADMIN/robots.txt" <<'RT'
 User-agent: *
