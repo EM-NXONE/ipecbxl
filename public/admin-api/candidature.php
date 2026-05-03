@@ -106,10 +106,10 @@ $histStmt = $pdo->prepare(
 $histStmt->execute([$id]);
 
 api_json([
-    'candidature'         => $cand,
-    'etudiant'            => $etudiant,
-    'homonyme'            => $homonyme,
-    'factures_scolarite'  => $facturesScolarite,
-    'historique'          => $histStmt->fetchAll(),
-    'statuts'             => ADMIN_STATUTS,
+    'candidature' => $cand,
+    'etudiant'    => $etudiant,
+    'homonyme'    => $homonyme,
+    'factures'    => $factures,
+    'historique'  => $histStmt->fetchAll(),
+    'statuts'     => ADMIN_STATUTS,
 ]);
