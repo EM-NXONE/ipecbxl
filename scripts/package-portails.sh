@@ -165,8 +165,11 @@ for d in "$OUT"/*/; do
 done
 move_output "$OUT" "$ADMIN" "index 404 200" "$forbid"
 
-restrict_portal_root "$ADMIN" "admin assets _build index.html favicon.ico favicon.svg"
+restrict_portal_root "$ADMIN" "admin assets _build favicon.ico favicon.svg"
 purge_portal_subdir "$ADMIN/admin"
+# IMPORTANT : pas d'index.html racine (sinon le fallback SPA servirait
+# la home prerendée du site vitrine — flash visible au refresh).
+rm -f "$ADMIN/index.html"
 
 mkdir -p "$ADMIN/api/_shared"
 cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
