@@ -37,6 +37,7 @@ import { Route as EtudiantAuthenticatedDocumentsRouteImport } from './routes/etu
 import { Route as AdminAuthenticatedRefusesRouteImport } from './routes/admin._authenticated.refuses'
 import { Route as AdminAuthenticatedPreadmisRouteImport } from './routes/admin._authenticated.preadmis'
 import { Route as AdminAuthenticatedEtudiantsRouteImport } from './routes/admin._authenticated.etudiants'
+import { Route as AdminAuthenticatedComptesRouteImport } from './routes/admin._authenticated.comptes'
 import { Route as AdminAuthenticatedCandidaturesRouteImport } from './routes/admin._authenticated.candidatures'
 import { Route as AdminAuthenticatedCandidaturesIdRouteImport } from './routes/admin._authenticated.candidatures.$id'
 
@@ -185,6 +186,12 @@ const AdminAuthenticatedEtudiantsRoute =
     path: '/etudiants',
     getParentRoute: () => AdminAuthenticatedRoute,
   } as any)
+const AdminAuthenticatedComptesRoute =
+  AdminAuthenticatedComptesRouteImport.update({
+    id: '/comptes',
+    path: '/comptes',
+    getParentRoute: () => AdminAuthenticatedRoute,
+  } as any)
 const AdminAuthenticatedCandidaturesRoute =
   AdminAuthenticatedCandidaturesRouteImport.update({
     id: '/candidatures',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/etudiant/login': typeof EtudiantLoginRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/comptes': typeof AdminAuthenticatedComptesRoute
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/admin/preadmis': typeof AdminAuthenticatedPreadmisRoute
   '/admin/refuses': typeof AdminAuthenticatedRefusesRoute
@@ -247,6 +255,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/etudiant/login': typeof EtudiantLoginRoute
   '/admin/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/comptes': typeof AdminAuthenticatedComptesRoute
   '/admin/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/admin/preadmis': typeof AdminAuthenticatedPreadmisRoute
   '/admin/refuses': typeof AdminAuthenticatedRefusesRoute
@@ -278,6 +287,7 @@ export interface FileRoutesById {
   '/etudiant/_authenticated': typeof EtudiantAuthenticatedRouteWithChildren
   '/etudiant/login': typeof EtudiantLoginRoute
   '/admin/_authenticated/candidatures': typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  '/admin/_authenticated/comptes': typeof AdminAuthenticatedComptesRoute
   '/admin/_authenticated/etudiants': typeof AdminAuthenticatedEtudiantsRoute
   '/admin/_authenticated/preadmis': typeof AdminAuthenticatedPreadmisRoute
   '/admin/_authenticated/refuses': typeof AdminAuthenticatedRefusesRoute
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/etudiant/login'
     | '/admin/candidatures'
+    | '/admin/comptes'
     | '/admin/etudiants'
     | '/admin/preadmis'
     | '/admin/refuses'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/etudiant/login'
     | '/admin/candidatures'
+    | '/admin/comptes'
     | '/admin/etudiants'
     | '/admin/preadmis'
     | '/admin/refuses'
@@ -370,6 +382,7 @@ export interface FileRouteTypes {
     | '/etudiant/_authenticated'
     | '/etudiant/login'
     | '/admin/_authenticated/candidatures'
+    | '/admin/_authenticated/comptes'
     | '/admin/_authenticated/etudiants'
     | '/admin/_authenticated/preadmis'
     | '/admin/_authenticated/refuses'
@@ -598,6 +611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthenticatedEtudiantsRouteImport
       parentRoute: typeof AdminAuthenticatedRoute
     }
+    '/admin/_authenticated/comptes': {
+      id: '/admin/_authenticated/comptes'
+      path: '/comptes'
+      fullPath: '/admin/comptes'
+      preLoaderRoute: typeof AdminAuthenticatedComptesRouteImport
+      parentRoute: typeof AdminAuthenticatedRoute
+    }
     '/admin/_authenticated/candidatures': {
       id: '/admin/_authenticated/candidatures'
       path: '/candidatures'
@@ -632,6 +652,7 @@ const AdminAuthenticatedCandidaturesRouteWithChildren =
 
 interface AdminAuthenticatedRouteChildren {
   AdminAuthenticatedCandidaturesRoute: typeof AdminAuthenticatedCandidaturesRouteWithChildren
+  AdminAuthenticatedComptesRoute: typeof AdminAuthenticatedComptesRoute
   AdminAuthenticatedEtudiantsRoute: typeof AdminAuthenticatedEtudiantsRoute
   AdminAuthenticatedPreadmisRoute: typeof AdminAuthenticatedPreadmisRoute
   AdminAuthenticatedRefusesRoute: typeof AdminAuthenticatedRefusesRoute
@@ -641,6 +662,7 @@ interface AdminAuthenticatedRouteChildren {
 const AdminAuthenticatedRouteChildren: AdminAuthenticatedRouteChildren = {
   AdminAuthenticatedCandidaturesRoute:
     AdminAuthenticatedCandidaturesRouteWithChildren,
+  AdminAuthenticatedComptesRoute: AdminAuthenticatedComptesRoute,
   AdminAuthenticatedEtudiantsRoute: AdminAuthenticatedEtudiantsRoute,
   AdminAuthenticatedPreadmisRoute: AdminAuthenticatedPreadmisRoute,
   AdminAuthenticatedRefusesRoute: AdminAuthenticatedRefusesRoute,
