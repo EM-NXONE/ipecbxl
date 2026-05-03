@@ -69,19 +69,25 @@ foreach ($lastFact as &$f) {
 }
 unset($f);
 
-// Derniers documents
-$dStmt = $pdo->prepare("SELECT * FROM documents
-                        WHERE etudiant_id=? AND visible_etudiant=1 AND statut='publie'
-                        ORDER BY date_emission DESC, id DESC LIMIT 5");
+// Derniers documents (joint la candidature pour récupérer la référence IPEC-CAND-...)
+$dStmt = $pdo->prepare("SELECT d.*, c.reference AS candidature_reference
+                        FROM documents d
+                        LEFT JOIN candidatures c ON c.id = d.candidature_id
+                        WHERE d.etudiant_id=? AND d.visible_etudiant=1 AND d.statut='publie'
+                        ORDER BY d.date_emission DESC, d.id DESC LIMIT 5");
 $dStmt->execute([$u['id']]);
 $lastDocs = $dStmt->fetchAll();
 
-// Nettoyage d'affichage des récapitulatifs de candidature (cf. /api/documents.php)
+// Nettoyage d'affichage des récapitulatifs de candidature (cf. /api/documents.php) :
+// on n'affiche QUE la référence IPEC-CAND-... (jamais la référence interne IPEC-DOC-...).
 foreach ($lastDocs as &$d) {
     if (($d['template'] ?? '') === 'recap_candidature') {
         $d['titre'] = 'Récapitulatif de candidature';
+        if (!empty($d['candidature_reference'])) {
+            $d['reference'] = $d['candidature_reference'];
+        }
     }
-    unset($d['data_json']);
+    unset($d['data_json'], $d['candidature_reference']);
 }
 unset($d);
 
