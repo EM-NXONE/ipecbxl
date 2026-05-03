@@ -63,14 +63,39 @@ if (!$etudiant) {
     }
 }
 
-// Factures de scolarité (si générées)
-$sStmt = $pdo->prepare("SELECT id, numero, libelle, montant_ttc_cents, date_emission,
-                               date_echeance, statut_paiement, paye_at, moyen_paiement
-                        FROM factures
-                        WHERE candidature_id = ? AND type = 'scolarite'
-                        ORDER BY date_echeance ASC, id ASC");
-$sStmt->execute([$id]);
-$facturesScolarite = $sStmt->fetchAll();
+// Toutes les factures liées à cette candidature (frais de dossier + scolarité)
+// + les factures liées à l'étudiant rattaché s'il y en a un (au cas où certaines
+// scolarités auraient été générées sans candidature_id).
+$factureIds = [];
+$factures   = [];
+$pushFact = function (array $row) use (&$factureIds, &$factures) {
+    $fid = (int)$row['id'];
+    if (isset($factureIds[$fid])) return;
+    $factureIds[$fid] = true;
+    $factures[] = $row;
+};
+
+$qf = "SELECT id, numero, type, libelle, description, montant_ttc_cents, tva_taux,
+              devise, date_emission, date_echeance, statut_paiement, paye_at,
+              moyen_paiement, paye_par_admin, reference_paiement
+         FROM factures
+        WHERE candidature_id = ?
+        ORDER BY FIELD(type,'frais_dossier','scolarite'), date_echeance ASC, id ASC";
+$st = $pdo->prepare($qf);
+$st->execute([$id]);
+foreach ($st->fetchAll() as $r) $pushFact($r);
+
+if ($etudiant) {
+    $qfe = "SELECT id, numero, type, libelle, description, montant_ttc_cents, tva_taux,
+                   devise, date_emission, date_echeance, statut_paiement, paye_at,
+                   moyen_paiement, paye_par_admin, reference_paiement
+              FROM factures
+             WHERE etudiant_id = ?
+             ORDER BY FIELD(type,'frais_dossier','scolarite'), date_echeance ASC, id ASC";
+    $st2 = $pdo->prepare($qfe);
+    $st2->execute([(int)$etudiant['id']]);
+    foreach ($st2->fetchAll() as $r) $pushFact($r);
+}
 
 // Historique
 $histStmt = $pdo->prepare(
@@ -81,10 +106,10 @@ $histStmt = $pdo->prepare(
 $histStmt->execute([$id]);
 
 api_json([
-    'candidature'         => $cand,
-    'etudiant'            => $etudiant,
-    'homonyme'            => $homonyme,
-    'factures_scolarite'  => $facturesScolarite,
-    'historique'          => $histStmt->fetchAll(),
-    'statuts'             => ADMIN_STATUTS,
+    'candidature' => $cand,
+    'etudiant'    => $etudiant,
+    'homonyme'    => $homonyme,
+    'factures'    => $factures,
+    'historique'  => $histStmt->fetchAll(),
+    'statuts'     => ADMIN_STATUTS,
 ]);
