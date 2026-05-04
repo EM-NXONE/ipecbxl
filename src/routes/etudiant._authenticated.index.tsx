@@ -91,12 +91,7 @@ function EtudiantDashboardPage() {
                   <p className="text-sm text-muted-foreground mb-4">{meta.description}</p>
                 )}
 
-                {c.statut !== "annulee" && c.statut !== "refusee" && (
-                  <Stepper currentStep={meta.step} />
-                )}
-                {c.statut === "refusee" && (
-                  <div className="text-xs uppercase tracking-wider text-destructive">Décision : non retenue</div>
-                )}
+                <Stepper currentStep={meta.step} statut={c.statut} />
               </div>
             );
           })}
