@@ -266,7 +266,7 @@ function Admissions() {
                 </p>
               </div>
               <div className="p-6 rounded-sm border border-blue/30 bg-blue/5">
-                <div className="text-xs uppercase tracking-widest text-blue mb-2">3ᵉ tranche — solde</div>
+                <div className="text-xs uppercase tracking-widest text-blue mb-2">Solde</div>
                 <div className="font-display text-xl text-cream mb-2">1 475 € (PAA) · 2 075 € (PEA)</div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Exigible avant les examens du second semestre.

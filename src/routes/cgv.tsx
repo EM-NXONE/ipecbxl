@@ -81,8 +81,8 @@ function CGV() {
                 à une procédure de visa
               </li>
               <li>
-                3ᵉ tranche — solde (1 475 € en PAA, 2 075 € en PEA) : exigible
-                avant les examens du second semestre
+                Solde (1 475 € en PAA, 2 075 € en PEA) : exigible avant les
+                examens du second semestre
               </li>
             </ul>
             <div className="mt-6 p-5 rounded-sm border border-blue/30 bg-blue/5">

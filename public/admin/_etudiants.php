@@ -463,7 +463,7 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
             'echeance'    => $t2Echeance,
         ],
         [
-            'libelle'     => "Frais de scolarité {$progLabel} — solde",
+            'libelle'     => "Frais de scolarité {$progLabel} — Solde",
             'description' => $isFebruary
                 ? "Solde des droits de scolarité — exigible 6 mois après le début du programme."
                 : "Solde des droits de scolarité — exigible avant le 31 janvier de l'année académique.",
