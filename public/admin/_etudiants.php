@@ -391,7 +391,19 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     if (!$isPAA && !$isPEA) {
         return ['created' => false, 'count' => 0, 'reason' => 'programme inconnu (ni PAA ni PEA)'];
     }
-    $progLabel = $isPEA ? 'PEA' : 'PAA';
+    $progBase = $isPEA ? 'PEA' : 'PAA';
+
+    // Détermine l'année (1, 2, 3) à partir du libellé annee de la candidature.
+    // Ex: "1ʳᵉ année (BAC+1)" → 1 ; "2ᵉ année (BAC+2)" → 2 ; PEA "1ʳᵉ année (BAC+4)" → 1.
+    $anneeStr = (string)($candidature['annee'] ?? '');
+    $yearNum = '';
+    if (preg_match('/^\s*(\d)/u', $anneeStr, $ym)) {
+        $yearNum = $ym[1];
+    }
+    // Sécurité : PAA = 1..3, PEA = 1..2
+    if ($isPAA && !in_array($yearNum, ['1','2','3'], true)) $yearNum = '';
+    if ($isPEA && !in_array($yearNum, ['1','2'], true))     $yearNum = '';
+    $progLabel = $progBase . $yearNum;
 
     // Montants en centimes (TTC, exonérés TVA enseignement)
     $t1Cents = 300000; // 3 000 €
