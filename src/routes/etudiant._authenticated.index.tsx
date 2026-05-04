@@ -91,12 +91,7 @@ function EtudiantDashboardPage() {
                   <p className="text-sm text-muted-foreground mb-4">{meta.description}</p>
                 )}
 
-                {c.statut !== "annulee" && c.statut !== "refusee" && (
-                  <Stepper currentStep={meta.step} />
-                )}
-                {c.statut === "refusee" && (
-                  <div className="text-xs uppercase tracking-wider text-destructive">Décision : non retenue</div>
-                )}
+                <Stepper currentStep={meta.step} statut={c.statut} />
               </div>
             );
           })}
@@ -181,23 +176,36 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: "warn" | "
   return <span className={`inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border ${cls}`}>{children}</span>;
 }
 
-function Stepper({ currentStep }: { currentStep: number }) {
+function Stepper({ currentStep, statut }: { currentStep: number; statut?: string }) {
+  const isRefused = statut === "refusee" || statut === "annulee";
+  const isValidated = statut === "validee";
   return (
     <ol className="flex items-center gap-2">
       {CANDIDATURE_STEPS.map((s, idx) => {
         const stepNum = idx + 1;
+        const isLast = stepNum === CANDIDATURE_STEPS.length;
         const done = stepNum < currentStep;
         const active = stepNum === currentStep;
-        const dot = done
+        let dot = done
           ? "bg-green-500/80 border-green-500/60 text-background"
           : active
             ? "bg-amber-500/80 border-amber-500/60 text-background"
             : "bg-transparent border-border/40 text-muted-foreground";
+        let icon: React.ReactNode = done ? "✓" : stepNum;
+        if (isLast && active) {
+          if (isValidated) {
+            dot = "bg-green-500/80 border-green-500/60 text-background";
+            icon = "✓";
+          } else if (isRefused) {
+            dot = "bg-destructive/80 border-destructive/60 text-background";
+            icon = "✕";
+          }
+        }
         const label = done || active ? "text-cream" : "text-muted-foreground";
         return (
           <li key={s.key} className="flex items-center gap-2 flex-1 min-w-0">
             <span className={`shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-[11px] font-medium ${dot}`}>
-              {done ? "✓" : stepNum}
+              {icon}
             </span>
             <span className={`text-xs truncate ${label}`}>{s.label}</span>
             {idx < CANDIDATURE_STEPS.length - 1 && (
