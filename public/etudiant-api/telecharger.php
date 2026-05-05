@@ -163,6 +163,47 @@ try {
         echo $out; exit;
     }
 
+    // Template "attestation_inscription" → attestation d'inscription définitive
+    if ($d['template'] === 'attestation_inscription' && function_exists('buildAttestationInscriptionPdf')) {
+        $data['reference_doc']    = $data['reference_doc']    ?? $d['reference'];
+        $data['date_emission']    = $data['date_emission']    ?? $d['date_emission'];
+        $data['civilite']         = $data['civilite']         ?? $d['civilite'];
+        $data['prenom']           = $data['prenom']           ?? $d['prenom'];
+        $data['nom']              = $data['nom']              ?? $d['nom'];
+        $data['email']            = $data['email']            ?? $d['email'];
+        $data['numero_etudiant']  = $data['numero_etudiant']  ?? $d['numero_etudiant'];
+        $out = buildAttestationInscriptionPdf($data);
+        if ($out === '') throw new RuntimeException('PDF vide.');
+        $pdo->prepare("UPDATE documents SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                       nb_telechargements = nb_telechargements + 1 WHERE id = ?")->execute([$id]);
+        etu_log_action((int)$user['id'], 'download_doc', 'Document ' . $d['reference']);
+        $filename = etu_safe_filename('attestation-inscription', $d['reference']);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
+
+    // Template "formulaire_inscription" → formulaire standard d'inscription
+    if ($d['template'] === 'formulaire_inscription' && function_exists('buildFormulaireInscriptionPdf')) {
+        $data['reference_doc']    = $data['reference_doc']    ?? $d['reference'];
+        $data['date_emission']    = $data['date_emission']    ?? $d['date_emission'];
+        $data['civilite']         = $data['civilite']         ?? $d['civilite'];
+        $data['prenom']           = $data['prenom']           ?? $d['prenom'];
+        $data['nom']              = $data['nom']              ?? $d['nom'];
+        $data['email']            = $data['email']            ?? $d['email'];
+        $data['numero_etudiant']  = $data['numero_etudiant']  ?? $d['numero_etudiant'];
+        $out = buildFormulaireInscriptionPdf($data);
+        if ($out === '') throw new RuntimeException('PDF vide.');
+        $pdo->prepare("UPDATE documents SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                       nb_telechargements = nb_telechargements + 1 WHERE id = ?")->execute([$id]);
+        etu_log_action((int)$user['id'], 'download_doc', 'Document ' . $d['reference']);
+        $filename = etu_safe_filename('formulaire-inscription', $d['reference']);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
     // Fallback générique (autres documents) — repris à l'identique de l'ancien telecharger.php
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);

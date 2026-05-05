@@ -578,3 +578,89 @@ function etudiant_create_document_preadmission(PDO $pdo, array $candidature, str
     ]);
 }
 
+/* =====================================================================
+ * Documents post-paiement T1 — Attestation d'inscription définitive
+ * + Formulaire standard d'inscription. Idempotent.
+ * ===================================================================== */
+function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudiantId, int $candidatureId, string $adminUser): array {
+    if ($etudiantId <= 0 || $candidatureId <= 0) {
+        return ['created' => false, 'count' => 0, 'reason' => 'identifiants invalides'];
+    }
+    $cs = $pdo->prepare("SELECT c.*, e.numero_etudiant
+                         FROM candidatures c
+                         INNER JOIN etudiants e ON e.id = c.etudiant_id
+                         WHERE c.id = ? AND c.etudiant_id = ? LIMIT 1");
+    $cs->execute([$candidatureId, $etudiantId]);
+    $cand = $cs->fetch();
+    if (!$cand) return ['created' => false, 'count' => 0, 'reason' => 'candidature introuvable'];
+
+    $fs = $pdo->prepare("SELECT numero, paye_at FROM factures
+                         WHERE candidature_id = ? AND type = 'scolarite' AND statut_paiement = 'payee'
+                         ORDER BY date_emission ASC, id ASC LIMIT 1");
+    $fs->execute([$candidatureId]);
+    $factT1 = $fs->fetch();
+    if (!$factT1) return ['created' => false, 'count' => 0, 'reason' => 'aucune facture scolarité payée'];
+
+    $baseData = [
+        'date_emission'         => date('Y-m-d'),
+        'civilite'              => $cand['civilite']        ?? null,
+        'prenom'                => $cand['prenom']          ?? null,
+        'nom'                   => $cand['nom']             ?? null,
+        'email'                 => $cand['email']           ?? null,
+        'date_naissance'        => $cand['date_naissance']  ?? null,
+        'nationalite'           => $cand['nationalite']     ?? null,
+        'telephone'             => $cand['telephone']       ?? null,
+        'rue'                   => $cand['rue']             ?? null,
+        'numero_rue'            => $cand['numero']          ?? null,
+        'code_postal'           => $cand['code_postal']     ?? null,
+        'ville'                 => $cand['ville']           ?? null,
+        'pays_residence'        => $cand['pays_residence']  ?? null,
+        'programme'             => $cand['programme']       ?? null,
+        'annee'                 => $cand['annee']           ?? null,
+        'specialisation'        => $cand['specialisation']  ?? null,
+        'rentree'               => $cand['rentree']         ?? null,
+        'annee_academique'      => $cand['annee_academique']?? null,
+        'numero_etudiant'       => $cand['numero_etudiant'] ?? null,
+        'candidature_reference' => $cand['reference']       ?? null,
+        'facture_t1_numero'     => $factT1['numero']        ?? null,
+        'facture_t1_paye_at'    => $factT1['paye_at']       ?? null,
+    ];
+
+    $created = 0;
+    $insert = $pdo->prepare(
+        "INSERT INTO documents
+            (reference, etudiant_id, candidature_id, type, template,
+             titre, description, data_json, statut, visible_etudiant,
+             date_emission, cree_par_admin)
+         VALUES (?, ?, ?, 'autre', ?,
+                 ?, ?, ?, 'publie', 1,
+                 ?, ?)"
+    );
+    $emis = date('Y-m-d');
+    $templates = [
+        'attestation_inscription' => [
+            'titre' => "Attestation d'inscription définitive",
+            'desc'  => "Inscription confirmée — première tranche acquittée.",
+        ],
+        'formulaire_inscription' => [
+            'titre' => "Formulaire standard d'inscription",
+            'desc'  => "Formulaire pré-rempli à imprimer, compléter et signer.",
+        ],
+    ];
+    foreach ($templates as $template => $meta) {
+        $st = $pdo->prepare("SELECT id FROM documents WHERE candidature_id = ? AND template = ? LIMIT 1");
+        $st->execute([$candidatureId, $template]);
+        if ($st->fetchColumn()) continue;
+        $ref = etudiant_generate_ref($pdo, 'DOC');
+        $data = array_merge($baseData, ['reference_doc' => $ref]);
+        $insert->execute([
+            $ref, $etudiantId, $candidatureId, $template,
+            $meta['titre'], $meta['desc'],
+            json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
+            $emis, $adminUser,
+        ]);
+        $created++;
+    }
+    return ['created' => $created > 0, 'count' => $created];
+}
+

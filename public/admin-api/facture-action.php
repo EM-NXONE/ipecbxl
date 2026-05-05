@@ -78,14 +78,30 @@ try {
             }
 
             // Si c'est une facture de scolarité → promotion en 'etudiant'
+            // + génération de l'attestation d'inscription définitive et du
+            // formulaire standard d'inscription (idempotent).
             $promoted = false;
+            $docsInscription = 0;
             if (($f['type'] ?? '') === 'scolarite' && $etudiantId > 0) {
                 $promoted = etudiant_promote_if_scolarite_paid($pdo, $etudiantId);
+                if ($candidatureId > 0) {
+                    try {
+                        $resDocs = etudiant_create_documents_inscription_definitive($pdo, $etudiantId, $candidatureId, admin_current_user());
+                        $docsInscription = (int)($resDocs['count'] ?? 0);
+                        if ($docsInscription > 0) {
+                            admin_log_action($candidatureId, 'create_docs_inscription_def',
+                                $docsInscription . ' document(s) (attestation + formulaire) générés');
+                        }
+                    } catch (\Throwable $e) {
+                        error_log('[facture-action] docs inscription #' . $candidatureId . ' : ' . $e->getMessage());
+                    }
+                }
             }
 
             $msg = 'Facture ' . ($f['numero'] ?? '') . ' marquée comme payée (' . $moyen . ' le ' . substr($payeAt, 0, 10) . ').';
             if ($preadmisCreated) $msg .= $preadmisCreated;
             if ($promoted) $msg .= ' Compte promu en « étudiant ».';
+            if ($docsInscription > 0) $msg .= ' ' . $docsInscription . ' document(s) d\'inscription définitive générés.';
 
             if ($candidatureId > 0) {
                 admin_log_action($candidatureId, 'mark_facture_paid',
