@@ -308,6 +308,10 @@ if ($docType === 'facture') {
         $documentLabel = 'Lettre de préadmission';
     } elseif ($tpl === 'recap_candidature') {
         $documentLabel = 'Récapitulatif de candidature';
+    } elseif ($tpl === 'attestation_inscription') {
+        $documentLabel = "Attestation d'inscription définitive";
+    } elseif ($tpl === 'formulaire_inscription') {
+        $documentLabel = "Formulaire standard d'inscription";
     } elseif (!empty($documentTitre)) {
         $documentLabel = $documentTitre;
     }
