@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles, Bus, ArrowRight } from "lucide-react";
+import { Sparkles, Bus, ArrowRight, Laptop } from "lucide-react";
 
 export const Route = createFileRoute("/vie-etudiante")({
   head: () => ({
