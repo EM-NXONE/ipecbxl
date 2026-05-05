@@ -86,6 +86,27 @@ function VieEtudiante() {
                 Conditions et tarifs STIB-MIVB <ArrowRight size={14} />
               </a>
             </div>
+
+            {/* LOCATION ORDINATEUR */}
+            <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
+              <Laptop className="text-blue mb-6" size={28} strokeWidth={1.5} />
+              <div className="text-xs uppercase tracking-widest text-blue mb-3">Service IPEC</div>
+              <h3 className="font-display text-2xl text-cream mb-4">Location d'ordinateur portable</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                L'IPEC met à disposition de ses étudiant·es un{" "}
+                <span className="text-cream">HP EliteBook reconditionné</span>{" "}
+                (gamme professionnelle, 14", clavier AZERTY-BE) en location pour
+                la durée de l'année académique. Tarif unique de{" "}
+                <span className="text-cream">20 €/mois</span> sur 10 mensualités,
+                avec une caution restituable de{" "}
+                <span className="text-cream">300 €</span> à la signature. Idéal
+                pour démarrer le cursus sans investissement matériel important.
+              </p>
+              <p className="text-xs text-muted-foreground/80 leading-relaxed mt-auto">
+                Sous réserve de disponibilité du parc. Demande à formuler auprès
+                du secrétariat lors de l'inscription définitive.
+              </p>
+            </div>
           </div>
 
           <p className="mt-10 text-xs text-muted-foreground leading-relaxed max-w-3xl">
