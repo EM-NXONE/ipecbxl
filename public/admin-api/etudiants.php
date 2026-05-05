@@ -10,24 +10,31 @@ $categorie = (string)($_GET['categorie'] ?? '');
 $where = [];
 $params = [];
 if ($q !== '') {
-    $where[] = "(prenom LIKE :q OR nom LIKE :q OR email LIKE :q OR numero_etudiant LIKE :q)";
+    $where[] = "(e.prenom LIKE :q OR e.nom LIKE :q OR e.email LIKE :q OR e.numero_etudiant LIKE :q)";
     $params[':q'] = '%' . $q . '%';
 }
 if (in_array($categorie, ['candidat','preadmis','etudiant'], true)) {
-    $where[] = "categorie = :categorie";
+    $where[] = "e.categorie = :categorie";
     $params[':categorie'] = $categorie;
 }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $pdo = db();
 $stmt = $pdo->prepare("
-    SELECT id, numero_etudiant, civilite, prenom, nom, email,
-           date_naissance, statut, categorie,
-           (password_hash IS NOT NULL) AS active,
-           derniere_connexion, created_at, cree_par_admin
-    FROM etudiants
+    SELECT e.id, e.numero_etudiant, e.civilite, e.prenom, e.nom, e.email,
+           e.date_naissance, e.statut, e.categorie,
+           (e.password_hash IS NOT NULL) AS active,
+           e.derniere_connexion, e.created_at, e.cree_par_admin,
+           c.programme, c.annee, c.specialisation
+    FROM etudiants e
+    LEFT JOIN candidatures c ON c.id = (
+        SELECT id FROM candidatures
+        WHERE etudiant_id = e.id
+        ORDER BY created_at DESC
+        LIMIT 1
+    )
     $whereSql
-    ORDER BY created_at DESC
+    ORDER BY e.created_at DESC
     LIMIT 200
 ");
 $stmt->execute($params);

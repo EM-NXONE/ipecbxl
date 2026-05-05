@@ -21,6 +21,16 @@ interface Etu {
   derniere_connexion: string | null;
   created_at: string;
   cree_par_admin: string | null;
+  programme: string | null;
+  annee: string | null;
+  specialisation: string | null;
+}
+
+function formatProgramme(programme: string | null, annee: string | null): string {
+  if (!programme) return "—";
+  const base = programme.toUpperCase();
+  const m = annee?.match(/\d/);
+  return m ? `${base}${m[0]}` : base;
 }
 
 interface ActionResult { message?: string; default_password?: string | null; }
@@ -121,12 +131,14 @@ export function ComptesTable({
       {error && <div className="mb-4 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
       <div className="bg-card border border-border/40 rounded-md overflow-x-auto">
-        <table className="w-full text-sm min-w-[860px]">
+        <table className="w-full text-sm min-w-[960px]">
           <thead className="text-xs uppercase tracking-wider text-muted-foreground border-b border-border/40">
             <tr>
               <th className="text-left px-4 py-2.5">N°</th>
               <th className="text-left px-4 py-2.5">Compte</th>
               {showCategorie && <th className="text-left px-4 py-2.5">Catégorie</th>}
+              <th className="text-left px-4 py-2.5">Programme</th>
+              <th className="text-left px-4 py-2.5">Spécialité</th>
               <th className="text-left px-4 py-2.5">Né(e) le</th>
               <th className="text-left px-4 py-2.5">État</th>
               <th className="text-left px-4 py-2.5">Dernière connexion</th>
@@ -152,6 +164,8 @@ export function ComptesTable({
                   {showCategorie && (
                     <td className="px-4 py-2.5"><CategorieBadge value={e.categorie} /></td>
                   )}
+                  <td className="px-4 py-2.5 text-cream text-xs font-mono">{formatProgramme(e.programme, e.annee)}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground text-xs">{e.specialisation || "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">{formatDate(e.date_naissance)}</td>
                   <td className="px-4 py-2.5 text-xs">
                     {active
@@ -179,7 +193,7 @@ export function ComptesTable({
               );
             })}
             {data && data.etudiants.length === 0 && (
-              <tr><td colSpan={showCategorie ? 7 : 6} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun compte.</td></tr>
+              <tr><td colSpan={showCategorie ? 9 : 8} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun compte.</td></tr>
             )}
           </tbody>
         </table>
