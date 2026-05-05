@@ -193,7 +193,7 @@ export function ComptesTable({
               );
             })}
             {data && data.etudiants.length === 0 && (
-              <tr><td colSpan={showCategorie ? 7 : 6} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun compte.</td></tr>
+              <tr><td colSpan={showCategorie ? 9 : 8} className="px-4 py-8 text-center text-muted-foreground text-sm">Aucun compte.</td></tr>
             )}
           </tbody>
         </table>
