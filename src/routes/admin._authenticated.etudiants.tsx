@@ -18,7 +18,7 @@ function AdminEtudiantsPage() {
   return (
     <ComptesTable
       title="Étudiants"
-      subtitle="1ère tranche de scolarité payée."
+      subtitle=""
       categorie="etudiant"
     />
   );
