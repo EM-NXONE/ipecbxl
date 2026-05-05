@@ -107,7 +107,7 @@ export function ComptesTable({
     <div>
       <h1 className="font-display text-3xl text-cream mb-2">{title}</h1>
       <p className="text-sm text-muted-foreground mb-6">
-        {data ? `${data.etudiants.length} compte${data.etudiants.length > 1 ? "s" : ""} — ${subtitle}` : "Chargement…"}
+        {data ? `${data.etudiants.length} compte${data.etudiants.length > 1 ? "s" : ""}${subtitle ? ` — ${subtitle}` : ""}` : "Chargement…"}
       </p>
 
       <div className="bg-card border border-border/40 rounded-md p-4 mb-4">
