@@ -21,6 +21,16 @@ interface Etu {
   derniere_connexion: string | null;
   created_at: string;
   cree_par_admin: string | null;
+  programme: string | null;
+  annee: string | null;
+  specialisation: string | null;
+}
+
+function formatProgramme(programme: string | null, annee: string | null): string {
+  if (!programme) return "—";
+  const base = programme.toUpperCase();
+  const m = annee?.match(/\d/);
+  return m ? `${base}${m[0]}` : base;
 }
 
 interface ActionResult { message?: string; default_password?: string | null; }
