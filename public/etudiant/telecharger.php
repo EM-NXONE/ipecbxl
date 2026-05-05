@@ -208,6 +208,35 @@ try {
         echo $out; exit;
     }
 
+    // ---- Templates "attestation_inscription" / "formulaire_inscription" ----
+    $newTemplates = [
+        'attestation_inscription' => ['fn' => 'buildAttestationInscriptionPdf', 'fname' => 'attestation-inscription'],
+        'formulaire_inscription'  => ['fn' => 'buildFormulaireInscriptionPdf',  'fname' => 'formulaire-inscription'],
+    ];
+    if (isset($newTemplates[$d['template']]) && function_exists($newTemplates[$d['template']]['fn'])) {
+        $tplCfg = $newTemplates[$d['template']];
+        $data['reference_doc']    = $data['reference_doc']    ?? $d['reference'];
+        $data['date_emission']    = $data['date_emission']    ?? $d['date_emission'];
+        $data['civilite']         = $data['civilite']         ?? $d['civilite'];
+        $data['prenom']           = $data['prenom']           ?? $d['prenom'];
+        $data['nom']              = $data['nom']              ?? $d['nom'];
+        $data['email']            = $data['email']            ?? $d['email'];
+        $data['numero_etudiant']  = $data['numero_etudiant']  ?? $d['numero_etudiant'];
+        $out = call_user_func($tplCfg['fn'], $data);
+        if ($out === '') { http_response_code(500); exit('PDF vide.'); }
+        $pdo->prepare("UPDATE documents
+                       SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
+                           nb_telechargements = nb_telechargements + 1
+                       WHERE id = ?")->execute([$id]);
+        $pdo->prepare("INSERT INTO etudiant_actions (etudiant_id, action, detail, ip)
+                       VALUES (?, 'download_doc', ?, ?)")
+            ->execute([$user['id'], 'Document ' . $d['reference'], $_SERVER['REMOTE_ADDR'] ?? null]);
+        $filename = safe_filename($tplCfg['fname'], $d['reference']);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($out));
+        echo $out; exit;
+    }
 
     $tr = function (string $s): string {
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
