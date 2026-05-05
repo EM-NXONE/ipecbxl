@@ -10,11 +10,11 @@ $categorie = (string)($_GET['categorie'] ?? '');
 $where = [];
 $params = [];
 if ($q !== '') {
-    $where[] = "(prenom LIKE :q OR nom LIKE :q OR email LIKE :q OR numero_etudiant LIKE :q)";
+    $where[] = "(e.prenom LIKE :q OR e.nom LIKE :q OR e.email LIKE :q OR e.numero_etudiant LIKE :q)";
     $params[':q'] = '%' . $q . '%';
 }
 if (in_array($categorie, ['candidat','preadmis','etudiant'], true)) {
-    $where[] = "categorie = :categorie";
+    $where[] = "e.categorie = :categorie";
     $params[':categorie'] = $categorie;
 }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -33,7 +33,7 @@ $stmt = $pdo->prepare("
         ORDER BY created_at DESC
         LIMIT 1
     )
-    " . ($whereSql ? str_replace(['prenom','nom','email','numero_etudiant','categorie'], ['e.prenom','e.nom','e.email','e.numero_etudiant','e.categorie'], $whereSql) : '') . "
+    $whereSql
     ORDER BY e.created_at DESC
     LIMIT 200
 ");
