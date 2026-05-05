@@ -40,7 +40,7 @@ function VieEtudiante() {
             Bruxelles, version étudiante.
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* UNiDAYS */}
             <div className="p-10 rounded-sm border border-border/60 bg-card/50 flex flex-col">
               <Sparkles className="text-blue mb-6" size={28} strokeWidth={1.5} />
