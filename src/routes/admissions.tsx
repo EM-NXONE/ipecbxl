@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, CreditCard, Mail, Calendar, ArrowRight, CheckCircle2, AlertTriangle, CalendarDays, GraduationCap } from "lucide-react";
 import {
-  getNextSeptemberRentree,
-  getNextFebruaryRentree,
+  SEPTEMBER_RENTREE_DATE,
+  FEBRUARY_RENTREE_DATE,
   getUpcomingAcademicYearLabel,
-  formatRentreeDate,
 } from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/admissions")({
@@ -34,8 +33,8 @@ const steps = [
 ];
 
 function Admissions() {
-  const septembreRentree = getNextSeptemberRentree();
-  const fevrierRentree = getNextFebruaryRentree();
+  const septembreRentree = SEPTEMBER_RENTREE_DATE;
+  const fevrierRentree = FEBRUARY_RENTREE_DATE;
   const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
@@ -167,7 +166,7 @@ function Admissions() {
                 <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
                 <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée principale · {academicYear}</div>
                 <h3 className="font-display text-xl text-cream leading-snug">
-                  {formatRentreeDate(septembreRentree)}
+                  {septembreRentree}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
                   Démarrage du cursus complet pour l'année académique {academicYear}.
@@ -178,7 +177,7 @@ function Admissions() {
                 <CalendarDays className="text-blue mb-5" size={28} strokeWidth={1.5} />
                 <div className="text-blue uppercase tracking-widest text-xs mb-2">Rentrée décalée</div>
                 <h3 className="font-display text-xl text-cream leading-snug">
-                  {formatRentreeDate(fevrierRentree)}
+                  {fevrierRentree}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
                   Pour intégrer l'IPEC en cours d'année.
