@@ -76,23 +76,27 @@ $pushFact = function (array $row) use (&$factureIds, &$factures) {
     $factures[] = $row;
 };
 
-$qf = "SELECT id, numero, type, libelle, description, montant_ttc_cents, tva_taux,
-              devise, date_emission, date_echeance, statut_paiement, paye_at,
-              moyen_paiement, paye_par_admin, reference_paiement
-         FROM factures
-        WHERE candidature_id = ?
-        ORDER BY FIELD(type,'frais_dossier','scolarite'), date_echeance ASC, id ASC";
+$qf = "SELECT f.id, f.numero, f.type, f.libelle, f.description, f.montant_ttc_cents, f.tva_taux,
+              f.devise, f.date_emission, f.date_echeance, f.statut_paiement, f.paye_at,
+              f.moyen_paiement, f.paye_par_admin, f.reference_paiement,
+              f.candidature_id, c.annee_academique AS candidature_annee_academique
+         FROM factures f
+         LEFT JOIN candidatures c ON c.id = f.candidature_id
+        WHERE f.candidature_id = ?
+        ORDER BY FIELD(f.type,'frais_dossier','scolarite'), f.date_echeance ASC, f.id ASC";
 $st = $pdo->prepare($qf);
 $st->execute([$id]);
 foreach ($st->fetchAll() as $r) $pushFact($r);
 
 if ($etudiant) {
-    $qfe = "SELECT id, numero, type, libelle, description, montant_ttc_cents, tva_taux,
-                   devise, date_emission, date_echeance, statut_paiement, paye_at,
-                   moyen_paiement, paye_par_admin, reference_paiement
-              FROM factures
-             WHERE etudiant_id = ?
-             ORDER BY FIELD(type,'frais_dossier','scolarite'), date_echeance ASC, id ASC";
+    $qfe = "SELECT f.id, f.numero, f.type, f.libelle, f.description, f.montant_ttc_cents, f.tva_taux,
+                   f.devise, f.date_emission, f.date_echeance, f.statut_paiement, f.paye_at,
+                   f.moyen_paiement, f.paye_par_admin, f.reference_paiement,
+                   f.candidature_id, c.annee_academique AS candidature_annee_academique
+              FROM factures f
+              LEFT JOIN candidatures c ON c.id = f.candidature_id
+             WHERE f.etudiant_id = ?
+             ORDER BY FIELD(f.type,'frais_dossier','scolarite'), f.date_echeance ASC, f.id ASC";
     $st2 = $pdo->prepare($qfe);
     $st2->execute([(int)$etudiant['id']]);
     foreach ($st2->fetchAll() as $r) $pushFact($r);
