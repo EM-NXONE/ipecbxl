@@ -8,6 +8,7 @@ api_method('GET');
 api_require_admin();
 admin_require_db();
 admin_require_etudiants();
+admin_require_cursus();
 
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) api_error('id invalide', 400);
