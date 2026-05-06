@@ -5,6 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, RefreshCw, Download, KeyRound, Ban, CheckCircle2 } from "lucide-react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
+import { AdminCursusActions, type CursusDescriptor, type CursusHistoryRow } from "@/components/AdminCursusActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
