@@ -307,6 +307,20 @@ function AdminCandidatureDetailPage() {
             )}
           </Card>
 
+          {data.etudiant && (
+            <Card title="Évolution du cursus">
+              <AdminCursusActions
+                latestCandidatureId={data.latest_candidature_id}
+                cursus={data.cursus}
+                history={data.cursus_history}
+                etudiantCategorie={data.etudiant.categorie}
+                motifInactif={data.etudiant.motif_inactif}
+                onDone={(m) => { setMsg(m); reload(); }}
+                onError={setError}
+              />
+            </Card>
+          )}
+
           <Card title="Autres actions">
             <AdminCandidatureActions
               id={id}
