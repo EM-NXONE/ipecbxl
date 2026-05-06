@@ -108,6 +108,13 @@ function admin_require_etudiants(): void {
     require_once $path;
 }
 
+function admin_require_cursus(): void {
+    admin_require_etudiants();
+    $path = admin_shared_path('_cursus.php');
+    if (!is_file($path)) api_error('Librairie cursus introuvable.', 500);
+    require_once $path;
+}
+
 // ---------- Auth admin ----------
 function admin_users(): array {
     global $ADMIN_USERS_CACHE;

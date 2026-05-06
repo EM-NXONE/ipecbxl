@@ -212,6 +212,7 @@ try {
     $newTemplates = [
         'attestation_inscription' => ['fn' => 'buildAttestationInscriptionPdf', 'fname' => 'attestation-inscription'],
         'formulaire_inscription'  => ['fn' => 'buildFormulaireInscriptionPdf',  'fname' => 'formulaire-inscription'],
+        'attestation_reussite'    => ['fn' => 'buildAttestationReussitePdf',    'fname' => 'attestation-reussite'],
     ];
     if (isset($newTemplates[$d['template']]) && function_exists($newTemplates[$d['template']]['fn'])) {
         $tplCfg = $newTemplates[$d['template']];

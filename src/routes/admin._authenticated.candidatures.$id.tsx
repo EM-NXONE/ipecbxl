@@ -5,6 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, RefreshCw, Download, KeyRound, Ban, CheckCircle2 } from "lucide-react";
 import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminCandidatureActions";
+import { AdminCursusActions, type CursusDescriptor, type CursusHistoryRow } from "@/components/AdminCursusActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "./admin._authenticated.index";
@@ -45,11 +46,14 @@ interface Detail {
     moyen_paiement: string | null; etudiant_id: number | null;
     ip: string | null; user_agent: string | null; updated_at: string | null; created_at: string;
   };
-  etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number; statut: string } | null;
+  etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number; statut: string; categorie: string; motif_inactif: string | null; date_fin_cursus: string | null } | null;
   homonyme: { id: number; numero_etudiant: string; prenom: string; nom: string; date_naissance: string } | null;
   factures: FactureRow[];
   historique: { id: number; action: string; detail: string | null; admin_user: string | null; created_at: string }[];
   statuts: Record<string, string>;
+  cursus: CursusDescriptor;
+  cursus_history: CursusHistoryRow[];
+  latest_candidature_id: number;
 }
 
 function AdminCandidatureDetailPage() {
@@ -302,6 +306,20 @@ function AdminCandidatureDetailPage() {
               </div>
             )}
           </Card>
+
+          {data.etudiant && (
+            <Card title="Évolution du cursus">
+              <AdminCursusActions
+                latestCandidatureId={data.latest_candidature_id}
+                cursus={data.cursus}
+                history={data.cursus_history}
+                etudiantCategorie={data.etudiant.categorie}
+                motifInactif={data.etudiant.motif_inactif}
+                onDone={(m) => { setMsg(m); reload(); }}
+                onError={setError}
+              />
+            </Card>
+          )}
 
           <Card title="Autres actions">
             <AdminCandidatureActions
