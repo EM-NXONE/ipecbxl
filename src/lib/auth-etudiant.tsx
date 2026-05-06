@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { etuApi, ApiError } from "./api";
 
-export type EtudiantCategorie = "candidat" | "preadmis" | "etudiant";
+export type EtudiantCategorie = "candidat" | "preadmis" | "etudiant" | "diplome" | "inactif";
 
 export interface EtudiantUser {
   id: number;
