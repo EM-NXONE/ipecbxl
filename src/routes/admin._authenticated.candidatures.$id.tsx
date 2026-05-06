@@ -46,11 +46,14 @@ interface Detail {
     moyen_paiement: string | null; etudiant_id: number | null;
     ip: string | null; user_agent: string | null; updated_at: string | null; created_at: string;
   };
-  etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number; statut: string } | null;
+  etudiant: { id: number; numero_etudiant: string; prenom: string; nom: string; email: string; active: number; statut: string; categorie: string; motif_inactif: string | null; date_fin_cursus: string | null } | null;
   homonyme: { id: number; numero_etudiant: string; prenom: string; nom: string; date_naissance: string } | null;
   factures: FactureRow[];
   historique: { id: number; action: string; detail: string | null; admin_user: string | null; created_at: string }[];
   statuts: Record<string, string>;
+  cursus: CursusDescriptor;
+  cursus_history: CursusHistoryRow[];
+  latest_candidature_id: number;
 }
 
 function AdminCandidatureDetailPage() {
