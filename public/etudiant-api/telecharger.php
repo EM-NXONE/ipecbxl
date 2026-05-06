@@ -203,6 +203,7 @@ try {
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Length: ' . strlen($out));
         echo $out; exit;
+    }
 
     // Template "attestation_reussite" → fin de cursus / diplomation
     if ($d['template'] === 'attestation_reussite' && function_exists('buildAttestationReussitePdf')) {
