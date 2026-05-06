@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { GraduationCap, Repeat, Award, UserX, UserCheck } from "lucide-react";
 import { adminApi } from "@/lib/api";
-import { ACADEMIC_YEAR_LABEL, SEPTEMBER_RENTREE_DATE, FEBRUARY_RENTREE_DATE } from "@/lib/academic-dates";
+import { ACADEMIC_YEAR_LABEL, RENTREE_PRINCIPALE_LABEL, RENTREE_DECALEE_LABEL } from "@/lib/academic-dates";
 
 export interface CursusDescriptor {
   current_step: string | null;
@@ -46,7 +46,7 @@ export function AdminCursusActions({
 }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [annee, setAnnee] = useState(ACADEMIC_YEAR_LABEL);
-  const [rentree, setRentree] = useState(`Septembre — ${SEPTEMBER_RENTREE_DATE}`);
+  const [rentree, setRentree] = useState(RENTREE_PRINCIPALE_LABEL);
 
   const isInactif  = etudiantCategorie === "inactif";
   const isDiplome  = etudiantCategorie === "diplome";
@@ -146,8 +146,8 @@ export function AdminCursusActions({
               onChange={(e) => setRentree(e.target.value)}
               className="w-full bg-secondary/30 border border-border/40 rounded-sm px-2 py-1.5 text-sm"
             >
-              <option value={`Septembre — ${SEPTEMBER_RENTREE_DATE}`}>Septembre — {SEPTEMBER_RENTREE_DATE}</option>
-              <option value={`Février — ${FEBRUARY_RENTREE_DATE}`}>Février — {FEBRUARY_RENTREE_DATE}</option>
+              <option value={RENTREE_PRINCIPALE_LABEL}>{RENTREE_PRINCIPALE_LABEL}</option>
+              <option value={RENTREE_DECALEE_LABEL}>{RENTREE_DECALEE_LABEL}</option>
             </select>
           </div>
 
