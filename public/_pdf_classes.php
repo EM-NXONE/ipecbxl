@@ -618,3 +618,179 @@ if (!function_exists('buildAttestationReussitePdf') && class_exists('IpecCandida
     }
 }
 
+/* ============================================================
+ * buildAttestationReussiteAnneePdf — réussite d'une année (passage)
+ * ============================================================ */
+if (!function_exists('buildAttestationReussiteAnneePdf') && class_exists('IpecCandidaturePdf')) {
+    function buildAttestationReussiteAnneePdf(array $data): string {
+        $tr = function (string $s): string {
+            $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+            return $out !== false ? $out : $s;
+        };
+        $fmt = function (?string $ymd): string {
+            if (!$ymd) return '';
+            $t = strtotime($ymd);
+            return $t ? date('d/m/Y', $t) : (string)$ymd;
+        };
+
+        $civ        = trim((string)($data['civilite'] ?? ''));
+        $prenom     = trim((string)($data['prenom'] ?? ''));
+        $nom        = trim((string)($data['nom'] ?? ''));
+        $dateNaiss  = $fmt((string)($data['date_naissance'] ?? ''));
+        $programme  = trim((string)($data['programme'] ?? ''));
+        $annee      = trim((string)($data['annee'] ?? ''));
+        $specialisation = trim((string)($data['specialisation'] ?? ''));
+        $anneeAcad  = trim((string)($data['annee_academique'] ?? ''));
+        $anneeSuiv  = trim((string)($data['annee_suivante'] ?? ''));
+        $refDoc     = trim((string)($data['reference_doc'] ?? ''));
+        $refCand    = trim((string)($data['candidature_reference'] ?? ''));
+        $emis       = $fmt((string)($data['date_emission'] ?? date('Y-m-d')));
+        $civAccord  = (stripos($civ, 'mme') === 0 || stripos($civ, 'madame') === 0) ? 'Madame' : 'Monsieur';
+
+        $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+        $pdf->docKind = 'document';
+        $pdf->reference = $refDoc;
+        $pdf->SetMargins(20, 20, 20);
+        $pdf->SetAutoPageBreak(true, 30);
+        $pdf->SetTitle($tr("Attestation de réussite d'année — IPEC"));
+        $pdf->SetAuthor($tr("IPEC — Institut Privé des Études Commerciales"));
+        $pdf->AddPage();
+
+        ipec_doc_header($pdf, "ATTESTATION DE RÉUSSITE", $refDoc, $emis, $refCand);
+
+        $pdf->SetFont('Helvetica', 'B', 11);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 6, $tr(trim($civ . ' ' . $prenom . ' ' . $nom)), 0, 1);
+        $pdf->SetFont('Helvetica', '', 10);
+        $pdf->SetTextColor(91, 100, 120);
+        if ($dateNaiss !== '') $pdf->Cell(0, 5, $tr('Né(e) le ' . $dateNaiss), 0, 1);
+        $pdf->Ln(6);
+
+        $pdf->SetFont('Helvetica', 'B', 12);
+        $pdf->SetTextColor(27, 31, 42);
+        $pdf->Cell(0, 7, $tr("Objet : Attestation de réussite d'année"), 0, 1);
+        $pdf->Ln(2);
+
+        $pdf->SetFont('Helvetica', '', 11);
+        $p = function (string $t) use ($pdf, $tr) { $pdf->MultiCell(0, 5.5, $tr($t)); $pdf->Ln(1.5); };
+
+        $detail = $programme . ($annee !== '' ? ' — ' . $annee : '')
+                . ($specialisation !== '' && stripos($specialisation, 'sais') === false
+                    ? ' (spécialisation : ' . $specialisation . ')' : '');
+
+        $p("Je soussigné, le Directeur de l'Institut Privé des Études Commerciales (IPEC), atteste que "
+            . $civAccord . " " . $prenom . " " . $nom
+            . ($dateNaiss !== '' ? ", né(e) le " . $dateNaiss : '')
+            . ", a validé avec succès l'année d'études suivante :");
+
+        $pdf->SetFont('Helvetica', 'B', 11);
+        $pdf->MultiCell(0, 5.5, $tr($detail !== '' ? $detail : 'Programme'));
+        if ($anneeAcad !== '') {
+            $pdf->SetFont('Helvetica', '', 11);
+            $pdf->MultiCell(0, 5.5, $tr("Année académique : " . $anneeAcad));
+        }
+        $pdf->Ln(2);
+        $pdf->SetFont('Helvetica', '', 11);
+
+        $p("Tous les modules d'enseignement, examens et travaux requis pour la validation de cette année académique ont été obtenus."
+            . ($anneeSuiv !== '' ? " L'étudiant(e) est autorisé(e) à poursuivre son cursus en " . $anneeSuiv . "." : ""));
+
+        $p("La présente attestation est délivrée à titre officiel pour faire valoir ce que de droit.");
+
+        $p("Fait à Bruxelles, le " . $emis . ".");
+
+        $pdf->Ln(12);
+        $pdf->SetFont('Helvetica', 'B', 11);
+        $pdf->Cell(0, 6, $tr("La Direction"), 0, 1);
+        $pdf->SetFont('Helvetica', 'I', 10);
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(0, 5, $tr("Institut Privé des Études Commerciales (IPEC)"), 0, 1);
+
+        return (string)$pdf->Output('S');
+    }
+}
+
+/* ============================================================
+ * buildDiplomeBachelierPdf — fin de PAA-3 (Bachelier)
+ * ============================================================ */
+if (!function_exists('buildDiplomeBachelierPdf') && class_exists('IpecCandidaturePdf')) {
+    function buildDiplomeBachelierPdf(array $data): string {
+        $tr = function (string $s): string {
+            $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $s);
+            return $out !== false ? $out : $s;
+        };
+        $fmt = function (?string $ymd): string {
+            if (!$ymd) return '';
+            $t = strtotime($ymd);
+            return $t ? date('d/m/Y', $t) : (string)$ymd;
+        };
+
+        $civ        = trim((string)($data['civilite'] ?? ''));
+        $prenom     = trim((string)($data['prenom'] ?? ''));
+        $nom        = trim((string)($data['nom'] ?? ''));
+        $dateNaiss  = $fmt((string)($data['date_naissance'] ?? ''));
+        $specialisation = trim((string)($data['specialisation'] ?? ''));
+        $anneeAcad  = trim((string)($data['annee_academique'] ?? ''));
+        $refDoc     = trim((string)($data['reference_doc'] ?? ''));
+        $refCand    = trim((string)($data['candidature_reference'] ?? ''));
+        $emis       = $fmt((string)($data['date_emission'] ?? date('Y-m-d')));
+
+        $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
+        $pdf->docKind = 'document';
+        $pdf->reference = $refDoc;
+        $pdf->SetMargins(20, 20, 20);
+        $pdf->SetAutoPageBreak(true, 30);
+        $pdf->SetTitle($tr("Diplôme de Bachelier — IPEC"));
+        $pdf->SetAuthor($tr("IPEC — Institut Privé des Études Commerciales"));
+        $pdf->AddPage();
+
+        ipec_doc_header($pdf, "DIPLÔME", $refDoc, $emis, $refCand);
+
+        $pdf->Ln(6);
+        $pdf->SetFont('Times', 'B', 22);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 12, $tr("DIPLÔME DE BACHELIER"), 0, 1, 'C');
+        $pdf->SetFont('Helvetica', '', 11);
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(0, 6, $tr("Programme d'Apprentissage Approfondi (PAA — BAC+3)"), 0, 1, 'C');
+        $pdf->Ln(10);
+
+        $pdf->SetFont('Helvetica', '', 12);
+        $pdf->SetTextColor(27, 31, 42);
+        $pdf->MultiCell(0, 6, $tr("Le Directeur de l'Institut Privé des Études Commerciales (IPEC) confère le présent diplôme à :"), 0, 'C');
+        $pdf->Ln(4);
+
+        $pdf->SetFont('Times', 'B', 18);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 10, $tr(trim($civ . ' ' . $prenom . ' ' . $nom)), 0, 1, 'C');
+
+        if ($dateNaiss !== '') {
+            $pdf->SetFont('Helvetica', '', 10);
+            $pdf->SetTextColor(91, 100, 120);
+            $pdf->Cell(0, 5, $tr('Né(e) le ' . $dateNaiss), 0, 1, 'C');
+        }
+        $pdf->Ln(6);
+
+        $pdf->SetFont('Helvetica', '', 11);
+        $pdf->SetTextColor(27, 31, 42);
+        $pdf->MultiCell(0, 6, $tr("ayant satisfait à l'ensemble des épreuves, modules et travaux du cycle de Bachelier en Études Commerciales (BAC+3)"
+            . ($specialisation !== '' && stripos($specialisation, 'sais') === false
+                ? ", spécialisation : " . $specialisation : "")
+            . ($anneeAcad !== '' ? ", au titre de l'année académique " . $anneeAcad : "")
+            . "."), 0, 'C');
+        $pdf->Ln(6);
+
+        $pdf->MultiCell(0, 6, $tr("Le présent diplôme est délivré à Bruxelles, le " . $emis . ", pour valoir ce que de droit."), 0, 'C');
+
+        $pdf->Ln(20);
+        $pdf->SetFont('Helvetica', 'B', 11);
+        $pdf->SetTextColor(15, 21, 37);
+        $pdf->Cell(0, 6, $tr("La Direction"), 0, 1, 'C');
+        $pdf->SetFont('Helvetica', 'I', 10);
+        $pdf->SetTextColor(91, 100, 120);
+        $pdf->Cell(0, 5, $tr("Institut Privé des Études Commerciales (IPEC)"), 0, 1, 'C');
+
+        return (string)$pdf->Output('S');
+    }
+}
+

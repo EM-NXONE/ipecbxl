@@ -205,19 +205,25 @@ try {
         echo $out; exit;
     }
 
-    // Template "attestation_reussite" → fin de cursus / diplomation
-    if ($d['template'] === 'attestation_reussite' && function_exists('buildAttestationReussitePdf')) {
+    // Templates "attestation_reussite" / "attestation_reussite_annee" / "diplome_bachelier"
+    $newDocTemplates = [
+        'attestation_reussite'       => ['fn' => 'buildAttestationReussitePdf',       'fname' => 'attestation-reussite'],
+        'attestation_reussite_annee' => ['fn' => 'buildAttestationReussiteAnneePdf', 'fname' => 'attestation-reussite-annee'],
+        'diplome_bachelier'          => ['fn' => 'buildDiplomeBachelierPdf',          'fname' => 'diplome-bachelier'],
+    ];
+    if (isset($newDocTemplates[$d['template']]) && function_exists($newDocTemplates[$d['template']]['fn'])) {
+        $cfg = $newDocTemplates[$d['template']];
         $data['reference_doc'] = $data['reference_doc'] ?? $d['reference'];
         $data['date_emission'] = $data['date_emission'] ?? $d['date_emission'];
         $data['civilite']      = $data['civilite']      ?? $d['civilite'];
         $data['prenom']        = $data['prenom']        ?? $d['prenom'];
         $data['nom']           = $data['nom']           ?? $d['nom'];
-        $out = buildAttestationReussitePdf($data);
+        $out = call_user_func($cfg['fn'], $data);
         if ($out === '') throw new RuntimeException('PDF vide.');
         $pdo->prepare("UPDATE documents SET vu_etudiant_at = COALESCE(vu_etudiant_at, NOW()),
                        nb_telechargements = nb_telechargements + 1 WHERE id = ?")->execute([$id]);
         etu_log_action((int)$user['id'], 'download_doc', 'Document ' . $d['reference']);
-        $filename = etu_safe_filename('attestation-reussite', $d['reference']);
+        $filename = etu_safe_filename($cfg['fname'], $d['reference']);
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Length: ' . strlen($out));
