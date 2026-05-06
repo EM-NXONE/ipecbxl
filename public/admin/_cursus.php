@@ -188,14 +188,13 @@ function cursus_evoluer(
     $newCand = cursus_create_next_candidature($pdo, $prev, $nextStep, $mode, $adminUser);
 
     // Génère les 3 factures de scolarité pour la nouvelle candidature.
-    // etudiant_create_factures_scolarite() est idempotent + s'occupe aussi
-    // de la lettre de préadmission. Il fait categorie ← 'preadmis'.
+    // etudiant_create_factures_scolarite() est idempotent + lettre de préadmission.
+    // NB : la catégorie de l'étudiant n'est JAMAIS rétrogradée. Un étudiant qui
+    // passe en année supérieure (ou redouble) reste 'etudiant'. La nouvelle
+    // attestation d'inscription définitive sera générée à part, lorsque la
+    // 1ʳᵉ tranche de la nouvelle année sera marquée payée
+    // (cf. etudiant_create_documents_inscription_definitive, scoped par candidature_id).
     $res = etudiant_create_factures_scolarite($pdo, $newCand, $adminUser);
-
-    // S'assure que la catégorie est BIEN 'preadmis' (et pas 'etudiant' héritée
-    // de l'ancienne année). Logique stricte par année.
-    $pdo->prepare("UPDATE etudiants SET categorie='preadmis' WHERE id=? AND categorie='etudiant'")
-        ->execute([(int)$prev['etudiant_id']]);
 
     return [
         'candidature'    => $newCand,

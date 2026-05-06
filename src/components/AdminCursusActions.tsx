@@ -73,7 +73,8 @@ export function AdminCursusActions({
       `Faire passer cet étudiant de ${cursus.current_label} à ${cursus.next_label}\n` +
       `pour l'année académique ${annee} ?\n\n` +
       `Une nouvelle candidature et 3 factures de scolarité seront générées.\n` +
-      `La catégorie repassera à « préadmis » jusqu'au paiement de la 1ʳᵉ tranche.`
+      `L'étudiant reste « étudiant » ; une nouvelle attestation d'inscription définitive\n` +
+      `sera générée après paiement de la 1ʳᵉ tranche de la nouvelle année.`
     )) return;
     run("passer_annee", { annee_academique: annee, rentree });
   };
