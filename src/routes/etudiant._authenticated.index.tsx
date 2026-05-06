@@ -30,6 +30,8 @@ interface Dashboard {
     annee?: string | null; specialisation?: string | null; rentree?: string | null;
     annee_academique?: string | null; created_at?: string | null;
     facture_payee?: number | string | null;
+    parent_candidature_id?: number | null;
+    type_inscription?: string | null;
   }>;
   last_factures: Array<{ id: number; numero: string; libelle: string; montant_ttc_cents: number; statut_paiement: string; date_emission: string }>;
   last_documents: Array<{ id: number; reference: string; type: string; titre: string; date_emission: string }>;
