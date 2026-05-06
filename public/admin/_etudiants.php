@@ -12,7 +12,12 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../_academic_dates.php';
+// _academic_dates.php est packagé soit à côté (admin/_shared, site/) soit dans le parent (dev: public/admin/ → public/_academic_dates.php)
+(function(){
+    foreach ([__DIR__ . '/_academic_dates.php', __DIR__ . '/../_academic_dates.php'] as $p) {
+        if (is_file($p)) { require_once $p; return; }
+    }
+})();
 
 /** Mot de passe par défaut pour tout compte étudiant créé/réinitialisé par l'admin. */
 const ETU_DEFAULT_PASSWORD = 'Student1';
