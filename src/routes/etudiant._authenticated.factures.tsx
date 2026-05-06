@@ -49,6 +49,20 @@ function moyenLabel(m?: string | null): string {
   return MOYEN_LABELS[m.toLowerCase()] ?? m;
 }
 
+function groupByAcademicYear(factures: Facture[]): Array<[string, Facture[]]> {
+  const map = new Map<string, Facture[]>();
+  for (const f of factures) {
+    const key = normalizeAcademicYear(f.candidature_annee_academique);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(f);
+  }
+  return Array.from(map.entries()).sort(([a], [b]) => {
+    if (a === "Année non précisée") return 1;
+    if (b === "Année non précisée") return -1;
+    return b.localeCompare(a);
+  });
+}
+
 function EtudiantFacturesPage() {
   const [data, setData] = useState<Resp | null>(null);
   const [error, setError] = useState<string | null>(null);
