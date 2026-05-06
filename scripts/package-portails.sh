@@ -127,6 +127,7 @@ cp "$PUB/mailer.php"        "$SITE/"
 cp "$PUB/db_config.php"     "$SITE/"
 cp "$PUB/verify.php"        "$SITE/"
 cp "$PUB/_pdf_classes.php"  "$SITE/"
+cp "$PUB/_academic_dates.php" "$SITE/"
 cp "$PUB/_shared/cors.php"  "$SITE/"
 cp "$PUB/admin/_etudiants.php" "$SITE/"
 cp "$PUB/admin/_cursus.php"    "$SITE/"
@@ -142,7 +143,7 @@ RewriteRule ^ - [L]
 RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
-<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^cors\.php$|^_etudiants\.php$|^_cursus\.php$)">
+<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^_academic_dates\.php$|^cors\.php$|^_etudiants\.php$|^_cursus\.php$)">
   Require all denied
 </FilesMatch>
 HT
@@ -177,6 +178,7 @@ cp "$PUB/admin-api/"*.php       "$ADMIN/api/"
 cp "$PUB/db_config.php"         "$ADMIN/api/_shared/"
 cp "$PUB/mailer.php"            "$ADMIN/api/_shared/"
 cp "$PUB/_pdf_classes.php"      "$ADMIN/api/_shared/"
+cp "$PUB/_academic_dates.php"   "$ADMIN/api/_shared/"
 cp "$PUB/_shared/cors.php"      "$ADMIN/api/_shared/"
 cp "$PUB/admin/_etudiants.php"  "$ADMIN/api/_shared/"
 cp "$PUB/admin/_cursus.php"     "$ADMIN/api/_shared/"
@@ -249,6 +251,7 @@ cp "$PUB/etudiant-api/"*.php "$LMS/api/"
 cp "$PUB/db_config.php"      "$LMS/api/_shared/"
 cp "$PUB/mailer.php"         "$LMS/api/_shared/"
 cp "$PUB/_pdf_classes.php"   "$LMS/api/_shared/"
+cp "$PUB/_academic_dates.php" "$LMS/api/_shared/"
 cp "$PUB/_shared/cors.php"   "$LMS/api/_shared/"
 cp "$PUB/ipec-logo-email.png" "$LMS/api/_shared/"
 cp -R "$PUB/FPDF"            "$LMS/api/_shared/"

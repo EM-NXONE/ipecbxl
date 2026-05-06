@@ -5,14 +5,16 @@ api_method('GET');
 $u = api_require_etudiant();
 
 $stmt = db()->prepare(
-    "SELECT id, numero, type, libelle, description,
-            montant_ht_cents, tva_taux, montant_ttc_cents, devise,
-            date_emission, date_echeance,
-            statut_paiement, paye_at, moyen_paiement, reference_paiement,
-            created_at, updated_at
-     FROM factures
-     WHERE etudiant_id=? AND visible_etudiant=1
-     ORDER BY date_emission DESC, id DESC"
+    "SELECT f.id, f.numero, f.type, f.libelle, f.description,
+            f.montant_ht_cents, f.tva_taux, f.montant_ttc_cents, f.devise,
+            f.date_emission, f.date_echeance,
+            f.statut_paiement, f.paye_at, f.moyen_paiement, f.reference_paiement,
+            f.created_at, f.updated_at,
+            c.annee_academique AS candidature_annee_academique
+     FROM factures f
+     LEFT JOIN candidatures c ON c.id = f.candidature_id
+     WHERE f.etudiant_id=? AND f.visible_etudiant=1
+     ORDER BY f.date_emission DESC, f.id DESC"
 );
 $stmt->execute([$u['id']]);
 $factures = $stmt->fetchAll();

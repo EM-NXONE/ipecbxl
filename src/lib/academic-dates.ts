@@ -47,3 +47,14 @@ export function formatRentreeDate(d: string): string {
 export function getCurrentAcademicYearStart(): number {
   return parseInt(ACADEMIC_YEAR_LABEL.slice(0, 4), 10);
 }
+
+/**
+ * Normalise un libellé d'année académique stocké en BDD.
+ * Accepte "2026-2027", "2026/2027", null/"" → "Année non précisée".
+ */
+export function normalizeAcademicYear(s: string | null | undefined): string {
+  const v = (s || "").trim();
+  if (!v) return "Année non précisée";
+  return v.replace("/", "-");
+}
+

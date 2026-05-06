@@ -4,10 +4,9 @@ import brusselsImg from "@/assets/brussels.jpg";
 import { ArrowRight, GraduationCap, Globe2, Compass, CalendarDays, Briefcase, Megaphone, Globe, LineChart } from "lucide-react";
 import { LogoIpec } from "@/components/LogoIpec";
 import {
-  getNextSeptemberRentree,
-  getNextFebruaryRentree,
+  SEPTEMBER_RENTREE_DATE,
+  FEBRUARY_RENTREE_DATE,
   getUpcomingAcademicYearLabel,
-  formatRentreeDate,
 } from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/")({
@@ -30,8 +29,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const septembreRentree = getNextSeptemberRentree();
-  const fevrierRentree = getNextFebruaryRentree();
+  const septembreRentree = SEPTEMBER_RENTREE_DATE;
+  const fevrierRentree = FEBRUARY_RENTREE_DATE;
   const academicYear = getUpcomingAcademicYearLabel();
   return (
     <>
@@ -366,7 +365,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée principale</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  <em className="text-gradient-blue not-italic">{formatRentreeDate(septembreRentree)}</em>
+                  <em className="text-gradient-blue not-italic">{septembreRentree}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   La grande rentrée académique : démarrage du cursus complet,
@@ -400,7 +399,7 @@ function Home() {
                 </div>
                 <div className="text-blue uppercase tracking-widest text-xs mb-3">Rentrée décalée</div>
                 <h3 className="font-display text-3xl text-cream leading-snug mb-5">
-                  <em className="text-gradient-blue not-italic">{formatRentreeDate(fevrierRentree)}</em>
+                  <em className="text-gradient-blue not-italic">{fevrierRentree}</em>
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                   Une seconde porte d'entrée, pensée pour celles et ceux qui souhaitent

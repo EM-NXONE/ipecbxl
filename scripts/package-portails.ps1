@@ -175,6 +175,7 @@ Copy-Item (Join-Path $PUB "mailer.php")        $SITE -Force
 Copy-Item (Join-Path $PUB "db_config.php")     $SITE -Force
 Copy-Item (Join-Path $PUB "verify.php")        $SITE -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE -Force
+Copy-Item (Join-Path $PUB "_academic_dates.php") $SITE -Force
 if (Test-Path (Join-Path $SITE "FPDF"))      { Remove-Item (Join-Path $SITE "FPDF")      -Recurse -Force }
 if (Test-Path (Join-Path $SITE "PHPMailer")) { Remove-Item (Join-Path $SITE "PHPMailer") -Recurse -Force }
 Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse -Force
@@ -189,7 +190,7 @@ RewriteRule ^ - [L]
 RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
-<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$)">
+<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^_academic_dates\.php$)">
   Require all denied
 </FilesMatch>
 "@
@@ -229,6 +230,7 @@ Copy-Item (Join-Path $PUB "admin-api\*.php")        $adminApi    -Force
 Copy-Item (Join-Path $PUB "db_config.php")          $adminShared -Force
 Copy-Item (Join-Path $PUB "mailer.php")             $adminShared -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared -Force
+Copy-Item (Join-Path $PUB "_academic_dates.php")    $adminShared -Force
 Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared -Force
 Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared -Force
 Copy-Item (Join-Path $PUB "admin\_cursus.php")      $adminShared -Force
@@ -287,6 +289,7 @@ Copy-Item (Join-Path $PUB "etudiant-api\*.php") $lmsApi    -Force
 Copy-Item (Join-Path $PUB "db_config.php")      $lmsShared -Force
 Copy-Item (Join-Path $PUB "mailer.php")         $lmsShared -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")   $lmsShared -Force
+Copy-Item (Join-Path $PUB "_academic_dates.php") $lmsShared -Force
 Copy-Item (Join-Path $PUB "_shared\cors.php")   $lmsShared -Force
 Copy-Item (Join-Path $PUB "ipec-logo-email.png") $lmsShared -Force
 Copy-Item (Join-Path $PUB "FPDF")               $lmsShared -Recurse -Force

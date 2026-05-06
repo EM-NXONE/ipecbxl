@@ -8,6 +8,7 @@ import { AdminCandidatureActions, adminActionMessage } from "@/components/AdminC
 import { AdminCursusActions, type CursusDescriptor, type CursusHistoryRow } from "@/components/AdminCursusActions";
 import { adminApi, adminUrl } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { normalizeAcademicYear } from "@/lib/academic-dates";
 import { StatusBadge } from "./admin._authenticated.index";
 
 export const Route = createFileRoute("/admin/_authenticated/candidatures/$id")({
@@ -31,6 +32,8 @@ interface FactureRow {
   moyen_paiement: string | null;
   paye_par_admin: string | null;
   reference_paiement: string | null;
+  candidature_id?: number | null;
+  candidature_annee_academique?: string | null;
 }
 
 interface Detail {
@@ -432,100 +435,122 @@ function FacturesCard({
     );
   }
 
+  // Regrouper par année académique
+  const groups = new Map<string, FactureRow[]>();
+  for (const f of factures) {
+    const key = normalizeAcademicYear(f.candidature_annee_academique);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(f);
+  }
+  const ordered = Array.from(groups.entries()).sort(([a], [b]) => {
+    if (a === "Année non précisée") return 1;
+    if (b === "Année non précisée") return -1;
+    return b.localeCompare(a);
+  });
+
   return (
     <Card title={`Factures (${factures.length})`}>
-      <ul className="divide-y divide-border/20 -my-2">
-        {factures.map((f) => {
-          const paid = f.statut_paiement === "payee";
-          return (
-            <li key={f.id} className="py-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border border-border/40 text-muted-foreground">
-                      {TYPE_LABELS[f.type] ?? f.type}
-                    </span>
-                    {paid ? (
-                      <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                        ✓ Payée
-                      </span>
-                    ) : (
-                      <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-amber-500/10 text-amber-300 border-amber-500/30">
-                        En attente
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-sm text-cream font-medium truncate">
-                    {f.libelle || "—"}
-                  </div>
-                  <div className="text-xs text-muted-foreground font-mono break-all">
-                    {f.numero}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1 space-x-3">
-                    {f.date_echeance && <span>Échéance : {formatDate(f.date_echeance)}</span>}
-                    {paid && f.paye_at && <span>Payée le {formatDate(f.paye_at)}</span>}
-                    {paid && f.moyen_paiement && <span>· {moyenLabel(f.moyen_paiement)}</span>}
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-cream font-medium">
-                    {formatMontantCents(f.montant_ttc_cents, f.devise)}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider">TTC</div>
-                </div>
-              </div>
+      <div className="space-y-5 -my-1">
+        {ordered.map(([year, list]) => (
+          <div key={year}>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 pb-1 border-b border-border/30">
+              Année académique {year} <span className="text-muted-foreground/70">· {list.length}</span>
+            </div>
+            <ul className="divide-y divide-border/20">
+              {list.map((f) => {
+                const paid = f.statut_paiement === "payee";
+                return (
+                  <li key={f.id} className="py-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border border-border/40 text-muted-foreground">
+                            {TYPE_LABELS[f.type] ?? f.type}
+                          </span>
+                          {paid ? (
+                            <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+                              ✓ Payée
+                            </span>
+                          ) : (
+                            <span className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm border bg-amber-500/10 text-amber-300 border-amber-500/30">
+                              En attente
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm text-cream font-medium truncate">
+                          {f.libelle || "—"}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono break-all">
+                          {f.numero}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1 space-x-3">
+                          {f.date_echeance && <span>Échéance : {formatDate(f.date_echeance)}</span>}
+                          {paid && f.paye_at && <span>Payée le {formatDate(f.paye_at)}</span>}
+                          {paid && f.moyen_paiement && <span>· {moyenLabel(f.moyen_paiement)}</span>}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-cream font-medium">
+                          {formatMontantCents(f.montant_ttc_cents, f.devise)}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider">TTC</div>
+                      </div>
+                    </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a
-                  href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=facture`)}
-                  target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40"
-                >
-                  <Download size={12} /> Facture PDF
-                </a>
-                {paid && (
-                  <a
-                    href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=recu`)}
-                    target="_blank" rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-emerald-500/40 text-xs text-emerald-300 hover:border-emerald-500/70"
-                  >
-                    <Download size={12} /> Reçu
-                  </a>
-                )}
-                {!paid ? (
-                  <button
-                    onClick={() => openPay(f, false)}
-                    disabled={busy === f.id}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-blue/40 text-xs text-blue hover:bg-blue/10 disabled:opacity-50"
-                  >
-                    <CheckCircle2 size={12} /> Marquer payée
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => openPay(f, true)}
-                      disabled={busy === f.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50"
-                    >
-                      Éditer
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!confirm("Annuler ce paiement ? La facture repassera en attente.")) return;
-                        runAction(f.id, "mark_unpaid");
-                      }}
-                      disabled={busy === f.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-amber-500/40 text-xs text-amber-300 hover:bg-amber-500/10 disabled:opacity-50"
-                    >
-                      Annuler paiement
-                    </button>
-                  </>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <a
+                        href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=facture`)}
+                        target="_blank" rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40"
+                      >
+                        <Download size={12} /> Facture PDF
+                      </a>
+                      {paid && (
+                        <a
+                          href={adminUrl(`/facture-pdf.php?id=${f.id}&kind=recu`)}
+                          target="_blank" rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-emerald-500/40 text-xs text-emerald-300 hover:border-emerald-500/70"
+                        >
+                          <Download size={12} /> Reçu
+                        </a>
+                      )}
+                      {!paid ? (
+                        <button
+                          onClick={() => openPay(f, false)}
+                          disabled={busy === f.id}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-blue/40 text-xs text-blue hover:bg-blue/10 disabled:opacity-50"
+                        >
+                          <CheckCircle2 size={12} /> Marquer payée
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => openPay(f, true)}
+                            disabled={busy === f.id}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-border/40 text-xs text-cream hover:border-blue/40 disabled:opacity-50"
+                          >
+                            Éditer
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (!confirm("Annuler ce paiement ? La facture repassera en attente.")) return;
+                              runAction(f.id, "mark_unpaid");
+                            }}
+                            disabled={busy === f.id}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-amber-500/40 text-xs text-amber-300 hover:bg-amber-500/10 disabled:opacity-50"
+                          >
+                            Annuler paiement
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
 
       {showPay && (
         <div

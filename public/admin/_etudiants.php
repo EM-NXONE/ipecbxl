@@ -12,6 +12,13 @@
 
 declare(strict_types=1);
 
+// _academic_dates.php est packagé soit à côté (admin/_shared, site/) soit dans le parent (dev: public/admin/ → public/_academic_dates.php)
+(function(){
+    foreach ([__DIR__ . '/_academic_dates.php', __DIR__ . '/../_academic_dates.php'] as $p) {
+        if (is_file($p)) { require_once $p; return; }
+    }
+})();
+
 /** Mot de passe par défaut pour tout compte étudiant créé/réinitialisé par l'admin. */
 const ETU_DEFAULT_PASSWORD = 'Student1';
 
@@ -417,14 +424,12 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     // T1 : à la confirmation d'inscription → 30 jours
     $t1Echeance = $today->modify('+30 days')->format('Y-m-d');
 
-    // Tente d'extraire la date de rentrée depuis candidature.rentree.
-    // Format attendu (cf. inscription.tsx) : "Septembre — JJ/MM/AAAA" ou "Février — JJ/MM/AAAA".
+    // Le libellé "rentree" est maintenant symbolique ("Rentrée principale" / "Rentrée décalée").
+    // La date réelle est résolue via ipec_rentree_date_for() (codée en dur côté serveur).
     $rentreeStr = (string)($candidature['rentree'] ?? '');
-    $rentreeDate = null;
-    if (preg_match('#(\d{2})/(\d{2})/(\d{4})#', $rentreeStr, $m)) {
-        $rentreeDate = DateTimeImmutable::createFromFormat('!d/m/Y', "{$m[1]}/{$m[2]}/{$m[3]}");
-    }
-    $isFebruary = (stripos($rentreeStr, 'février') !== false || stripos($rentreeStr, 'fevrier') !== false);
+    $rentreeDateStr = ipec_rentree_date_for($rentreeStr); // jj/mm/aaaa
+    $isFebruary = ipec_rentree_is_decalee($rentreeStr);
+    $rentreeDate = DateTimeImmutable::createFromFormat('!d/m/Y', $rentreeDateStr) ?: null;
 
     if ($rentreeDate) {
         // T2 : 15 jours avant la rentrée
@@ -447,7 +452,7 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     if ($t2Echeance < $t1Echeance) $t2Echeance = $t1Echeance;
     if ($t3Echeance < $t2Echeance) $t3Echeance = $t2Echeance;
 
-    $rentreeLabel = $rentreeStr !== '' ? $rentreeStr : 'rentrée à venir';
+    $rentreeLabel = ipec_rentree_label_normalized($rentreeStr);
 
     $tranches = [
         [

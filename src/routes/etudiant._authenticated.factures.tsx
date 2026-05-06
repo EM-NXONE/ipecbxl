@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Download, FileText } from "lucide-react";
 import { etuApi, etuUrl } from "@/lib/api";
 import { formatMoneyCents, formatDate, FACTURE_STATUTS } from "@/lib/format";
+import { normalizeAcademicYear } from "@/lib/academic-dates";
 
 export const Route = createFileRoute("/etudiant/_authenticated/factures")({
   component: EtudiantFacturesPage,
@@ -25,6 +26,7 @@ interface Facture {
   paye_at?: string | null;
   moyen_paiement?: string | null;
   reference_paiement?: string | null;
+  candidature_annee_academique?: string | null;
 }
 
 interface Resp {
@@ -45,6 +47,20 @@ const MOYEN_LABELS: Record<string, string> = {
 function moyenLabel(m?: string | null): string {
   if (!m) return "—";
   return MOYEN_LABELS[m.toLowerCase()] ?? m;
+}
+
+function groupByAcademicYear(factures: Facture[]): Array<[string, Facture[]]> {
+  const map = new Map<string, Facture[]>();
+  for (const f of factures) {
+    const key = normalizeAcademicYear(f.candidature_annee_academique);
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(f);
+  }
+  return Array.from(map.entries()).sort(([a], [b]) => {
+    if (a === "Année non précisée") return 1;
+    if (b === "Année non précisée") return -1;
+    return b.localeCompare(a);
+  });
 }
 
 function EtudiantFacturesPage() {
@@ -78,89 +94,85 @@ function EtudiantFacturesPage() {
         <Kpi label="Nombre" value={count !== undefined ? String(count) : "—"} />
       </div>
 
-      <div className="bg-card border border-border/40 rounded-md overflow-hidden">
+      <div className="space-y-6">
         {!data ? (
-          <div className="p-8 text-sm text-muted-foreground">Chargement…</div>
+          <div className="bg-card border border-border/40 rounded-md p-8 text-sm text-muted-foreground">Chargement…</div>
         ) : data.factures.length === 0 ? (
-          <div className="p-8 text-sm text-muted-foreground">Aucune facture pour l'instant.</div>
+          <div className="bg-card border border-border/40 rounded-md p-8 text-sm text-muted-foreground">Aucune facture pour l'instant.</div>
         ) : (
-          <>
-            {/* Tableau (desktop) — chaque facture = 2 lignes : infos puis libellé */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
-                  <tr>
-                    <th className="text-left font-medium px-4 py-3">Facture</th>
-                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
-                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
-                    <th className="text-right font-medium px-4 py-3">Montant</th>
-                    <th className="text-left font-medium px-4 py-3">Statut</th>
-                    <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Payée le</th>
-                    <th className="text-left font-medium px-4 py-3">Moyen</th>
-                    <th className="text-right font-medium px-4 py-3">Documents</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.factures.map((f) => {
+          groupByAcademicYear(data.factures).map(([year, list]) => (
+            <section key={year}>
+              <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
+                Année académique {year} <span className="text-muted-foreground/70">· {list.length}</span>
+              </h2>
+              <div className="bg-card border border-border/40 rounded-md overflow-hidden">
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-secondary/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border/40">
+                      <tr>
+                        <th className="text-left font-medium px-4 py-3">Facture</th>
+                        <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Émise le</th>
+                        <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
+                        <th className="text-right font-medium px-4 py-3">Montant</th>
+                        <th className="text-left font-medium px-4 py-3">Statut</th>
+                        <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Payée le</th>
+                        <th className="text-left font-medium px-4 py-3">Moyen</th>
+                        <th className="text-right font-medium px-4 py-3">Documents</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {list.map((f) => {
+                        const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
+                        const paid = f.statut_paiement === "payee";
+                        return <FactureRows key={f.id} f={f} paid={paid} statut={s} />;
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <ul className="md:hidden divide-y divide-border/30">
+                  {list.map((f) => {
                     const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
                     const paid = f.statut_paiement === "payee";
                     return (
-                      <FactureRows key={f.id} f={f} paid={paid} statut={s} />
+                      <li key={f.id} className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-cream font-medium truncate">{f.libelle}</div>
+                            <div className="font-mono text-[11px] text-muted-foreground">{f.numero}</div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-cream font-medium tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</div>
+                            <div className="text-[11px] text-muted-foreground">{formatDate(f.date_emission)}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <Badge tone={s.tone}>{s.label}</Badge>
+                            {f.date_echeance && !paid && (
+                              <div className="text-[11px] text-muted-foreground mt-1">Échéance {formatDate(f.date_echeance)}</div>
+                            )}
+                            {paid && f.paye_at && (
+                              <div className="text-[11px] text-muted-foreground mt-1">Payée le {formatDate(f.paye_at)} · {moyenLabel(f.moyen_paiement)}</div>
+                            )}
+                          </div>
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <a href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)} className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline">
+                              <FileText size={12} /> Facture
+                            </a>
+                            {paid && (
+                              <a href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)} className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline">
+                                <Download size={12} /> Reçu
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </li>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Cartes (mobile) */}
-            <ul className="md:hidden divide-y divide-border/30">
-              {data.factures.map((f) => {
-                const s = FACTURE_STATUTS[f.statut_paiement] ?? { label: f.statut_paiement, tone: "muted" as const };
-                const paid = f.statut_paiement === "payee";
-                return (
-                  <li key={f.id} className="p-4 space-y-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-cream font-medium truncate">{f.libelle}</div>
-                        <div className="font-mono text-[11px] text-muted-foreground">{f.numero}</div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <div className="text-cream font-medium tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</div>
-                        <div className="text-[11px] text-muted-foreground">{formatDate(f.date_emission)}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <Badge tone={s.tone}>{s.label}</Badge>
-                        {f.date_echeance && !paid && (
-                          <div className="text-[11px] text-muted-foreground mt-1">Échéance {formatDate(f.date_echeance)}</div>
-                        )}
-                        {paid && f.paye_at && (
-                          <div className="text-[11px] text-muted-foreground mt-1">Payée le {formatDate(f.paye_at)} · {moyenLabel(f.moyen_paiement)}</div>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <a
-                          href={etuUrl(`/telecharger.php?type=facture&id=${f.id}`)}
-                          className="inline-flex items-center gap-1.5 text-xs text-blue hover:underline"
-                        >
-                          <FileText size={12} /> Facture
-                        </a>
-                        {paid && (
-                          <a
-                            href={etuUrl(`/telecharger.php?type=recu&id=${f.id}`)}
-                            className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline"
-                          >
-                            <Download size={12} /> Reçu
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
+                </ul>
+              </div>
+            </section>
+          ))
         )}
       </div>
     </div>
