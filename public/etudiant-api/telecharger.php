@@ -26,7 +26,7 @@ try {
         $stmt = $pdo->prepare(
             "SELECT f.*, e.civilite, e.prenom, e.nom, e.email,
                     c.rue, c.numero AS num_rue, c.code_postal, c.ville, c.pays_residence,
-                    c.programme, c.annee, c.rentree
+                    c.programme, c.annee, c.rentree, c.annee_academique
              FROM factures f
              INNER JOIN etudiants e ON e.id = f.etudiant_id
              LEFT JOIN candidatures c ON c.id = f.candidature_id
@@ -48,7 +48,7 @@ try {
             'civilite' => $f['civilite'], 'prenom' => $f['prenom'], 'nom' => $f['nom'],
             'adresse' => $adresse, 'rue' => $f['rue'], 'numero' => $f['num_rue'],
             'codePostal' => $f['code_postal'], 'ville' => $f['ville'], 'paysResidence' => $f['pays_residence'],
-            'email' => $f['email'], 'programme' => $f['programme'], 'annee' => $f['annee'], 'rentree' => $f['rentree'],
+            'email' => $f['email'], 'programme' => $f['programme'], 'annee' => $f['annee'], 'rentree' => $f['rentree'], 'annee_academique' => $f['annee_academique'],
             'libelle' => $f['libelle'], 'description' => $f['description'],
             'montant_ttc_cents' => (int)$f['montant_ttc_cents'], 'tva_taux' => (float)$f['tva_taux'],
             'devise' => $f['devise'], 'date_emission' => $f['date_emission'], 'date_echeance' => $f['date_echeance'],
@@ -68,7 +68,7 @@ try {
         $stmt = $pdo->prepare(
             "SELECT f.*, e.civilite, e.prenom, e.nom, e.email,
                     c.rue, c.numero AS num_rue, c.code_postal, c.ville, c.pays_residence,
-                    c.programme, c.annee, c.specialisation, c.rentree
+                    c.programme, c.annee, c.specialisation, c.rentree, c.annee_academique
              FROM factures f
              INNER JOIN etudiants e ON e.id = f.etudiant_id
              LEFT JOIN candidatures c ON c.id = f.candidature_id
@@ -91,7 +91,7 @@ try {
             'codePostal' => $f['code_postal'], 'ville' => $f['ville'], 'paysResidence' => $f['pays_residence'],
             'email' => $f['email'],
             'programme' => $f['programme'], 'annee' => $f['annee'],
-            'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'],
+            'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'], 'annee_academique' => $f['annee_academique'],
             'montant_ttc_cents' => (int)$f['montant_ttc_cents'],
             'tva_taux' => (float)$f['tva_taux'],
             'libelle' => $f['libelle'], 'description' => $f['description'],
