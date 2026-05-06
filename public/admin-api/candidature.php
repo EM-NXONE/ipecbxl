@@ -106,11 +106,39 @@ $histStmt = $pdo->prepare(
 );
 $histStmt->execute([$id]);
 
+// Toutes les candidatures de l'étudiant (historique cursus année par année)
+$cursus_history = [];
+$latest_cand = $cand;
+if ($etudiant) {
+    $hStmt = $pdo->prepare(
+        "SELECT id, reference, statut, programme, annee, specialisation,
+                rentree, annee_academique, type_inscription, parent_candidature_id,
+                created_at
+         FROM candidatures
+         WHERE etudiant_id = ?
+         ORDER BY created_at DESC, id DESC"
+    );
+    $hStmt->execute([(int)$etudiant['id']]);
+    $cursus_history = $hStmt->fetchAll();
+    if (!empty($cursus_history)) {
+        // La candidature la plus récente détermine l'étape "courante" du cursus.
+        $latest_cand = $cursus_history[0] + $cand; // garde tout le détail si c'est la même
+        if ((int)$cursus_history[0]['id'] !== (int)$cand['id']) {
+            $lst = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
+            $lst->execute([(int)$cursus_history[0]['id']]);
+            $latest_cand = $lst->fetch() ?: $cand;
+        }
+    }
+}
+
 api_json([
-    'candidature' => $cand,
-    'etudiant'    => $etudiant,
-    'homonyme'    => $homonyme,
-    'factures'    => $factures,
-    'historique'  => $histStmt->fetchAll(),
-    'statuts'     => ADMIN_STATUTS,
+    'candidature'    => $cand,
+    'etudiant'       => $etudiant,
+    'homonyme'       => $homonyme,
+    'factures'       => $factures,
+    'historique'     => $histStmt->fetchAll(),
+    'statuts'        => ADMIN_STATUTS,
+    'cursus'         => cursus_describe_for($latest_cand),
+    'cursus_history' => $cursus_history,
+    'latest_candidature_id' => (int)$latest_cand['id'],
 ]);
