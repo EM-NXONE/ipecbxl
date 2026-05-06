@@ -1017,20 +1017,22 @@ function buildFacturePdf(array $f): array {
 
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
-    // Année académique aaaa/aaaa : on cherche un "20xx" dans la rentrée, sinon on calcule
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
-        $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
-        $startY = $isPrintemps ? ($y - 1) : $y;
-        $academicYear = $startY . '/' . ($startY + 1);
-    } else {
-        $now = time();
-        $curY = (int)date('Y', $now);
-        $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        $academicYear = $startY . '/' . ($startY + 1);
+    // Année académique : utiliser celle stockée si fournie, sinon dériver
+    $academicYear = trim((string)($f['annee_academique'] ?? ''));
+    if ($academicYear === '') {
+        if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
+            $y = (int)$m[1];
+            $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t|d[eé]cal/i', $rentreeLabel);
+            $startY = $isPrintemps ? ($y - 1) : $y;
+            $academicYear = $startY . '-' . ($startY + 1);
+        } else {
+            $now = time();
+            $curY = (int)date('Y', $now);
+            $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
+            $academicYear = $startY . '-' . ($startY + 1);
+        }
     }
+    $academicYear = str_replace('/', '-', $academicYear);
 
     // Deux encadrés côte à côte : "Facturé à" (gauche) et "Inscription" (droite)
     $pdf->Ln(8);
