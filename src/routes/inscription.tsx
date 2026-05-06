@@ -78,8 +78,8 @@ function Inscription() {
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
-  const septembreRentree = formatRentreeDate(getNextSeptemberRentree());
-  const fevrierRentree = formatRentreeDate(getNextFebruaryRentree());
+  const septembreRentree = getNextSeptemberRentree(); // "Rentrée principale"
+  const fevrierRentree = getNextFebruaryRentree();    // "Rentrée décalée"
   const academicYearLabel = getUpcomingAcademicYearLabel();
 
   const handleProgrammeChange = (value: Programme) => {
