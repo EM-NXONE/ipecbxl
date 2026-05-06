@@ -20,7 +20,7 @@ $pdo = db();
 $stmt = $pdo->prepare(
     "SELECT f.*, e.civilite, e.prenom, e.nom, e.email,
             c.rue, c.numero AS num_rue, c.code_postal, c.ville, c.pays_residence,
-            c.programme, c.annee, c.specialisation, c.rentree, c.reference AS ref_candidature
+            c.programme, c.annee, c.specialisation, c.rentree, c.annee_academique, c.reference AS ref_candidature
      FROM factures f
      INNER JOIN etudiants e ON e.id = f.etudiant_id
      LEFT JOIN candidatures c ON c.id = f.candidature_id
@@ -54,6 +54,7 @@ $base = [
     'annee'             => $f['annee'],
     'specialisation'    => $f['specialisation'],
     'rentree'           => $f['rentree'],
+    'annee_academique'  => $f['annee_academique'],
     'libelle'           => $f['libelle'],
     'description'       => $f['description'],
     'montant_ttc_cents' => (int)$f['montant_ttc_cents'],

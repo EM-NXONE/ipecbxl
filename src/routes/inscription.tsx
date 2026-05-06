@@ -78,8 +78,8 @@ function Inscription() {
 
   const years = yearsByProgramme[programme];
   const allowUndecided = programme === "PAA" && (annee === "1" || annee === "2");
-  const septembreRentree = formatRentreeDate(getNextSeptemberRentree());
-  const fevrierRentree = formatRentreeDate(getNextFebruaryRentree());
+  const septembreRentree = getNextSeptemberRentree(); // "Rentrée principale"
+  const fevrierRentree = getNextFebruaryRentree();    // "Rentrée décalée"
   const academicYearLabel = getUpcomingAcademicYearLabel();
 
   const handleProgrammeChange = (value: Programme) => {
@@ -399,8 +399,8 @@ function Inscription() {
                     Rentrée envisagée — Année {academicYearLabel}
                   </label>
                   <select required name="rentree" className="w-full bg-card border border-border/60 px-4 py-3 rounded-sm text-cream focus:border-blue focus:outline-none transition-colors">
-                    <option>Septembre — {septembreRentree}</option>
-                    <option>Février — {fevrierRentree}</option>
+                    <option>{septembreRentree}</option>
+                    <option>{fevrierRentree}</option>
                   </select>
                 </div>
 

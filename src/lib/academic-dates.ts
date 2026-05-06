@@ -1,8 +1,9 @@
 /**
  * Dates de rentrée et année académique — VALEURS CODÉES EN DUR.
  *
- * ⚠️  À METTRE À JOUR MANUELLEMENT CHAQUE ANNÉE.
- *     Modifier uniquement les constantes ci-dessous.
+ * ⚠️ À METTRE À JOUR MANUELLEMENT CHAQUE ANNÉE.
+ *    Modifier uniquement les constantes ci-dessous, ET la copie côté
+ *    PHP : public/_academic_dates.php (mêmes valeurs).
  */
 
 // Année académique affichée partout (format AAAA-AAAA)
@@ -14,24 +15,30 @@ export const SEPTEMBER_RENTREE_DATE = "14/09/2026";
 // Date de la rentrée décalée (format jj/mm/aaaa)
 export const FEBRUARY_RENTREE_DATE = "01/02/2027";
 
+// Libellés symboliques utilisés dans les formulaires/BDD.
+// On stocke ces libellés en BDD (candidatures.rentree) plutôt que des dates,
+// pour qu'aucune date n'apparaisse dans les documents/UI.
+export const RENTREE_PRINCIPALE_LABEL = "Rentrée principale";
+export const RENTREE_DECALEE_LABEL = "Rentrée décalée";
+
 // ───────────────────────────────────────────────────────────────
-// Helpers conservés pour compatibilité — ils renvoient désormais
-// directement les chaînes ci-dessus (plus aucun calcul).
+// Helpers (compat) — ne renvoient désormais que les libellés
+// symboliques, plus jamais de dates.
 // ───────────────────────────────────────────────────────────────
 
 export function getNextSeptemberRentree(): string {
-  return SEPTEMBER_RENTREE_DATE;
+  return RENTREE_PRINCIPALE_LABEL;
 }
 
 export function getNextFebruaryRentree(): string {
-  return FEBRUARY_RENTREE_DATE;
+  return RENTREE_DECALEE_LABEL;
 }
 
 export function getUpcomingAcademicYearLabel(): string {
   return ACADEMIC_YEAR_LABEL;
 }
 
-/** No-op : la date est déjà formatée. Conservé pour compatibilité. */
+/** No-op : on renvoie tel quel. Conservé pour compatibilité. */
 export function formatRentreeDate(d: string): string {
   return d;
 }
