@@ -30,6 +30,8 @@ interface Dashboard {
     annee?: string | null; specialisation?: string | null; rentree?: string | null;
     annee_academique?: string | null; created_at?: string | null;
     facture_payee?: number | string | null;
+    parent_candidature_id?: number | null;
+    type_inscription?: string | null;
   }>;
   last_factures: Array<{ id: number; numero: string; libelle: string; montant_ttc_cents: number; statut_paiement: string; date_emission: string }>;
   last_documents: Array<{ id: number; reference: string; type: string; titre: string; date_emission: string }>;
@@ -67,12 +69,26 @@ function EtudiantDashboardPage() {
 
       {error && <div className="mb-6 px-4 py-3 rounded-sm bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>}
 
+      {user?.categorie === "diplome" && (
+        <div className="mb-6 px-4 py-3 rounded-sm bg-green-500/10 border border-green-500/30 text-sm text-green-300">
+          🎓 Félicitations, vous êtes diplômé(e) de l'IPEC. Votre attestation de réussite est disponible dans vos documents.
+        </div>
+      )}
+      {user?.categorie === "inactif" && (
+        <div className="mb-6 px-4 py-3 rounded-sm bg-amber-500/10 border border-amber-500/30 text-sm text-amber-300">
+          Votre cursus est actuellement inactif. Contactez le secrétariat pour toute question.
+        </div>
+      )}
+
       {data?.candidatures && data.candidatures.length > 0 && (
         <section className="mb-8 space-y-4">
           <h2 className="font-display text-lg text-cream">Suivi de candidature</h2>
-          {data.candidatures.map((c) => {
+          {data.candidatures.map((c, idx) => {
             const meta = CANDIDATURE_STATUTS[c.statut] ?? { label: c.statut, tone: "muted" as const, description: "", step: 0 };
             const programmeLabel = [c.programme, c.annee, c.specialisation].filter(Boolean).join(" · ");
+            const isCurrent = idx === 0;
+            const typeLabel = c.type_inscription === "redoublement" ? "Redoublement"
+              : c.type_inscription === "passage" ? "Passage d'année" : null;
             return (
               <div key={c.id} className="bg-card border border-border/40 rounded-md p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
@@ -80,11 +96,16 @@ function EtudiantDashboardPage() {
                     <div className="text-cream font-medium truncate">{programmeLabel || "Candidature"}</div>
                     <div className="text-xs text-muted-foreground font-mono mt-0.5">
                       {c.reference}
+                      {c.annee_academique ? <> · {c.annee_academique}</> : null}
                       {c.rentree ? <> · Rentrée {c.rentree}</> : null}
                       {c.created_at ? <> · Déposée le {formatDate(c.created_at)}</> : null}
                     </div>
                   </div>
-                  <Badge tone={meta.tone}>{meta.label}</Badge>
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    {isCurrent && <Badge tone="info">Année en cours</Badge>}
+                    {typeLabel && <Badge tone="muted">{typeLabel}</Badge>}
+                    <Badge tone={meta.tone}>{meta.label}</Badge>
+                  </div>
                 </div>
 
                 {meta.description && (
