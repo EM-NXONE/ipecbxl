@@ -69,15 +69,9 @@ function cursus_create_next_candidature(
     $meta = CURSUS_LABELS[$stepKey] ?? null;
     if (!$meta) throw new RuntimeException("Étape cursus inconnue : $stepKey");
 
-    // Année académique cible = constante codée en dur côté frontend, transmise
-    // en paramètre par l'API (cf. ACADEMIC_YEAR_LABEL dans src/lib/academic-dates.ts).
-    // Ici on fait confiance à l'admin (UI préremplit avec la valeur courante).
-    // Réf : docs/cursus.md
-    $reference = etudiant_generate_ref($pdo, 'CAND'); // helper neutre, voir db_config.php
-    if (!$reference) {
-        // Fallback : pattern existant des références candidature.
-        $reference = 'IPEC-CAND-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3)));
-    }
+    // Référence officielle (IPEC-CAND-AAAA-XXXXXX), unique en base.
+    // Mémoire : JAMAIS de fallback timestamp inventé.
+    $reference = generateDocumentReference($pdo, 'CAND');
 
     $pdo->beginTransaction();
     try {
