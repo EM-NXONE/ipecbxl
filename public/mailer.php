@@ -753,20 +753,9 @@ function buildCandidaturePdf(array $f): string {
     if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
     if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
     if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
-    $saison = '';
-    if (preg_match('/f[ée]vrier/i', $rentreeLabel)) {
-        $saison = 'Février';
-    } elseif (preg_match('/septembre/i', $rentreeLabel)) {
-        $saison = 'Septembre';
-    }
     $anneeAcadValue = $academicYear;
-    if ($saison !== '') {
-        $anneeAcadValue .= ' - ' . $saison;
-        if ($rentreeLabel !== '') {
-            $anneeAcadValue .= ' (' . $rentreeLabel . ')';
-        }
-    } elseif ($rentreeLabel !== '') {
-        $anneeAcadValue .= ' (' . $rentreeLabel . ')';
+    if ($rentreeDisplay !== '') {
+        $anneeAcadValue .= ' (' . $rentreeDisplay . ')';
     }
     $infoRow('Année académique', $anneeAcadValue);
 
