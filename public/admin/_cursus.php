@@ -413,8 +413,25 @@ function cursus_set_actif(PDO $pdo, int $etudiantId): string {
  *   can_diplomer: bool
  * }
  */
-function cursus_describe_for(array $latestCandidature): array {
-    $step = cursus_step_key($latestCandidature);
+/**
+ * Renvoie un descripteur pour l'UI : étape courante + actions possibles.
+ *
+ * Accepte au choix :
+ *   - un tableau étudiant (avec etape_courante / annee_academique_courante / rentree_courante) ;
+ *   - une candidature (fallback si l'étape courante n'est pas encore renseignée).
+ *
+ * Quand on a accès aux deux (cas habituel), passer l'étudiant en 1er paramètre
+ * et la candidature initiale en fallback.
+ */
+function cursus_describe_for(?array $etudiantOrCand, ?array $candFallback = null): array {
+    // Distinguer "fiche étudiant" vs "candidature" : la candidature porte 'reference' qui commence par IPEC-CAND.
+    $isCand = $etudiantOrCand
+        && isset($etudiantOrCand['reference'])
+        && stripos((string)$etudiantOrCand['reference'], 'IPEC-CAND') === 0;
+    if ($isCand && $candFallback === null) { $candFallback = $etudiantOrCand; $etudiantOrCand = null; }
+
+    $cur = etudiant_current_cursus($etudiantOrCand, $candFallback);
+    $step = $cur['etape'];
     $next = $step ? cursus_next_step($step) : null;
     return [
         'current_step'  => $step,
@@ -424,5 +441,7 @@ function cursus_describe_for(array $latestCandidature): array {
         'can_promote'   => $step !== null && $next !== null,
         'can_redouble'  => $step !== null,
         'can_diplomer'  => $step === 'PEA-2',
+        'annee_academique_courante' => $cur['annee_academique'],
+        'rentree_courante'          => $cur['rentree'],
     ];
 }
