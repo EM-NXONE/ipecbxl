@@ -12,10 +12,13 @@
 
 declare(strict_types=1);
 
-// _academic_dates.php est packagé soit à côté (admin/_shared, site/) soit dans le parent (dev: public/admin/ → public/_academic_dates.php)
+// _academic_dates.php + _etu_notify.php sont packagés soit à côté (admin/_shared, site/),
+// soit dans le parent (dev: public/admin/ → public/*.php).
 (function(){
-    foreach ([__DIR__ . '/_academic_dates.php', __DIR__ . '/../_academic_dates.php'] as $p) {
-        if (is_file($p)) { require_once $p; return; }
+    foreach (['_academic_dates.php', '_etu_notify.php'] as $f) {
+        foreach ([__DIR__ . '/' . $f, __DIR__ . '/../' . $f] as $p) {
+            if (is_file($p)) { require_once $p; break; }
+        }
     }
 })();
 
