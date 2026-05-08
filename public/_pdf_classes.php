@@ -559,6 +559,7 @@ if (!function_exists('buildAttestationReussitePdf') && class_exists('IpecCandida
         $annee       = trim((string)($data['annee'] ?? ''));
         $specialisation = trim((string)($data['specialisation'] ?? ''));
         $anneeAcad   = trim((string)($data['annee_academique'] ?? ''));
+        if (function_exists('ipec_academic_year_for')) { $anneeAcad = ipec_academic_year_for($anneeAcad); }
         $refDoc      = trim((string)($data['reference_doc'] ?? ''));
         $refCand     = trim((string)($data['candidature_reference'] ?? ''));
         $emis        = $fmt((string)($data['date_emission'] ?? date('Y-m-d')));
@@ -647,6 +648,7 @@ if (!function_exists('buildAttestationReussiteAnneePdf') && class_exists('IpecCa
         $annee      = trim((string)($data['annee'] ?? ''));
         $specialisation = trim((string)($data['specialisation'] ?? ''));
         $anneeAcad  = trim((string)($data['annee_academique'] ?? ''));
+        if (function_exists('ipec_academic_year_for')) { $anneeAcad = ipec_academic_year_for($anneeAcad); }
         $anneeSuiv  = trim((string)($data['annee_suivante'] ?? ''));
         $refDoc     = trim((string)($data['reference_doc'] ?? ''));
         $refCand    = trim((string)($data['candidature_reference'] ?? ''));
@@ -737,6 +739,7 @@ if (!function_exists('buildDiplomeBachelierPdf') && class_exists('IpecCandidatur
         $dateNaiss  = $fmt((string)($data['date_naissance'] ?? ''));
         $specialisation = trim((string)($data['specialisation'] ?? ''));
         $anneeAcad  = trim((string)($data['annee_academique'] ?? ''));
+        if (function_exists('ipec_academic_year_for')) { $anneeAcad = ipec_academic_year_for($anneeAcad); }
         $refDoc     = trim((string)($data['reference_doc'] ?? ''));
         $refCand    = trim((string)($data['candidature_reference'] ?? ''));
         $emis       = $fmt((string)($data['date_emission'] ?? date('Y-m-d')));
