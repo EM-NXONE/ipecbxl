@@ -81,6 +81,9 @@ register_shutdown_function(function () use (&$DEBUG) {
 // top-level avec `function` (donc hoistées dès l'inclusion du fichier).
 if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
     require_once __DIR__ . '/db_config.php';
+    if (is_file(__DIR__ . '/_academic_dates.php')) {
+        require_once __DIR__ . '/_academic_dates.php';
+    }
     require_once __DIR__ . '/PHPMailer/src/Exception.php';
     require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
     require_once __DIR__ . '/PHPMailer/src/SMTP.php';
