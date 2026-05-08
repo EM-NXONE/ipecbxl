@@ -9,7 +9,7 @@ $stmt = db()->prepare(
      FROM documents d
      LEFT JOIN candidatures c ON c.id = d.candidature_id
      WHERE d.etudiant_id = ? AND d.visible_etudiant = 1 AND d.statut = 'publie'
-     ORDER BY d.date_emission DESC, d.id DESC"
+     ORDER BY COALESCE(d.annee_academique, '') DESC, d.date_emission DESC, d.id DESC"
 );
 $stmt->execute([$u['id']]);
 $docs = $stmt->fetchAll();

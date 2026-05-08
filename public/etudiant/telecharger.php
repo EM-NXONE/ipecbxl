@@ -67,6 +67,8 @@ try {
             'programme'     => $f['programme'],
             'annee'         => $f['annee'],
             'rentree'       => $f['rentree'],
+            'annee_academique' => $f['annee_academique'] ?? null,
+            'etape_cursus'  => $f['etape_cursus'] ?? null,
             // Surcharges spécifiques à cette facture
             'libelle'       => $f['libelle'],
             'description'   => $f['description'],
@@ -118,6 +120,8 @@ try {
             'email' => $f['email'],
             'programme' => $f['programme'], 'annee' => $f['annee'],
             'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'],
+            'annee_academique' => $f['annee_academique'] ?? null,
+            'etape_cursus' => $f['etape_cursus'] ?? null,
             'montant_ttc_cents' => (int)$f['montant_ttc_cents'],
             'tva_taux' => (float)$f['tva_taux'],
             'libelle' => $f['libelle'], 'description' => $f['description'],
