@@ -109,6 +109,9 @@ header('Content-Type: application/json; charset=utf-8');
 // Le fichier db_config.php est protégé par .htaccess (deny all en HTTP)
 // mais reste lisible côté PHP via require.
 require_once __DIR__ . '/db_config.php';
+if (is_file(__DIR__ . '/_academic_dates.php')) {
+    require_once __DIR__ . '/_academic_dates.php';
+}
 
 // ----- CORS -----
 $allowedOrigins = [
