@@ -1341,20 +1341,12 @@ function buildRecuPaiementPdf(array $f): array {
     $anneeNorm = preg_replace('/\s+—.*$/u', '', str_replace(['1ʳᵉ', '1ᵉʳ', '1er'], '1ère', $anneeLabel));
     $anneeNorm = trim($anneeNorm);
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
-    $academicYear = trim((string)($f['annee_academique'] ?? ''));
-    if ($academicYear === '') {
-        if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-            $y = (int)$m[1];
-            $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t|d[eé]cal/i', $rentreeLabel);
-            $startY = $isPrintemps ? ($y - 1) : $y;
-            $academicYear = $startY . '-' . ($startY + 1);
-        } else {
-            $curY = (int)$now->format('Y');
-            $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
-            $academicYear = $startY . '-' . ($startY + 1);
-        }
+    $academicYear = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for($f['annee_academique'] ?? null)
+        : str_replace('/', '-', trim((string)($f['annee_academique'] ?? '')));
+    if (function_exists('ipec_rentree_label_normalized')) {
+        $rentreeLabel = ipec_rentree_label_normalized($rentreeLabel);
     }
-    $academicYear = str_replace('/', '-', $academicYear);
 
     // Encadrés
     $pdf->SetY(48);
