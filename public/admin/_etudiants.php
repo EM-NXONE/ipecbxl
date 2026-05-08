@@ -248,6 +248,10 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
         etudiant_sync_documents_historiques($pdo, $etuId, $candidature, $adminUser);
 
         $pdo->commit();
+        if (function_exists('etu_notify_send_welcome')) {
+            try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD); }
+            catch (\Throwable $e) { error_log('[etudiant_create_from_candidature] welcome: ' . $e->getMessage()); }
+        }
         return [
             'etudiant_id'      => $etuId,
             'numero'           => $numero,
