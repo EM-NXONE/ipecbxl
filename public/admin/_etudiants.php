@@ -717,6 +717,9 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
     $eRow->execute([$etudiantId]);
     $cur = etudiant_current_cursus($eRow->fetch() ?: null, $cand);
 
+    $created = 0;
+    $createdTitles = [];
+
     $insert = $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
