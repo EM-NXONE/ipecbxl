@@ -307,21 +307,25 @@ function cursus_diplomer(PDO $pdo, int $candidatureId, string $adminUser): array
     if (empty($cand['etudiant_id'])) {
         throw new RuntimeException('Aucun compte étudiant rattaché.');
     }
-    $step = cursus_step_key($cand);
-    if ($step !== 'PEA-2') {
-        throw new RuntimeException("La diplomation n'est possible qu'en dernière année (PEA2).");
-    }
-
     $etuId = (int)$cand['etudiant_id'];
 
-    // Crée (idempotent) le document attestation de réussite.
+    $eStmt = $pdo->prepare("SELECT etape_courante, annee_academique_courante, rentree_courante FROM etudiants WHERE id = ?");
+    $eStmt->execute([$etuId]);
+    $cur = etudiant_current_cursus($eStmt->fetch() ?: [], $cand);
+    if (($cur['etape'] ?? null) !== 'PEA-2') {
+        throw new RuntimeException("La diplomation n'est possible qu'en dernière année (PEA2).");
+    }
+    $anneeAca = $cur['annee_academique'];
+
+    // Crée (idempotent) le document attestation de réussite (cycle complet).
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'attestation_reussite' LIMIT 1");
-    $exists->execute([$candidatureId]);
+                             WHERE etudiant_id = ? AND template = 'attestation_reussite' LIMIT 1");
+    $exists->execute([$etuId]);
     $created = false;
     if (!$exists->fetchColumn()) {
         $ref = etudiant_generate_ref($pdo, 'DOC');
         $emis = date('Y-m-d');
+        $peaMeta = CURSUS_LABELS['PEA-2'];
         $data = [
             'reference_doc'         => $ref,
             'date_emission'         => $emis,
@@ -329,23 +333,24 @@ function cursus_diplomer(PDO $pdo, int $candidatureId, string $adminUser): array
             'prenom'                => $cand['prenom']          ?? null,
             'nom'                   => $cand['nom']             ?? null,
             'date_naissance'        => $cand['date_naissance']  ?? null,
-            'programme'             => $cand['programme']       ?? null,
-            'annee'                 => $cand['annee']           ?? null,
+            'programme'             => $peaMeta['programme'],
+            'annee'                 => $peaMeta['annee_label'],
             'specialisation'        => $cand['specialisation']  ?? null,
-            'annee_academique'      => $cand['annee_academique']?? null,
+            'annee_academique'      => $anneeAca,
             'candidature_reference' => $cand['reference']       ?? null,
         ];
         $pdo->prepare(
             "INSERT INTO documents
                 (reference, etudiant_id, candidature_id, type, template,
-                 titre, description, data_json, statut, visible_etudiant,
+                 titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
                  date_emission, cree_par_admin)
              VALUES (?, ?, ?, 'attestation', 'attestation_reussite',
-                     ?, ?, ?, 'publie', 1,
+                     ?, ?, ?, ?, ?, 'publie', 1,
                      ?, ?)"
         )->execute([
             $ref, $etuId, $candidatureId,
-            "Attestation de réussite — {$cand['programme']} {$cand['annee']}",
+            "Attestation de réussite — {$peaMeta['programme']} {$peaMeta['annee_label']}",
+            $anneeAca, 'PEA-2',
             "Cycle complet validé. Document officiel signé par la direction de l'IPEC.",
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             $emis, $adminUser,
