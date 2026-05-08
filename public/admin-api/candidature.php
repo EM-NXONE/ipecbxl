@@ -112,7 +112,7 @@ $histStmt = $pdo->prepare(
 $histStmt->execute([$id]);
 
 // Historique cursus : reconstruit depuis les années académiques distinctes
-// présentes sur les factures de scolarité (1 ligne = 1 année validée/payée).
+// présentes sur les factures de scolarité (1 ligne = 1 année du cursus).
 $cursus_history = [];
 if ($etudiant) {
     $hStmt = $pdo->prepare(
@@ -128,7 +128,23 @@ if ($etudiant) {
           ORDER BY f.annee_academique DESC, f.etape_cursus DESC"
     );
     $hStmt->execute([(int)$etudiant['id']]);
-    $cursus_history = $hStmt->fetchAll();
+    $rows = $hStmt->fetchAll();
+    foreach ($rows as $r) {
+        $step = (string)($r['etape_cursus'] ?? '');
+        [$progBase, $yearNum] = array_pad(explode('-', $step, 2), 2, '');
+        $cursus_history[] = [
+            'id'                    => (int)$r['id'],
+            'reference'             => $cand['reference'] ?? '',
+            'statut'                => 'validee',
+            'programme'             => $progBase ?: null,
+            'annee'                 => $yearNum  ? ($yearNum . 'ʳᵉ/ᵉ année') : null,
+            'annee_academique'      => $r['annee_academique'],
+            'rentree'               => null,
+            'type_inscription'      => 'progression',
+            'parent_candidature_id' => null,
+            'created_at'            => $r['started_at'],
+        ];
+    }
 }
 
 api_json([
