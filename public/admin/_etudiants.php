@@ -144,6 +144,11 @@ function etudiant_create_minimal_for_candidature(PDO $pdo, int $candidatureId, a
         $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
             ->execute([$etuId, $candidatureId]);
         $pdo->commit();
+        // Mail de bienvenue (non bloquant) — uniquement à la création initiale
+        if (function_exists('etu_notify_send_welcome')) {
+            try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD); }
+            catch (\Throwable $e) { error_log('[etudiant_create_minimal] welcome mail: ' . $e->getMessage()); }
+        }
         return ['etudiant_id' => $etuId, 'numero' => $numero, 'deja_existant' => false];
     } catch (\Throwable $e) {
         $pdo->rollBack();
