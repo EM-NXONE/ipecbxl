@@ -381,14 +381,16 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
         $pdo->prepare(
             "INSERT INTO documents
                 (reference, etudiant_id, candidature_id, type, template,
-                 titre, description, data_json, statut, visible_etudiant,
+                 titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
                  date_emission, cree_par_admin)
              VALUES (?, ?, ?, 'autre', 'recap_candidature',
-                     ?, ?, ?, 'publie', 1,
+                     ?, ?, ?, ?, ?, 'publie', 1,
                      ?, ?)"
         )->execute([
             $ref, $etudiantId, $candId,
             'Récapitulatif de candidature',
+            $candidature['annee_academique'] ?? null,
+            etudiant_step_from_programme_annee($candidature['programme'] ?? null, $candidature['annee'] ?? null),
             null,
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             $emis, $adminUser,
