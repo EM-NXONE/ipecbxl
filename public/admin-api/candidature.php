@@ -80,9 +80,9 @@ $pushFact = function (array $row) use (&$factureIds, &$factures) {
 $qf = "SELECT f.id, f.numero, f.type, f.libelle, f.description, f.montant_ttc_cents, f.tva_taux,
               f.devise, f.date_emission, f.date_echeance, f.statut_paiement, f.paye_at,
               f.moyen_paiement, f.paye_par_admin, f.reference_paiement,
-              f.candidature_id, c.annee_academique AS candidature_annee_academique
+              f.candidature_id, f.annee_academique, f.etape_cursus,
+              f.annee_academique AS candidature_annee_academique
          FROM factures f
-         LEFT JOIN candidatures c ON c.id = f.candidature_id
         WHERE f.candidature_id = ?
         ORDER BY FIELD(f.type,'frais_dossier','scolarite'), f.date_echeance ASC, f.id ASC";
 $st = $pdo->prepare($qf);
@@ -93,9 +93,9 @@ if ($etudiant) {
     $qfe = "SELECT f.id, f.numero, f.type, f.libelle, f.description, f.montant_ttc_cents, f.tva_taux,
                    f.devise, f.date_emission, f.date_echeance, f.statut_paiement, f.paye_at,
                    f.moyen_paiement, f.paye_par_admin, f.reference_paiement,
-                   f.candidature_id, c.annee_academique AS candidature_annee_academique
+                   f.candidature_id, f.annee_academique, f.etape_cursus,
+                   f.annee_academique AS candidature_annee_academique
               FROM factures f
-              LEFT JOIN candidatures c ON c.id = f.candidature_id
              WHERE f.etudiant_id = ?
              ORDER BY FIELD(f.type,'frais_dossier','scolarite'), f.date_echeance ASC, f.id ASC";
     $st2 = $pdo->prepare($qfe);
@@ -111,29 +111,24 @@ $histStmt = $pdo->prepare(
 );
 $histStmt->execute([$id]);
 
-// Toutes les candidatures de l'étudiant (historique cursus année par année)
+// Historique cursus : reconstruit depuis les années académiques distinctes
+// présentes sur les factures de scolarité (1 ligne = 1 année validée/payée).
 $cursus_history = [];
-$latest_cand = $cand;
 if ($etudiant) {
     $hStmt = $pdo->prepare(
-        "SELECT id, reference, statut, programme, annee, specialisation,
-                rentree, annee_academique, type_inscription, parent_candidature_id,
-                created_at
-         FROM candidatures
-         WHERE etudiant_id = ?
-         ORDER BY created_at DESC, id DESC"
+        "SELECT MIN(f.id) AS id,
+                f.annee_academique,
+                f.etape_cursus,
+                COUNT(*) AS nb_factures,
+                SUM(f.statut_paiement = 'payee') AS nb_payees,
+                MIN(f.date_emission) AS started_at
+           FROM factures f
+          WHERE f.etudiant_id = ? AND f.type = 'scolarite' AND f.annee_academique IS NOT NULL
+          GROUP BY f.annee_academique, f.etape_cursus
+          ORDER BY f.annee_academique DESC, f.etape_cursus DESC"
     );
     $hStmt->execute([(int)$etudiant['id']]);
     $cursus_history = $hStmt->fetchAll();
-    if (!empty($cursus_history)) {
-        // La candidature la plus récente détermine l'étape "courante" du cursus.
-        $latest_cand = $cursus_history[0] + $cand; // garde tout le détail si c'est la même
-        if ((int)$cursus_history[0]['id'] !== (int)$cand['id']) {
-            $lst = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
-            $lst->execute([(int)$cursus_history[0]['id']]);
-            $latest_cand = $lst->fetch() ?: $cand;
-        }
-    }
 }
 
 api_json([
@@ -143,7 +138,7 @@ api_json([
     'factures'       => $factures,
     'historique'     => $histStmt->fetchAll(),
     'statuts'        => ADMIN_STATUTS,
-    'cursus'         => cursus_describe_for($latest_cand),
+    'cursus'         => cursus_describe_for($etudiant, $cand),
     'cursus_history' => $cursus_history,
-    'latest_candidature_id' => (int)$latest_cand['id'],
+    'latest_candidature_id' => (int)$cand['id'],
 ]);
