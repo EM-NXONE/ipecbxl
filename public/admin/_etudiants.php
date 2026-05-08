@@ -699,17 +699,48 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
         'facture_t1_paye_at'    => $factT1['paye_at']       ?? null,
     ];
 
-    $created = 0;
-    $createdTitles = [];
+    // Templates à émettre. Snapshot étape + année académique courants pour
+    // que le doc soit relié à la bonne année (cf. progression in-place).
+    $templates = [
+        'attestation_inscription_definitive' => [
+            'titre' => "Attestation d'inscription définitive",
+            'desc'  => "Inscription confirmée après paiement de la 1ʳᵉ tranche de scolarité.",
+        ],
+        'formulaire_standard_inscription' => [
+            'titre' => "Formulaire standard d'inscription",
+            'desc'  => "Document officiel d'inscription à l'IPEC.",
+        ],
+    ];
+    $emis = date('Y-m-d');
+    // Snapshot état courant (priorité etudiants.etape_courante > candidature)
+    $eRow = $pdo->prepare("SELECT etape_courante, annee_academique_courante, rentree_courante FROM etudiants WHERE id = ?");
+    $eRow->execute([$etudiantId]);
+    $cur = etudiant_current_cursus($eRow->fetch() ?: null, $cand);
+
+    $insert = $pdo->prepare(
+        "INSERT INTO documents
+            (reference, etudiant_id, candidature_id, type, template,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
+             date_emission, cree_par_admin)
+         VALUES (?, ?, ?, 'autre', ?,
+                 ?, ?, ?, ?, ?, 'publie', 1,
+                 ?, ?)"
+    );
     foreach ($templates as $template => $meta) {
-        $st = $pdo->prepare("SELECT id FROM documents WHERE candidature_id = ? AND template = ? LIMIT 1");
-        $st->execute([$candidatureId, $template]);
+        $st = $pdo->prepare("SELECT id FROM documents
+                              WHERE etudiant_id = ? AND template = ? AND COALESCE(annee_academique,'') = COALESCE(?, '')
+                              LIMIT 1");
+        $st->execute([$etudiantId, $template, $cur['annee_academique']]);
         if ($st->fetchColumn()) continue;
         $ref = etudiant_generate_ref($pdo, 'DOC');
-        $data = array_merge($baseData, ['reference_doc' => $ref]);
+        $data = array_merge($baseData, [
+            'reference_doc'    => $ref,
+            'annee_academique' => $cur['annee_academique'],
+            'rentree'          => $cur['rentree'],
+        ]);
         $insert->execute([
             $ref, $etudiantId, $candidatureId, $template,
-            $meta['titre'], $meta['desc'],
+            $meta['titre'], $cur['annee_academique'], $cur['etape'], $meta['desc'],
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             $emis, $adminUser,
         ]);
