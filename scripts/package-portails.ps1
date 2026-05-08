@@ -232,6 +232,7 @@ Copy-Item (Join-Path $PUB "db_config.php")          $adminShared -Force
 Copy-Item (Join-Path $PUB "mailer.php")             $adminShared -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")       $adminShared -Force
 Copy-Item (Join-Path $PUB "_academic_dates.php")    $adminShared -Force
+Copy-Item (Join-Path $PUB "_etu_notify.php")        $adminShared -Force
 Copy-Item (Join-Path $PUB "_shared\cors.php")       $adminShared -Force
 Copy-Item (Join-Path $PUB "admin\_etudiants.php")   $adminShared -Force
 Copy-Item (Join-Path $PUB "admin\_cursus.php")      $adminShared -Force
