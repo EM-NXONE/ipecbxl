@@ -306,6 +306,12 @@ if (!function_exists('buildAttestationInscriptionPdf') && class_exists('IpecCand
         $specialisation = trim((string)($data['specialisation'] ?? ''));
         $rentree        = trim((string)($data['rentree'] ?? ''));
         $anneeAcad      = trim((string)($data['annee_academique'] ?? ''));
+        if (function_exists('ipec_rentree_label_normalized') && $rentree !== '') {
+            $rentree = ipec_rentree_label_normalized($rentree);
+        }
+        if (function_exists('ipec_academic_year_for')) {
+            $anneeAcad = ipec_academic_year_for($anneeAcad);
+        }
 
         $factT1Num = trim((string)($data['facture_t1_numero'] ?? ''));
         $factT1Paye = $fmt((string)($data['facture_t1_paye_at'] ?? ''));
