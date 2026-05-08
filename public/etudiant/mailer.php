@@ -81,6 +81,9 @@ register_shutdown_function(function () use (&$DEBUG) {
 // top-level avec `function` (donc hoistées dès l'inclusion du fichier).
 if (defined('IPEC_MAILER_AS_LIB') && IPEC_MAILER_AS_LIB === true) {
     require_once __DIR__ . '/db_config.php';
+    if (is_file(__DIR__ . '/_academic_dates.php')) {
+        require_once __DIR__ . '/_academic_dates.php';
+    }
     require_once __DIR__ . '/PHPMailer/src/Exception.php';
     require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
     require_once __DIR__ . '/PHPMailer/src/SMTP.php';
@@ -106,6 +109,9 @@ header('Content-Type: application/json; charset=utf-8');
 // Le fichier db_config.php est protégé par .htaccess (deny all en HTTP)
 // mais reste lisible côté PHP via require.
 require_once __DIR__ . '/db_config.php';
+if (is_file(__DIR__ . '/_academic_dates.php')) {
+    require_once __DIR__ . '/_academic_dates.php';
+}
 
 // ----- CORS -----
 $allowedOrigins = [
@@ -662,18 +668,14 @@ function buildCandidaturePdf(array $f): string {
 
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
-        $isFevrier = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
-        $startY = $isFevrier ? ($y - 1) : $y;
-        $academicYear = $startY . '/' . ($startY + 1);
-    } else {
-        $curY = (int)$now->format('Y');
-        $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
-        $academicYear = $startY . '/' . ($startY + 1);
-    }
+    // Année académique : valeur stockée si présente, sinon constante centrale (_academic_dates.php).
+    $academicYear = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for($f['annee_academique'] ?? null)
+        : str_replace('/', '-', trim((string)($f['annee_academique'] ?? '')));
+    // Libellé de rentrée normalisé : "Rentrée principale" / "Rentrée décalée".
+    $rentreeDisplay = function_exists('ipec_rentree_label_normalized')
+        ? ipec_rentree_label_normalized($rentreeLabel)
+        : $rentreeLabel;
 
     // ===== Deux encadrés côte à côte : CANDIDAT (gauche) / CANDIDATURE (droite) =====
     $pdf->Ln(8);
@@ -751,20 +753,9 @@ function buildCandidaturePdf(array $f): string {
     if ($programmeFull !== '') $infoRow('Programme', $programmeFull);
     if ($anneeNorm !== '')     $infoRow('Année', $anneeNorm);
     if ($hasSpecialite)        $infoRow('Spécialité', $specialisation);
-    $saison = '';
-    if (preg_match('/f[ée]vrier/i', $rentreeLabel)) {
-        $saison = 'Février';
-    } elseif (preg_match('/septembre/i', $rentreeLabel)) {
-        $saison = 'Septembre';
-    }
     $anneeAcadValue = $academicYear;
-    if ($saison !== '') {
-        $anneeAcadValue .= ' - ' . $saison;
-        if ($rentreeLabel !== '') {
-            $anneeAcadValue .= ' (' . $rentreeLabel . ')';
-        }
-    } elseif ($rentreeLabel !== '') {
-        $anneeAcadValue .= ' (' . $rentreeLabel . ')';
+    if ($rentreeDisplay !== '') {
+        $anneeAcadValue .= ' (' . $rentreeDisplay . ')';
     }
     $infoRow('Année académique', $anneeAcadValue);
 
@@ -1017,19 +1008,14 @@ function buildFacturePdf(array $f): array {
 
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
-    // Année académique aaaa/aaaa : on cherche un "20xx" dans la rentrée, sinon on calcule
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
-        $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
-        $startY = $isPrintemps ? ($y - 1) : $y;
-        $academicYear = $startY . '/' . ($startY + 1);
-    } else {
-        $now = time();
-        $curY = (int)date('Y', $now);
-        $startY = ((int)date('n', $now) >= 9) ? $curY : $curY - 1;
-        $academicYear = $startY . '/' . ($startY + 1);
+    // Année académique : utiliser celle stockée si fournie, sinon dériver
+    // Année académique : valeur stockée si présente, sinon constante centrale (_academic_dates.php).
+    $academicYear = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for($f['annee_academique'] ?? null)
+        : str_replace('/', '-', trim((string)($f['annee_academique'] ?? '')));
+    // Libellé de rentrée normalisé.
+    if (function_exists('ipec_rentree_label_normalized')) {
+        $rentreeLabel = ipec_rentree_label_normalized($rentreeLabel);
     }
 
     // Deux encadrés côte à côte : "Facturé à" (gauche) et "Inscription" (droite)
@@ -1355,16 +1341,11 @@ function buildRecuPaiementPdf(array $f): array {
     $anneeNorm = preg_replace('/\s+—.*$/u', '', str_replace(['1ʳᵉ', '1ᵉʳ', '1er'], '1ère', $anneeLabel));
     $anneeNorm = trim($anneeNorm);
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        $isPrintemps = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
-        $startY = $isPrintemps ? ($y - 1) : $y;
-        $academicYear = $startY . '/' . ($startY + 1);
-    } else {
-        $curY = (int)$now->format('Y');
-        $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
-        $academicYear = $startY . '/' . ($startY + 1);
+    $academicYear = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for($f['annee_academique'] ?? null)
+        : str_replace('/', '-', trim((string)($f['annee_academique'] ?? '')));
+    if (function_exists('ipec_rentree_label_normalized')) {
+        $rentreeLabel = ipec_rentree_label_normalized($rentreeLabel);
     }
 
     // Encadrés
@@ -1606,13 +1587,13 @@ HTML;
     $candidatureDbError   = null;
     $candidatureDbId      = null;
 
-    // Calcul de l'année académique (cohérent avec ce qu'affichent les PDFs)
-    $academicYearForDb = '';
-    if (preg_match('/(20\d{2})/', $rentree, $mYr)) {
-        $yr = (int)$mYr[1];
-        $isPrintempsDb = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentree);
-        $startYr = $isPrintempsDb ? ($yr - 1) : $yr;
-        $academicYearForDb = $startYr . '/' . ($startYr + 1);
+    // Année académique : centralisée dans _academic_dates.php (constante IPEC_ACADEMIC_YEAR_LABEL).
+    $academicYearForDb = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for(null)
+        : '';
+    // Libellé de rentrée normalisé pour l'enregistrement BDD ("Rentrée principale" / "Rentrée décalée").
+    if (function_exists('ipec_rentree_label_normalized')) {
+        $rentree = ipec_rentree_label_normalized($rentree);
     }
 
     try {
@@ -1656,6 +1637,53 @@ HTML;
             ':user_agent'       => substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
         ]);
         $candidatureDbId = (int)$pdo->lastInsertId();
+
+        // ---- Auto-création du compte étudiant (catégorie='candidat') ---------
+        // Le candidat reçoit un mot de passe par défaut "Student1" et peut
+        // se connecter immédiatement à son espace pour suivre son dossier.
+        // Non bloquant : toute exception est loggée mais n'empêche pas l'envoi.
+        try {
+            $etuLib = __DIR__ . '/_etudiants.php';
+            if (is_file($etuLib)) {
+                require_once $etuLib;
+                if (function_exists('etudiant_create_minimal_for_candidature')) {
+                    $candForEtu = [
+                        'prenom'         => $prenom,
+                        'nom'            => $nom,
+                        'date_naissance' => $dateNaissance,
+                        'civilite'       => $civilite,
+                        'email'          => $email,
+                        'telephone'      => $telephone,
+                        'nationalite'    => $nationalite,
+                    ];
+                    $res = etudiant_create_minimal_for_candidature($pdo, $candidatureDbId, $candForEtu);
+                    // Synchronise facture frais de dossier 400 € + récap candidature
+                    if (!empty($res['etudiant_id']) && function_exists('etudiant_sync_documents_historiques')) {
+                        $candFull = $candForEtu + [
+                            'id'             => $candidatureDbId,
+                            'reference'      => $candidatureReference,
+                            'facture_numero' => $factureReference,
+                            'facture_payee'  => 0,
+                            'created_at'     => date('Y-m-d H:i:s'),
+                            'rue'            => $rue,
+                            'numero'         => $numero,
+                            'code_postal'    => $codePostal,
+                            'ville'          => $ville,
+                            'pays_residence' => $paysResidence,
+                            'programme'      => $programme,
+                            'annee'          => $annee,
+                            'specialisation' => $specialisation,
+                            'rentree'        => $rentree,
+                            'message'        => $message,
+                            'ip'             => $ip,
+                        ];
+                        etudiant_sync_documents_historiques($pdo, (int)$res['etudiant_id'], $candFull, 'auto:soumission');
+                    }
+                }
+            }
+        } catch (\Throwable $autoErr) {
+            error_log('[mailer.php] Auto-création compte étudiant échouée : ' . $autoErr->getMessage());
+        }
     } catch (\Throwable $dbErr) {
         $candidatureDbError = $dbErr->getMessage();
         error_log('[mailer.php] INSERT candidature échoué : ' . $candidatureDbError);
