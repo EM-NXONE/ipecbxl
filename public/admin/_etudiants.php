@@ -339,12 +339,12 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
             : date('Y-m-d');
         $pdo->prepare(
             "INSERT INTO factures
-                (numero, etudiant_id, candidature_id, type, libelle, description,
+                (numero, etudiant_id, candidature_id, type, libelle, annee_academique, etape_cursus, description,
                  montant_ht_cents, tva_taux, montant_ttc_cents, devise,
                  date_emission, date_echeance,
                  statut_paiement, paye_at, paye_par_admin, moyen_paiement,
                  visible_etudiant, cree_par_admin)
-             VALUES (?, ?, ?, 'frais_dossier', ?, ?,
+             VALUES (?, ?, ?, 'frais_dossier', ?, ?, ?, ?,
                      40000, 0.00, 40000, 'EUR',
                      ?, ?,
                      ?, ?, ?, ?,
@@ -352,6 +352,8 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
         )->execute([
             $numero, $etudiantId, $candId,
             'Frais de dossier IPEC',
+            $candidature['annee_academique'] ?? null,
+            etudiant_step_from_programme_annee($candidature['programme'] ?? null, $candidature['annee'] ?? null),
             'Traitement de la candidature ' . ($candidature['reference'] ?? ''),
             $emis, $emis,
             $payee ? 'payee' : 'en_attente',
