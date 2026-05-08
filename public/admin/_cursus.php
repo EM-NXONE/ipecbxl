@@ -189,49 +189,62 @@ function cursus_evoluer(
 }
 
 /**
- * Crée (idempotent) l'attestation de réussite d'année pour la candidature
- * que l'étudiant vient de valider (= candidature parent au passage).
+ * Crée (idempotent) l'attestation de réussite de l'année que l'étudiant
+ * vient de valider. Idempotence : (etudiant_id, template, prevStep, anneeValidee).
+ *
+ * @param array  $cand          La candidature initiale (porte l'identité).
+ * @param string $prevStep      Étape validée (ex 'PAA-1').
+ * @param string $nextStep      Étape autorisée pour l'année suivante (ex 'PAA-2').
+ * @param string|null $anneeValidee  Année académique qui vient d'être validée.
  */
-function cursus_create_attestation_reussite_annee(PDO $pdo, array $prevCand, string $nextStep, string $adminUser): bool {
-    $cid = (int)$prevCand['id'];
+function cursus_create_attestation_reussite_annee(
+    PDO $pdo, array $cand, string $prevStep, string $nextStep, ?string $anneeValidee, string $adminUser
+): bool {
+    $cid   = (int)$cand['id'];
+    $etuId = (int)$cand['etudiant_id'];
+    // Idempotence par (étudiant, étape validée, année académique)
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'attestation_reussite_annee' LIMIT 1");
-    $exists->execute([$cid]);
+                             WHERE etudiant_id = ? AND template = 'attestation_reussite_annee'
+                               AND COALESCE(etape_cursus,'') = ? AND COALESCE(annee_academique,'') = COALESCE(?, '')
+                             LIMIT 1");
+    $exists->execute([$etuId, $prevStep, $anneeValidee]);
     if ($exists->fetchColumn()) return false;
 
-    $nextLabel = '';
-    if (isset(CURSUS_LABELS[$nextStep])) {
-        $m = CURSUS_LABELS[$nextStep];
-        $nextLabel = $m['programme'] . ' ' . $m['annee_label'];
-    }
+    $prevMeta = CURSUS_LABELS[$prevStep] ?? null;
+    $nextMeta = CURSUS_LABELS[$nextStep] ?? null;
+    $prevLabelProg = $prevMeta ? $prevMeta['programme'] : '';
+    $prevLabelAnn  = $prevMeta ? $prevMeta['annee_label'] : '';
+    $nextLabel     = $nextMeta ? ($nextMeta['programme'] . ' ' . $nextMeta['annee_label']) : '';
+
     $ref = etudiant_generate_ref($pdo, 'DOC');
     $emis = date('Y-m-d');
     $data = [
         'reference_doc'         => $ref,
         'date_emission'         => $emis,
-        'civilite'              => $prevCand['civilite']         ?? null,
-        'prenom'                => $prevCand['prenom']           ?? null,
-        'nom'                   => $prevCand['nom']              ?? null,
-        'date_naissance'        => $prevCand['date_naissance']   ?? null,
-        'programme'             => $prevCand['programme']        ?? null,
-        'annee'                 => $prevCand['annee']            ?? null,
-        'specialisation'        => $prevCand['specialisation']   ?? null,
-        'annee_academique'      => $prevCand['annee_academique'] ?? null,
+        'civilite'              => $cand['civilite']        ?? null,
+        'prenom'                => $cand['prenom']          ?? null,
+        'nom'                   => $cand['nom']             ?? null,
+        'date_naissance'        => $cand['date_naissance']  ?? null,
+        'programme'             => $prevLabelProg,
+        'annee'                 => $prevLabelAnn,
+        'specialisation'        => $cand['specialisation']  ?? null,
+        'annee_academique'      => $anneeValidee,
         'annee_suivante'        => $nextLabel,
-        'candidature_reference' => $prevCand['reference']        ?? null,
+        'candidature_reference' => $cand['reference']       ?? null,
     ];
     $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
              date_emission, cree_par_admin)
          VALUES (?, ?, ?, 'attestation', 'attestation_reussite_annee',
-                 ?, ?, ?, 'publie', 1,
+                 ?, ?, ?, ?, ?, 'publie', 1,
                  ?, ?)"
     )->execute([
-        $ref, (int)$prevCand['etudiant_id'], $cid,
-        "Attestation de réussite — {$prevCand['programme']} {$prevCand['annee']}",
-        "Année académique " . ($prevCand['annee_academique'] ?? '') . " validée. Document officiel signé par la direction de l'IPEC.",
+        $ref, $etuId, $cid,
+        "Attestation de réussite — {$prevLabelProg} {$prevLabelAnn}",
+        $anneeValidee, $prevStep,
+        "Année académique " . ($anneeValidee ?? '') . " validée. Document officiel signé par la direction de l'IPEC.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
     ]);
@@ -241,11 +254,12 @@ function cursus_create_attestation_reussite_annee(PDO $pdo, array $prevCand, str
 /**
  * Crée (idempotent) le diplôme de Bachelier en fin de PAA-3.
  */
-function cursus_create_diplome_bachelier(PDO $pdo, array $prevCand, string $adminUser): bool {
-    $cid = (int)$prevCand['id'];
+function cursus_create_diplome_bachelier(PDO $pdo, array $cand, ?string $anneeValidee, string $adminUser): bool {
+    $cid   = (int)$cand['id'];
+    $etuId = (int)$cand['etudiant_id'];
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'diplome_bachelier' LIMIT 1");
-    $exists->execute([$cid]);
+                             WHERE etudiant_id = ? AND template = 'diplome_bachelier' LIMIT 1");
+    $exists->execute([$etuId]);
     if ($exists->fetchColumn()) return false;
 
     $ref = etudiant_generate_ref($pdo, 'DOC');
@@ -253,25 +267,26 @@ function cursus_create_diplome_bachelier(PDO $pdo, array $prevCand, string $admi
     $data = [
         'reference_doc'         => $ref,
         'date_emission'         => $emis,
-        'civilite'              => $prevCand['civilite']         ?? null,
-        'prenom'                => $prevCand['prenom']           ?? null,
-        'nom'                   => $prevCand['nom']              ?? null,
-        'date_naissance'        => $prevCand['date_naissance']   ?? null,
-        'specialisation'        => $prevCand['specialisation']   ?? null,
-        'annee_academique'      => $prevCand['annee_academique'] ?? null,
-        'candidature_reference' => $prevCand['reference']        ?? null,
+        'civilite'              => $cand['civilite']         ?? null,
+        'prenom'                => $cand['prenom']           ?? null,
+        'nom'                   => $cand['nom']              ?? null,
+        'date_naissance'        => $cand['date_naissance']   ?? null,
+        'specialisation'        => $cand['specialisation']   ?? null,
+        'annee_academique'      => $anneeValidee,
+        'candidature_reference' => $cand['reference']        ?? null,
     ];
     $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
              date_emission, cree_par_admin)
          VALUES (?, ?, ?, 'diplome', 'diplome_bachelier',
-                 ?, ?, ?, 'publie', 1,
+                 ?, ?, ?, ?, ?, 'publie', 1,
                  ?, ?)"
     )->execute([
-        $ref, (int)$prevCand['etudiant_id'], $cid,
+        $ref, $etuId, $cid,
         "Diplôme de Bachelier (PAA — BAC+3)",
+        $anneeValidee, 'PAA-3',
         "Diplôme officiel délivré au terme du cycle PAA. Signé par la direction de l'IPEC.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
