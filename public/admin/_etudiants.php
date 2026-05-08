@@ -26,6 +26,42 @@ declare(strict_types=1);
 const ETU_DEFAULT_PASSWORD = 'Student1';
 
 /**
+ * Déduit la clé d'étape ('PAA-1' ... 'PEA-2') depuis programme + libellé année.
+ * Renvoie null si non identifiable.
+ */
+function etudiant_step_from_programme_annee(?string $programme, ?string $annee): ?string {
+    $p = strtoupper(trim((string)$programme));
+    if (strpos($p, 'PEA') === 0) $base = 'PEA';
+    elseif (strpos($p, 'PAA') === 0) $base = 'PAA';
+    else return null;
+    if (!preg_match('/(\d)/u', (string)$annee, $m)) return null;
+    return $base . '-' . $m[1];
+}
+
+/**
+ * Renvoie l'état courant du cursus d'un étudiant :
+ *   ['etape' => 'PAA-2', 'annee_academique' => '2027-2028', 'rentree' => 'Rentrée principale']
+ *
+ * Priorité : colonnes etudiants.etape_courante / annee_academique_courante /
+ * rentree_courante (renseignées par cursus_evoluer). Sinon, fallback sur la
+ * candidature initiale fournie en paramètre.
+ */
+function etudiant_current_cursus(?array $etudiant, ?array $candidatureFallback = null): array {
+    $etape  = $etudiant['etape_courante'] ?? null;
+    $annee  = $etudiant['annee_academique_courante'] ?? null;
+    $rentree= $etudiant['rentree_courante'] ?? null;
+    if (!$etape && $candidatureFallback) {
+        $etape = etudiant_step_from_programme_annee(
+            $candidatureFallback['programme'] ?? null,
+            $candidatureFallback['annee']     ?? null
+        );
+    }
+    if (!$annee   && $candidatureFallback) $annee   = $candidatureFallback['annee_academique'] ?? null;
+    if (!$rentree && $candidatureFallback) $rentree = $candidatureFallback['rentree']          ?? null;
+    return ['etape' => $etape, 'annee_academique' => $annee, 'rentree' => $rentree];
+}
+
+/**
  * Génère un numéro étudiant unique : IPEC-ETU-AAAA-XXXX
  */
 function etudiant_generate_numero(PDO $pdo): string {
