@@ -176,6 +176,7 @@ Copy-Item (Join-Path $PUB "db_config.php")     $SITE -Force
 Copy-Item (Join-Path $PUB "verify.php")        $SITE -Force
 Copy-Item (Join-Path $PUB "_pdf_classes.php")  $SITE -Force
 Copy-Item (Join-Path $PUB "_academic_dates.php") $SITE -Force
+Copy-Item (Join-Path $PUB "_etu_notify.php")    $SITE -Force
 if (Test-Path (Join-Path $SITE "FPDF"))      { Remove-Item (Join-Path $SITE "FPDF")      -Recurse -Force }
 if (Test-Path (Join-Path $SITE "PHPMailer")) { Remove-Item (Join-Path $SITE "PHPMailer") -Recurse -Force }
 Copy-Item (Join-Path $PUB "FPDF")              $SITE -Recurse -Force
