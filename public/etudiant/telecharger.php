@@ -67,6 +67,8 @@ try {
             'programme'     => $f['programme'],
             'annee'         => $f['annee'],
             'rentree'       => $f['rentree'],
+            'annee_academique' => $f['annee_academique'] ?? null,
+            'etape_cursus'  => $f['etape_cursus'] ?? null,
             // Surcharges spécifiques à cette facture
             'libelle'       => $f['libelle'],
             'description'   => $f['description'],
