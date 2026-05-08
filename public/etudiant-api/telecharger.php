@@ -91,7 +91,7 @@ try {
             'codePostal' => $f['code_postal'], 'ville' => $f['ville'], 'paysResidence' => $f['pays_residence'],
             'email' => $f['email'],
             'programme' => $f['programme'], 'annee' => $f['annee'],
-            'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'], 'annee_academique' => $f['annee_academique'],
+            'specialisation' => $f['specialisation'], 'rentree' => $f['rentree'], 'annee_academique' => $f['annee_academique'], 'etape_cursus' => $f['etape_cursus'] ?? null,
             'montant_ttc_cents' => (int)$f['montant_ttc_cents'],
             'tva_taux' => (float)$f['tva_taux'],
             'libelle' => $f['libelle'], 'description' => $f['description'],
