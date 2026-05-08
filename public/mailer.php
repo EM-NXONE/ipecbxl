@@ -668,18 +668,14 @@ function buildCandidaturePdf(array $f): string {
 
     $hasSpecialite = ($specialisation !== '' && !preg_match('/je ne sais pas/i', $specialisation));
 
-    $academicYear = '';
-    if (preg_match('/(20\d{2})/', $rentreeLabel, $m)) {
-        $y = (int)$m[1];
-        // Si la rentrée tombe entre janvier et août, l'année académique a commencé en septembre précédent.
-        $isFevrier = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentreeLabel);
-        $startY = $isFevrier ? ($y - 1) : $y;
-        $academicYear = $startY . '/' . ($startY + 1);
-    } else {
-        $curY = (int)$now->format('Y');
-        $startY = ((int)$now->format('n') >= 9) ? $curY : $curY - 1;
-        $academicYear = $startY . '/' . ($startY + 1);
-    }
+    // Année académique : valeur stockée si présente, sinon constante centrale (_academic_dates.php).
+    $academicYear = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for($f['annee_academique'] ?? null)
+        : str_replace('/', '-', trim((string)($f['annee_academique'] ?? '')));
+    // Libellé de rentrée normalisé : "Rentrée principale" / "Rentrée décalée".
+    $rentreeDisplay = function_exists('ipec_rentree_label_normalized')
+        ? ipec_rentree_label_normalized($rentreeLabel)
+        : $rentreeLabel;
 
     // ===== Deux encadrés côte à côte : CANDIDAT (gauche) / CANDIDATURE (droite) =====
     $pdf->Ln(8);
