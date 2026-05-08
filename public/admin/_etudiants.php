@@ -653,26 +653,7 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
     ];
 
     $created = 0;
-    $insert = $pdo->prepare(
-        "INSERT INTO documents
-            (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
-             date_emission, cree_par_admin)
-         VALUES (?, ?, ?, 'autre', ?,
-                 ?, ?, ?, 'publie', 1,
-                 ?, ?)"
-    );
-    $emis = date('Y-m-d');
-    $templates = [
-        'attestation_inscription' => [
-            'titre' => "Attestation d'inscription définitive",
-            'desc'  => "Inscription confirmée — première tranche acquittée.",
-        ],
-        'formulaire_inscription' => [
-            'titre' => "Formulaire standard d'inscription",
-            'desc'  => "Formulaire pré-rempli à imprimer, compléter et signer.",
-        ],
-    ];
+    $createdTitles = [];
     foreach ($templates as $template => $meta) {
         $st = $pdo->prepare("SELECT id FROM documents WHERE candidature_id = ? AND template = ? LIMIT 1");
         $st->execute([$candidatureId, $template]);
@@ -686,6 +667,13 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
             $emis, $adminUser,
         ]);
         $created++;
+        $createdTitles[] = $meta['titre'];
+    }
+    if ($created > 0 && function_exists('etu_notify_send_documents')) {
+        try {
+            $items = array_map(fn($t) => ['titre' => $t, 'kind' => 'document'], $createdTitles);
+            etu_notify_send_documents($pdo, $etudiantId, $items);
+        } catch (\Throwable $e) { error_log('[inscription_definitive] notify: ' . $e->getMessage()); }
     }
     return ['created' => $created > 0, 'count' => $created];
 }
