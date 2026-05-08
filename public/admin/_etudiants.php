@@ -641,14 +641,16 @@ function etudiant_create_document_preadmission(PDO $pdo, array $candidature, str
     $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
              date_emission, cree_par_admin)
          VALUES (?, ?, ?, 'autre', 'preadmission',
-                 ?, ?, ?, 'publie', 1,
+                 ?, ?, ?, ?, ?, 'publie', 1,
                  ?, ?)"
     )->execute([
         $ref, $etuId, $candId,
         'Lettre de préadmission IPEC',
+        $candidature['annee_academique'] ?? null,
+        etudiant_step_from_programme_annee($candidature['programme'] ?? null, $candidature['annee'] ?? null),
         "Avis favorable — sous réserve du paiement de la 1ʳᵉ tranche.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
