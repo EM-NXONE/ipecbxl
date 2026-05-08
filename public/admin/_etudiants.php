@@ -12,10 +12,13 @@
 
 declare(strict_types=1);
 
-// _academic_dates.php est packagé soit à côté (admin/_shared, site/) soit dans le parent (dev: public/admin/ → public/_academic_dates.php)
+// _academic_dates.php + _etu_notify.php sont packagés soit à côté (admin/_shared, site/),
+// soit dans le parent (dev: public/admin/ → public/*.php).
 (function(){
-    foreach ([__DIR__ . '/_academic_dates.php', __DIR__ . '/../_academic_dates.php'] as $p) {
-        if (is_file($p)) { require_once $p; return; }
+    foreach (['_academic_dates.php', '_etu_notify.php'] as $f) {
+        foreach ([__DIR__ . '/' . $f, __DIR__ . '/../' . $f] as $p) {
+            if (is_file($p)) { require_once $p; break; }
+        }
     }
 })();
 
@@ -141,6 +144,11 @@ function etudiant_create_minimal_for_candidature(PDO $pdo, int $candidatureId, a
         $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
             ->execute([$etuId, $candidatureId]);
         $pdo->commit();
+        // Mail de bienvenue (non bloquant) — uniquement à la création initiale
+        if (function_exists('etu_notify_send_welcome')) {
+            try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD); }
+            catch (\Throwable $e) { error_log('[etudiant_create_minimal] welcome mail: ' . $e->getMessage()); }
+        }
         return ['etudiant_id' => $etuId, 'numero' => $numero, 'deja_existant' => false];
     } catch (\Throwable $e) {
         $pdo->rollBack();
@@ -240,6 +248,10 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
         etudiant_sync_documents_historiques($pdo, $etuId, $candidature, $adminUser);
 
         $pdo->commit();
+        if (function_exists('etu_notify_send_welcome')) {
+            try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD); }
+            catch (\Throwable $e) { error_log('[etudiant_create_from_candidature] welcome: ' . $e->getMessage()); }
+        }
         return [
             'etudiant_id'      => $etuId,
             'numero'           => $numero,
@@ -525,6 +537,15 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     try { etudiant_set_categorie($pdo, $etuId, 'preadmis'); }
     catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] set_categorie failed: ' . $e->getMessage()); }
 
+    // Notification étudiant : nouveaux documents/factures disponibles
+    if (function_exists('etu_notify_send_documents')) {
+        try {
+            $items = [['titre' => 'Lettre de préadmission IPEC', 'kind' => 'document']];
+            foreach ($tranches as $t) $items[] = ['titre' => $t['libelle'], 'kind' => 'facture'];
+            etu_notify_send_documents($pdo, $etuId, $items);
+        } catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] notify: ' . $e->getMessage()); }
+    }
+
     return ['created' => true, 'count' => count($tranches)];
 }
 
@@ -632,26 +653,7 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
     ];
 
     $created = 0;
-    $insert = $pdo->prepare(
-        "INSERT INTO documents
-            (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
-             date_emission, cree_par_admin)
-         VALUES (?, ?, ?, 'autre', ?,
-                 ?, ?, ?, 'publie', 1,
-                 ?, ?)"
-    );
-    $emis = date('Y-m-d');
-    $templates = [
-        'attestation_inscription' => [
-            'titre' => "Attestation d'inscription définitive",
-            'desc'  => "Inscription confirmée — première tranche acquittée.",
-        ],
-        'formulaire_inscription' => [
-            'titre' => "Formulaire standard d'inscription",
-            'desc'  => "Formulaire pré-rempli à imprimer, compléter et signer.",
-        ],
-    ];
+    $createdTitles = [];
     foreach ($templates as $template => $meta) {
         $st = $pdo->prepare("SELECT id FROM documents WHERE candidature_id = ? AND template = ? LIMIT 1");
         $st->execute([$candidatureId, $template]);
@@ -665,6 +667,13 @@ function etudiant_create_documents_inscription_definitive(PDO $pdo, int $etudian
             $emis, $adminUser,
         ]);
         $created++;
+        $createdTitles[] = $meta['titre'];
+    }
+    if ($created > 0 && function_exists('etu_notify_send_documents')) {
+        try {
+            $items = array_map(fn($t) => ['titre' => $t, 'kind' => 'document'], $createdTitles);
+            etu_notify_send_documents($pdo, $etudiantId, $items);
+        } catch (\Throwable $e) { error_log('[inscription_definitive] notify: ' . $e->getMessage()); }
     }
     return ['created' => $created > 0, 'count' => $created];
 }

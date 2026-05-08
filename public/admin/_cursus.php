@@ -194,11 +194,26 @@ function cursus_evoluer(
     // réussite de l'année précédente, et — si on quitte PAA-3 — le diplôme
     // de Bachelier. Idempotent.
     $docsCreated = 0;
+    $extraNotifyTitles = [];
     if ($mode === 'passage') {
-        $docsCreated += cursus_create_attestation_reussite_annee($pdo, $prev, $nextStep, $adminUser) ? 1 : 0;
-        if ($curStep === 'PAA-3') {
-            $docsCreated += cursus_create_diplome_bachelier($pdo, $prev, $adminUser) ? 1 : 0;
+        if (cursus_create_attestation_reussite_annee($pdo, $prev, $nextStep, $adminUser)) {
+            $docsCreated++;
+            $extraNotifyTitles[] = "Attestation de réussite — {$prev['programme']} {$prev['annee']}";
         }
+        if ($curStep === 'PAA-3') {
+            if (cursus_create_diplome_bachelier($pdo, $prev, $adminUser)) {
+                $docsCreated++;
+                $extraNotifyTitles[] = "Diplôme de Bachelier (PAA — BAC+3)";
+            }
+        }
+    }
+    // Notification complémentaire pour les attestations / diplôme
+    // (les nouvelles factures scolarité sont déjà notifiées par etudiant_create_factures_scolarite).
+    if (!empty($extraNotifyTitles) && function_exists('etu_notify_send_documents')) {
+        try {
+            $items = array_map(fn($t) => ['titre' => $t, 'kind' => 'document'], $extraNotifyTitles);
+            etu_notify_send_documents($pdo, (int)$prev['etudiant_id'], $items);
+        } catch (\Throwable $e) { error_log('[cursus_evoluer] notify: ' . $e->getMessage()); }
     }
 
     return [
