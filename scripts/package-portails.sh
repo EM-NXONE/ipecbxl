@@ -144,7 +144,7 @@ RewriteRule ^ - [L]
 RewriteRule ^(mailer\.php|verify\.php|FPDF/|PHPMailer/) - [L]
 RewriteRule ^ index.html [L]
 
-<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^_academic_dates\.php$|^cors\.php$|^_etudiants\.php$|^_cursus\.php$)">
+<FilesMatch "(^db_config\.php$|^_pdf_classes\.php$|^_academic_dates\.php$|^_etu_notify\.php$|^cors\.php$|^_etudiants\.php$|^_cursus\.php$)">
   Require all denied
 </FilesMatch>
 HT
