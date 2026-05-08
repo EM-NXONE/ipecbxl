@@ -1587,13 +1587,13 @@ HTML;
     $candidatureDbError   = null;
     $candidatureDbId      = null;
 
-    // Calcul de l'année académique (cohérent avec ce qu'affichent les PDFs)
-    $academicYearForDb = '';
-    if (preg_match('/(20\d{2})/', $rentree, $mYr)) {
-        $yr = (int)$mYr[1];
-        $isPrintempsDb = (bool)preg_match('/f[ée]vrier|janvier|mars|avril|mai|juin|juillet|ao[ûu]t/i', $rentree);
-        $startYr = $isPrintempsDb ? ($yr - 1) : $yr;
-        $academicYearForDb = $startYr . '/' . ($startYr + 1);
+    // Année académique : centralisée dans _academic_dates.php (constante IPEC_ACADEMIC_YEAR_LABEL).
+    $academicYearForDb = function_exists('ipec_academic_year_for')
+        ? ipec_academic_year_for(null)
+        : '';
+    // Libellé de rentrée normalisé pour l'enregistrement BDD ("Rentrée principale" / "Rentrée décalée").
+    if (function_exists('ipec_rentree_label_normalized')) {
+        $rentree = ipec_rentree_label_normalized($rentree);
     }
 
     try {
