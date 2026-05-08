@@ -42,6 +42,7 @@ if (!empty($cand['etudiant_id'])) {
     $eStmt = $pdo->prepare(
         "SELECT id, numero_etudiant, civilite, prenom, nom, email,
                 date_naissance, statut, categorie, motif_inactif, date_fin_cursus,
+                etape_courante, annee_academique_courante, rentree_courante,
                 (password_hash IS NOT NULL) AS active,
                 derniere_connexion, cree_par_admin, created_at
          FROM etudiants WHERE id = ?"
