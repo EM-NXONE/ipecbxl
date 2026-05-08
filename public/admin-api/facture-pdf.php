@@ -20,7 +20,9 @@ $pdo = db();
 $stmt = $pdo->prepare(
     "SELECT f.*, e.civilite, e.prenom, e.nom, e.email,
             c.rue, c.numero AS num_rue, c.code_postal, c.ville, c.pays_residence,
-            c.programme, c.annee, c.specialisation, c.rentree, c.annee_academique, c.reference AS ref_candidature
+            c.programme AS cand_programme, c.annee AS cand_annee, c.specialisation,
+            c.rentree AS cand_rentree, c.annee_academique AS cand_annee_academique,
+            c.reference AS ref_candidature
      FROM factures f
      INNER JOIN etudiants e ON e.id = f.etudiant_id
      LEFT JOIN candidatures c ON c.id = f.candidature_id
@@ -30,6 +32,21 @@ $stmt = $pdo->prepare(
 $stmt->execute([$id]);
 $f = $stmt->fetch();
 if (!$f) api_error('Facture introuvable.', 404);
+
+// L'année académique + l'étape de cursus de la facture priment sur celles de
+// la candidature initiale (cf. progression in-place : un étudiant n'a qu'UNE
+// candidature, mais ses factures portent leur propre année académique).
+$factAnnee = (string)($f['annee_academique'] ?? '') ?: ($f['cand_annee_academique'] ?? null);
+$step      = (string)($f['etape_cursus']     ?? '');
+if ($step !== '') {
+    // Reconstruit programme + libellé année à partir de l'étape (PAA-2, PEA-1, ...)
+    [$progBase, $yearNum] = array_pad(explode('-', $step, 2), 2, '');
+    $progLabel = $progBase;
+    $anneeLabel = $yearNum ? ($yearNum . (($yearNum === '1') ? 'ʳᵉ' : 'ᵉ') . ' année') : ($f['cand_annee'] ?? null);
+} else {
+    $progLabel  = $f['cand_programme'] ?? null;
+    $anneeLabel = $f['cand_annee']     ?? null;
+}
 
 $adresse = trim(
     trim(($f['rue'] ?? '') . ' ' . ($f['num_rue'] ?? '')) .
@@ -50,11 +67,11 @@ $base = [
     'codePostal'        => $f['code_postal'],
     'ville'             => $f['ville'],
     'paysResidence'     => $f['pays_residence'],
-    'programme'         => $f['programme'],
-    'annee'             => $f['annee'],
+    'programme'         => $progLabel,
+    'annee'             => $anneeLabel,
     'specialisation'    => $f['specialisation'],
-    'rentree'           => $f['rentree'],
-    'annee_academique'  => $f['annee_academique'],
+    'rentree'           => $f['cand_rentree'],
+    'annee_academique'  => $factAnnee,
     'libelle'           => $f['libelle'],
     'description'       => $f['description'],
     'montant_ttc_cents' => (int)$f['montant_ttc_cents'],

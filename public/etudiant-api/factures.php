@@ -10,11 +10,11 @@ $stmt = db()->prepare(
             f.date_emission, f.date_echeance,
             f.statut_paiement, f.paye_at, f.moyen_paiement, f.reference_paiement,
             f.created_at, f.updated_at,
-            c.annee_academique AS candidature_annee_academique
+            f.annee_academique, f.etape_cursus,
+            f.annee_academique AS candidature_annee_academique
      FROM factures f
-     LEFT JOIN candidatures c ON c.id = f.candidature_id
      WHERE f.etudiant_id=? AND f.visible_etudiant=1
-     ORDER BY f.date_emission DESC, f.id DESC"
+     ORDER BY f.annee_academique DESC, f.date_emission DESC, f.id DESC"
 );
 $stmt->execute([$u['id']]);
 $factures = $stmt->fetchAll();

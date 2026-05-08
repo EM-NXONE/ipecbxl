@@ -56,100 +56,50 @@ function cursus_next_step(string $key): ?string {
 }
 
 /**
- * Crée la nouvelle candidature pour l'année académique en cours, liée à la
- * précédente. Statut = 'validee' (l'étudiant n'a pas à recandidater),
- * facture_payee = 1 (les frais 400 € ne sont JAMAIS refacturés au passage).
- */
-function cursus_create_next_candidature(
-    PDO $pdo, array $previous, string $stepKey, string $type, string $adminUser
-): array {
-    if (!in_array($type, ['passage', 'redoublement'], true)) {
-        throw new InvalidArgumentException('type_inscription invalide.');
-    }
-    $meta = CURSUS_LABELS[$stepKey] ?? null;
-    if (!$meta) throw new RuntimeException("Étape cursus inconnue : $stepKey");
-
-    // Référence officielle (IPEC-CAND-AAAA-XXXXXX), unique en base.
-    // Mémoire : JAMAIS de fallback timestamp inventé.
-    $reference = generateDocumentReference($pdo, 'CAND');
-
-    $pdo->beginTransaction();
-    try {
-        $stmt = $pdo->prepare(
-            "INSERT INTO candidatures
-                (reference, statut,
-                 civilite, prenom, nom, date_naissance, nationalite,
-                 email, telephone,
-                 rue, numero, code_postal, ville, pays_residence,
-                 programme, annee, specialisation, rentree, annee_academique,
-                 message, etudiant_id, parent_candidature_id, type_inscription,
-                 facture_payee, facture_payee_at, facture_payee_par,
-                 created_at)
-             VALUES
-                (?, 'validee',
-                 ?, ?, ?, ?, ?,
-                 ?, ?,
-                 ?, ?, ?, ?, ?,
-                 ?, ?, ?, ?, ?,
-                 ?, ?, ?, ?,
-                 1, NOW(), ?,
-                 NOW())"
-        );
-        $stmt->execute([
-            $reference,
-            $previous['civilite'], $previous['prenom'], $previous['nom'],
-            $previous['date_naissance'], $previous['nationalite'],
-            $previous['email'], $previous['telephone'],
-            $previous['rue'], $previous['numero'], $previous['code_postal'],
-            $previous['ville'], $previous['pays_residence'],
-            $meta['programme'], $meta['annee_label'], $previous['specialisation'],
-            $previous['rentree'],            // calé sur la même rentrée
-            $previous['annee_academique'],   // sera remplacé par UI/API si fournie
-            null,
-            (int)$previous['etudiant_id'],
-            (int)$previous['id'],
-            $type,
-            $adminUser,
-        ]);
-        $newId = (int)$pdo->lastInsertId();
-        $pdo->commit();
-    } catch (\Throwable $e) {
-        $pdo->rollBack();
-        throw $e;
-    }
-
-    // Recharge la nouvelle ligne (avec les champs par défaut MySQL : created_at, etc.)
-    $stmt = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
-    $stmt->execute([$newId]);
-    return $stmt->fetch();
-}
-
-/**
  * Action : passer à l'année suivante (PAA1→PAA2 etc.) ou redoubler.
- * Génère automatiquement les 3 factures de scolarité de la nouvelle année,
- * crée la lettre de préadmission, et fait redescendre l'étudiant en
- * 'preadmis' tant que la T1 n'est pas payée.
+ *
+ * MODÈLE (depuis migration v7) : un étudiant n'a qu'UNE SEULE candidature
+ * (le dossier d'admission initial). La progression NE crée plus de
+ * nouvelle ligne dans `candidatures` — on met à jour l'état courant
+ * sur `etudiants` (etape_courante / annee_academique_courante / rentree_courante)
+ * puis on génère les 3 factures de scolarité de la NOUVELLE année académique
+ * rattachées à la candidature initiale, mais portant elles-mêmes leur propre
+ * `annee_academique` + `etape_cursus`.
+ *
+ * L'étudiant reste « etudiant » (jamais de retour en preadmis). Une nouvelle
+ * attestation d'inscription définitive sera générée seulement après paiement
+ * de la 1ʳᵉ tranche de la nouvelle année (cf. facture-action.php).
  *
  * @param string $mode 'passage' ou 'redoublement'
- * @param string|null $anneeAcademique label "AAAA-AAAA" (optionnel — sinon repris du parent)
- * @param string|null $rentree libellé "Septembre — JJ/MM/AAAA" (optionnel)
- * @return array{candidature:array, factures_count:int}
+ * @param string|null $anneeAcademique label "AAAA-AAAA" (obligatoire en pratique)
+ * @param string|null $rentree libellé "Rentrée principale" / "Rentrée décalée"
+ * @return array{candidature:array, factures_count:int, documents_count:int}
  */
 function cursus_evoluer(
-    PDO $pdo, int $previousCandidatureId, string $mode,
+    PDO $pdo, int $candidatureId, string $mode,
     ?string $anneeAcademique, ?string $rentree, string $adminUser
 ): array {
+    if (!in_array($mode, ['passage','redoublement'], true)) {
+        throw new InvalidArgumentException('mode invalide.');
+    }
     $stmt = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
-    $stmt->execute([$previousCandidatureId]);
-    $prev = $stmt->fetch();
-    if (!$prev) throw new RuntimeException('Candidature précédente introuvable.');
-    if (empty($prev['etudiant_id'])) {
+    $stmt->execute([$candidatureId]);
+    $cand = $stmt->fetch();
+    if (!$cand) throw new RuntimeException('Candidature introuvable.');
+    if (empty($cand['etudiant_id'])) {
         throw new RuntimeException('Aucun compte étudiant rattaché à cette candidature.');
     }
+    $etuId = (int)$cand['etudiant_id'];
 
-    $curStep = cursus_step_key($prev);
-    if (!$curStep) {
-        throw new RuntimeException("Cursus indéterminé pour cette candidature (programme/année).");
+    // Lit l'étudiant pour récupérer l'étape courante (sinon on retombe sur la candidature).
+    $eStmt = $pdo->prepare("SELECT id, etape_courante, annee_academique_courante, rentree_courante, categorie
+                            FROM etudiants WHERE id = ?");
+    $eStmt->execute([$etuId]);
+    $etu = $eStmt->fetch() ?: [];
+    $cur = etudiant_current_cursus($etu, $cand);
+    $curStep = $cur['etape'];
+    if (!$curStep || !in_array($curStep, CURSUS_STEPS, true)) {
+        throw new RuntimeException("Étape de cursus indéterminée pour cet étudiant.");
     }
 
     if ($mode === 'passage') {
@@ -157,116 +107,144 @@ function cursus_evoluer(
         if (!$nextStep) {
             throw new RuntimeException("Cet étudiant est déjà en dernière année (PEA2). Utilisez « Diplômer » à la place.");
         }
-    } else { // redoublement
+    } else {
         $nextStep = $curStep;
     }
 
-    // Garde-fou : pas deux candidatures pour la même étape sur la même année académique.
-    if ($anneeAcademique) {
-        $check = $pdo->prepare(
-            "SELECT id FROM candidatures
-              WHERE etudiant_id = ? AND annee_academique = ?
-                AND programme = ? AND annee LIKE ?
-              LIMIT 1"
-        );
-        $meta = CURSUS_LABELS[$nextStep];
-        $check->execute([
-            (int)$prev['etudiant_id'],
-            $anneeAcademique,
-            $meta['programme'],
-            $meta['annee_label'],
-        ]);
-        if ($check->fetchColumn()) {
-            throw new RuntimeException("Une candidature existe déjà pour {$meta['programme']} {$meta['annee_label']} en {$anneeAcademique}.");
-        }
+    if (!$anneeAcademique) {
+        throw new RuntimeException("Année académique cible requise.");
+    }
+    $rentreeNorm = $rentree ? ipec_rentree_label_normalized($rentree) : ipec_rentree_label_normalized($cur['rentree']);
+
+    // Garde-fou : pas deux jeux de factures pour la même (étudiant, année académique).
+    $check = $pdo->prepare("SELECT COUNT(*) FROM factures
+                             WHERE etudiant_id = ? AND type='scolarite' AND annee_academique = ?");
+    $check->execute([$etuId, $anneeAcademique]);
+    if ((int)$check->fetchColumn() > 0) {
+        throw new RuntimeException("Des factures de scolarité existent déjà pour cet étudiant en {$anneeAcademique}.");
     }
 
-    // Pré-remplit annee_academique / rentree si fournis (UI)
-    if ($anneeAcademique) $prev['annee_academique'] = $anneeAcademique;
-    if ($rentree)         $prev['rentree']          = $rentree;
+    // Met à jour l'état courant sur l'étudiant. Catégorie : reste 'etudiant'
+    // (s'il l'était déjà). Si pour une raison X il n'a jamais payé sa T1
+    // initiale, on ne le rétrograde pas non plus — règle métier explicite.
+    $pdo->prepare("UPDATE etudiants
+                   SET etape_courante = ?,
+                       annee_academique_courante = ?,
+                       rentree_courante = ?,
+                       motif_inactif = NULL,
+                       date_fin_cursus = NULL
+                   WHERE id = ?")
+        ->execute([$nextStep, $anneeAcademique, $rentreeNorm, $etuId]);
 
-    $newCand = cursus_create_next_candidature($pdo, $prev, $nextStep, $mode, $adminUser);
+    // Génère les 3 factures de scolarité de la NOUVELLE année académique,
+    // rattachées à la candidature initiale (un étudiant = une candidature).
+    // On force statut='validee' + facture_payee=1 dans le tableau passé pour
+    // satisfaire les garde-fous internes (la candidature initiale est déjà validée).
+    $candForFact = $cand;
+    $candForFact['statut']         = 'validee';
+    $candForFact['facture_payee']  = 1;
+    $res = etudiant_create_factures_scolarite($pdo, $candForFact, $adminUser, [
+        'step_key'              => $nextStep,
+        'annee_academique'      => $anneeAcademique,
+        'rentree'               => $rentreeNorm,
+        'idempotency_scope'     => 'etudiant_year',
+        'skip_preadmission_doc' => true,   // pas de "lettre de préadmission" sur progression
+        'skip_set_categorie'    => true,   // l'étudiant reste 'etudiant'
+    ]);
 
-    // Génère les 3 factures de scolarité pour la nouvelle candidature.
-    $res = etudiant_create_factures_scolarite($pdo, $newCand, $adminUser);
-
-    // Au PASSAGE d'année (pas en redoublement) : génère l'attestation de
-    // réussite de l'année précédente, et — si on quitte PAA-3 — le diplôme
-    // de Bachelier. Idempotent.
+    // Documents pédagogiques liés au passage (idempotent).
     $docsCreated = 0;
     $extraNotifyTitles = [];
     if ($mode === 'passage') {
-        if (cursus_create_attestation_reussite_annee($pdo, $prev, $nextStep, $adminUser)) {
+        if (cursus_create_attestation_reussite_annee($pdo, $cand, $curStep, $nextStep, $cur['annee_academique'] ?? null, $adminUser)) {
             $docsCreated++;
-            $extraNotifyTitles[] = "Attestation de réussite — {$prev['programme']} {$prev['annee']}";
+            $extraNotifyTitles[] = "Attestation de réussite — " . CURSUS_LABELS[$curStep]['programme'] . ' ' . CURSUS_LABELS[$curStep]['annee_label'];
         }
         if ($curStep === 'PAA-3') {
-            if (cursus_create_diplome_bachelier($pdo, $prev, $adminUser)) {
+            if (cursus_create_diplome_bachelier($pdo, $cand, $cur['annee_academique'] ?? null, $adminUser)) {
                 $docsCreated++;
                 $extraNotifyTitles[] = "Diplôme de Bachelier (PAA — BAC+3)";
             }
         }
     }
-    // Notification complémentaire pour les attestations / diplôme
-    // (les nouvelles factures scolarité sont déjà notifiées par etudiant_create_factures_scolarite).
     if (!empty($extraNotifyTitles) && function_exists('etu_notify_send_documents')) {
         try {
             $items = array_map(fn($t) => ['titre' => $t, 'kind' => 'document'], $extraNotifyTitles);
-            etu_notify_send_documents($pdo, (int)$prev['etudiant_id'], $items);
+            etu_notify_send_documents($pdo, $etuId, $items);
         } catch (\Throwable $e) { error_log('[cursus_evoluer] notify: ' . $e->getMessage()); }
     }
 
+    // Recharge la candidature pour la cohérence du retour.
+    $stmt2 = $pdo->prepare("SELECT * FROM candidatures WHERE id = ?");
+    $stmt2->execute([$candidatureId]);
+    $candReloaded = $stmt2->fetch() ?: $cand;
+
     return [
-        'candidature'    => $newCand,
+        'candidature'    => $candReloaded,
         'factures_count' => (int)($res['count'] ?? 0),
         'documents_count'=> $docsCreated,
+        'next_step'      => $nextStep,
+        'next_label'     => CURSUS_LABELS[$nextStep]['programme'] . ' ' . CURSUS_LABELS[$nextStep]['annee_label'],
     ];
 }
 
 /**
- * Crée (idempotent) l'attestation de réussite d'année pour la candidature
- * que l'étudiant vient de valider (= candidature parent au passage).
+ * Crée (idempotent) l'attestation de réussite de l'année que l'étudiant
+ * vient de valider. Idempotence : (etudiant_id, template, prevStep, anneeValidee).
+ *
+ * @param array  $cand          La candidature initiale (porte l'identité).
+ * @param string $prevStep      Étape validée (ex 'PAA-1').
+ * @param string $nextStep      Étape autorisée pour l'année suivante (ex 'PAA-2').
+ * @param string|null $anneeValidee  Année académique qui vient d'être validée.
  */
-function cursus_create_attestation_reussite_annee(PDO $pdo, array $prevCand, string $nextStep, string $adminUser): bool {
-    $cid = (int)$prevCand['id'];
+function cursus_create_attestation_reussite_annee(
+    PDO $pdo, array $cand, string $prevStep, string $nextStep, ?string $anneeValidee, string $adminUser
+): bool {
+    $cid   = (int)$cand['id'];
+    $etuId = (int)$cand['etudiant_id'];
+    // Idempotence par (étudiant, étape validée, année académique)
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'attestation_reussite_annee' LIMIT 1");
-    $exists->execute([$cid]);
+                             WHERE etudiant_id = ? AND template = 'attestation_reussite_annee'
+                               AND COALESCE(etape_cursus,'') = ? AND COALESCE(annee_academique,'') = COALESCE(?, '')
+                             LIMIT 1");
+    $exists->execute([$etuId, $prevStep, $anneeValidee]);
     if ($exists->fetchColumn()) return false;
 
-    $nextLabel = '';
-    if (isset(CURSUS_LABELS[$nextStep])) {
-        $m = CURSUS_LABELS[$nextStep];
-        $nextLabel = $m['programme'] . ' ' . $m['annee_label'];
-    }
+    $prevMeta = CURSUS_LABELS[$prevStep] ?? null;
+    $nextMeta = CURSUS_LABELS[$nextStep] ?? null;
+    $prevLabelProg = $prevMeta ? $prevMeta['programme'] : '';
+    $prevLabelAnn  = $prevMeta ? $prevMeta['annee_label'] : '';
+    $nextLabel     = $nextMeta ? ($nextMeta['programme'] . ' ' . $nextMeta['annee_label']) : '';
+
     $ref = etudiant_generate_ref($pdo, 'DOC');
     $emis = date('Y-m-d');
     $data = [
         'reference_doc'         => $ref,
         'date_emission'         => $emis,
-        'civilite'              => $prevCand['civilite']         ?? null,
-        'prenom'                => $prevCand['prenom']           ?? null,
-        'nom'                   => $prevCand['nom']              ?? null,
-        'date_naissance'        => $prevCand['date_naissance']   ?? null,
-        'programme'             => $prevCand['programme']        ?? null,
-        'annee'                 => $prevCand['annee']            ?? null,
-        'specialisation'        => $prevCand['specialisation']   ?? null,
-        'annee_academique'      => $prevCand['annee_academique'] ?? null,
+        'civilite'              => $cand['civilite']        ?? null,
+        'prenom'                => $cand['prenom']          ?? null,
+        'nom'                   => $cand['nom']             ?? null,
+        'date_naissance'        => $cand['date_naissance']  ?? null,
+        'programme'             => $prevLabelProg,
+        'annee'                 => $prevLabelAnn,
+        'specialisation'        => $cand['specialisation']  ?? null,
+        'annee_academique'      => $anneeValidee,
         'annee_suivante'        => $nextLabel,
-        'candidature_reference' => $prevCand['reference']        ?? null,
+        'candidature_reference' => $cand['reference']       ?? null,
     ];
     $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
              date_emission, cree_par_admin)
          VALUES (?, ?, ?, 'attestation', 'attestation_reussite_annee',
-                 ?, ?, ?, 'publie', 1,
+                 ?, ?, ?, ?, ?, 'publie', 1,
                  ?, ?)"
     )->execute([
-        $ref, (int)$prevCand['etudiant_id'], $cid,
-        "Attestation de réussite — {$prevCand['programme']} {$prevCand['annee']}",
-        "Année académique " . ($prevCand['annee_academique'] ?? '') . " validée. Document officiel signé par la direction de l'IPEC.",
+        $ref, $etuId, $cid,
+        "Attestation de réussite — {$prevLabelProg} {$prevLabelAnn}",
+        $anneeValidee, $prevStep,
+        "Année académique " . ($anneeValidee ?? '') . " validée. Document officiel signé par la direction de l'IPEC.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
     ]);
@@ -276,11 +254,12 @@ function cursus_create_attestation_reussite_annee(PDO $pdo, array $prevCand, str
 /**
  * Crée (idempotent) le diplôme de Bachelier en fin de PAA-3.
  */
-function cursus_create_diplome_bachelier(PDO $pdo, array $prevCand, string $adminUser): bool {
-    $cid = (int)$prevCand['id'];
+function cursus_create_diplome_bachelier(PDO $pdo, array $cand, ?string $anneeValidee, string $adminUser): bool {
+    $cid   = (int)$cand['id'];
+    $etuId = (int)$cand['etudiant_id'];
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'diplome_bachelier' LIMIT 1");
-    $exists->execute([$cid]);
+                             WHERE etudiant_id = ? AND template = 'diplome_bachelier' LIMIT 1");
+    $exists->execute([$etuId]);
     if ($exists->fetchColumn()) return false;
 
     $ref = etudiant_generate_ref($pdo, 'DOC');
@@ -288,25 +267,26 @@ function cursus_create_diplome_bachelier(PDO $pdo, array $prevCand, string $admi
     $data = [
         'reference_doc'         => $ref,
         'date_emission'         => $emis,
-        'civilite'              => $prevCand['civilite']         ?? null,
-        'prenom'                => $prevCand['prenom']           ?? null,
-        'nom'                   => $prevCand['nom']              ?? null,
-        'date_naissance'        => $prevCand['date_naissance']   ?? null,
-        'specialisation'        => $prevCand['specialisation']   ?? null,
-        'annee_academique'      => $prevCand['annee_academique'] ?? null,
-        'candidature_reference' => $prevCand['reference']        ?? null,
+        'civilite'              => $cand['civilite']         ?? null,
+        'prenom'                => $cand['prenom']           ?? null,
+        'nom'                   => $cand['nom']              ?? null,
+        'date_naissance'        => $cand['date_naissance']   ?? null,
+        'specialisation'        => $cand['specialisation']   ?? null,
+        'annee_academique'      => $anneeValidee,
+        'candidature_reference' => $cand['reference']        ?? null,
     ];
     $pdo->prepare(
         "INSERT INTO documents
             (reference, etudiant_id, candidature_id, type, template,
-             titre, description, data_json, statut, visible_etudiant,
+             titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
              date_emission, cree_par_admin)
          VALUES (?, ?, ?, 'diplome', 'diplome_bachelier',
-                 ?, ?, ?, 'publie', 1,
+                 ?, ?, ?, ?, ?, 'publie', 1,
                  ?, ?)"
     )->execute([
-        $ref, (int)$prevCand['etudiant_id'], $cid,
+        $ref, $etuId, $cid,
         "Diplôme de Bachelier (PAA — BAC+3)",
+        $anneeValidee, 'PAA-3',
         "Diplôme officiel délivré au terme du cycle PAA. Signé par la direction de l'IPEC.",
         json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
         $emis, $adminUser,
@@ -327,21 +307,25 @@ function cursus_diplomer(PDO $pdo, int $candidatureId, string $adminUser): array
     if (empty($cand['etudiant_id'])) {
         throw new RuntimeException('Aucun compte étudiant rattaché.');
     }
-    $step = cursus_step_key($cand);
-    if ($step !== 'PEA-2') {
-        throw new RuntimeException("La diplomation n'est possible qu'en dernière année (PEA2).");
-    }
-
     $etuId = (int)$cand['etudiant_id'];
 
-    // Crée (idempotent) le document attestation de réussite.
+    $eStmt = $pdo->prepare("SELECT etape_courante, annee_academique_courante, rentree_courante FROM etudiants WHERE id = ?");
+    $eStmt->execute([$etuId]);
+    $cur = etudiant_current_cursus($eStmt->fetch() ?: [], $cand);
+    if (($cur['etape'] ?? null) !== 'PEA-2') {
+        throw new RuntimeException("La diplomation n'est possible qu'en dernière année (PEA2).");
+    }
+    $anneeAca = $cur['annee_academique'];
+
+    // Crée (idempotent) le document attestation de réussite (cycle complet).
     $exists = $pdo->prepare("SELECT id FROM documents
-                             WHERE candidature_id = ? AND template = 'attestation_reussite' LIMIT 1");
-    $exists->execute([$candidatureId]);
+                             WHERE etudiant_id = ? AND template = 'attestation_reussite' LIMIT 1");
+    $exists->execute([$etuId]);
     $created = false;
     if (!$exists->fetchColumn()) {
         $ref = etudiant_generate_ref($pdo, 'DOC');
         $emis = date('Y-m-d');
+        $peaMeta = CURSUS_LABELS['PEA-2'];
         $data = [
             'reference_doc'         => $ref,
             'date_emission'         => $emis,
@@ -349,23 +333,24 @@ function cursus_diplomer(PDO $pdo, int $candidatureId, string $adminUser): array
             'prenom'                => $cand['prenom']          ?? null,
             'nom'                   => $cand['nom']             ?? null,
             'date_naissance'        => $cand['date_naissance']  ?? null,
-            'programme'             => $cand['programme']       ?? null,
-            'annee'                 => $cand['annee']           ?? null,
+            'programme'             => $peaMeta['programme'],
+            'annee'                 => $peaMeta['annee_label'],
             'specialisation'        => $cand['specialisation']  ?? null,
-            'annee_academique'      => $cand['annee_academique']?? null,
+            'annee_academique'      => $anneeAca,
             'candidature_reference' => $cand['reference']       ?? null,
         ];
         $pdo->prepare(
             "INSERT INTO documents
                 (reference, etudiant_id, candidature_id, type, template,
-                 titre, description, data_json, statut, visible_etudiant,
+                 titre, annee_academique, etape_cursus, description, data_json, statut, visible_etudiant,
                  date_emission, cree_par_admin)
              VALUES (?, ?, ?, 'attestation', 'attestation_reussite',
-                     ?, ?, ?, 'publie', 1,
+                     ?, ?, ?, ?, ?, 'publie', 1,
                      ?, ?)"
         )->execute([
             $ref, $etuId, $candidatureId,
-            "Attestation de réussite — {$cand['programme']} {$cand['annee']}",
+            "Attestation de réussite — {$peaMeta['programme']} {$peaMeta['annee_label']}",
+            $anneeAca, 'PEA-2',
             "Cycle complet validé. Document officiel signé par la direction de l'IPEC.",
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             $emis, $adminUser,
@@ -428,8 +413,25 @@ function cursus_set_actif(PDO $pdo, int $etudiantId): string {
  *   can_diplomer: bool
  * }
  */
-function cursus_describe_for(array $latestCandidature): array {
-    $step = cursus_step_key($latestCandidature);
+/**
+ * Renvoie un descripteur pour l'UI : étape courante + actions possibles.
+ *
+ * Accepte au choix :
+ *   - un tableau étudiant (avec etape_courante / annee_academique_courante / rentree_courante) ;
+ *   - une candidature (fallback si l'étape courante n'est pas encore renseignée).
+ *
+ * Quand on a accès aux deux (cas habituel), passer l'étudiant en 1er paramètre
+ * et la candidature initiale en fallback.
+ */
+function cursus_describe_for(?array $etudiantOrCand, ?array $candFallback = null): array {
+    // Distinguer "fiche étudiant" vs "candidature" : la candidature porte 'reference' qui commence par IPEC-CAND.
+    $isCand = $etudiantOrCand
+        && isset($etudiantOrCand['reference'])
+        && stripos((string)$etudiantOrCand['reference'], 'IPEC-CAND') === 0;
+    if ($isCand && $candFallback === null) { $candFallback = $etudiantOrCand; $etudiantOrCand = null; }
+
+    $cur = etudiant_current_cursus($etudiantOrCand, $candFallback);
+    $step = $cur['etape'];
     $next = $step ? cursus_next_step($step) : null;
     return [
         'current_step'  => $step,
@@ -439,5 +441,7 @@ function cursus_describe_for(array $latestCandidature): array {
         'can_promote'   => $step !== null && $next !== null,
         'can_redouble'  => $step !== null,
         'can_diplomer'  => $step === 'PEA-2',
+        'annee_academique_courante' => $cur['annee_academique'],
+        'rentree_courante'          => $cur['rentree'],
     ];
 }
