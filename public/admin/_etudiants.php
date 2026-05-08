@@ -417,7 +417,7 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
  *
  * @return array{created:bool, count:int, reason?:string}
  * ===================================================================== */
-function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string $adminUser): array {
+function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string $adminUser, array $opts = []): array {
     // --- Garde-fous ---
     if (($candidature['statut'] ?? '') !== 'validee') {
         return ['created' => false, 'count' => 0, 'reason' => 'statut non validé'];
@@ -431,34 +431,41 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     $etuId  = (int)$candidature['etudiant_id'];
     $candId = (int)$candidature['id'];
 
-    // Idempotence : si déjà une facture scolarité, on s'arrête.
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM factures
-                            WHERE candidature_id = ? AND type = 'scolarite'");
-    $stmt->execute([$candId]);
+    // --- Cible : étape + année académique ----------------------------
+    // Par défaut : on lit la candidature (flux d'admission initiale).
+    // En cas de progression, $opts permet d'écraser ces valeurs sans avoir à
+    // dupliquer la candidature (one-candidature-per-student).
+    $stepKey = (string)($opts['step_key'] ?? '');
+    if ($stepKey === '') {
+        $stepKey = (string)(etudiant_step_from_programme_annee($candidature['programme'] ?? null, $candidature['annee'] ?? null) ?? '');
+    }
+    if ($stepKey === '') {
+        return ['created' => false, 'count' => 0, 'reason' => 'programme inconnu (ni PAA ni PEA)'];
+    }
+    [$progBase, $yearNum] = explode('-', $stepKey, 2);
+    $progLabel = $progBase . $yearNum;
+    $isPEA = ($progBase === 'PEA');
+
+    $anneeAca   = (string)($opts['annee_academique'] ?? $candidature['annee_academique'] ?? '') ?: null;
+    $rentreeStr = (string)($opts['rentree']          ?? $candidature['rentree']          ?? '');
+
+    // --- Idempotence : initiale = par candidature, progression = par (étudiant, année académique).
+    $scope = $opts['idempotency_scope'] ?? 'candidature';
+    if ($scope === 'etudiant_year') {
+        if (!$anneeAca) {
+            return ['created' => false, 'count' => 0, 'reason' => 'annee_academique requise pour la progression'];
+        }
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM factures
+                                WHERE etudiant_id = ? AND type = 'scolarite' AND annee_academique = ?");
+        $stmt->execute([$etuId, $anneeAca]);
+    } else {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM factures
+                                WHERE candidature_id = ? AND type = 'scolarite'");
+        $stmt->execute([$candId]);
+    }
     if ((int)$stmt->fetchColumn() > 0) {
         return ['created' => false, 'count' => 0, 'reason' => 'déjà générées'];
     }
-
-    // --- Programme : PAA vs PEA (prend le préfixe du libellé) ---
-    $progRaw = strtoupper(trim((string)($candidature['programme'] ?? '')));
-    $isPEA = (strpos($progRaw, 'PEA') === 0);
-    $isPAA = (strpos($progRaw, 'PAA') === 0);
-    if (!$isPAA && !$isPEA) {
-        return ['created' => false, 'count' => 0, 'reason' => 'programme inconnu (ni PAA ni PEA)'];
-    }
-    $progBase = $isPEA ? 'PEA' : 'PAA';
-
-    // Détermine l'année (1, 2, 3) à partir du libellé annee de la candidature.
-    // Ex: "1ʳᵉ année (BAC+1)" → 1 ; "2ᵉ année (BAC+2)" → 2 ; PEA "1ʳᵉ année (BAC+4)" → 1.
-    $anneeStr = (string)($candidature['annee'] ?? '');
-    $yearNum = '';
-    if (preg_match('/^\s*(\d)/u', $anneeStr, $ym)) {
-        $yearNum = $ym[1];
-    }
-    // Sécurité : PAA = 1..3, PEA = 1..2
-    if ($isPAA && !in_array($yearNum, ['1','2','3'], true)) $yearNum = '';
-    if ($isPEA && !in_array($yearNum, ['1','2'], true))     $yearNum = '';
-    $progLabel = $progBase . $yearNum;
 
     // Montants en centimes (TTC, exonérés TVA enseignement)
     $t1Cents = 300000; // 3 000 €
@@ -474,7 +481,6 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
 
     // Le libellé "rentree" est maintenant symbolique ("Rentrée principale" / "Rentrée décalée").
     // La date réelle est résolue via ipec_rentree_date_for() (codée en dur côté serveur).
-    $rentreeStr = (string)($candidature['rentree'] ?? '');
     $rentreeDateStr = ipec_rentree_date_for($rentreeStr); // jj/mm/aaaa
     $isFebruary = ipec_rentree_is_decalee($rentreeStr);
     $rentreeDate = DateTimeImmutable::createFromFormat('!d/m/Y', $rentreeDateStr) ?: null;
@@ -501,22 +507,23 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     if ($t3Echeance < $t2Echeance) $t3Echeance = $t2Echeance;
 
     $rentreeLabel = ipec_rentree_label_normalized($rentreeStr);
+    $anneeSuffix  = $anneeAca ? " ({$anneeAca})" : '';
 
     $tranches = [
         [
-            'libelle'     => "Frais de scolarité {$progLabel} — 1ʳᵉ tranche",
+            'libelle'     => "Frais de scolarité {$progLabel} — 1ʳᵉ tranche{$anneeSuffix}",
             'description' => "Première tranche due à la confirmation d'inscription ({$rentreeLabel}).",
             'montant'     => $t1Cents,
             'echeance'    => $t1Echeance,
         ],
         [
-            'libelle'     => "Frais de scolarité {$progLabel} — 2ᵉ tranche",
+            'libelle'     => "Frais de scolarité {$progLabel} — 2ᵉ tranche{$anneeSuffix}",
             'description' => "Deuxième tranche exigible avant le début du programme ({$rentreeLabel}).",
             'montant'     => $trancheSolde,
             'echeance'    => $t2Echeance,
         ],
         [
-            'libelle'     => "Frais de scolarité {$progLabel} — Solde",
+            'libelle'     => "Frais de scolarité {$progLabel} — Solde{$anneeSuffix}",
             'description' => $isFebruary
                 ? "Solde des droits de scolarité — exigible 6 mois après le début du programme."
                 : "Solde des droits de scolarité — exigible avant le 31 janvier de l'année académique.",
@@ -530,11 +537,11 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     try {
         $insert = $pdo->prepare(
             "INSERT INTO factures
-                (numero, etudiant_id, candidature_id, type, libelle, description,
+                (numero, etudiant_id, candidature_id, type, libelle, annee_academique, etape_cursus, description,
                  montant_ht_cents, tva_taux, montant_ttc_cents, devise,
                  date_emission, date_echeance,
                  statut_paiement, visible_etudiant, cree_par_admin)
-             VALUES (?, ?, ?, 'scolarite', ?, ?,
+             VALUES (?, ?, ?, 'scolarite', ?, ?, ?, ?,
                      ?, 0.00, ?, 'EUR',
                      ?, ?,
                      'en_attente', 1, ?)"
@@ -544,7 +551,7 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
             if ($idx === 0) $factureT1Numero = $numero;
             $insert->execute([
                 $numero, $etuId, $candId,
-                $t['libelle'], $t['description'],
+                $t['libelle'], $anneeAca, $stepKey, $t['description'],
                 $t['montant'], $t['montant'],
                 $emission, $t['echeance'],
                 $adminUser,
@@ -556,27 +563,31 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
         throw $e;
     }
 
-    // Document "Lettre de préadmission" — généré en même temps que les factures
-    // (idempotent : ne crée rien si déjà présent pour cette candidature)
-    try {
-        etudiant_create_document_preadmission($pdo, $candidature, $adminUser, [
-            'facture_t1_numero'   => $factureT1Numero,
-            'facture_t1_echeance' => $tranches[0]['echeance'],
-        ]);
-    } catch (\Throwable $e) {
-        // Ne pas faire échouer la génération des factures si le document échoue ;
-        // l'admin pourra le rejouer via sync_documents.
-        error_log('[etudiant_create_factures_scolarite] preadmission doc failed: ' . $e->getMessage());
+    // Document "Lettre de préadmission" — uniquement à l'admission initiale
+    // (pas aux passages d'année : l'étudiant n'est plus préadmis).
+    if (empty($opts['skip_preadmission_doc'])) {
+        try {
+            etudiant_create_document_preadmission($pdo, $candidature, $adminUser, [
+                'facture_t1_numero'   => $factureT1Numero,
+                'facture_t1_echeance' => $tranches[0]['echeance'],
+            ]);
+        } catch (\Throwable $e) {
+            error_log('[etudiant_create_factures_scolarite] preadmission doc failed: ' . $e->getMessage());
+        }
     }
 
-    // Promotion catégorie : candidat → preadmis (factures scolarité émises)
-    try { etudiant_set_categorie($pdo, $etuId, 'preadmis'); }
-    catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] set_categorie failed: ' . $e->getMessage()); }
+    // Promotion catégorie : candidat → preadmis (uniquement à l'admission initiale).
+    // Lors d'un passage d'année l'étudiant reste 'etudiant' (règle métier).
+    if (empty($opts['skip_set_categorie'])) {
+        try { etudiant_set_categorie($pdo, $etuId, 'preadmis'); }
+        catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] set_categorie failed: ' . $e->getMessage()); }
+    }
 
     // Notification étudiant : nouveaux documents/factures disponibles
     if (function_exists('etu_notify_send_documents')) {
         try {
-            $items = [['titre' => 'Lettre de préadmission IPEC', 'kind' => 'document']];
+            $items = [];
+            if (empty($opts['skip_preadmission_doc'])) $items[] = ['titre' => 'Lettre de préadmission IPEC', 'kind' => 'document'];
             foreach ($tranches as $t) $items[] = ['titre' => $t['libelle'], 'kind' => 'facture'];
             etu_notify_send_documents($pdo, $etuId, $items);
         } catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] notify: ' . $e->getMessage()); }
