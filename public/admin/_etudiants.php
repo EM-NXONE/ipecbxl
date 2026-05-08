@@ -537,6 +537,15 @@ function etudiant_create_factures_scolarite(PDO $pdo, array $candidature, string
     try { etudiant_set_categorie($pdo, $etuId, 'preadmis'); }
     catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] set_categorie failed: ' . $e->getMessage()); }
 
+    // Notification étudiant : nouveaux documents/factures disponibles
+    if (function_exists('etu_notify_send_documents')) {
+        try {
+            $items = [['titre' => 'Lettre de préadmission IPEC', 'kind' => 'document']];
+            foreach ($tranches as $t) $items[] = ['titre' => $t['libelle'], 'kind' => 'facture'];
+            etu_notify_send_documents($pdo, $etuId, $items);
+        } catch (\Throwable $e) { error_log('[etudiant_create_factures_scolarite] notify: ' . $e->getMessage()); }
+    }
+
     return ['created' => true, 'count' => count($tranches)];
 }
 
