@@ -901,7 +901,7 @@ function buildFacturePdf(array $f): array {
                 . substr($digits12, 3, 4) . '/'
                 . substr($digits12, 7, 5) . '+++';
 
-    $iban = 'BE53 3770 8630 2553';
+    $iban = 'BE67 6508 0631 8587';
     $bic  = 'BBRUBEBB';
 
     // ---------------------------------------------------------------
