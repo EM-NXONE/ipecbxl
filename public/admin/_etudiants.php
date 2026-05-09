@@ -337,6 +337,8 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
         $emis   = !empty($candidature['created_at'])
             ? date('Y-m-d', strtotime((string)$candidature['created_at']))
             : date('Y-m-d');
+        // Échéance : 14 jours après l'émission (frais de dossier non remboursables).
+        $echeance = date('Y-m-d', strtotime($emis . ' +14 days'));
         $pdo->prepare(
             "INSERT INTO factures
                 (numero, etudiant_id, candidature_id, type, libelle, annee_academique, etape_cursus, description,
@@ -355,7 +357,7 @@ function etudiant_sync_documents_historiques(PDO $pdo, int $etudiantId, array $c
             $candidature['annee_academique'] ?? null,
             etudiant_step_from_programme_annee($candidature['programme'] ?? null, $candidature['annee'] ?? null),
             'Traitement de la candidature ' . ($candidature['reference'] ?? ''),
-            $emis, $emis,
+            $emis, $echeance,
             $payee ? 'payee' : 'en_attente',
             $payee ? ($candidature['created_at'] ?? date('Y-m-d H:i:s')) : null,
             $payee ? $adminUser : null,
