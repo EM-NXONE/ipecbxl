@@ -22,8 +22,8 @@ require_once __DIR__ . '/mailer.php';
 // Constantes
 // ---------------------------------------------------------------------------
 const ETU_COOKIE_NAME      = 'IPEC_ETU';
-const ETU_SESSION_LIFETIME = 30 * 24 * 3600;  // 30 jours
-const ETU_SESSION_REFRESH  = 7 * 24 * 3600;   // refresh expiration toutes les 7 jours
+const ETU_SESSION_LIFETIME = 3 * 3600;  // 3 h d'inactivité
+const ETU_SESSION_REFRESH  = 0;              // refresh à chaque requête
 const ETU_RATE_LIMIT_DIR   = __DIR__ . '/../../.ipec-etu-ratelimit';
 
 // Hôte canonique du portail étudiant (LMS). Sert pour générer les liens
@@ -73,6 +73,7 @@ function etu_absolute_url(string $path): string {
 ini_set('session.use_strict_mode', '1');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_lifetime', '0'); // session cookie (clos à la fermeture du navigateur)
 if (!empty($_SERVER['HTTPS'])) {
     ini_set('session.cookie_secure', '1');
 }
@@ -169,7 +170,7 @@ function etu_session_create(int $etudiantId): string {
     ]);
     $cookiePath = etu_base_path() === '' ? '/' : '/etudiant/';
     setcookie(ETU_COOKIE_NAME, $token, [
-        'expires'  => time() + ETU_SESSION_LIFETIME,
+        'expires'  => 0, // cookie de session : supprimé à la fermeture du navigateur
         'path'     => $cookiePath,
         'secure'   => !empty($_SERVER['HTTPS']),
         'httponly' => true,

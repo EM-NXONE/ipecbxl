@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 // ---------- Constantes ----------
 const ETU_COOKIE_NAME      = 'IPEC_ETU';
-const ETU_SESSION_LIFETIME = 30 * 24 * 3600;  // 30 jours
+const ETU_SESSION_LIFETIME = 3 * 3600;  // 3 h d'inactivité
 const ETU_RATE_LIMIT_DIR   = __DIR__ . '/../../.ipec-etu-ratelimit';
 const ETU_CANONICAL_HOST   = 'lms.ipec.school';
 
@@ -104,7 +104,7 @@ function etu_session_create(int $etudiantId): string {
         $exp,
     ]);
     setcookie(ETU_COOKIE_NAME, $token, [
-        'expires'  => time() + ETU_SESSION_LIFETIME,
+        'expires'  => 0, // cookie de session : supprimé à la fermeture du navigateur
         'path'     => '/',
         'secure'   => !empty($_SERVER['HTTPS']),
         'httponly' => true,

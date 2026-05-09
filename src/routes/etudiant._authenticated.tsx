@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { LayoutDashboard, Receipt, FolderOpen, User } from "lucide-react";
 import { PortalLayout, type PortalNavItem } from "@/components/PortalLayout";
 import { useEtudiantAuth } from "@/lib/auth-etudiant";
+import { useIdleLogout } from "@/hooks/use-idle-logout";
 
 export const Route = createFileRoute("/etudiant/_authenticated")({
   component: EtudiantAuthenticatedLayout,
@@ -21,6 +22,8 @@ const NAV: PortalNavItem[] = [
 // Délai de revalidation périodique de la session (l'admin peut suspendre/archiver
 // le compte à tout moment côté back — on veut décrocher l'étudiant rapidement).
 const SESSION_POLL_MS = 30_000;
+// Déconnexion auto après 3 h sans aucune interaction utilisateur sur l'onglet.
+const IDLE_LOGOUT_MS = 3 * 60 * 60 * 1000;
 
 function EtudiantAuthenticatedLayout() {
   const { user, loading, logout, refresh } = useEtudiantAuth();
@@ -41,6 +44,12 @@ function EtudiantAuthenticatedLayout() {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [user, refresh]);
+
+  // Déconnexion automatique après 3 h d'inactivité utilisateur réelle
+  // (mouvements souris, clavier, touch, scroll). Le polling /me.php ne réarme pas ce timer.
+  useIdleLogout(!!user, IDLE_LOGOUT_MS, () => {
+    logout().finally(() => navigate({ to: "/etudiant/login" }));
+  });
 
 
   if (loading) {
