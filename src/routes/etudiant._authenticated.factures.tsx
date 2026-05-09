@@ -209,10 +209,6 @@ function FactureRows({ f, paid, statut }: { f: Facture; paid: boolean; statut: {
       <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{f.date_echeance ? formatDate(f.date_echeance) : "—"}</td>
       <td className="px-4 py-4 text-right font-medium text-cream whitespace-nowrap tabular-nums">{formatMoneyCents(f.montant_ttc_cents, f.devise)}</td>
       <td className="px-4 py-4"><Badge tone={statut.tone}>{statut.label}</Badge></td>
-      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{f.paye_at ? formatDate(f.paye_at) : "—"}</td>
-      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">
-        {paid || f.statut_paiement === "partiellement_payee" ? moyenLabel(f.moyen_paiement) : "—"}
-      </td>
       <td className="px-4 py-4">
         <div className="flex items-center justify-end gap-3">
           <a
