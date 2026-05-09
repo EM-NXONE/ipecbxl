@@ -596,14 +596,28 @@ function buildCandidaturePdf(array $f): string {
         return $out !== false ? $out : $s;
     };
 
-    $now           = new DateTimeImmutable('now', new DateTimeZone('Europe/Brussels'));
-    $dateStr       = $now->format('d/m/Y');
+    // Date/heure de signature : on utilise IMPÉRATIVEMENT la date de soumission
+    // d'origine (candidatures.created_at) si elle est passée dans $f, pour que la
+    // signature électronique reste invariable lors d'une régénération du PDF.
+    // Fallback sur "maintenant" uniquement pour le tout premier envoi (où la
+    // ligne BDD n'existe pas encore).
+    $tz = new DateTimeZone('Europe/Brussels');
+    $submittedRaw = trim((string)($f['submitted_at'] ?? ''));
+    try {
+        $signedAt = $submittedRaw !== ''
+            ? new DateTimeImmutable($submittedRaw, $tz)
+            : new DateTimeImmutable('now', $tz);
+    } catch (\Throwable $e) {
+        $signedAt = new DateTimeImmutable('now', $tz);
+    }
+    $now           = $signedAt;
+    $dateStr       = $signedAt->format('d/m/Y');
     // Référence officielle stockée en base (IPEC-CAND-AAAA-XXXXXX), unique.
     // Aucune référence inventée : si l'appelant n'en fournit pas (cas BDD down),
     // on laisse vide → footer/PDF n'affiche aucune réf plutôt qu'une fausse.
     $reference     = trim((string)($f['reference'] ?? ''));
     $numCandidature = $reference;
-    $submittedAt   = $now->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
+    $submittedAt   = $signedAt->format('d/m/Y \\à H:i \\(\\h\\e\\u\\r\\e \\d\\e \\B\\r\\u\\x\\e\\l\\l\\e\\s\\)');
 
     $pdf = new IpecCandidaturePdf('P', 'mm', 'A4');
     $pdf->docKind = 'candidature';
