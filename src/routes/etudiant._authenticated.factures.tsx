@@ -49,6 +49,11 @@ function moyenLabel(m?: string | null): string {
   return MOYEN_LABELS[m.toLowerCase()] ?? m;
 }
 
+/** Retire la mention « (AAAA-AAAA) » en fin de libellé (déjà dans l'entête de groupe). */
+function cleanLibelle(libelle: string): string {
+  return libelle.replace(/\s*[\(\[]\s*\d{4}\s*[-/]\s*\d{4}\s*[\)\]]\s*$/u, "").trim();
+}
+
 function groupByAcademicYear(factures: Facture[]): Array<[string, Facture[]]> {
   const map = new Map<string, Facture[]>();
   for (const f of factures) {
@@ -137,7 +142,7 @@ function EtudiantFacturesPage() {
                       <li key={f.id} className="p-4 space-y-2">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <div className="text-cream font-medium truncate">{f.libelle}</div>
+                            <div className="text-cream font-medium truncate">{cleanLibelle(f.libelle)}</div>
                             <div className="font-mono text-[11px] text-muted-foreground">{f.numero}</div>
                           </div>
                           <div className="text-right shrink-0">
@@ -199,7 +204,7 @@ function FactureRows({ f, paid, statut }: { f: Facture; paid: boolean; statut: {
   return (
     <tr className="hover:bg-secondary/20 border-t border-border/30 align-middle">
       <td className="px-4 py-4 min-w-[260px]">
-        <div className="text-cream text-[13px] leading-snug font-medium">{f.libelle}</div>
+        <div className="text-cream text-[13px] leading-snug font-medium">{cleanLibelle(f.libelle)}</div>
         <div className="font-mono text-[11px] text-muted-foreground mt-0.5 tracking-tight">{f.numero}</div>
       </td>
       <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
