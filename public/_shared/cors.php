@@ -22,7 +22,6 @@ function ipec_allowed_origins(): array {
         'https://lms.ipec.school',
         // Previews Lovable
         'https://ipecbxl.lovable.app',
-        'https://preview--ipecbxl.lovable.app',
         'https://id-preview--e680d373-9824-4b72-b3de-ec8be69b1869.lovable.app',
     ];
 }

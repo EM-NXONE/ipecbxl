@@ -106,9 +106,9 @@ function etu_session_create(int $etudiantId): string {
     setcookie(ETU_COOKIE_NAME, $token, [
         'expires'  => time() + ETU_SESSION_LIFETIME,
         'path'     => '/',
-        'secure'   => true,
+        'secure'   => !empty($_SERVER['HTTPS']),
         'httponly' => true,
-        'samesite' => 'None',
+        'samesite' => 'Lax',
     ]);
     return $token;
 }
@@ -120,8 +120,8 @@ function etu_session_destroy(): void {
     }
     setcookie(ETU_COOKIE_NAME, '', [
         'expires' => time() - 3600, 'path' => '/',
-        'secure' => true,
-        'httponly' => true, 'samesite' => 'None',
+        'secure' => !empty($_SERVER['HTTPS']),
+        'httponly' => true, 'samesite' => 'Lax',
     ]);
 }
 

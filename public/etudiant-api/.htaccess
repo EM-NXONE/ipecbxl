@@ -1,22 +1,3 @@
 RewriteEngine On
 # Bloque l'accès direct au dossier _shared (helpers PHP réutilisables)
 RewriteRule ^_shared/ - [F]
-
-# ---------- CORS au niveau Apache ----------
-# Indispensable pour que les preflights OPTIONS reçoivent les bons headers
-# (Apache répond aux OPTIONS sans exécuter PHP par défaut).
-<IfModule mod_headers.c>
-    SetEnvIf Origin "^https://(www\.|admin\.|lms\.)?ipec\.school$" CORS_ORIGIN=$0
-    SetEnvIf Origin "^https://([a-z0-9-]+--)?ipecbxl\.lovable\.app$" CORS_ORIGIN=$0
-    SetEnvIf Origin "^https://id-preview--[a-z0-9-]+\.lovable\.app$" CORS_ORIGIN=$0
-
-    Header always set Access-Control-Allow-Origin "%{CORS_ORIGIN}e" env=CORS_ORIGIN
-    Header always set Access-Control-Allow-Credentials "true" env=CORS_ORIGIN
-    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS" env=CORS_ORIGIN
-    Header always set Access-Control-Allow-Headers "Content-Type, Accept" env=CORS_ORIGIN
-    Header always merge Vary "Origin"
-</IfModule>
-
-# Court-circuite OPTIONS avec un 204 vide (preflight CORS)
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^ - [R=204,L]
