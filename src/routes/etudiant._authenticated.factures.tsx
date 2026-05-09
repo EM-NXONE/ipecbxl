@@ -142,7 +142,7 @@ function EtudiantFacturesPage() {
                       <li key={f.id} className="p-4 space-y-2">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <div className="text-cream font-medium truncate">{f.libelle}</div>
+                            <div className="text-cream font-medium truncate">{cleanLibelle(f.libelle)}</div>
                             <div className="font-mono text-[11px] text-muted-foreground">{f.numero}</div>
                           </div>
                           <div className="text-right shrink-0">
