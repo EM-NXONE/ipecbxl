@@ -24,12 +24,21 @@ interface Etu {
   programme: string | null;
   annee: string | null;
   specialisation: string | null;
+  etape_courante: string | null;
+  annee_academique_courante: string | null;
+  rentree_courante: string | null;
 }
 
-function formatProgramme(programme: string | null, annee: string | null): string {
-  if (!programme) return "—";
-  const base = programme.toUpperCase();
-  const m = annee?.match(/\d/);
+function formatProgramme(e: Etu): string {
+  // Préfère l'étape courante (ex "PAA-2") si renseignée — c'est la promotion
+  // actuelle de l'étudiant après les éventuels passages d'année.
+  if (e.etape_courante) {
+    const [prog, num] = e.etape_courante.split("-");
+    return num ? `${prog}${num}` : prog;
+  }
+  if (!e.programme) return "—";
+  const base = e.programme.toUpperCase();
+  const m = e.annee?.match(/\d/);
   return m ? `${base}${m[0]}` : base;
 }
 
@@ -164,7 +173,7 @@ export function ComptesTable({
                   {showCategorie && (
                     <td className="px-4 py-2.5"><CategorieBadge value={e.categorie} /></td>
                   )}
-                  <td className="px-4 py-2.5 text-cream text-xs font-mono">{formatProgramme(e.programme, e.annee)}</td>
+                  <td className="px-4 py-2.5 text-cream text-xs font-mono">{formatProgramme(e)}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">{e.specialisation || "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">{formatDate(e.date_naissance)}</td>
                   <td className="px-4 py-2.5 text-xs">

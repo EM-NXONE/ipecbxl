@@ -23,6 +23,7 @@ $pdo = db();
 $stmt = $pdo->prepare("
     SELECT e.id, e.numero_etudiant, e.civilite, e.prenom, e.nom, e.email,
            e.date_naissance, e.statut, e.categorie,
+           e.etape_courante, e.annee_academique_courante, e.rentree_courante,
            (e.password_hash IS NOT NULL) AS active,
            e.derniere_connexion, e.created_at, e.cree_par_admin,
            c.programme, c.annee, c.specialisation
