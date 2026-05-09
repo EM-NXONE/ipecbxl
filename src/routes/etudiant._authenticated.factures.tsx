@@ -204,7 +204,7 @@ function FactureRows({ f, paid, statut }: { f: Facture; paid: boolean; statut: {
   return (
     <tr className="hover:bg-secondary/20 border-t border-border/30 align-middle">
       <td className="px-4 py-4 min-w-[260px]">
-        <div className="text-cream text-[13px] leading-snug font-medium">{f.libelle}</div>
+        <div className="text-cream text-[13px] leading-snug font-medium">{cleanLibelle(f.libelle)}</div>
         <div className="font-mono text-[11px] text-muted-foreground mt-0.5 tracking-tight">{f.numero}</div>
       </td>
       <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">{formatDate(f.date_emission)}</td>
