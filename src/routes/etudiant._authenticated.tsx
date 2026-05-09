@@ -2,6 +2,7 @@
  * Layout authentifié de l'espace étudiant.
  */
 import { createFileRoute, Outlet, Navigate, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { LayoutDashboard, Receipt, FolderOpen, User } from "lucide-react";
 import { PortalLayout, type PortalNavItem } from "@/components/PortalLayout";
 import { useEtudiantAuth } from "@/lib/auth-etudiant";
@@ -17,9 +18,30 @@ const NAV: PortalNavItem[] = [
   { to: "/etudiant/profil", label: "Profil", icon: <User size={16} /> },
 ];
 
+// Délai de revalidation périodique de la session (l'admin peut suspendre/archiver
+// le compte à tout moment côté back — on veut décrocher l'étudiant rapidement).
+const SESSION_POLL_MS = 30_000;
+
 function EtudiantAuthenticatedLayout() {
-  const { user, loading, logout } = useEtudiantAuth();
+  const { user, loading, logout, refresh } = useEtudiantAuth();
   const navigate = useNavigate();
+
+  // Revalide la session : (1) périodiquement, (2) au retour de focus / changement
+  // de visibilité onglet. Si l'admin a suspendu le compte, /me.php renvoie 401 →
+  // refresh() met user à null → l'écran ci-dessous redirige vers /login.
+  useEffect(() => {
+    if (!user) return;
+    const id = window.setInterval(() => { refresh(); }, SESSION_POLL_MS);
+    const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [user, refresh]);
+
 
   if (loading) {
     return (
