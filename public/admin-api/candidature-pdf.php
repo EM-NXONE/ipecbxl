@@ -36,6 +36,7 @@ $base = [
     'specialisation' => $c['specialisation'], 'rentree' => $c['rentree'],
     'message' => $c['message'], 'ip' => $c['ip'],
     'reference_facture' => $c['facture_numero'],
+    'submitted_at' => $c['created_at'] ?? null,
 ];
 
 try {
