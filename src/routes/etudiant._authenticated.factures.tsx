@@ -120,8 +120,6 @@ function EtudiantFacturesPage() {
                         <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Échéance</th>
                         <th className="text-right font-medium px-4 py-3">Montant</th>
                         <th className="text-left font-medium px-4 py-3">Statut</th>
-                        <th className="text-left font-medium px-4 py-3 whitespace-nowrap">Payée le</th>
-                        <th className="text-left font-medium px-4 py-3">Moyen</th>
                         <th className="text-right font-medium px-4 py-3">Documents</th>
                       </tr>
                     </thead>
