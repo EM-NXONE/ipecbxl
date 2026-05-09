@@ -154,11 +154,39 @@ function AdminCandidatureDetailPage() {
           </Card>
 
           <Card title="Dossier académique">
-            <Field label="Cursus" value={c.programme || "—"} />
-            <Field label="Année" value={c.annee || "—"} />
-            <Field label="Spécialisation" value={c.specialisation || "—"} />
-            <Field label="Rentrée" value={c.rentree || "—"} />
-            <Field label="Année académique" value={c.annee_academique || "—"} />
+          {(() => {
+            const cur = data.cursus;
+            // État courant (depuis etudiants.etape_courante etc.) si dispo,
+            // sinon retombe sur les valeurs de la candidature initiale.
+            const curProgramme = cur.current_step ? cur.current_step.split("-")[0] : (c.programme || "—");
+            const curAnnee     = cur.current_label || c.annee || "—";
+            const curAnneeAca  = cur.annee_academique_courante || c.annee_academique || "—";
+            const curRentree   = cur.rentree_courante || c.rentree || "—";
+            // Inscription initiale (si différente de l'état courant)
+            const initStep = `${(c.programme || "").toUpperCase()}-${(c.annee || "").match(/\d/)?.[0] ?? ""}`;
+            const initDiffers = cur.current_step && initStep && cur.current_step !== initStep
+              || (cur.annee_academique_courante && c.annee_academique && cur.annee_academique_courante !== c.annee_academique);
+            return (
+              <>
+                <Field label="Cursus" value={curProgramme} />
+                <Field label="Année" value={curAnnee} />
+                <Field label="Spécialisation" value={c.specialisation || "—"} />
+                <Field label="Rentrée" value={curRentree} />
+                <Field label="Année académique" value={curAnneeAca} />
+                {initDiffers && (
+                  <div className="mt-3 pt-3 border-t border-border/20 text-xs text-muted-foreground">
+                    <div className="uppercase tracking-wider text-[10px] mb-1">Inscription initiale</div>
+                    <div>
+                      {c.programme || "—"} {c.annee || ""}
+                      {c.annee_academique && <span> · {c.annee_academique}</span>}
+                      {c.rentree && <span> · {c.rentree}</span>}
+                      <span> · reçue le {formatDate(c.created_at)}</span>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
           </Card>
 
           {c.message && (
