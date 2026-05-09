@@ -173,7 +173,7 @@ export function ComptesTable({
                   {showCategorie && (
                     <td className="px-4 py-2.5"><CategorieBadge value={e.categorie} /></td>
                   )}
-                  <td className="px-4 py-2.5 text-cream text-xs font-mono">{formatProgramme(e.programme, e.annee)}</td>
+                  <td className="px-4 py-2.5 text-cream text-xs font-mono">{formatProgramme(e)}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">{e.specialisation || "—"}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">{formatDate(e.date_naissance)}</td>
                   <td className="px-4 py-2.5 text-xs">
