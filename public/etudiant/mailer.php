@@ -2027,37 +2027,11 @@ if ($type === 'inscription') {
             $candidateMail->addStringAttachment($pdfAttachment, $pdfFilename, 'base64', 'application/pdf');
         }
 
-        // PJ #2 : facture des frais de dossier (400 €).
+        // La facture des frais de dossier (400 €) n'est PAS jointe à cet e-mail :
+        // elle est consultable et téléchargeable directement depuis l'espace
+        // étudiant (un second e-mail contenant les accès est envoyé séparément
+        // à la création du compte).
         $factureError = null;
-        try {
-            [$facturePdf, $factureFilename, $factureNumero] = buildFacturePdf([
-                'reference'           => $candidatureReference,
-                'reference_facture'   => $factureReference,
-                'civilite'      => $civilite,
-                'prenom'        => $prenom,
-                'nom'           => $nom,
-                'adresse'       => $adresse,
-                'rue'           => $rue,
-                'numero'        => $numero,
-                'codePostal'    => $codePostal,
-                'ville'         => $ville,
-                'paysResidence' => $paysResidence,
-                'email'         => $email,
-                'programme'     => $programme,
-                'annee'         => $annee,
-                'rentree'       => $rentree,
-            ]);
-            if ($facturePdf !== '' && $factureFilename !== '') {
-                $candidateMail->addStringAttachment($facturePdf, $factureFilename, 'base64', 'application/pdf');
-                // Le n° de facture (IPEC-FACT-AAAA-XXXXXX) est déjà stocké en
-                // BDD lors de l'INSERT initial — pas d'UPDATE nécessaire ici.
-            } else {
-                $factureError = 'buildFacturePdf a renvoyé un résultat vide';
-            }
-        } catch (\Throwable $factErr) {
-            $factureError = $factErr->getMessage() . ' @ ' . $factErr->getFile() . ':' . $factErr->getLine();
-            error_log('[mailer.php] Échec génération facture PDF : ' . $factureError);
-        }
 
         $candidateMail->send();
 
