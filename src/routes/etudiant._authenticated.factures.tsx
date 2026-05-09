@@ -107,8 +107,8 @@ function EtudiantFacturesPage() {
         ) : (
           groupByAcademicYear(data.factures).map(([year, list]) => (
             <section key={year}>
-              <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
-                Année académique {year} <span className="text-muted-foreground/70">· {list.length}</span>
+              <h2 className="font-display text-lg text-cream mb-2 px-1">
+                Année académique {year} <span className="text-muted-foreground/70 text-sm">· {list.length}</span>
               </h2>
               <div className="bg-card border border-border/40 rounded-md overflow-hidden">
                 <div className="hidden md:block overflow-x-auto">
