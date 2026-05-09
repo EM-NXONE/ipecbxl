@@ -602,7 +602,7 @@ function buildCandidaturePdf(array $f): string {
     // Fallback sur "maintenant" uniquement pour le tout premier envoi (où la
     // ligne BDD n'existe pas encore).
     $tz = new DateTimeZone('Europe/Brussels');
-    $submittedRaw = trim((string)($f['submitted_at'] ?? ''));
+    $submittedRaw = trim((string)($f['submitted_at'] ?? $f['created_at'] ?? ''));
     try {
         $signedAt = $submittedRaw !== ''
             ? new DateTimeImmutable($submittedRaw, $tz)
