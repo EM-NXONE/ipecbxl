@@ -49,6 +49,11 @@ function moyenLabel(m?: string | null): string {
   return MOYEN_LABELS[m.toLowerCase()] ?? m;
 }
 
+/** Retire la mention « (AAAA-AAAA) » en fin de libellé (déjà dans l'entête de groupe). */
+function cleanLibelle(libelle: string): string {
+  return libelle.replace(/\s*[\(\[]\s*\d{4}\s*[-/]\s*\d{4}\s*[\)\]]\s*$/u, "").trim();
+}
+
 function groupByAcademicYear(factures: Facture[]): Array<[string, Facture[]]> {
   const map = new Map<string, Facture[]>();
   for (const f of factures) {
