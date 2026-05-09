@@ -45,6 +45,12 @@ function EtudiantAuthenticatedLayout() {
     };
   }, [user, refresh]);
 
+  // Déconnexion automatique après 3 h d'inactivité utilisateur réelle
+  // (mouvements souris, clavier, touch, scroll). Le polling /me.php ne réarme pas ce timer.
+  useIdleLogout(!!user, IDLE_LOGOUT_MS, () => {
+    logout().finally(() => navigate({ to: "/etudiant/login" }));
+  });
+
 
   if (loading) {
     return (
