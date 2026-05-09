@@ -97,7 +97,7 @@ function EtudiantDashboardPage() {
                     <div className="text-xs text-muted-foreground font-mono mt-0.5">
                       {c.reference}
                       {c.annee_academique ? <> · {c.annee_academique}</> : null}
-                      {c.rentree ? <> · Rentrée {c.rentree}</> : null}
+                      {c.rentree ? <> · {c.rentree}</> : null}
                       {c.created_at ? <> · Déposée le {formatDate(c.created_at)}</> : null}
                     </div>
                   </div>
