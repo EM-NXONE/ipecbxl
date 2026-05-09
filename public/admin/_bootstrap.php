@@ -33,7 +33,7 @@ const ADMIN_USERS = [
 ];
 
 // Durée de session (secondes) avant déconnexion auto. Défaut : 4 h.
-const ADMIN_SESSION_LIFETIME = 4 * 3600;
+const ADMIN_SESSION_LIFETIME = 3 * 3600; // 3 h d'inactivité
 
 // Liste blanche d'IP optionnelle (vide = pas de filtrage IP).
 const ADMIN_IP_ALLOWLIST = [];
@@ -50,6 +50,7 @@ require_once __DIR__ . '/../mailer.php';
 ini_set('session.use_strict_mode', '1');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_lifetime', '0'); // cookie de session (clos à la fermeture du navigateur)
 if (!empty($_SERVER['HTTPS'])) {
     ini_set('session.cookie_secure', '1');
 }
@@ -77,11 +78,14 @@ function admin_is_logged_in(): bool {
     if (empty($_SESSION['admin_user']) || empty($_SESSION['admin_login_at'])) {
         return false;
     }
-    if (time() - (int)$_SESSION['admin_login_at'] > ADMIN_SESSION_LIFETIME) {
+    // Inactivité : on regarde la dernière activité (rolling), pas l'heure de login.
+    $last = (int)($_SESSION['admin_last_seen'] ?? $_SESSION['admin_login_at']);
+    if (time() - $last > ADMIN_SESSION_LIFETIME) {
         $_SESSION = [];
         session_destroy();
         return false;
     }
+    $_SESSION['admin_last_seen'] = time();
     return true;
 }
 
