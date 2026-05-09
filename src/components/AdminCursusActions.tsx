@@ -15,6 +15,8 @@ export interface CursusDescriptor {
   can_promote: boolean;
   can_redouble: boolean;
   can_diplomer: boolean;
+  annee_academique_courante?: string | null;
+  rentree_courante?: string | null;
 }
 
 export interface CursusHistoryRow {
