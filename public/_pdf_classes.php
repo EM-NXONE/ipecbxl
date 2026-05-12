@@ -54,7 +54,8 @@ if (!class_exists('IpecCandiduature') && !class_exists('IpecCandidaturePdf') && 
                 $this->Ln(3);
                 $this->SetFont('Helvetica', '', 7);
                 $this->SetTextColor(44, 93, 219);
-                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C');
+                $verifUrl = 'https://ipec.school/verification?reference=' . rawurlencode($refToShow);
+                $this->Cell(0, 4, $tr('Authenticité vérifiable sur ipec.school/verification — Réf. ' . $refToShow), 0, 1, 'C', false, $verifUrl);
             }
         }
     }
