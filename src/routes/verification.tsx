@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, ShieldAlert, Search, Loader2 } from "lucide-react";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
@@ -49,6 +49,24 @@ function VerificationPage() {
   const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const autoSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get("reference") || params.get("ref");
+    if (refParam) {
+      const cleaned = refParam.toUpperCase().replace(/\s+/g, "");
+      setReference(cleaned);
+      if (!autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
+        setTimeout(() => {
+          formRef.current?.requestSubmit();
+        }, 100);
+      }
+    }
+  }, []);
 
   const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Normalisation légère : majuscules, on supprime les espaces, on garde
@@ -118,7 +136,7 @@ function VerificationPage() {
 
       <section className="py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6 lg:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="reference"
