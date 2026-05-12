@@ -136,7 +136,7 @@ function VerificationPage() {
 
       <section className="py-20 lg:py-28">
         <div className="mx-auto max-w-3xl px-6 lg:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="reference"
