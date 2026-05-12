@@ -49,6 +49,24 @@ function VerificationPage() {
   const [reference, setReference] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VerifyResult | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const autoSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get("reference") || params.get("ref");
+    if (refParam) {
+      const cleaned = refParam.toUpperCase().replace(/\s+/g, "");
+      setReference(cleaned);
+      if (!autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
+        setTimeout(() => {
+          formRef.current?.requestSubmit();
+        }, 100);
+      }
+    }
+  }, []);
 
   const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Normalisation légère : majuscules, on supprime les espaces, on garde
