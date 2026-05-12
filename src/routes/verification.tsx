@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, ShieldAlert, Search, Loader2 } from "lucide-react";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
