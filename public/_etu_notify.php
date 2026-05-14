@@ -186,7 +186,7 @@ HTML;
      * Idempotent au sens où l'appelant ne déclenche cette fonction qu'à la
      * création initiale (pas à chaque rattachement).
      */
-    function etu_notify_send_welcome(PDO $pdo, int $etudiantId, string $defaultPassword): bool {
+    function etu_notify_send_welcome(PDO $pdo, int $etudiantId, string $defaultPassword, ?string $firstLoginUrl = null): bool {
         $etu = etu_notify_load_etudiant($pdo, $etudiantId);
         if (!$etu || !filter_var($etu['email'], FILTER_VALIDATE_EMAIL)) return false;
 
@@ -196,6 +196,19 @@ HTML;
         $pwdH     = etu_h($defaultPassword);
         $lmsUrl   = etu_notify_lms_url();
 
+        $firstLoginBlock = '';
+        $altFirstLogin   = '';
+        if ($firstLoginUrl) {
+            $urlH = etu_h($firstLoginUrl);
+            $firstLoginBlock =
+                  "<p style=\"margin:18px 0 8px 0;\"><b>Première connexion :</b> cliquez sur le bouton ci-dessous pour "
+                . "<b>définir votre propre mot de passe</b> et accéder directement à votre espace. "
+                . "Ce lien est valable <b>7 jours</b> et à usage unique.</p>"
+                . "<p style=\"font-size:12px;color:#a8a8a8;margin:6px 0 0 0;\">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>"
+                . "<a href=\"{$urlH}\" style=\"color:#2371cd;word-break:break-all;\">{$urlH}</a></p>";
+            $altFirstLogin = "Première connexion (définir votre mot de passe, valable 7 jours) : {$firstLoginUrl}\n";
+        }
+
         $body = "<p>{$salut},</p>"
               . "<p>Votre <b>espace étudiant IPEC</b> vient d'être créé. "
               . "Vous pouvez désormais y accéder pour suivre l'état de votre dossier, télécharger vos documents officiels et consulter vos factures.</p>"
@@ -204,22 +217,29 @@ HTML;
               . "<div style=\"margin:0 0 6px 0;\"><b>Numéro étudiant</b> : {$numeroH}</div>"
               . "<div style=\"margin:0;\"><b>Mot de passe provisoire</b> : <code style=\"background:#fff;padding:2px 6px;border-radius:3px;border:1px solid #d8e1ee;color:#2c5ddb;\">{$pwdH}</code></div>"
               . "</div>"
-              . "<p>Pour des raisons de sécurité, nous vous recommandons de <b>modifier ce mot de passe</b> dès votre première connexion depuis la rubrique <i>Profil</i>.</p>"
+              . $firstLoginBlock
+              . "<p>Pour des raisons de sécurité, <b>changez ce mot de passe dès votre première connexion</b>"
+              . ($firstLoginUrl ? " (le bouton ci-dessous vous mène directement à l'écran de création d'un mot de passe personnel)" : " depuis la rubrique <i>Profil</i>")
+              . ".</p>"
               . "<p>Vous trouverez dans votre espace : votre récapitulatif de candidature, votre facture des frais de dossier, ainsi que tout document officiel ajouté ultérieurement par notre équipe (lettre de préadmission, attestation d'inscription, attestations de réussite, etc.).</p>";
 
         $alt = "Bonjour,\n\nVotre espace étudiant IPEC a été créé.\n"
              . "Identifiant : {$etu['email']}\n"
              . "Numéro étudiant : {$etu['numero_etudiant']}\n"
              . "Mot de passe provisoire : {$defaultPassword}\n\n"
+             . $altFirstLogin
              . "Connexion : {$lmsUrl}\n\n"
              . "Pensez à modifier votre mot de passe lors de votre première connexion.\n\n"
              . "— L'équipe IPEC\n";
 
+        $ctaLabel = $firstLoginUrl ? "Définir mon mot de passe et me connecter" : "Accéder à mon espace étudiant";
+        $ctaHref  = $firstLoginUrl ?: $lmsUrl;
+
         $html = etu_notify_render_html(
             "Bienvenue sur votre espace IPEC",
             $body,
-            "Accéder à mon espace étudiant",
-            $lmsUrl
+            $ctaLabel,
+            $ctaHref
         );
 
         return etu_notify_send_mail(
