@@ -60,29 +60,128 @@ if (!defined('IPEC_ETU_NOTIFY_LOADED')) {
         ];
     }
 
-    /** Archive le mail envoyé dans le dossier Sent IMAP de admission@. Non bloquant. */
-    function etu_notify_archive_imap_sent(PHPMailer\PHPMailer\PHPMailer $sentMail, array $smtp): void {
+    /**
+     * Archive le mail envoyé dans le dossier Sent IMAP de admission@. Non bloquant.
+     * Renvoie un statut détaillé pour les diagnostics (cf. test-email.php).
+     *   ['ok' => bool, 'reason' => string|null, 'mailbox' => string]
+     */
+    function etu_notify_archive_imap_sent(PHPMailer\PHPMailer\PHPMailer $sentMail, array $smtp): array {
+        $mailbox = '{' . $smtp['imap_host'] . ':' . $smtp['imap_port'] . '/imap/ssl}' . $smtp['imap_sent_box'];
         if (!function_exists('imap_open')) {
-            error_log('[etu_notify] Extension PHP imap non disponible — pas d\'archivage Sent.');
-            return;
+            $msg = 'Extension PHP imap non disponible — pas d\'archivage Sent.';
+            error_log('[etu_notify] ' . $msg);
+            return ['ok' => false, 'reason' => $msg, 'mailbox' => $mailbox];
         }
         try {
             $rawMessage = $sentMail->getSentMIMEMessage();
-            $mailbox    = '{' . $smtp['imap_host'] . ':' . $smtp['imap_port'] . '/imap/ssl}' . $smtp['imap_sent_box'];
             $imap       = @imap_open($mailbox, $smtp['admission_user'], $smtp['admission_pass'], OP_HALFOPEN);
             if ($imap === false) {
-                error_log('[etu_notify] imap_open échoué : ' . (imap_last_error() ?: 'raison inconnue'));
+                $err = imap_last_error() ?: 'raison inconnue';
+                error_log('[etu_notify] imap_open échoué : ' . $err);
                 @imap_errors(); @imap_alerts();
-                return;
+                return ['ok' => false, 'reason' => 'imap_open : ' . $err, 'mailbox' => $mailbox];
             }
             $appended = @imap_append($imap, $mailbox, $rawMessage, '\\Seen');
             @imap_close($imap);
             if (!$appended) {
-                error_log('[etu_notify] imap_append échoué : ' . (imap_last_error() ?: 'raison inconnue'));
+                $err = imap_last_error() ?: 'raison inconnue';
+                error_log('[etu_notify] imap_append échoué : ' . $err);
+                @imap_errors(); @imap_alerts();
+                return ['ok' => false, 'reason' => 'imap_append : ' . $err, 'mailbox' => $mailbox];
             }
             @imap_errors(); @imap_alerts();
+            return ['ok' => true, 'reason' => null, 'mailbox' => $mailbox];
         } catch (\Throwable $e) {
             error_log('[etu_notify] Archivage IMAP échoué : ' . $e->getMessage());
+            return ['ok' => false, 'reason' => $e->getMessage(), 'mailbox' => $mailbox];
+        }
+    }
+
+    /**
+     * Envoi de test (utilisé par /admin → "Tester l'envoi").
+     * Vérifie la config SMTP, envoie un mail branding IPEC à $toEmail, puis
+     * tente l'archivage IMAP. Renvoie un rapport détaillé (jamais d'exception).
+     */
+    function etu_notify_send_test_email(string $toEmail): array {
+        $report = [
+            'ok'         => false,
+            'config'     => null,
+            'smtp_sent'  => false,
+            'smtp_error' => null,
+            'imap'       => null,
+            'message'    => '',
+        ];
+        $toEmail = trim($toEmail);
+        if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+            $report['message'] = 'Adresse e-mail invalide.';
+            return $report;
+        }
+        $smtp = etu_notify_load_smtp();
+        if (!$smtp) {
+            $report['message'] = 'Configuration SMTP introuvable (.ipec-mailer.env).';
+            return $report;
+        }
+        $report['config'] = [
+            'host'            => $smtp['host'],
+            'port'            => $smtp['port'],
+            'secure'          => $smtp['secure'],
+            'admission_user'  => $smtp['admission_user'],
+            'imap_host'       => $smtp['imap_host'],
+            'imap_port'       => $smtp['imap_port'],
+            'imap_sent_box'   => $smtp['imap_sent_box'],
+            'imap_ext_loaded' => function_exists('imap_open'),
+        ];
+        if (!etu_notify_require_phpmailer()) {
+            $report['message'] = 'PHPMailer introuvable.';
+            return $report;
+        }
+
+        $now  = date('d/m/Y H:i:s');
+        $body = "<p>Bonjour,</p>"
+              . "<p>Ceci est un <b>e-mail de test</b> déclenché depuis l'espace d'administration IPEC le <b>{$now}</b>.</p>"
+              . "<p>Si vous recevez ce message, l'envoi via <code>admission@ipec.school</code> fonctionne. "
+              . "Une copie doit également apparaître dans le dossier <b>Sent</b> de la boîte admission@.</p>";
+        $html = etu_notify_render_html("Test d'envoi e-mail IPEC", $body);
+        $alt  = "Test d'envoi e-mail IPEC ({$now}).\nSi vous recevez ce message, l'envoi depuis admission@ipec.school fonctionne.";
+
+        try {
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = $smtp['host'];
+            $mail->Port       = $smtp['port'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $smtp['admission_user'];
+            $mail->Password   = $smtp['admission_pass'];
+            $mail->SMTPSecure = $smtp['secure'] === 'tls'
+                ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
+                : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            $mail->CharSet  = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->setFrom($smtp['admission_user'], 'IPEC — Service des admissions');
+            $mail->addAddress($toEmail);
+            $mail->addReplyTo($smtp['admission_user'], 'IPEC — Service des admissions');
+            $logoPath = __DIR__ . '/ipec-logo-email.png';
+            if (is_file($logoPath)) {
+                $mail->addEmbeddedImage($logoPath, 'ipec-logo', 'ipec-logo.png', 'base64', 'image/png');
+            }
+            $mail->isHTML(true);
+            $mail->Subject = "[TEST] Envoi IPEC — " . $now;
+            $mail->Body    = $html;
+            $mail->AltBody = $alt;
+            $mail->send();
+            $report['smtp_sent'] = true;
+            $report['imap']      = etu_notify_archive_imap_sent($mail, $smtp);
+            $report['ok']        = $report['smtp_sent'] && !empty($report['imap']['ok']);
+            $report['message']   = $report['ok']
+                ? "E-mail envoyé à {$toEmail} et copie déposée dans « " . $smtp['imap_sent_box'] . " »."
+                : ($report['smtp_sent']
+                    ? "E-mail envoyé à {$toEmail} mais la copie IMAP a échoué (voir détails)."
+                    : "Échec de l'envoi SMTP.");
+            return $report;
+        } catch (\Throwable $e) {
+            $report['smtp_error'] = isset($mail) ? ($mail->ErrorInfo ?: $e->getMessage()) : $e->getMessage();
+            $report['message']    = "Échec de l'envoi SMTP : " . $report['smtp_error'];
+            return $report;
         }
     }
 
