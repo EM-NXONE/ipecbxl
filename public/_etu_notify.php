@@ -183,18 +183,20 @@ HTML;
             $mail->Host       = $smtp['host'];
             $mail->Port       = $smtp['port'];
             $mail->SMTPAuth   = true;
-            $mail->Username   = $smtp['user'];
-            $mail->Password   = $smtp['pass'];
+            // Auth en tant qu'admission@ → From cohérent avec SPF/DKIM
+            // et archivage possible dans son dossier Sent.
+            $mail->Username   = $smtp['admission_user'];
+            $mail->Password   = $smtp['admission_pass'];
             $mail->SMTPSecure = $smtp['secure'] === 'tls'
                 ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
                 : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
             $mail->CharSet  = 'UTF-8';
             $mail->Encoding = 'base64';
 
-            // From = boîte SMTP authentifiée (process@ipec.school) — reply-To noreply
-            $mail->setFrom($smtp['user'], 'IPEC — Espace étudiant');
+            // From = admission@ipec.school (même adresse que l'auth SMTP)
+            $mail->setFrom($smtp['admission_user'], 'IPEC — Service des admissions');
             $mail->addAddress($toEmail, $toName);
-            $mail->addReplyTo('admission@ipec.school', 'IPEC — Service des admissions');
+            $mail->addReplyTo($smtp['admission_user'], 'IPEC — Service des admissions');
 
             $logoPath = __DIR__ . '/ipec-logo-email.png';
             if (is_file($logoPath)) {
@@ -207,6 +209,10 @@ HTML;
             $mail->AltBody = $altText;
 
             $mail->send();
+
+            // Archivage dans le dossier Sent IMAP de admission@ (non bloquant)
+            etu_notify_archive_imap_sent($mail, $smtp);
+
             return true;
         } catch (\Throwable $e) {
             error_log('[etu_notify] envoi échoué : ' . (isset($mail) ? ($mail->ErrorInfo ?: $e->getMessage()) : $e->getMessage()));
