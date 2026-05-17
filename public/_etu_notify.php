@@ -41,13 +41,49 @@ if (!defined('IPEC_ETU_NOTIFY_LOADED')) {
         $user = $env['SMTP_USER'] ?? '';
         $pass = $env['SMTP_PASS'] ?? '';
         if ($host === '' || $user === '' || $pass === '') return null;
+        // Credentials admission@ (fallback sur SMTP_* si non définis).
+        // Permet d'envoyer From: admission@ avec auth SMTP cohérente (SPF/DKIM OK)
+        // et d'archiver dans le dossier Sent de admission@ via IMAP.
+        $admissionUser = $env['ADMISSION_SMTP_USER'] ?? $user;
+        $admissionPass = $env['ADMISSION_SMTP_PASS'] ?? $pass;
         return [
-            'host'   => $host,
-            'port'   => (int)($env['SMTP_PORT'] ?? 465),
-            'secure' => strtolower($env['SMTP_SECURE'] ?? 'ssl'),
-            'user'   => $user,
-            'pass'   => $pass,
+            'host'           => $host,
+            'port'           => (int)($env['SMTP_PORT'] ?? 465),
+            'secure'         => strtolower($env['SMTP_SECURE'] ?? 'ssl'),
+            'user'           => $user,
+            'pass'           => $pass,
+            'admission_user' => $admissionUser,
+            'admission_pass' => $admissionPass,
+            'imap_host'      => $env['ADMISSION_IMAP_HOST'] ?? $host,
+            'imap_port'      => (int)($env['ADMISSION_IMAP_PORT'] ?? 993),
+            'imap_sent_box'  => $env['ADMISSION_IMAP_SENT_FOLDER'] ?? 'Sent',
         ];
+    }
+
+    /** Archive le mail envoyé dans le dossier Sent IMAP de admission@. Non bloquant. */
+    function etu_notify_archive_imap_sent(PHPMailer\PHPMailer\PHPMailer $sentMail, array $smtp): void {
+        if (!function_exists('imap_open')) {
+            error_log('[etu_notify] Extension PHP imap non disponible — pas d\'archivage Sent.');
+            return;
+        }
+        try {
+            $rawMessage = $sentMail->getSentMIMEMessage();
+            $mailbox    = '{' . $smtp['imap_host'] . ':' . $smtp['imap_port'] . '/imap/ssl}' . $smtp['imap_sent_box'];
+            $imap       = @imap_open($mailbox, $smtp['admission_user'], $smtp['admission_pass'], OP_HALFOPEN);
+            if ($imap === false) {
+                error_log('[etu_notify] imap_open échoué : ' . (imap_last_error() ?: 'raison inconnue'));
+                @imap_errors(); @imap_alerts();
+                return;
+            }
+            $appended = @imap_append($imap, $mailbox, $rawMessage, '\\Seen');
+            @imap_close($imap);
+            if (!$appended) {
+                error_log('[etu_notify] imap_append échoué : ' . (imap_last_error() ?: 'raison inconnue'));
+            }
+            @imap_errors(); @imap_alerts();
+        } catch (\Throwable $e) {
+            error_log('[etu_notify] Archivage IMAP échoué : ' . $e->getMessage());
+        }
     }
 
     /** Charge PHPMailer si pas déjà chargé. */
