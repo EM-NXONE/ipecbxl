@@ -288,11 +288,7 @@ function etudiant_create_from_candidature(PDO $pdo, array $candidature, string $
 
         $pdo->commit();
         if (function_exists('etu_notify_send_welcome')) {
-            $firstLoginUrl = null;
-            try {
-                $tok = etudiant_create_token($pdo, $etuId, 'reset_password', 7 * 24 * 3600);
-                $firstLoginUrl = 'https://lms.ipec.school/etudiant/reset/' . $tok;
-            } catch (\Throwable $e) { error_log('[etudiant_create_from_candidature] token: ' . $e->getMessage()); }
+            $firstLoginUrl = 'https://lms.ipec.school/etudiant/login?next=/etudiant/profil';
             try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD, $firstLoginUrl); }
             catch (\Throwable $e) { error_log('[etudiant_create_from_candidature] welcome: ' . $e->getMessage()); }
         }
