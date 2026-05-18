@@ -28,9 +28,20 @@ if (!defined('IPEC_ETU_NOTIFY_LOADED')) {
 
     /** Charge les credentials SMTP depuis .ipec-mailer.env. */
     function etu_notify_load_smtp(): ?array {
-        $envPath = __DIR__ . '/../.ipec-mailer.env';
-        if (!is_file($envPath)) return null;
+        // Le fichier .ipec-mailer.env est placé hors public_html sur n0c.
+        // Selon l'endroit où ce fichier est packagé, on doit remonter de 1 à
+        // 4 niveaux pour le retrouver :
+        //   - public/_etu_notify.php                 → ../             (dev/site)
+        //   - admin/api/_shared/_etu_notify.php      → ../../../       (admin packagé)
+        //   - lms/api/_shared/_etu_notify.php        → ../../../       (lms packagé)
+        $envPath = null;
+        foreach (['/..', '/../..', '/../../..', '/../../../..'] as $up) {
+            $candidate = __DIR__ . $up . '/.ipec-mailer.env';
+            if (is_file($candidate)) { $envPath = $candidate; break; }
+        }
+        if (!$envPath) { error_log('[etu_notify] .ipec-mailer.env introuvable depuis ' . __DIR__); return null; }
         $env = [];
+
         foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
             $line = trim($line);
             if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
