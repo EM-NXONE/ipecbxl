@@ -10,12 +10,25 @@ import { useEtudiantAuth } from "@/lib/auth-etudiant";
 
 export const Route = createFileRoute("/etudiant/login")({
   component: EtudiantLoginPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    next: typeof search.next === "string" ? search.next : undefined,
+  }),
   head: () => ({ meta: [{ title: "IPEC | Connexion étudiant" }] }),
 });
+
+// Empêche les open-redirects : on n'accepte qu'un chemin interne sous /etudiant/.
+function safeNext(next?: string): string {
+  if (!next) return "/etudiant";
+  if (!next.startsWith("/etudiant")) return "/etudiant";
+  if (next.startsWith("//")) return "/etudiant";
+  return next;
+}
 
 function EtudiantLoginPage() {
   const { user, loading, login } = useEtudiantAuth();
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const target = safeNext(next);
   const [numero, setNumero] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +42,7 @@ function EtudiantLoginPage() {
     );
   }
   if (user) {
-    return <Navigate to="/etudiant" />;
+    return <Navigate to={target} />;
   }
 
   const onSubmit = async (e: FormEvent) => {
@@ -41,7 +54,7 @@ function EtudiantLoginPage() {
         numero_etudiant: numero.trim().toUpperCase(),
         password,
       });
-      navigate({ to: "/etudiant" });
+      navigate({ to: target });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Identifiants invalides ou compte non activé.");
     } finally {
