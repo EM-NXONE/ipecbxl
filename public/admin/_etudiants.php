@@ -180,13 +180,11 @@ function etudiant_create_minimal_for_candidature(PDO $pdo, int $candidatureId, a
         $pdo->prepare("UPDATE candidatures SET etudiant_id = ? WHERE id = ?")
             ->execute([$etuId, $candidatureId]);
         $pdo->commit();
-        // Mail de bienvenue (non bloquant) — uniquement à la création initiale
+        // Mail de bienvenue (non bloquant) — uniquement à la création initiale.
+        // Le lien renvoie sur la page de connexion en demandant un retour vers
+        // /etudiant/profil, où l'étudiant pourra changer son mot de passe.
         if (function_exists('etu_notify_send_welcome')) {
-            $firstLoginUrl = null;
-            try {
-                $tok = etudiant_create_token($pdo, $etuId, 'reset_password', 7 * 24 * 3600);
-                $firstLoginUrl = 'https://lms.ipec.school/etudiant/reset/' . $tok;
-            } catch (\Throwable $e) { error_log('[etudiant_create_minimal] token: ' . $e->getMessage()); }
+            $firstLoginUrl = 'https://lms.ipec.school/etudiant/login?next=/etudiant/profil';
             try { etu_notify_send_welcome($pdo, $etuId, ETU_DEFAULT_PASSWORD, $firstLoginUrl); }
             catch (\Throwable $e) { error_log('[etudiant_create_minimal] welcome mail: ' . $e->getMessage()); }
         }
